@@ -1,0 +1,5 @@
+See file:///E:/study/github/research-institute/gradle/gradle_cpp_test/build/tmp/linkGreeterSharedLibrary/output.txt for all output for linkGreeterSharedLibrary.
+linking greeter.dll successful.
+  正在创建库 E:\study\github\research-institute\gradle\gradle_cpp_test\build\libs\greeter\shared\greeter.lib 和对象 E:\study\github\research-institute\gradle\gradle_cpp_test\build\libs\greeter\shared\greeter.exp
+
+Finished linkGreeterSharedLibrary, see full log file:///E:/study/github/research-institute/gradle/gradle_cpp_test/build/tmp/linkGreeterSharedLibrary/output.txt.

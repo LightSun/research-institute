@@ -1,0 +1,3 @@
+/OUT:E:\study\github\research-institute\gradle\gradle_cpp_test\build\libs\greeter\static\greeter.lib
+/NOLOGO
+E:\study\github\research-institute\gradle\gradle_cpp_test\build\objs\greeter\static\greeterCpp\c0hgcxf506qzxujsyrhx4l9ru\greeter.obj

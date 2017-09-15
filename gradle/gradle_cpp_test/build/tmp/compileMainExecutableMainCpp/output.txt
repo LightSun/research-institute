@@ -1,0 +1,7 @@
+See file:///E:/study/github/research-institute/gradle/gradle_cpp_test/build/tmp/compileMainExecutableMainCpp/output.txt for all output for compileMainExecutableMainCpp.
+compiling greeting.cpp successful.
+greeting.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include\xlocale(341): warning C4530: 使用了 C++ 异常处理程序，但未启用展开语义。请指定 /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include\exception(359): warning C4577: 在未指定异常处理模式的情况下使用了 "noexcept"；不一定会在异常时终止。指定 /EHsc
+
+Finished compileMainExecutableMainCpp, see full log file:///E:/study/github/research-institute/gradle/gradle_cpp_test/build/tmp/compileMainExecutableMainCpp/output.txt.

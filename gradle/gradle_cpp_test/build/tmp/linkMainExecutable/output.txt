@@ -1,0 +1,4 @@
+See file:///E:/study/github/research-institute/gradle/gradle_cpp_test/build/tmp/linkMainExecutable/output.txt for all output for linkMainExecutable.
+linking main.exe successful.
+
+Finished linkMainExecutable, see full log file:///E:/study/github/research-institute/gradle/gradle_cpp_test/build/tmp/linkMainExecutable/output.txt.

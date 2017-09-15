@@ -1,0 +1,4 @@
+See file:///E:/study/github/research-institute/gradle/gradle_cpp_test/build/tmp/createGreeterStaticLibrary/output.txt for all output for createGreeterStaticLibrary.
+archiving greeter.lib successful.
+
+Finished createGreeterStaticLibrary, see full log file:///E:/study/github/research-institute/gradle/gradle_cpp_test/build/tmp/createGreeterStaticLibrary/output.txt.
