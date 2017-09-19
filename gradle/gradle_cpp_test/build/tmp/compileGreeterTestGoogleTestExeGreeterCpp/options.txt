@@ -1,0 +1,9 @@
+/TP
+/nologo
+/c
+/IE:\study\github\research-institute\gradle\gradle_cpp_test\src\greeter\headers
+/IE:\study\github\research-institute\gradle\gradle_cpp_test\3rdparty\googletest-master\googletest\include
+"/IC:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include"
+"/IC:\Program Files (x86)\Windows Kits\8.1\Include\shared"
+"/IC:\Program Files (x86)\Windows Kits\8.1\Include\um"
+"/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt"
