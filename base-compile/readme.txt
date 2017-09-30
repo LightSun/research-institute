@@ -25,3 +25,13 @@ javac 用于启动 java 编译器, 格式为 javac <options> <source files>, 其
           指定查找注释处理程序的位置, 不写的话会使用 -cp 的位置
     -processor <class1>[,<class2>,<class3>...]
           要运行的注释处理程序的名称; 绕过默认的搜索进程
+
+
+编译java文件的命令都知道，是javac  aaa.java .
+但是，如果你这个java文件中，引入其他的jar包，需要用到-cp命令。
+加载单个jar包。需要下载用到的jar包，并引入目录。
+javac -cp C:\Users\whr-pc\Desktop\classpath\img\json-lib-2.4-jdk15.jar Xml2Json.java
+加载多个jar包，中级用   ； 符号隔开。
+javac -cp C:\Users\whr-pc\Desktop\classpath\img\json-lib-2.4-jdk15.jar;jdom-1.0.jar;spring-json-1.3.1.jar Xml2Json.java
+
+生成class文件后，执行class文件，也需要用 -cp  命令加载jar包。就可以了
