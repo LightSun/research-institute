@@ -35,3 +35,6 @@ javac -cp C:\Users\whr-pc\Desktop\classpath\img\json-lib-2.4-jdk15.jar Xml2Json.
 javac -cp C:\Users\whr-pc\Desktop\classpath\img\json-lib-2.4-jdk15.jar;jdom-1.0.jar;spring-json-1.3.1.jar Xml2Json.java
 
 生成class文件后，执行class文件，也需要用 -cp  命令加载jar包。就可以了
+
+gradle 文章
+http://blog.csdn.net/maosidiaoxian/article/details/55683474
