@@ -10,6 +10,7 @@ fun main(args: Array<String>) {
 
     // Java
    // Collections.swap(list, Collections.binarySearch(list, Collections.max(otherList)), Collections.max(list));
+    val cs = Const(1.0)
 }
 
 //==================================================
@@ -48,7 +49,7 @@ class C7 : C6() {
  * 不允许非私有构造
  * 请注意，扩展类（间接继承器）的子类的类可以放置在任何位置，而不必在同一个文件中。
  */
-//密封类不能直接实例化。
+//密封类不能直接实例化。可以被继承
 sealed class Expr
 
 data class Const(val number: Double) : Expr(){
