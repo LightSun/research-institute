@@ -2,6 +2,8 @@
 
 本项目主要学习:
          Coroutine = 协程（轻量级线程）: https://studygolang.com/articles/11134
+  next:
+           通道 vs 阻塞队列
 
 //3种调度方式
          launch(CommonPool) {...}
