@@ -8,6 +8,7 @@ import kotlin.reflect.KClass;
  * kotlin 可以直接调用java. 不过省略new关键字
  * 从java调用kotlin
  *   kotlin官方文档: https://kotlinlang.org/docs/reference/using-gradle.html#configuring-dependencies
+ *                  https://kotlinlang.org/docs/reference/java-to-kotlin-interop.html#instance-fields
  */
 public class TestJavaCallKotlin {
 
