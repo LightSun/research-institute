@@ -29,11 +29,21 @@ class BuildCs{
 
 object Obj{
     const val CONST = 1
+    init {
+
+    }
 }
 const val MAX = 239
 
 
 class C {
+    init {
+
+    }
+    constructor()
+    constructor(name: String){
+      //  logger.info("User initialized with name: ${name}")
+    }
     companion object {
         @JvmStatic fun foo() {}
         fun bar() {} //not static
