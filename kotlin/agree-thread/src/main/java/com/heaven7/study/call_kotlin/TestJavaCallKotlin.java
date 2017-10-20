@@ -4,6 +4,9 @@ import com.heaven7.study.java_calling_kotlin.*;
 import kotlin.jvm.JvmClassMappingKt;
 import kotlin.reflect.KClass;
 
+import java.io.IOException;
+import java.util.List;
+
 /**.
  * kotlin 可以直接调用java. 不过省略new关键字
  * 从java调用kotlin
@@ -11,8 +14,6 @@ import kotlin.reflect.KClass;
  *                  https://kotlinlang.org/docs/reference/java-to-kotlin-interop.html#instance-fields
  */
 public class TestJavaCallKotlin {
-
-    private KClass<Foo> kClass;
 
     /**
      * 可见性: 映射
@@ -46,11 +47,14 @@ public class TestJavaCallKotlin {
         System.out.println(Obj.CONST);
         System.out.println(DemoUtils.MAX);
 
+        //静态方法
         C.foo(); // works fine
         //C.bar(); // error: not a static method
+        // 伴生对象
         C.Companion.foo(); // instance method remains
         C.Companion.bar(); // the only way it works
 
+        // java里使用kotlin反射
         KClass<Foo> kClass = JvmClassMappingKt.getKotlinClass(Foo.class);
         log(kClass.getTypeParameters());
 
@@ -58,10 +62,26 @@ public class TestJavaCallKotlin {
        // c.filterValid(null)
         //c.filterValidInt(null)
 
+        //kotlin 1个 方法或者构造。生成多个。 java可调用
         Foo2 foo2 = new Foo2(1, 1.5);
         Foo2 foo3 = new Foo2(1);
         foo3.f("", 0, "");
         //...etc
+        try {
+            foo3.test();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //泛型相关。
+        Box<Derived> box = demo2.boxDerived(new Derived());
+        Base base = demo2.unboxBase(box);
+
+        Box<? extends Derived> box1 = demo2.boxDerived2(new Derived());
+       // Base base1 = demo2.unboxBase2(box1); //error
+
+        //取消泛型
+        List list = demo2.emptyList();
     }
 
     private static void log(Object obj){
