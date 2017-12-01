@@ -1,0 +1,42 @@
+import javax.tools.ToolProvider
+
+group 'com.heaven7.study.java'
+version '1.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    // Should be available in the run-time (like VirtualMachine)
+    compile files(((URLClassLoader) ToolProvider.getSystemToolClassLoader()).getURLs())
+
+    compile 'com.heaven7.java.base:Java-base:1.1.0'
+    compile 'org.javassist:javassist:3.20.0-GA'
+
+    // Should be available in the run-time (like VirtualMachine)
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+
+jar {
+    archiveName = "test-agent-${rootProject.version}.jar"
+    manifest {
+        attributes (
+                'Premain-Class': 'com.heaven7.java.study.agent.IdeaPatcher',
+                'Agent-Class': 'com.heaven7.java.study.agent.IdeaPatcher',
+                'Can-Redefine-Classes': 'true',
+                'Can-Retransform-Classes': 'true',
+                'Implementation-Title': "Test Agent",
+                'Implementation-Version': rootProject.version
+        )
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
