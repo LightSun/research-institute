@@ -28,7 +28,8 @@ public final class FalseSharing_JDK1_6
     public static void main(final String[] args) throws Exception {
         final long start = System.nanoTime();
         runTest();
-        System.out.println("duration = " + (System.nanoTime() - start));
+        //当不用padding 时， 41213491726/34355329502 ，使用padding后 基本在18680753472
+        System.out.println("duration = " + (System.nanoTime() - start));//duration = 18680753472 ,17273237255 18952343113
     }
 
     private static void runTest() throws InterruptedException {
@@ -56,6 +57,6 @@ public final class FalseSharing_JDK1_6
 
     public final static class VolatileLong {
         public volatile long value = 0L;
-        public long p1, p2, p3, p4, p5, p6; // comment out 
+       // public long p1, p2, p3, p4, p5, p6; // comment out
     }
 }

@@ -1,0 +1,8 @@
+# keep annotated by NotProguard (被注解的元素不混淆)
+-keep @XXX.NoProguard class * {*;}
+-keep class * {
+@XXX.NotProguard <fields>;
+}
+-keepclassmembers class * {
+@XXX.NotProguard <methods>;
+}

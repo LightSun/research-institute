@@ -20,11 +20,11 @@ public class T1 {
 
     //java object layout. 查看jvm对象的布局
     public static void main(String[] args) throws Exception {
+        System.out.println(System.getProperty("java.vm.name")); //Java HotSpot(TM) 64-Bit Server VM
 
         CurrentLayouter layouter = new CurrentLayouter();
         ClassLayout layout = layouter.layout(ClassData.parseClass(T1.class));
         System.out.println(layout.toPrintable());
-
 
         System.out.println(layouter.layout(ClassData.parseClass(MyClass.class)).toPrintable());
     }
