@@ -1,0 +1,1 @@
+Java对象的内存布局：对象头（Header）、实例数据（Instance Data）和对齐填充（Padding）
