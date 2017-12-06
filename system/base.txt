@@ -1,0 +1,8 @@
+
+7个示例科普CPU CACHE
+https://coolshell.cn/articles/10249.html
+
+关于操作系统的基础知识: operating-systems-three-easy-piceces
+http://pages.cs.wisc.edu/~remzi/OSTEP/
+https://yuxiangque.gitbooks.io/operating-systems-three-easy-piceces/content/chapter1.html
+https://github.com/LightSun/operating-systems-three-easy-piceces/blob/master/chapter1.md
