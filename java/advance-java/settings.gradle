@@ -1,2 +1,3 @@
 rootProject.name = 'advance-java'
+include 'annotation_class'
 

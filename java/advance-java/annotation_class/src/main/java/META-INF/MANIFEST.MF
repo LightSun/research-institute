@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: guava-19.0.jar javapoet-1.9.0.jar auto-service-1.0-rc3.jar
+  auto-common-0.8.jar
+

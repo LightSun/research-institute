@@ -1,12 +1,11 @@
 package com.heaven7.study.android_arch;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LifecycleRegistry;
-import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.os.Bundle;
-import android.app.Fragment;
 
 public class ReportFragment extends Fragment {
 
@@ -66,11 +65,6 @@ public class ReportFragment extends Fragment {
 
     private void dispatch(Lifecycle.Event event) {
         Activity activity = getActivity();
-        if (activity instanceof LifecycleRegistryOwner) {
-            ((LifecycleRegistryOwner) activity).getLifecycle().handleLifecycleEvent(event);
-            return;
-        }
-
         if (activity instanceof LifecycleOwner) {
             Lifecycle lifecycle = ((LifecycleOwner) activity).getLifecycle();
             if (lifecycle instanceof LifecycleRegistry) {
