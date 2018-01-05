@@ -27,6 +27,7 @@ driver.get(file_path)
 driver.find_element_by_name("file").click()
 
 os.system(r"E:\test\test-html\src\main\upfile.exe")
+driver.close()
 
 
 
