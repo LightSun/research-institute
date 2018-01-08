@@ -1,14 +1,11 @@
 package test.effect;
 
-import com.intellij.ide.favoritesTreeView.NoteNode;
-import test.Effect;
-
 import java.util.List;
 
 /**
  * 核心效果，针对多个子视频： 拆分，插入, 删除, 替换
  */
-public class CoreEffect extends Effect{
+public class CoreEffect {
 
     public List<Node> getNodes(){
         return null;
@@ -51,12 +48,12 @@ public class CoreEffect extends Effect{
 
         }
 
-        /** move the left line that make current node enlarge */
+        /** move the right line that make current node enlarge */
         public void enlargeRight(Node focus, Node next, float scale){
 
         }
 
-        /** move the left line that make current node shrink */
+        /** move the right line that make current node shrink */
         public void shrinkRight(Node focus, Node next, float scale){
 
         }
