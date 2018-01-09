@@ -1,12 +1,14 @@
-package test.provide;
-
+package test.provide.framework;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+/**
+ * indicate the fields will not be proguarded.
+ */
 @Retention(RetentionPolicy.CLASS)
-public @interface ProvideMethod {
+@Target(ElementType.TYPE)
+public @interface KeepFields {
 }

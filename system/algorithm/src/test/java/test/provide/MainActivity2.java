@@ -1,17 +1,19 @@
 package test.provide;
 
-public class MainActivity2 {
+import org.junit.Test;
 
+public class MainActivity2 extends MainActivity{
 
-    @ProvideMethod
+    @Test
     public void onCreate(){
-
+       super.onCreate();
     }
+    @Test
     public void onStart(){
-
+        super.onStart();
     }
-    @ProvideMethod
+    @Test
     public void onDestroy(){
-
+        super.onDestroy();
     }
 }
