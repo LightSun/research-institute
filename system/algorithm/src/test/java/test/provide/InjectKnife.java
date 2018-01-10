@@ -1,5 +1,7 @@
 package test.provide;
 
+import test.provide.framework.InjectorRegistry;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -7,11 +9,46 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class InjectorKnife {
+public class InjectKnife {
 
+    private static final WeakHashMap<Class<? extends InjectorRegistry>, Class<?>> sGenClassMap;
 
-    public static Injector create(Object provider, Object insertor){
-        return new Injector(provider).with(insertor);
+    static {
+        sGenClassMap = new WeakHashMap<>();
+    }
+
+    public static Injector from(InjectorRegistry registry){
+        return new Injector(getGenClass(registry));
+    }
+
+    public static Injector from(InjectorRegistry registry, Object insertor){
+        return from(registry).with(insertor);
+    }
+
+    private static Class<?> getGenClass(InjectorRegistry provider) {
+        Class<? extends InjectorRegistry> clazz = provider.getClass();
+        Class<?> target = sGenClassMap.get(clazz);
+        if(target != null){
+            return target;
+        }else {
+            Provider pro = getProvider(clazz);
+            if (pro == null) {
+                throw new NullPointerException();
+            }
+            target = pro.value();
+            sGenClassMap.put(clazz, target);
+        }
+        return target;
+    }
+
+    private static Provider getProvider(Class<?> clazz) {
+        Provider pro;
+        do{
+            pro = clazz.getAnnotation(Provider.class);
+            clazz = clazz.getSuperclass();
+        }while (pro == null && !clazz.getName().startsWith("java.")
+                && !clazz.getName().startsWith("android."));
+        return pro;
     }
 
     private static void logCallStack() {
@@ -30,41 +67,23 @@ public class InjectorKnife {
         private static final String PREX_FLAG = "FLAG_";
         private static final WeakHashMap<Class<?>, List<Method>> sMethodsMap; //insertor, methods
         private final ArrayList<Object> insertors;
-        private final Object provider;
         private final Class<?> mFlagClass;
 
         static {
             sMethodsMap = new WeakHashMap<>();
         }
 
-        public Injector(Object provider) {
+        Injector(Class<?> genClass) {
             this.insertors = new ArrayList<>();
-            this.provider = provider;
-
-            Class<?> clazz = provider.getClass();
-            Provider pro = getProvider(clazz);
-            if(pro == null){
-                throw new NullPointerException();
-            }
-            mFlagClass = pro.value();
-        }
-
-        private Provider getProvider(Class<?> clazz) {
-            Provider pro;
-            do{
-                pro = clazz.getAnnotation(Provider.class);
-                clazz = clazz.getSuperclass();
-            }while (pro == null && !clazz.getName().startsWith("java.")
-                    && !clazz.getName().startsWith("android."));
-            return pro;
+            mFlagClass = genClass;
         }
 
         public Injector with(Object insertor){
             insertors.add(insertor);
             Class<?> clazz = insertor.getClass();
             if(sMethodsMap.get(clazz) == null) {
-                List<Method> methods = StreamSupport.stream( Arrays.spliterator(clazz.getMethods()), false).filter(
-                        method -> (method.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC
+                List<Method> methods = StreamSupport.stream( Arrays.spliterator(clazz.getMethods()), false)
+                        .filter(method -> (method.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC
                                 && method.getAnnotation(Insertor.class) != null
                 ).collect(Collectors.toList());
                 sMethodsMap.put(clazz, methods);

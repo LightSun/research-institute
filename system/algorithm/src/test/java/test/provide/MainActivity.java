@@ -8,10 +8,10 @@ public class MainActivity implements InjectorRegistry{
 
     private static final String TAG = "MainActivity";
 
-    private final InjectorKnife.Injector injector;
+    private final InjectKnife.Injector injector;
 
     public MainActivity() {
-        injector = InjectorKnife.create(this, new Inlay());
+        injector = InjectKnife.from(this, new Inlay());
     }
 
     //最终可以字节码注入
@@ -32,7 +32,7 @@ public class MainActivity implements InjectorRegistry{
     }
 
     @Override
-    public InjectorKnife.Injector getInjector() {
+    public InjectKnife.Injector getInjector() {
         return injector;
     }
 }

@@ -1,8 +1,8 @@
 package test.provide.framework;
 
-import test.provide.InjectorKnife;
+import test.provide.InjectKnife;
 
 public interface InjectorRegistry {
 
-    InjectorKnife.Injector getInjector();
+    InjectKnife.Injector getInjector();
 }
