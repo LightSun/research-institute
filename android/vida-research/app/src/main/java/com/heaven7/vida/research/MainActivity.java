@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_drag0);
 
         findViewById(R.id.box1).setOnTouchListener(this);
         findViewById(R.id.box2).setOnTouchListener(this);

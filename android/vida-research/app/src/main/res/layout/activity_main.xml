@@ -1,54 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/leftContainer"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:background="#E8E6E7"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/box1"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:layout_margin="10dp"
-            android:background="@drawable/box1" />
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Horizontal drag"
+            android:id="@+id/buttonDragH"
+            />
 
-        <ImageView
-            android:id="@+id/box2"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:layout_margin="10dp"
-            android:background="@drawable/box2" />
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vertical drag"
+            android:id="@+id/buttonDragV"
+            />
 
-        <ImageView
-            android:id="@+id/box3"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:layout_margin="10dp"
-            android:background="@drawable/box3" />
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edge drag"
+            android:id="@+id/buttonDragEdge"
+            />
 
-    </LinearLayout>
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Capture drag"
+            android:id="@+id/buttonDragCapture"
+            />
 
-    <LinearLayout
-        android:id="@+id/rightContainer"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:background="#B1BEC4"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
-    </LinearLayout>
-
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Youtube layout"
+            android:id="@+id/buttonYoutube"
+            />
 </LinearLayout>
