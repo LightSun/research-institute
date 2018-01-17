@@ -1,5 +1,6 @@
 package test.provide;
 
+import test.provide.framework.InjectObserver;
 import test.provide.framework.InjectorRegistry;
 
 import java.lang.reflect.Field;
@@ -21,7 +22,7 @@ public class InjectKnife {
         return new Injector(getGenClass(registry));
     }
 
-    public static Injector from(InjectorRegistry registry, Object insertor){
+    public static Injector from(InjectorRegistry registry, InjectObserver insertor){
         return from(registry).with(insertor);
     }
 
@@ -90,13 +91,24 @@ public class InjectKnife {
             }
             return this;
         }
-
         public void inject(Object...params){
+            inject(null, params);
+        }
+        /**
+         * 重载问题
+         * 方法参数问题
+         * 继承问题
+         * inject 到多个的问题
+         * @param params
+         */
+
+        //params : the local params of method
+        public void inject(Class<?>[] paramTypes, Object...params){
            // logCallStack();
             final String callMethodName = getCallMethodName();
             int flag;
             try {
-                Field field = mFlagClass.getField(PREX_FLAG + callMethodName);
+                Field field = mFlagClass.getField(PREX_FLAG + callMethodName); //重载问题
                 flag = (int) field.get(null);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 return;

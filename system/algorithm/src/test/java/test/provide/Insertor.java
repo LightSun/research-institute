@@ -12,5 +12,5 @@ public @interface Insertor {
      * the insert flags
      * @return
      */
-    int value();
+    int value() ;
 }

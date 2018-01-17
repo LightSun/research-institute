@@ -16,17 +16,23 @@ public class MainActivity implements InjectorRegistry{
 
     //最终可以字节码注入
     @Test
-    @ProvideMethod()
+    @ProvideMethod
     public void onCreate(){
         getInjector().inject();
     }
+
+    public void onCreate(int x){
+        //不支持重载
+        //getInjector().inject(new Class<?>[]{int.class}, x);
+    }
+
     @Test
-    @ProvideMethod()
+    @ProvideMethod
     public void onStart(){
         getInjector().inject();
     }
     @Test
-    @ProvideMethod()
+    @ProvideMethod
     public void onDestroy(){
         getInjector().inject();
     }

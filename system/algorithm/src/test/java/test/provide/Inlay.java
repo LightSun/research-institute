@@ -1,6 +1,8 @@
 package test.provide;
 
-public class Inlay {
+import test.provide.framework.InjectObserver;
+
+public class Inlay implements InjectObserver {
 
     @Insertor(MainActivity__$Flags.FLAG_onDestroy | MainActivity__$Flags.FLAG_onStart)
     public void every(){
