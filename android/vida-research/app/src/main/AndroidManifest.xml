@@ -21,6 +21,8 @@
         <activity android:name=".drag.MainActivity"/>
         <activity android:name=".drag.DragActivity"/>
         <activity android:name=".drag.YoutubeActivity"/>
+        <activity android:name=".TestAndroidSpringActivity"/>
+        <activity android:name=".TestDampScrollView"/>
     </application>
 
 </manifest>

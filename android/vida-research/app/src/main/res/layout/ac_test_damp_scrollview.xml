@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.heaven7.vida.research.widget.DampScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_light"
+        >
+
+        <View
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            />
+
+    </LinearLayout>
+
+</com.heaven7.vida.research.widget.DampScrollView>

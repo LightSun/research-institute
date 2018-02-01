@@ -14,6 +14,8 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(MainActivity.class));
         list.add(new ActivityInfo(com.heaven7.vida.research.drag.MainActivity.class));
         list.add(new ActivityInfo(DragActivity.class));
+        list.add(new ActivityInfo(TestAndroidSpringActivity.class));
+        list.add(new ActivityInfo(TestDampScrollView.class));
     }
 
 }

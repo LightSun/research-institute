@@ -1,20 +1,21 @@
-<com.heaven7.vida.research.drag.DragLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/dragLayout">
+<com.heaven7.vida.research.drag.DragLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dragLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="30dp"
+    >
 
     <View
-            android:id="@+id/drag1"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:background="#AD78CC"/>
+        android:id="@+id/drag1"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:background="#AD78CC" />
 
     <View
-            android:id="@+id/drag2"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:background="#FF00FF"/>
+        android:id="@+id/drag2"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:background="#FF00FF" />
 
 </com.heaven7.vida.research.drag.DragLayout>
