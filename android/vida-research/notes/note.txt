@@ -1,0 +1,3 @@
+
+android 如何使的float保留2位或者多位小数
+http://blog.csdn.net/diguoweiwu/article/details/51910079
