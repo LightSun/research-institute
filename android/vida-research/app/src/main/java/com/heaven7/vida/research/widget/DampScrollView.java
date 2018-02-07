@@ -1,6 +1,7 @@
 package com.heaven7.vida.research.widget;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -128,5 +129,10 @@ public class DampScrollView extends ScrollView {
         animation.setFillAfter(true);
         animation.setInterpolator(new AccelerateInterpolator());
         childView.setAnimation(animation);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
     }
 }
