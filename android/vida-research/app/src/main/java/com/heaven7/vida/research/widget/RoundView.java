@@ -15,6 +15,8 @@ import android.view.View;
 
 import com.heaven7.vida.research.R;
 
+import static com.heaven7.vida.research.utils.DrawableUtils2.drawableToBitmap;
+
 /**
  * Created by heaven7 on 2018/2/7 0007.
  */
@@ -80,22 +82,4 @@ public class RoundView extends View{
         canvas.restore();
     }
 
-    public static Bitmap drawableToBitmap(Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-            if(bitmapDrawable.getBitmap() != null) {
-                return bitmapDrawable.getBitmap();
-            }
-        }
-        Bitmap bitmap;
-        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
-            return null;
-        } else {
-            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        }
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
-    }
 }

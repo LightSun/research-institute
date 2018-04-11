@@ -2,6 +2,7 @@ package com.heaven7.vida.research;
 
 import com.heaven7.vida.research.drag.DragActivity;
 import com.heaven7.vida.research.sample.TestRoundViewActivity;
+import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
 
 import java.util.List;
 
@@ -17,7 +18,9 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(DragActivity.class));
         list.add(new ActivityInfo(TestAndroidSpringActivity.class));
         list.add(new ActivityInfo(TestDampScrollView.class));
+
         list.add(new ActivityInfo(TestRoundViewActivity.class));
+        list.add(new ActivityInfo(TestZoomDrawableActivity.class));
     }
 
 }
