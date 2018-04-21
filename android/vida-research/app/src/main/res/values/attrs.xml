@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="DiscView">
+        <!-- 最大圆盘的宽高,  圆盘之间的梯度,  行间距,  整个画幅偏移的大小, 圆的边缘颜色 -->
+        <attr name="disc_max_width_height" format="dimension|reference"/>
+        <attr name="disc_row_distance" format="dimension|reference"/>
+        <attr name="disc_whole_offset_y" format="dimension|reference"/>
+        <attr name="disc_circle_color" format="color|reference"/>
+    </declare-styleable>
+
+</resources>

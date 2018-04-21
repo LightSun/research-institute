@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+
+    <com.heaven7.vida.research.widget.DiscView
+        android:id="@+id/discView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:disc_circle_color="@android:color/black"
+        app:disc_max_width_height="725dp"
+        app:disc_row_distance="10dp"
+        />
+
+</FrameLayout>
