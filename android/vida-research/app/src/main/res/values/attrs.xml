@@ -2,11 +2,38 @@
 <resources>
 
     <declare-styleable name="DiscView">
-        <!-- 最大圆盘的宽高,  圆盘之间的梯度,  行间距,  整个画幅偏移的大小, 圆的边缘颜色 -->
+        <!-- 最大圆盘的宽高,  行间距,  圆的边缘颜色 -->
         <attr name="disc_max_width_height" format="dimension|reference"/>
         <attr name="disc_row_distance" format="dimension|reference"/>
-        <attr name="disc_whole_offset_y" format="dimension|reference"/>
         <attr name="disc_circle_color" format="color|reference"/>
+
+        <attr name="disc_shadowColor" format="color|reference"/>
+        <attr name="disc_shadowRadius" format="dimension|reference"/>
+        <attr name="disc_shadowDx" format="dimension|reference"/>
+        <attr name="disc_shadowDy" format="dimension|reference"/>
+        <attr name="disc_shadowFlags">
+            <flag name="all" value="0x000f"/>
+            <flag name="left" value="0x0001"/>
+            <flag name="top" value="0x0002"/>
+            <flag name="right" value="0x0004"/>
+            <flag name="bottom" value="0x0008"/>
+        </attr>
+    </declare-styleable>
+
+
+    <!-- ShadowLayout 阴影 -->
+    <declare-styleable name="ShadowLayout">
+        <attr name="shadowColor" format="color"/>
+        <attr name="shadowRadius" format="dimension"/>
+        <attr name="shadowDx" format="dimension"/>
+        <attr name="shadowDy" format="dimension"/>
+        <attr name="shadowSide">
+            <flag name="all" value="0x1111"/>
+            <flag name="left" value="0x0001"/>
+            <flag name="top" value="0x0010"/>
+            <flag name="right" value="0x0100"/>
+            <flag name="bottom" value="0x1000"/>
+        </attr>
     </declare-styleable>
 
 </resources>

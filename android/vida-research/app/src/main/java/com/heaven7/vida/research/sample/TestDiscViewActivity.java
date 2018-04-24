@@ -35,7 +35,7 @@ public class TestDiscViewActivity extends AppCompatActivity {
             public float provideDegree(DiscView.Item item, Paint p) {
                 DiscView.Row row = item.rows.get(0);
                 p.setTextSize(row.textSize);
-                return row.text.length() * 8;
+                return row.text.length() * 6;
             }
             @Override
             public float provideVOffset(DiscView.Disc disc, int index, float radius) {
@@ -97,38 +97,24 @@ public class TestDiscViewActivity extends AppCompatActivity {
           //3
         disc = new DiscView.Disc();
         disc.step = step;
+        disc.loop = true;
         maxTextSize -= 30;
-
-        item = new DiscView.Item();
-        disc.addItem(item);
-        item.addRow(createRow("rect", maxTextSize));
-
-        item = new DiscView.Item();
-        disc.addItem(item);
-        item.addRow(createRow("rect2", maxTextSize));
-
-        item = new DiscView.Item();
-        disc.addItem(item);
-        item.addRow(createRow("rect23", maxTextSize));
-
-        item = new DiscView.Item();
-        disc.addItem(item);
-        item.addRow(createRow("rect234", maxTextSize));
-
-        item = new DiscView.Item();
-        disc.addItem(item);
-        item.addRow(createRow("rect2345", maxTextSize));
-
-        item = new DiscView.Item();
-        disc.addItem(item);
-        item.addRow(createRow("rect23456", maxTextSize));
-
-        item = new DiscView.Item();
-        disc.addItem(item);
-        item.addRow(createRow("rect2345", maxTextSize));
+        addItems(disc, 10, maxTextSize);
 
         discs.add(disc);
         mDiscView.setDiscs(discs);
+    }
+
+    private void addItems(DiscView.Disc disc, int count , float textSize) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("rect_");
+        for(int i = 0 ; i < count ; i ++){
+            sb.append(i);
+
+            DiscView.Item item = new DiscView.Item();
+            item.addRow(createRow(sb.toString(), textSize));
+            disc.addItem(item);
+        }
     }
 
     private DiscView.Row createRow(String text, float textSize) {
