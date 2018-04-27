@@ -7,17 +7,6 @@
         <attr name="disc_row_distance" format="dimension|reference"/>
         <attr name="disc_circle_color" format="color|reference"/>
 
-        <attr name="disc_shadowColor" format="color|reference"/>
-        <attr name="disc_shadowRadius" format="dimension|reference"/>
-        <attr name="disc_shadowDx" format="dimension|reference"/>
-        <attr name="disc_shadowDy" format="dimension|reference"/>
-        <attr name="disc_shadowFlags">
-            <flag name="all" value="0x000f"/>
-            <flag name="left" value="0x0001"/>
-            <flag name="top" value="0x0002"/>
-            <flag name="right" value="0x0004"/>
-            <flag name="bottom" value="0x0008"/>
-        </attr>
     </declare-styleable>
 
 

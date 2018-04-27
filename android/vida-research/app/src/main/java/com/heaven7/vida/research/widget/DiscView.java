@@ -23,13 +23,11 @@ import android.view.WindowManager;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.vida.research.R;
+import com.heaven7.vida.research.utils.DiscList;
 import com.heaven7.vida.research.utils.LinearEquation;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.BaseStream;
 
 /**
  * 圆盘view
@@ -40,22 +38,15 @@ public class DiscView extends View {
 
     private static final String TAG = "DiscView";
 
-    public static final int FLAG_LEFT = 0x0001;
-    public static final int FLAG_TOP = 0x0002;
-    public static final int FLAG_RIGHT = 0x0004;
-    public static final int FLAG_BOTTOM = 0x0008;
-    public static final int FLAG_ALL = FLAG_LEFT | FLAG_TOP | FLAG_RIGHT | FLAG_BOTTOM;
-
     private static final boolean DEBUG = true;
     private static final float CRITICAL_DEGREE = 60f;
-    private static final float DEFAULT_START_ANGLE = -180f;
+    private static final float DRAW_DEGREE_OFFSET = -180f;
+    private static final float DEFAULT_START_ANGLE = -180f - DRAW_DEGREE_OFFSET;
 
     private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF mRectF = new RectF();
     private final Path mPath = new Path();
     private final int mCircleColor;
-
-  //  private final ShadowHelper mShadowHelper = new ShadowHelper();
 
     private final GestureDetector mGestureDetector;
 
@@ -123,15 +114,12 @@ public class DiscView extends View {
                 throw new IllegalStateException();
             }
             mCircleColor = arr.getColor(R.styleable.DiscView_disc_circle_color, Color.RED);
-            // mShadowHelper.init(arr);
         } finally {
             arr.recycle();
         }
 
         mCircleCenter.set(mScreenWidth / 2, mDiscSize / 2);
         mPaint.setStyle(Paint.Style.STROKE);
-        //shadow
-        // mShadowHelper.setUpShadowPaint();
 
         //init touch
         GestureListenerImpl gestureListener = new GestureListenerImpl();
@@ -145,140 +133,15 @@ public class DiscView extends View {
 
     private void preProcessVisibleItems(List<Disc> discs) {
         for (Disc disc : discs) {
+            //disc.mDiscList.setVisibleAngles();
             if (disc.loop) {
                 //compute the all degree to decide which will be visible.
-                recomputeVisibleItems(disc, true);
                 //if all item is visible . we just mark the loop to false.
-                if (disc.visibleItems.size() == disc.items.size()) {
+               /* if (disc.visibleItems.size() == disc.items.size()) {
                     disc.loop = false;
-                }
+                }*/
             }
         }
-    }
-
-    private void recomputeVisibleItems(Disc disc, boolean first) {
-        disc.visibleItems.clear();
-        if (first) {
-            disc.startAngle = mStartVisibleAngle;
-        }
-        final float wholeStartAngle = disc.startAngle % 360;
-        final List<Item> items = disc.items;
-        final int size = items.size();
-        //if rotated. we
-        final float minAngle = mStartVisibleAngle;
-        final float maxCircleAngle = 360f - Math.abs(minAngle);
-        final float mStartVisibleAngle = this.mStartVisibleAngle;
-        final float mEndVisibleAngle = this.mEndVisibleAngle;
-
-        float lastAngle = wholeStartAngle;
-        float startAngel, endAngel;
-        int minVisibleIndex = -1;
-        int maxVisibleIndex = -1;
-
-        //startVisibleAngle ~ endVisibleAngle
-        for (int i = 0; i < size; i++) {
-            Item item = items.get(i);
-            if (item.degree == 0f) {
-                item.degree = mProvider.provideDegree(item, mPaint);
-            }
-            startAngel = lastAngle;
-            endAngel = lastAngle + item.degree;
-            lastAngle = endAngel;
-
-            if (mCircleMode) {
-                if (endAngel >= maxCircleAngle) {
-                    //out of range
-                    break;
-                } else {
-                    item.setAngles(startAngel, endAngel);
-                    item.setNormal(true);
-                    disc.visibleItems.add(item);
-                    if (minVisibleIndex == -1) {
-                        minVisibleIndex = i;
-                    }
-                    maxVisibleIndex = i;
-                }
-            } else {
-                //half
-                if (endAngel <= mStartVisibleAngle) {
-                    //
-                } else if (startAngel >= mEndVisibleAngle) {
-                    break;
-                } else {
-                    item.setNormal(true);
-                    disc.visibleItems.add(item);
-                    if (minVisibleIndex == -1) {
-                        minVisibleIndex = i;
-                    }
-                    maxVisibleIndex = i;
-                }
-            }
-        }
-
-        Logger.d(TAG, "recomputeVisibleItems", "minVisibleIndex = "
-                + minVisibleIndex + " , maxVisibleIndex = " + maxVisibleIndex + " ,wholeStartAngle = " + wholeStartAngle);
-        //前补,  -180 ~ mStartVisibleAngle . 后面的item补前面。
-        float preAngle = wholeStartAngle;//-170
-        float minAngleForSupplier = Math.abs(lastAngle) - 360f;
-        //TODO 反接有bug
-        if (preAngle > minAngleForSupplier) {
-            if (mCircleMode) {
-                for (int i = size - 1; i > maxVisibleIndex; i--) {
-                    //desc. check can visible or not.
-                    Item item = items.get(i);
-
-                    if (item.degree == 0f) {
-                        item.degree = mProvider.provideDegree(item, mPaint);
-                    }
-                    startAngel = preAngle - item.degree;
-                    endAngel = preAngle;
-
-                    if (startAngel >= minAngleForSupplier) {
-                        item.setAngles(startAngel, endAngel);
-                        item.setNormal(false);
-                        disc.visibleItems.add(0, item);
-                    } else {
-                        break;
-                    }
-                    preAngle = startAngel;
-                }
-            } else {
-                //旋转后的角度 > 可见角度
-                if (wholeStartAngle > mStartVisibleAngle) {
-                    for (int i = size - 1; i > maxVisibleIndex; i--) {
-                        //desc. check can visible or not.
-                        Item item = items.get(i);
-
-                        if (item.degree == 0f) {
-                            item.degree = mProvider.provideDegree(item, mPaint);
-                        }
-                        startAngel = preAngle - item.degree;
-                        endAngel = preAngle;
-                        Logger.v(TAG, "recomputeVisibleItems",
-                                String.format(item.rows.get(0).text + " <<< (mStartVisibleAngle, wholeStartAngle) is (%.6f, %.6f), startAngel = "
-                                        + startAngel + " ,endAngel = " + endAngel, mStartVisibleAngle, wholeStartAngle));
-
-                        if (endAngel > mStartVisibleAngle && endAngel <= wholeStartAngle) {
-                            if (startAngel < mEndVisibleAngle) {
-                                item.setAngles(startAngel, endAngel);
-                                item.setNormal(false);
-                                disc.visibleItems.add(0, item);
-                            } else {
-                                Logger.v(TAG, "recomputeVisibleItems", " >>> not matched");
-                            }
-                        } else {
-                            break;
-                        }
-                        preAngle = startAngel;
-                    }
-                }
-            }
-        }
-        disc.startAngle = wholeStartAngle;
-        disc.startDrawAngle = preAngle;
-        Logger.d(TAG, "recomputeVisibleItems", "visible items: " + disc.visibleItems);
-        Logger.d(TAG, "recomputeVisibleItems", "startAngle = " + wholeStartAngle
-                + " ,startDrawAngle = " + disc.startDrawAngle);
     }
 
     private void computeStartAndEndAngle() {
@@ -289,16 +152,15 @@ public class DiscView extends View {
             float degree = distanceToDegree(mCircleCenter.y, Math.abs(val));
             float leftOffsetDegree = 90f - degree;
             mStartVisibleAngle = DEFAULT_START_ANGLE - leftOffsetDegree;
-            mEndVisibleAngle = leftOffsetDegree;
+            mEndVisibleAngle = DEFAULT_START_ANGLE + 180f + leftOffsetDegree;
         } else if (val < 0) {
             float degree = distanceToDegree(mCircleCenter.y, Math.abs(val));
             float leftOffsetDegree = 90f - degree;
             mStartVisibleAngle = DEFAULT_START_ANGLE + leftOffsetDegree;
-            mEndVisibleAngle = -leftOffsetDegree;
+            mEndVisibleAngle = DEFAULT_START_ANGLE + 180f - leftOffsetDegree;
         } else {
-            //=
             mStartVisibleAngle = DEFAULT_START_ANGLE;
-            mEndVisibleAngle = 0f;
+            mEndVisibleAngle = DEFAULT_START_ANGLE + 180f;
         }
         Logger.d(TAG, "computeStartAndEndAngle", "mStartVisibleAngle = " + mStartVisibleAngle
                 + ", mEndVisibleAngle = " + mEndVisibleAngle);
@@ -356,14 +218,13 @@ public class DiscView extends View {
             }
 
             mPaint.setColor(mCircleColor);
-            // mShadowHelper.drawShadow(canvas, r);
             canvas.drawCircle(0, 0, r, mPaint);
-            float startDegree = disc.startDrawAngle;
+            float startDegree = disc.startDrawAngle + DRAW_DEGREE_OFFSET;
             if (disc.start_vOffset == -1) {
                 disc.start_vOffset = mProvider.provideVOffset(disc, i, r);
             }
-
-            final List<Item> items = disc.loop ? disc.visibleItems : disc.items;
+          //TODO
+            final List<Item> items = /*disc.loop ? disc.visibleItems :*/ disc.items;
             for (int i1 = 0, size1 = items.size(); i1 < size1; i1++) {
                 Item item = items.get(i1);
                 if (item.degree == 0) {
@@ -496,7 +357,7 @@ public class DiscView extends View {
         }
         //adjust visible items and start angle.
         if (mFocusDisc.loop) {
-            recomputeVisibleItems(mFocusDisc, false);
+            //recomputeVisibleItems(mFocusDisc, false);
         } else {
             mFocusDisc.startDrawAngle = mFocusDisc.startAngle;
         }
@@ -606,49 +467,14 @@ public class DiscView extends View {
         float provideVOffset(Disc disc, int index, float radius);
     }
 
-    private static class ShadowHelper {
-
-        final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        int flags;
-        float shadowRadius;
-        float shadowDx;
-        float shadowDy;
-        int shadowColor;
-
-        void init(TypedArray arr) {
-            flags = arr.getInt(R.styleable.DiscView_disc_shadowFlags, FLAG_ALL);
-            shadowRadius = arr.getDimension(R.styleable.DiscView_disc_shadowRadius, 0);
-            shadowDx = arr.getDimension(R.styleable.DiscView_disc_shadowDx, 0);
-            shadowDy = arr.getDimension(R.styleable.DiscView_disc_shadowDy, 0);
-            shadowColor = arr.getColor(R.styleable.DiscView_disc_shadowColor, Color.BLACK);
-        }
-
-        void setUpShadowPaint() {
-            mPaint.reset();
-            mPaint.setAntiAlias(true);
-            mPaint.setColor(Color.TRANSPARENT);
-            mPaint.setShadowLayer(shadowRadius, shadowDx,
-                    shadowDy, shadowColor);
-        }
-
-        void drawShadow(Canvas canvas, float circleRadius) {
-            canvas.drawCircle(0, 0, circleRadius, mPaint);
-        }
-
-    }
-
     /**
      * indicate one disc.
      */
     public static class Disc {
 
+        final DiscList<Item> mDiscList = new DiscList<>();
         final List<Item> items = new ArrayList<>();
-        /**
-         * visible items for loop
-         */
-        final List<Item> visibleItems = new ArrayList<>();
-        /** no visible items for loop */
-        //final List<Item> noVisibleItems = new ArrayList<>();
+
         /**
          * the step between current and next disc
          */
@@ -693,39 +519,24 @@ public class DiscView extends View {
     /**
      * one item indicate sector area. which may contains multi rows.
      */
-    public static class Item {
+    public static class Item extends DiscList.BaseDiscItem{
+
         public final List<Row> rows = new ArrayList<>();
         /**
          * the degree of this
          */
         float degree;
 
-        private boolean normal = true;
-
-        //just used internal
-        float endAngel;
-        float startAngel;
-
         public void addRow(Row row) {
             rows.add(row);
         }
 
+        String getDefaultText() {
+            return rows.get(0).text;
+        }
         @Override
-        public String toString() {
-            return "Item{" +
-                    "text=" + rows.get(0).text +
-                    ", degree=" + degree +
-                    ", backup=" + !normal +
-                    '}';
-        }
-
-        void setNormal(boolean normal) {
-            this.normal = normal;
-        }
-
-        void setAngles(float startAngel, float endAngel) {
-            this.startAngel = startAngel;
-            this.endAngel = endAngel;
+        public float getDegree() {
+            return degree;
         }
     }
 

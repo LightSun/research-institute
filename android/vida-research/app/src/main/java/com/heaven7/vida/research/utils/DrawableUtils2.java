@@ -7,10 +7,21 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * Created by heaven7 on 2018/2/7 0007.
  */
 public class DrawableUtils2 {
+
+    public static byte[] bitmap2Bytes(Bitmap bm) {
+        if (bm == null) {
+            return null;
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
 
     public static Drawable zoomDrawable(Context context, Drawable drawable, int w, int h) {
         int width = drawable.getIntrinsicWidth();

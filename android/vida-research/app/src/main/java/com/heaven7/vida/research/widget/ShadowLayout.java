@@ -14,7 +14,6 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.widget.RelativeLayout;
 
 import com.heaven7.vida.research.R;
@@ -22,18 +21,13 @@ import com.heaven7.vida.research.R;
 public class ShadowLayout extends RelativeLayout {
 
     public static final int ALL = 0x1111;
-
     public static final int LEFT = 0x0001;
-
     public static final int TOP = 0x0010;
-
     public static final int RIGHT = 0x0100;
-
     public static final int BOTTOM = 0x1000;
 
-    private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-    private RectF mRectF = new RectF();
+    private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF mRectF = new RectF();
 
     /**
      * 阴影的颜色
@@ -118,10 +112,6 @@ public class ShadowLayout extends RelativeLayout {
         mRectF.top = rectTop;
         mRectF.right = rectRight;
         mRectF.bottom = rectBottom;
-        Log.i("lijk", "onLayout rectLeft " + rectLeft);
-        Log.i("lijk", "onLayout rectTop " + rectTop);
-        Log.i("lijk", "onLayout rectRight " + rectRight);
-        Log.i("lijk", "onLayout rectBottom " + rectBottom);
         this.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 
@@ -131,7 +121,6 @@ public class ShadowLayout extends RelativeLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.i("lijk", "onDraw  ");
         setUpShadowPaint();
         canvas.drawRect(mRectF, mPaint);
     }
@@ -171,12 +160,10 @@ public class ShadowLayout extends RelativeLayout {
                 paint.setStyle(Paint.Style.FILL);
                 canvas.drawPath(buildConvexPath(), paint);
             }
-
             @Override
             public void getOutline(Outline outline) {
                 outline.setConvexPath(buildConvexPath());
             }
-
             private Path buildConvexPath() {
                 Path path = new Path();
                 path.lineTo(rect().left, rect().top);

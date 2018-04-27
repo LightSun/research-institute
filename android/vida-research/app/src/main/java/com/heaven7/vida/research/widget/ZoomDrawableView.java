@@ -2,6 +2,8 @@ package com.heaven7.vida.research.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DrawableUtils;
@@ -16,6 +18,7 @@ import com.heaven7.vida.research.utils.DrawableUtils2;
  */
 public class ZoomDrawableView extends View{
 
+    private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Drawable mDrawable;
 
     public ZoomDrawableView(Context context, @Nullable AttributeSet attrs) {
@@ -32,11 +35,16 @@ public class ZoomDrawableView extends View{
         Drawable drawable = context.getResources().getDrawable(R.drawable.ic_test);
         mDrawable = DrawableUtils2.zoomDrawable(context, drawable, 100, 100);
         mDrawable.setBounds(0, 0, 100, 100);
+
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(5);
+        mPaint.setColor(Color.BLUE);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         mDrawable.draw(canvas);
+        //canvas.drawRect(136, 325, );
     }
 }

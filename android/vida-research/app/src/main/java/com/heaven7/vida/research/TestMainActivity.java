@@ -1,6 +1,7 @@
 package com.heaven7.vida.research;
 
 import com.heaven7.vida.research.drag.DragActivity;
+import com.heaven7.vida.research.sample.TestBaiduFaceActivity;
 import com.heaven7.vida.research.sample.TestDiscViewActivity;
 import com.heaven7.vida.research.sample.TestRoundViewActivity;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
@@ -23,6 +24,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestRoundViewActivity.class));
         list.add(new ActivityInfo(TestZoomDrawableActivity.class));
         list.add(new ActivityInfo(TestDiscViewActivity.class));
+        list.add(new ActivityInfo(TestBaiduFaceActivity.class));
     }
 
 }

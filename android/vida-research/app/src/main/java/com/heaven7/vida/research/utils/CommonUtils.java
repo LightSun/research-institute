@@ -8,9 +8,17 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author heaven7
@@ -80,4 +88,48 @@ public class CommonUtils {
         return false;
     }
 
+    public static Map<String,String> toMap(@NonNull IRawData data) {
+        final Map<String,String> map = new HashMap<String,String>();
+
+        Class<?> clazz = data.getClass();
+        populateJsonFromFields(data, clazz, map);
+        while ((clazz = clazz.getSuperclass()) != Object.class && clazz != null) {
+            populateJsonFromFields(data, clazz, map);
+        }
+        return map;
+    }
+    private static void populateJsonFromFields(Object data, Class<?> clazz, Map<String,String> map) {
+        final boolean fromSuper = data.getClass() != clazz;
+        final Field[] fields = clazz.getDeclaredFields();
+        if (fields != null && fields.length > 0) {
+            for (Field f : fields) {
+                f.setAccessible(true);
+                if (fromSuper) {
+                    final Expose expose = f.getAnnotation(Expose.class);
+                    if (expose == null || !expose.serialize()) {
+                        continue;
+                    }
+                }
+                final SerializedName sn = f.getAnnotation(SerializedName.class);
+                if (sn == null) {
+                    continue;
+                }
+                try {
+                    Object val = f.get(data);
+                    map.put(sn.value(), val !=null ? val.toString() : "");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * the tag interface, and the json fields must have annotation {@link com.google.gson.annotations.SerializedName}
+     *  and field from super must have annotation {@link com.google.gson.annotations.Expose}.
+     * Created by heaven7 on 2016/10/9.
+     */
+
+    public  interface IRawData {
+    }
 }
