@@ -97,7 +97,6 @@ public class TestDiscViewActivity extends AppCompatActivity {
           //3
         disc = new DiscView.Disc();
         disc.step = step;
-        disc.loop = true;
         maxTextSize -= 30;
         addItems(disc, 10, maxTextSize);
 

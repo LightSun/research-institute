@@ -1,5 +1,7 @@
 package com.heaven7.vida.research.face_bd;
 
+import android.graphics.Rect;
+
 /**
  * face info of https://ai.baidu.com/docs#/Face-Detect/top
  * Created by heaven7 on 2018/4/27 0027.
@@ -50,7 +52,7 @@ public class FaceInfo {
     /**
      * 性别
      */
-    private String gener;
+    private String gender;
     /**
      * 性别置信度，范围[0~1]，face_fields包含gender时返回
      */
@@ -116,8 +118,8 @@ public class FaceInfo {
         return expression_probability;
     }
 
-    public String getGener() {
-        return gener;
+    public String getGender() {
+        return gender;
     }
 
     public double getGender_probability() {
@@ -153,7 +155,7 @@ public class FaceInfo {
                 ", roll=" + roll +
                 ", expression=" + expression +
                 ", expression_probability=" + expression_probability +
-                ", gener='" + gener + '\'' +
+                ", gender='" + gender + '\'' +
                 ", gender_probability=" + gender_probability +
                 ", glasses=" + glasses +
                 ", glasses_probability=" + glasses_probability +
@@ -168,6 +170,10 @@ public class FaceInfo {
     public static class Location {
 
         public int left, top, width, height;
+
+        public Rect toRect(){
+            return new Rect(left, top, left + width, top + height);
+        }
 
         @Override
         public String toString() {

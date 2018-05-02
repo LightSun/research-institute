@@ -45,6 +45,7 @@ public class FaceRequest {
         imageUrl = netUrl;
         return this;
     }
+
     public static String getPathFromDrawableRes(Context context, int id) {
         Resources resources = context.getResources();
         String path = ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
@@ -53,6 +54,7 @@ public class FaceRequest {
                 + resources.getResourceEntryName(id);
         return path;
     }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static int getExifOrientation(InputStream in) {
 
@@ -122,7 +124,8 @@ public class FaceRequest {
         });
     }
 
-    public void startRequest(Context context, final @DrawableRes int imageId) {
+    public void startRequest(Context context, final @DrawableRes int imageId,
+                             final AbstractRetrofitCallback<ArrayList<FaceInfo>> callback) {
         if (mService == null) {
             mService = Executors.newCachedThreadPool();
         }
@@ -162,12 +165,7 @@ public class FaceRequest {
                     public void onEnd(int code) {
                         Logger.d(TAG, "onEnd", RetrofitCaller.codeToString(code));
                     }
-                }).callback(new AbstractRetrofitCallback<ArrayList<FaceInfo>>() {
-                    @Override
-                    public void onSuccess(ArrayList<FaceInfo> result) {
-                        Logger.i(TAG, "onSuccess", "" + result);
-                    }
-                }).call();
+                }).callback(callback).call();
             }
         });
     }

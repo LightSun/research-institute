@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -92,6 +93,16 @@ public class ExampleUnitTest2 {
     public void testRotateMulti2(){
         for (int i = 0 ; i < 20;  i++) {
             mDiscList.rotate(45, false);
+            logItems("i = " + i);
+        }
+    }
+
+
+    @Test //混合
+    public void testRotateMutex(){
+        Random r  = new Random();
+        for (int i = 0 ; i < 30;  i++) {
+            mDiscList.rotate((r.nextInt(10) + 1 ) * 10, r.nextInt(10) > 5);
             logItems("i = " + i);
         }
     }

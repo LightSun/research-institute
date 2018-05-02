@@ -1,5 +1,7 @@
 package com.heaven7.vida.research.utils;
 
+import com.heaven7.core.util.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,13 +51,14 @@ import java.util.List;
 
 public class DiscList<E extends DiscList.DiscItem> {
 
+   // private static final String TAG = "DiscList";
     private final ArrayList<E> mItems = new ArrayList<>();
     private final ArrayList<E> mLayoutItems = new ArrayList<>();
     /** for some case .we may allow overlap some angle. */
     private static final int DEFAULT_OVERLAP_DEGREE = 0;
 
     private float mStartVisibleAngle = 0f;
-    private float mEndVisibleAngle = 180f;
+    private float mEndVisibleAngle = 360f;
     private float mRotatedDegree = 0;
     private float mStartDrawAngle;
     /** for some case .we may allow overlap some angle. */
@@ -88,16 +91,19 @@ public class DiscList<E extends DiscList.DiscItem> {
         if(end - start > 360f){
             throw new IllegalArgumentException();
         }
-        if (start < 0 && end < 0) {
+        if (end < 0) {
             do {
                 start += 360f;
                 end += 360f;
             }while (end < 0);
-        } else if (start > 360f && end > 360f) {
+        } else if (start > 360f) {
             do {
                 start -= 360f;
                 end -= 360f;
             } while (start > 360f);
+        }
+        if(mStartVisibleAngle == start && mEndVisibleAngle == end){
+            return;
         }
         this.mStartVisibleAngle = start;
         this.mEndVisibleAngle = end;
@@ -120,19 +126,15 @@ public class DiscList<E extends DiscList.DiscItem> {
             throw new IllegalArgumentException("degree must > 0");
         }
         if (clockwise) {
+            this.mRotatedDegree += degree;
             //for clock wise . check tail
             if (!mLayoutItems.isEmpty()) {
                 //rotate
                 rotateLayoutItems(degree);
-                //check out of range.
-                float over = mRotatedDegree - mRotatedDegree % 360;
-                if(over > 0 && over % 360 == 0){
-                    over = 0f;
-                }
                 for (int size = mLayoutItems.size(), i = size - 1; i >= 0; i--) {
                     E e = mLayoutItems.get(i);
                     //end position is over start angle.
-                    if (e.getEndAngle() > mStartVisibleAngle + 360f + over) {
+                    if (shouldDelete(e)) {
                         mLayoutItems.remove(i);
                         onRemoveLayoutItem(e);
                     } else {
@@ -152,22 +154,16 @@ public class DiscList<E extends DiscList.DiscItem> {
                     }
                 }
             }
-            this.mRotatedDegree += degree;
         } else {
+            this.mRotatedDegree -= degree;
             //for !clock wise . check head
             if (!mLayoutItems.isEmpty()) {
                 //rotate
                 rotateLayoutItems(-degree);
-                //check out of range. -370 - (-10)
-                //over used to adjust
-                float over = mRotatedDegree - mRotatedDegree % 360;
-                if(over < 0 && over % 360 == 0){
-                    over = 0;
-                }
                 for (int size = mLayoutItems.size(), i = 0; i < size; i++) {
                     E e = mLayoutItems.get(i);
                     //end position is over start angle.
-                    if (e.getEndAngle() <= mStartVisibleAngle + over) {
+                    if(shouldDelete(e)){
                         mLayoutItems.remove(i);
                         onRemoveLayoutItem(e);
                         size --;
@@ -189,10 +185,23 @@ public class DiscList<E extends DiscList.DiscItem> {
                     }
                 }
             }
-            this.mRotatedDegree -= degree;
         }
         mStartDrawAngle = mLayoutItems.get(0).getStartAngle();
+        logItems("rotate");
     }
+
+    public void logItems(String tag) {
+        System.out.println("=========== start ["+ tag +"] ============");
+        List<E> items = getLayoutItems(null);
+        for (E item : items){
+            System.out.println(item.getDegree() + " ,reverse = " + item.isReverse());
+        }
+        System.out.println("drawAngle = " + getStartDrawAngle()
+                + " ,rotate angle = " + getRotatedDegree());
+        System.out.println("=========== end ["+ tag +"] ============");
+        System.out.println();
+    }
+
     /**
      * rotate to target degree.
      *
@@ -228,6 +237,7 @@ public class DiscList<E extends DiscList.DiscItem> {
     public float getOverlapDegree() {
         return mOverlapDegree;
     }
+
     /**
      * set overlap degree. in disc, in some case, we may allow overlap some degree.
      * <p>Note ,if you want overlap degree. you must call this before call any of other methods. like {@linkplain #setItems(List)} .</p>
@@ -236,7 +246,6 @@ public class DiscList<E extends DiscList.DiscItem> {
     public void setOverlapDegree(float overlapDegree) {
         this.mOverlapDegree = overlapDegree;
     }
-
     /**
      * get the start draw angle. which should often called after {@linkplain #layout()}
      *
@@ -253,6 +262,7 @@ public class DiscList<E extends DiscList.DiscItem> {
     public float getStartVisibleAngle() {
         return mStartVisibleAngle;
     }
+
     /**
      * get the end visible angle
      * @return the end visible angle
@@ -260,7 +270,6 @@ public class DiscList<E extends DiscList.DiscItem> {
     public float getEndVisibleAngle() {
         return mEndVisibleAngle;
     }
-
     /**
      * get the rotated degree
      * @return the the rotated degree
@@ -305,7 +314,7 @@ public class DiscList<E extends DiscList.DiscItem> {
      * resort the items
      *
      * @param delegate the sort delegate
-     * @return false if no items. true if otherwise.
+     * @return false if no items. true otherwise.
      */
     public boolean sort(SortDelegate<E> delegate) {
         if (delegate == null) {
@@ -331,28 +340,25 @@ public class DiscList<E extends DiscList.DiscItem> {
         float temp = mStartVisibleAngle;
         E last = mItems.get(0);
         temp += last.getDegree();
-        if(temp <= mStartVisibleAngle + 360f){
-            addLayoutItem(last, false);
-            last.setStartAngle(start);
-            last.setEndAngle(temp);
-            start = temp;
-            for (;;){
-                E item = next(last);
-                temp += item.getDegree();
-                if(temp <= mStartVisibleAngle + 360f){
-                    addLayoutItem(item, false);
-                    item.setStartAngle(start);
-                    item.setEndAngle(temp);
-                    start = temp;
-                    last = item;
-                }else{
-                    break;
-                }
+        //angle must below 360.
+        addLayoutItem(last, false);
+        last.setStartAngle(start);
+        last.setEndAngle(temp);
+        start = temp;
+        for (;;){
+            E item = next(last);
+            temp += item.getDegree();
+            if(start < mEndVisibleAngle){
+                addLayoutItem(item, false);
+                item.setStartAngle(start);
+                item.setEndAngle(temp);
+                start = temp;
+                last = item;
+            }else{
+                break;
             }
-            mStartDrawAngle = mLayoutItems.get(0).getStartAngle();
-        }else{
-            System.err.println("cant layout any item.");
         }
+        mStartDrawAngle = mLayoutItems.get(0).getStartAngle();
         return true;
     }
 
@@ -396,18 +402,15 @@ public class DiscList<E extends DiscList.DiscItem> {
     }
 
     //degree > 0
-    private void insertTailItems( E head, E tail) {
+    private void insertTailItems(E head, E tail) {
         E next = next(tail);
         if (next.isHold()) {
             return;
         }
-        float over = mRotatedDegree - mRotatedDegree % 360;
-        if(over < 0 && over % 360 == 0){
-            over = 0;
-        }
+        float[] angles = adjustAngles(tail, null);
         float endAngle = tail.getEndAngle();
         float nextDegree = next.getDegree();
-        if ((endAngle + nextDegree ) <= head.getStartAngle() + 360f + over) {
+        if (angles[1] < mEndVisibleAngle && (endAngle + nextDegree ) <= head.getStartAngle() + 360f) {
             next.setStartAngle(endAngle);
             next.setEndAngle(endAngle + nextDegree);
             addLayoutItem(next, false);
@@ -416,22 +419,39 @@ public class DiscList<E extends DiscList.DiscItem> {
     }
 
     private void insertHeadItems(E head) {
-        float over = mRotatedDegree - mRotatedDegree % 360;
-        if(over > 0 && over % 360 == 0){
-            over = 0f;
-        }
-        float startAngle = head.getStartAngle();
-        if (startAngle > mStartVisibleAngle + over) {
+        float startAngle = adjustAngles(head, null)[0];
+        if (startAngle > mStartVisibleAngle) {
             //will insert new item.
             E previous = previous(head);
             if (previous.isHold()) {
                 return;
             }
-            previous.setStartAngle(startAngle - previous.getDegree());
-            previous.setEndAngle(startAngle);
+            previous.setStartAngle(head.getStartAngle() - previous.getDegree());
+            previous.setEndAngle(head.getStartAngle());
             addLayoutItem(previous, true);
             insertHeadItems(previous);
         }
+    }
+
+    //Normalized: to -360 ~ 360.
+    private boolean shouldDelete(E e) {
+        //start angle > end angle
+        float startAngle = e.getStartAngle();
+        float endAngle = e.getEndAngle();
+
+        if(startAngle >= 360){
+            int count = Math.min((int)startAngle / 360, (int)endAngle/ 360);
+            float over = count * 360;
+            startAngle -= over;
+            endAngle -= over;
+        }else if( endAngle <= -360){
+            int count = Math.min((int)startAngle / 360, (int)endAngle/ 360);
+            float over = count * 360;
+            startAngle += over;
+            endAngle += over;
+        }
+        //start angle > max .  or end angle  < min
+        return startAngle >= mEndVisibleAngle || endAngle <= mStartVisibleAngle;
     }
 
     private void addLayoutItem(E e, boolean head) {
@@ -451,10 +471,34 @@ public class DiscList<E extends DiscList.DiscItem> {
         }
     }
 
+    /** adjust angles to (-360~360) */
+    private static float[] adjustAngles(DiscItem e, float[] out) {
+        if(out == null){
+            out = new float[2];
+        }
+        float startAngle = e.getStartAngle();
+        float endAngle = e.getEndAngle();
+
+        if(startAngle >= 360){
+            int count = Math.min((int)startAngle / 360, (int)endAngle/ 360);
+            float over = count * 360;
+            startAngle -= over;
+            endAngle -= over;
+        }else if( endAngle <= -360){
+            int count = Math.min((int)startAngle / 360, (int)endAngle/ 360);
+            float over = count * 360;
+            startAngle += over;
+            endAngle += over;
+        }
+        out[0] = startAngle;
+        out[1] = endAngle;
+        return out;
+    }
     /**
      * the disc item.
      * @author heaven7
      */
+
     public interface DiscItem {
         void setIndex(int index);
 
@@ -480,6 +524,8 @@ public class DiscList<E extends DiscList.DiscItem> {
         float getStartAngle();
 
         float getEndAngle();
+
+        String getLogText();
     }
 
     /**
@@ -548,6 +594,11 @@ public class DiscList<E extends DiscList.DiscItem> {
         @Override
         public float getEndAngle() {
             return endAngle;
+        }
+
+        @Override
+        public String getLogText() {
+            return toString();
         }
 
         @Override

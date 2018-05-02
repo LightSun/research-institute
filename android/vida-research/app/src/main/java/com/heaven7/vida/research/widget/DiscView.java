@@ -64,6 +64,7 @@ public class DiscView extends View {
      */
     private List<Disc> mDiscs;
     private DiscProvider mProvider;
+    private final List<Item> mTempList = new ArrayList<>();
 
     //handle event
     private float mLastX = -1;
@@ -128,18 +129,23 @@ public class DiscView extends View {
 
     public void setDiscs(List<Disc> discs) {
         this.mDiscs = discs;
+        computeDegree(discs);
         requestLayout();
+    }
+
+    private void computeDegree(List<Disc> discs) {
+        for(Disc disc : discs){
+            //decide: total degree >360 or not.
+            disc.loop = disc.computeDegree(mProvider, mPaint) > 360;
+        }
     }
 
     private void preProcessVisibleItems(List<Disc> discs) {
         for (Disc disc : discs) {
-            //disc.mDiscList.setVisibleAngles();
             if (disc.loop) {
-                //compute the all degree to decide which will be visible.
-                //if all item is visible . we just mark the loop to false.
-               /* if (disc.visibleItems.size() == disc.items.size()) {
-                    disc.loop = false;
-                }*/
+                DiscList<Item> discList = disc.getDiscList();
+                discList.setVisibleAngles(mStartVisibleAngle, mEndVisibleAngle);
+                discList.setItems(disc.items);
             }
         }
     }
@@ -219,17 +225,14 @@ public class DiscView extends View {
 
             mPaint.setColor(mCircleColor);
             canvas.drawCircle(0, 0, r, mPaint);
+
             float startDegree = disc.startDrawAngle + DRAW_DEGREE_OFFSET;
             if (disc.start_vOffset == -1) {
                 disc.start_vOffset = mProvider.provideVOffset(disc, i, r);
             }
-          //TODO
-            final List<Item> items = /*disc.loop ? disc.visibleItems :*/ disc.items;
+            final List<Item> items = disc.loop ? disc.getDiscList().getLayoutItems(mTempList) : disc.items;
             for (int i1 = 0, size1 = items.size(); i1 < size1; i1++) {
                 Item item = items.get(i1);
-                if (item.degree == 0) {
-                    item.degree = mProvider.provideDegree(item, mPaint);
-                }
                 float degree = item.degree;
                 float vOffset = disc.start_vOffset;
                 for (int i2 = 0, size2 = item.rows.size(); i2 < size2; i2++) {
@@ -242,6 +245,7 @@ public class DiscView extends View {
                 }
                 startDegree += degree;
             }
+            mTempList.clear();
 
             r -= disc.step;
             if (r <= 0) {
@@ -294,7 +298,7 @@ public class DiscView extends View {
     //轮盘放不下item的问题？
     protected boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2,
                                float dx, float dy) {
-        Logger.d(TAG, "onScroll", "--------------");
+       // Logger.d(TAG, "onScroll", "--------------");
         if (dx == 0) {
             return false;
         }
@@ -310,6 +314,8 @@ public class DiscView extends View {
         }
         float x = e2.getX();
         float y = e2.getY();
+
+        final float deltaDegree;
         if (dx < 0) {
             //to right. first + and -
             if (mLastX > mInitX && x < mInitX) {
@@ -317,21 +323,26 @@ public class DiscView extends View {
                 float tempY = le.getY(mInitX);
 
                 float distance = computeDistance(mLastX, mLastY, mInitX, tempY);
-                mFocusDisc.startAngle += distanceToDegree(distance);
+                float degree1 = distanceToDegree(distance);
+                mFocusDisc.startAngle += degree1;
                 distance = computeDistance(mInitX, tempY, x, y);
-                mFocusDisc.startAngle -= distanceToDegree(distance);
+                float degree2 = distanceToDegree(distance);
+                mFocusDisc.startAngle -= degree2;
                 mInitY = tempY;
-                Logger.d(TAG, "onScroll", "to right >>> first + and -");
+                deltaDegree = degree1 - degree2;
+               // Logger.d(TAG, "onScroll", "to right >>> first + and -");
             } else {
                 float distance = computeDistance(mLastX, mLastY, x, y);
                 float degree = distanceToDegree(distance);
                 //right of init position
                 if (x > mInitX) {
                     mFocusDisc.startAngle += degree;
+                    deltaDegree = degree;
                 } else {
                     mFocusDisc.startAngle -= degree;
+                    deltaDegree = -degree;
                 }
-                Logger.d(TAG, "onScroll", "to right");
+               // Logger.d(TAG, "onScroll", "to right");
             }
         } else {
             //to left。first - and +
@@ -339,36 +350,36 @@ public class DiscView extends View {
                 LinearEquation le = new LinearEquation(mLastX, mLastY, x, y);
                 float tempY = le.getY(mInitX);
                 float distance = computeDistance(mLastX, mLastY, mInitX, tempY);
-                mFocusDisc.startAngle -= distanceToDegree(distance);
+                float degree1 = distanceToDegree(distance);
+                mFocusDisc.startAngle -= degree1;
                 distance = computeDistance(mInitX, tempY, x, y);
-                mFocusDisc.startAngle += distanceToDegree(distance);
+                float degree2 = distanceToDegree(distance);
+                mFocusDisc.startAngle += degree2;
                 mInitY = tempY;
-                Logger.d(TAG, "onScroll", "to left >>> first - and +");
+                deltaDegree = degree2 - degree1;
+               // Logger.d(TAG, "onScroll", "to left >>> first - and +");
             } else {
                 float distance = computeDistance(mLastX, mLastY, x, y);
                 float degree = distanceToDegree(distance);
                 if (x < mInitX) {
                     mFocusDisc.startAngle -= degree;
+                    deltaDegree = -degree;
                 } else {
                     mFocusDisc.startAngle += degree;
+                    deltaDegree = degree;
                 }
-                Logger.d(TAG, "onScroll", "to left");
+               // Logger.d(TAG, "onScroll", "to left");
             }
         }
         //adjust visible items and start angle.
         if (mFocusDisc.loop) {
-            //recomputeVisibleItems(mFocusDisc, false);
+            Logger.d(TAG, "onScroll", "deltaDegree = " + deltaDegree);
+            DiscList<Item> discList = mFocusDisc.getDiscList();
+            discList.rotate(Math.abs(deltaDegree), deltaDegree > 0);
+            mFocusDisc.startDrawAngle = discList.getStartDrawAngle();
         } else {
             mFocusDisc.startDrawAngle = mFocusDisc.startAngle;
         }
-       /* float distance = computeDistance(mLastX, mLastY, e2.getX(), e2.getY());
-
-        float degree = distanceToDegree(distance);
-        if (dx < 0) {
-            mFocusDisc.startAngle += degree;
-        } else {
-            mFocusDisc.startAngle -= degree;
-        }*/
         mLastX = x;
         mLastY = y;
         postInvalidate();
@@ -472,19 +483,18 @@ public class DiscView extends View {
      */
     public static class Disc {
 
-        final DiscList<Item> mDiscList = new DiscList<>();
+        private DiscList<Item> mDiscList;
         final List<Item> items = new ArrayList<>();
+
+        /**
+         * when loop is true, no matter how many items. the all items will loop
+         */
+        boolean loop;
 
         /**
          * the step between current and next disc
          */
         public int step;
-
-        /**
-         * when loop is true, no matter how many items. the all items will loop
-         */
-        public boolean loop;
-
         /**
          * the select text color
          */
@@ -514,6 +524,20 @@ public class DiscView extends View {
             items.add(item);
         }
 
+        /*public*/ float computeDegree(DiscProvider provider, Paint paint) {
+            float total = 0f;
+            for(Item item : items){
+                item.degree = provider.provideDegree(item, paint);
+                total += item.degree;
+            }
+            return total;
+        }
+        /*public*/ DiscList<Item> getDiscList() {
+            if(mDiscList == null){
+                mDiscList = new DiscList<>();
+            }
+            return mDiscList;
+        }
     }
 
     /**
@@ -537,6 +561,10 @@ public class DiscView extends View {
         @Override
         public float getDegree() {
             return degree;
+        }
+        @Override
+        public String getLogText() {
+            return getDefaultText() + " ," + toString();
         }
     }
 
