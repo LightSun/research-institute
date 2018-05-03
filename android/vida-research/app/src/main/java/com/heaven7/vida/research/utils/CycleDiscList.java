@@ -9,13 +9,13 @@ import java.util.List;
  * the disc list. help we manage disc. and the disc is from left . that means the angle of left side is 0.
  * the angle of right side is 180. Here is a simple demo:
  * <pre><code>
- *       private final DiscList<DiscList.BaseDiscItem> mDiscList = new DiscList<>();
+ *       private final CycleDiscList<CycleDiscList.BaseDiscItem> mDiscList = new CycleDiscList<>();
  *       private void setUp() {
-              List<DiscList.BaseDiscItem> list = new ArrayList<>();
+              List<CycleDiscList.BaseDiscItem> list = new ArrayList<>();
               final float min = 10;
               for(int i = 0 ; i < 10 ; i ++){
                      final int index = i;
-                     list.add(new DiscList.BaseDiscItem() {
+                     list.add(new CycleDiscList.BaseDiscItem() {
                          {@literal @} Override
                         public float getDegree() {
                             return  min + index * 10;
@@ -35,8 +35,8 @@ import java.util.List;
          }
          public void logItems(String tag) {
              System.out.println("=========== start ["+ tag +"] ============");
-             List<DiscList.BaseDiscItem> items = mDiscList.getLayoutItems(null);
-             for (DiscList.BaseDiscItem item : items){
+             List<CycleDiscList.BaseDiscItem> items = mDiscList.getLayoutItems(null);
+             for (CycleDiscList.BaseDiscItem item : items){
                   System.out.println(item.getDegree() + " ,reverse = " + item.isReverse());
              }
              System.out.println("drawAngle = " + mDiscList.getStartDrawAngle()
@@ -49,9 +49,9 @@ import java.util.List;
  * Created by heaven7 on 2018/4/25 0025.
  */
 
-public class DiscList<E extends DiscList.DiscItem> {
+public class CycleDiscList<E extends CycleDiscList.DiscItem> {
 
-   // private static final String TAG = "DiscList";
+    private static final String TAG = "CycleDiscList";
     private final ArrayList<E> mItems = new ArrayList<>();
     private final ArrayList<E> mLayoutItems = new ArrayList<>();
     /** for some case .we may allow overlap some angle. */
@@ -113,6 +113,14 @@ public class DiscList<E extends DiscList.DiscItem> {
     }
 
     /**
+     * rotate the disc with target angle.
+     * @param deltaAngle the delta angle.
+     * @see  #rotate(float, boolean)
+     */
+    public void rotate(float deltaAngle) {
+        rotate(Math.abs(deltaAngle), deltaAngle > 0);
+    }
+    /**
      * rotate the disc with target degree. degree must > 0.
      *
      * @param degree    the degree . > 0
@@ -131,6 +139,7 @@ public class DiscList<E extends DiscList.DiscItem> {
             if (!mLayoutItems.isEmpty()) {
                 //rotate
                 rotateLayoutItems(degree);
+                //remove out of range
                 for (int size = mLayoutItems.size(), i = size - 1; i >= 0; i--) {
                     E e = mLayoutItems.get(i);
                     //end position is over start angle.
@@ -160,6 +169,7 @@ public class DiscList<E extends DiscList.DiscItem> {
             if (!mLayoutItems.isEmpty()) {
                 //rotate
                 rotateLayoutItems(-degree);
+                //remove out of range
                 for (int size = mLayoutItems.size(), i = 0; i < size; i++) {
                     E e = mLayoutItems.get(i);
                     //end position is over start angle.
@@ -187,19 +197,6 @@ public class DiscList<E extends DiscList.DiscItem> {
             }
         }
         mStartDrawAngle = mLayoutItems.get(0).getStartAngle();
-        logItems("rotate");
-    }
-
-    public void logItems(String tag) {
-        System.out.println("=========== start ["+ tag +"] ============");
-        List<E> items = getLayoutItems(null);
-        for (E item : items){
-            System.out.println(item.getDegree() + " ,reverse = " + item.isReverse());
-        }
-        System.out.println("drawAngle = " + getStartDrawAngle()
-                + " ,rotate angle = " + getRotatedDegree());
-        System.out.println("=========== end ["+ tag +"] ============");
-        System.out.println();
     }
 
     /**
@@ -247,7 +244,7 @@ public class DiscList<E extends DiscList.DiscItem> {
         this.mOverlapDegree = overlapDegree;
     }
     /**
-     * get the start draw angle. which should often called after {@linkplain #layout()}
+     * get the start draw angle.
      *
      * @return the start angle of draw.
      */
@@ -279,35 +276,70 @@ public class DiscList<E extends DiscList.DiscItem> {
     }
 
     /**
-     * get the next item by anchor.
-     *
-     * @param anchor the anchor
-     * @return the next item
+     * query item which is at the target angle.
+     * @param centerAngle the center angle
+     * @param targetAngle the target angle
+     * @param callback the query callback.
      */
-    public E next(E anchor) {
-        int index = anchor.getIndex();
-        if (index == mItems.size() - 1) {
-            index = 0;
-        } else {
-            index++;
+    public boolean queryItem(float centerAngle, float targetAngle, QueryCallback<E> callback) {
+        float[] angles = new float[2];
+        E result = null;
+        for (int i = 0, size = mLayoutItems.size(); i < size; i++) {
+            E item = mLayoutItems.get(i);
+            adjustAngles(item, angles);
+            if(targetAngle >= angles[0] && targetAngle <= angles[1]){
+                result = item;
+                break;
+            }
         }
-        return mItems.get(index);
+        if(result != null){
+            float expectStartDegree = centerAngle - result.getDegree() / 2;
+            float delta = expectStartDegree - angles[0];
+            Logger.d(TAG, "queryItem", "delta = " + delta + " ,selectItem = " + result);
+            callback.onQueryResult(result, delta);
+            return true;
+        }
+        return false;
     }
-
     /**
-     * get the previous item by anchor.
-     *
-     * @param anchor the anchor
-     * @return the previous item
+     * make the nearest item in center. this must called after set items. or else return null.
+     * @param centerAngle the center angle
+     * @return the nearest item
      */
-    public E previous(E anchor) {
-        int index = anchor.getIndex();
-        if (index == 0) {
-            index = mItems.size() - 1;
-        } else {
-            index--;
+    public E makeItemInCenter(float centerAngle) {
+        if(mLayoutItems.isEmpty()){
+            return null;
         }
-        return mItems.get(index);
+        //final float centerAngle = 90f;
+        float minDistance = Integer.MAX_VALUE;
+        float[] angles = new float[2];
+        float distanceStart, distanceEnd, start = 0f;
+
+        E nearItem = null;
+        for (int i = 0, size = mLayoutItems.size(); i < size; i++) {
+            E item = mLayoutItems.get(i);
+            adjustAngles(item, angles);
+            distanceStart = Math.abs(centerAngle - angles[0]);
+            distanceEnd = Math.abs(centerAngle - angles[1]);
+            float tmp = Math.min(distanceStart, distanceEnd);
+            //contains . break
+            if(centerAngle >= angles[0] && centerAngle <= angles[1]){
+                start = angles[0];
+                nearItem = item;
+                break;
+            }else if(tmp < minDistance){
+                start = angles[0];
+                minDistance = tmp;
+                nearItem = item;
+            }
+        }
+        if(nearItem != null){
+            float expectStartDegree = centerAngle - nearItem.getDegree() / 2;
+            float delta = expectStartDegree - start;
+            rotate(delta);
+            Logger.d(TAG, "makeItemInCenter", "delta = " + delta + " ,selectItem = " + nearItem);
+        }
+        return nearItem;
     }
 
     /**
@@ -471,6 +503,38 @@ public class DiscList<E extends DiscList.DiscItem> {
         }
     }
 
+    /**
+     * get the next item by anchor.
+     *
+     * @param anchor the anchor
+     * @return the next item
+     */
+    private E next(E anchor) {
+        int index = anchor.getIndex();
+        if (index == mItems.size() - 1) {
+            index = 0;
+        } else {
+            index++;
+        }
+        return mItems.get(index);
+    }
+
+    /**
+     * get the previous item by anchor.
+     *
+     * @param anchor the anchor
+     * @return the previous item
+     */
+    private E previous(E anchor) {
+        int index = anchor.getIndex();
+        if (index == 0) {
+            index = mItems.size() - 1;
+        } else {
+            index--;
+        }
+        return mItems.get(index);
+    }
+
     /** adjust angles to (-360~360) */
     private static float[] adjustAngles(DiscItem e, float[] out) {
         if(out == null){
@@ -494,11 +558,11 @@ public class DiscList<E extends DiscList.DiscItem> {
         out[1] = endAngle;
         return out;
     }
+
     /**
      * the disc item.
      * @author heaven7
      */
-
     public interface DiscItem {
         void setIndex(int index);
 
@@ -524,25 +588,35 @@ public class DiscList<E extends DiscList.DiscItem> {
         float getStartAngle();
 
         float getEndAngle();
+    }
 
-        String getLogText();
+    /**
+     * the query callback.
+     * @param <E> the disc item
+     */
+    public interface QueryCallback<E extends DiscItem> {
+        /**
+         * called on query done. see {@linkplain CycleDiscList#queryItem(float, float, QueryCallback)}.
+         * @param item the item.
+         * @param deltaAngle the delta angle
+         */
+        void onQueryResult(E item, float deltaAngle);
     }
 
     /**
      * the sort delegate
-     * @param <E>
+     * @param <E> the disc item
      * @author heaven7
      */
     public interface SortDelegate<E extends DiscItem> {
         void sort(List<E> items);
     }
 
-
     /**
      * the base disc item
      * @author heaven7
      */
-    public static abstract class BaseDiscItem implements DiscList.DiscItem {
+    public static abstract class BaseDiscItem implements CycleDiscList.DiscItem {
         private int index;
         private boolean hold;
         private boolean reverse;
@@ -594,11 +668,6 @@ public class DiscList<E extends DiscList.DiscItem> {
         @Override
         public float getEndAngle() {
             return endAngle;
-        }
-
-        @Override
-        public String getLogText() {
-            return toString();
         }
 
         @Override

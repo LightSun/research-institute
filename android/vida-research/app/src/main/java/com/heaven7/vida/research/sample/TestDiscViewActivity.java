@@ -49,6 +49,8 @@ public class TestDiscViewActivity extends AppCompatActivity {
         //1
         DiscView.Disc disc = new DiscView.Disc();
         disc.step = step * 2;
+        disc.selectTextColor = Color.BLACK;
+        disc.textColor = Color.parseColor("#d0d0d0");
 
         DiscView.Item item = new DiscView.Item();
         disc.addItem(item);
@@ -71,6 +73,8 @@ public class TestDiscViewActivity extends AppCompatActivity {
         //2
         disc = new DiscView.Disc();
         disc.step = step;
+        disc.selectTextColor = Color.BLACK;
+        disc.textColor = Color.parseColor("#d0d0d0");
         maxTextSize -= 30;
 
         item = new DiscView.Item();
@@ -97,6 +101,8 @@ public class TestDiscViewActivity extends AppCompatActivity {
           //3
         disc = new DiscView.Disc();
         disc.step = step;
+        disc.selectTextColor = Color.BLACK;
+        disc.textColor = Color.parseColor("#d0d0d0");
         maxTextSize -= 30;
         addItems(disc, 10, maxTextSize);
 
@@ -119,7 +125,7 @@ public class TestDiscViewActivity extends AppCompatActivity {
     private DiscView.Row createRow(String text, float textSize) {
         DiscView.Row row = new DiscView.Row();
         row.text = text;
-        row.textColor = Color.RED;
+        //row.textColor = Color.RED;
         row.textSize = textSize;
         return row;
     }
