@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class ExampleUnitTest2 {
 
-    private final CycleDiscList<DiscList.BaseDiscItem> mDiscList = new CycleDiscList<>();
+    private final CycleDiscList<CycleDiscList.BaseDiscItem> mDiscList = new CycleDiscList<>();
 
     public ExampleUnitTest2() {
         setUp();

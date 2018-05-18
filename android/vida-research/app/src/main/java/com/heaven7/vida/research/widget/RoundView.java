@@ -55,7 +55,29 @@ public class RoundView extends View{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        int width = getWidth() / 2 - 20;
+        //draw 4
+        int dx = 20;
+        int dy = 20;
+
+        canvas.save();
+        canvas.translate(dx, dy);
+        int rectWidth = 50;
+
+        rect.set(0, 0, rectWidth, getHeight());
+        for(int i = 0 ; i < 10 ; i ++){
+            rectF.set(rect);
+            path.reset();
+            path.addRoundRect(rectF, 20, 20, Path.Direction.CW);
+
+            canvas.save();
+            canvas.clipPath(path);
+            canvas.drawBitmap(mBitmap, null, rect, null);
+            canvas.restore();
+            rect.offset(rectWidth, 0);
+        }
+        canvas.restore();
+
+       /* int width = getWidth() / 2 - 20;
         int height = getHeight();
 
         rectF.set(0, 0, width, height);
@@ -79,7 +101,7 @@ public class RoundView extends View{
         canvas.save();
         canvas.clipPath(path);
         canvas.drawBitmap(mBitmap, null, rect, null);
-        canvas.restore();
+        canvas.restore();*/
     }
 
 }

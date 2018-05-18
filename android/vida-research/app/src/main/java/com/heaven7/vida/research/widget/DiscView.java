@@ -181,7 +181,7 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
         switch (event.getActionMasked()) {
 
             case MotionEvent.ACTION_UP:
-                makeItemInCenter();
+                makeItemInCenter(mFocusDisc);
                 resetTouch();
                 break;
 
@@ -276,9 +276,16 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
         canvas.drawTextOnPath(text, mPath, hOffset, vOffset, paint);
     }
 
-    private void makeItemInCenter() {
-        if (mFocusDisc != null && mFocusDisc.makeItemInCenter(mDiscCallback)) {
-            invalidate();
+    private void makeItemInCenter(Disc disc) {
+        if(isAnimating()){
+            //anim doing.
+            return;
+        }
+        if (disc != null) {
+            if(!disc.centering && disc.makeItemInCenter(mDiscCallback)){
+                Logger.d(TAG, "makeItemInCenter", "center ok .");
+                invalidate();
+            }
         }
     }
 
@@ -576,6 +583,16 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             Logger.d(TAG, "onFling", "");
+            if(mFocusDisc == null){
+                return false;
+            }
+            float distance = computeDistance(e1.getX(), e1.getY(), e2.getX(), e2.getY());
+            float degree = distanceToDegree(distance);
+            if(e2.getX() > e1.getX()){
+                mAnimHelper.fling(mFocusDisc, degree);
+            }else{
+                mAnimHelper.fling(mFocusDisc, -degree);
+            }
             return true;
         }
     }
@@ -585,6 +602,7 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
         private Disc disc;
         private Item focusItem;
         boolean animating;
+        private int mDuration = 250;
 
         void start(Disc disc, Item focusItem, float deltaAngle){
             this.disc = disc;
@@ -592,7 +610,7 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
             ObjectAnimator animator = ObjectAnimator.ofFloat(this, sANIM_PROP,
                     disc.startAngle, disc.startAngle + deltaAngle);
             animator.setInterpolator(new LinearInterpolator());
-            animator.setDuration(250);
+            animator.setDuration(mDuration);
             animator.addListener(this);
             animator.start();
         }
@@ -606,7 +624,7 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
             ObjectAnimator animator = ObjectAnimator.ofFloat(this, sANIM_PROP_CYCLE,
                     startRotateDegree, startRotateDegree + deltaAngle);
             animator.setInterpolator(new LinearInterpolator());
-            animator.setDuration(250);
+            animator.setDuration(mDuration);
             animator.addListener(this);
             animator.start();
         }
@@ -625,13 +643,29 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
         Float getRotateAngle() {
             return disc.getDiscList().getRotatedDegree();
         }
-
+        void fling(Disc disc, float deltaAngle) {
+            Logger.d(TAG, "fling", "start fling .deltaAngle = " + deltaAngle);
+            mDuration = 100;
+            if(disc.loop){
+                startCycle(disc, null, deltaAngle);
+            }else{
+                start(disc, null, deltaAngle);
+            }
+            mDuration = 250;
+        }
         @Override
         public void onAnimationEnd(Animator animation) {
-            disc.selectItem = focusItem;
             animating = false;
-            if (mDiscCallback != null) {
-                mDiscCallback.onClickItem(mFocusDisc, focusItem);
+            if(focusItem != null) {
+                disc.selectItem = focusItem;
+                if (mDiscCallback != null) {
+                    mDiscCallback.onClickItem(mFocusDisc, focusItem);
+                }
+                focusItem = null;
+            }else{
+                //from fling
+                Logger.d(TAG, "onAnimationEnd", "fling done. start center >>> ");
+                makeItemInCenter(disc);
             }
         }
         @Override
@@ -716,6 +750,8 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
          */
         Item selectItem;
 
+        boolean centering;
+
         public void addItem(Item item) {
             items.add(item);
         }
@@ -737,6 +773,7 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
         }
 
         /*public*/ boolean makeItemInCenter(DiscCallback callback) {
+            centering = true;
             final Item oldItem = this.selectItem;
             final Item newItem ;
             if (loop) {
@@ -783,6 +820,7 @@ public class DiscView extends View implements CycleDiscList.QueryCallback<DiscVi
             if(callback != null){
                 callback.onSelectItem(this, oldItem, newItem);
             }
+            centering = false;
             return newItem != null;
         }
 
