@@ -1,0 +1,20 @@
+group 'com.heaven7.java.ffmpeg'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+//apply plugin: 'cpp'
+
+sourceCompatibility = 1.8
+
+repositories {
+    //mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile 'com.heaven7.java.base:Java-base:1.1.0'
+    compile 'com.heaven7.java.visitor:Visitor:1.1.9'
+    compile 'com.google.code.gson:gson:2.8.2'
+}
