@@ -597,5 +597,9 @@ public class Vocabulary {
         public void setDesc(String desc) {
             this.desc = desc;
         }
+
+        public Float getShotTypeScore() {
+            return shotTypeScore;
+        }
     }
 }

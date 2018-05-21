@@ -8,15 +8,17 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.gap.ItemDelegate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static com.heaven7.ve.colorgap.VEGapUtils.getAverMainFaceArea;
+import static com.heaven7.ve.colorgap.VEGapUtils.getFileName;
+import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
 
 /**
  * the media part item, Equivalent to a video camera-shot
@@ -137,27 +139,23 @@ public class MediaPartItem implements ItemDelegate {
     @Override
     public float getDomainTagScore() {
         if(domainTagScore >= 0 ){
-           return domainTagScore;
+            return domainTagScore;
         }
         // frame得分（形容词 + 名词）
-        // TODO: 改成“or”
         List<FrameTags> framesTags = getFramesTags();
-        if(framesTags == null){
+        if(Predicates.isEmpty(framesTags)){
             return 0;
         }
         float score = 0f;
         for(FrameTags ft : framesTags){
             //先对common tag进行分组， 并且只考虑top tags.(WeddingTagIte.description, score)
             Map<String, Float> tagDict = new HashMap<>();
-            for (int tagIdx : ft.getTopTagSet()){
-                //noun
-                Vocabulary.WeddingTagItem item = Vocabulary.getNounWeedingTagItem(tagIdx);
-                if(item != null){
-                    tagDict.put(item.getDesc(), (float) item.getScore());
-                }
-
-                //adj
-                item = Vocabulary.getAdjWeddingTagItem(tagIdx);
+            Set<Integer> tagSet = ft.getTopTagSet(3, 0.8f);
+            if(Predicates.isEmpty(tagSet)){
+                tagSet = ft.getTopTagSet(3, 0.5f);
+            }
+            for (int tagIdx : tagSet){
+                Vocabulary.WeddingTagItem item = Vocabulary.getWeddingTagItem(tagIdx, Vocabulary.TYPE_WEDDING_ALL);
                 if(item != null){
                     tagDict.put(item.getDesc(), (float) item.getScore());
                 }
@@ -167,6 +165,36 @@ public class MediaPartItem implements ItemDelegate {
                 score += val;
             }
         }
+        score = score / framesTags.size();
+
+        //2. 增加人脸得分
+        if(imageMeta != null){
+            int faces = imageMeta.getMainFaceCount();
+            if(faces == 1){
+                score += 1.0f;
+            }else if(faces == 2){
+                score += 1.5f;
+            }else if(faces > 2){
+                score += 1.0f;
+            }
+        }
+        // 3. 增加镜头类型得分
+        if(imageMeta != null){
+            String shotType = imageMeta.getShotType();
+            switch (MetaInfo.getShotTypeFrom(shotType)){
+                case MetaInfo.SHOT_TYPE_CLOSE_UP :
+                    score += 2f;
+                    break;
+                case MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP :
+                    score += 1.5f;
+                    break;
+                case MetaInfo.SHOT_TYPE_MEDIUM_SHOT :
+                case MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT :
+                    score += 0.5f;
+                    break;
+            }
+        }
+
         this.domainTagScore = score;
         return score;
     }
@@ -181,9 +209,9 @@ public class MediaPartItem implements ItemDelegate {
     public boolean isBlackShot(){
         if(imageMeta != null){
             List<List<Integer>> tags = imageMeta.getTags();
-                /*
-                 *  if tags.count == 0 || tags == [20]  return true
-                 */
+            /*
+             *  if tags.count == 0 || tags == [20]  return true
+             */
             if(Predicates.isEmpty(tags)){
                 return true;
             }else if(tags.size() == 1){
@@ -205,6 +233,7 @@ public class MediaPartItem implements ItemDelegate {
         Throwables.checkNull(imageMeta);
         return imageMeta.getDate() + (long)CommonUtils.frameToTime(videoPart.getEndTime(), TimeUnit.MILLISECONDS);
     }
+    /** set tags with main face and shot type */
     private void setRawTags() {
         if(imageMeta == null){
             return;
@@ -214,10 +243,14 @@ public class MediaPartItem implements ItemDelegate {
         if(!Predicates.isEmpty(framesTags)){
             imageMeta.setRawVideoTags(framesTags);
 
-            List<Integer> tags = calculateTags(framesTags);
+            List<Integer> tags = calculateTags(framesTags, Vocabulary.TYPE_WEDDING_ALL);
             List<List<Integer>> tmp_tags = new ArrayList<>();
             tmp_tags.add(tags);
             imageMeta.setTags(tmp_tags);
+
+            imageMeta.setNounTags(calculateTags(framesTags, Vocabulary.TYPE_WEDDING_NOUN));
+            imageMeta.setDomainTags(calculateTags(framesTags, Vocabulary.TYPE_WEDDING_DOMAIN));
+            imageMeta.setAdjTags(calculateTags(framesTags, Vocabulary.TYPE_WEDDING_ADJ));
         }
 
         //face tags
@@ -225,15 +258,142 @@ public class MediaPartItem implements ItemDelegate {
         if(!Predicates.isEmpty(faceRectsList)){
             imageMeta.setRawFaceRects(faceRectsList);
         }
+
+        //face count and shot type
+        calculateMainFaces();
+        calculateShotType();
     }
 
+    // 根据rawtags计算镜头类型
+    // 1. 人脸优先
+    // 2. 再尝试vidoe tags
+    private void calculateShotType() {
+        if(imageMeta == null){
+            return;
+        }
+        //1, face
+        if(!Predicates.isEmpty(imageMeta.getRawFaceRects()) && imageMeta.getMainFaceCount() > 0){
+            List<FrameFaceRects> faceRects = imageMeta.getRawFaceRects();
+            List<FrameItem> fis = new ArrayList<>();
+            for(int i = 0 , size = imageMeta.getRawFaceRects().size() ; i < size ; i ++){
+                List<Float> areas = new ArrayList<>();
+                //面积降序
+                VisitServices.from(faceRects.get(i).getRects()).transformToCollection(null,
+                        new Comparator<Float>() {
+                            @Override
+                            public int compare(Float o1, Float o2) {
+                                return Float.compare(o2, o1);
+                            }
+                        },
+                        (faceRect, param) -> faceRect.getWidth() * faceRect.getHeight()
+                ).save(areas);
+                fis.add(new FrameItem(i, areas));
+            }
+            float averMainFaceArea = getAverMainFaceArea(fis, imageMeta.getMainFaceCount());
+            String shotType = getShotType(averMainFaceArea);
+            if(shotType != null){
+                imageMeta.setShotType(shotType);
+            }
+        }
+        //2, video tags. 分三类进行计算（noun, domain, adj），noun计3分，其余计1分，返回最终得分最高的镜头类型
+        if(!Predicates.isEmpty(imageMeta.getTags())){
+            Map<String, Float>  shotTypeDict = new HashMap<>();
+            List<Integer> shotTypeTags = new ArrayList<>();
+            shotTypeTags.addAll(imageMeta.getNounTags());
+            shotTypeTags.addAll(imageMeta.getDomainTags());
+            shotTypeTags.addAll(imageMeta.getAdjTags());
+            for(int tagIdx : shotTypeTags){
+                Vocabulary.WeddingTagItem item = Vocabulary.getWeddingTagItem(tagIdx, Vocabulary.TYPE_WEDDING_ALL);
+                if(item == null){
+                    continue;
+                }
+                String st1 = item.getShotType1();
+                if(!TextUtils.isEmpty(st1)){
+                    Float val = shotTypeDict.get(st1);
+                    if(val != null){
+                        shotTypeDict.put(st1, val + item.getShotTypeScore());
+                    }else{
+                        shotTypeDict.put(st1, item.getShotTypeScore());
+                    }
+                }
+
+                String st2 = item.getShotType2();
+                if(!TextUtils.isEmpty(st2)){
+                    Float val = shotTypeDict.get(st2);
+                    if(val != null){
+                        shotTypeDict.put(st2, val + item.getShotTypeScore());
+                    }else{
+                        shotTypeDict.put(st2, item.getShotTypeScore());
+                    }
+                }
+            }
+            //dump shotTypeDict
+            //shot type
+            if(shotTypeDict.size() > 0){
+                String shotType = null;
+                float maxVal = -1f;
+                for (Map.Entry<String, Float> en : shotTypeDict.entrySet()){
+                    Float value = en.getValue();
+                    if(value > maxVal){
+                        maxVal = value;
+                        shotType =  en.getKey();
+                    }
+                }
+                imageMeta.setShotType(shotType);
+            }
+        }
+    }
+
+    // 根据rawRects计算主人脸个数
+    private void calculateMainFaces() {
+        if(imageMeta == null){
+            return;
+        }
+        if(Predicates.isEmpty(imageMeta.getRawFaceRects())){
+            return;
+        }
+        List<FrameFaceRects> ffrs = VisitServices.from(imageMeta.getRawFaceRects()).visitForQueryList(new PredicateVisitor<FrameFaceRects>() {
+            @Override
+            public Boolean visit(FrameFaceRects ffr, Object param) {
+                return ffr.hasRect();
+            }
+        }, null);
+        //遍历rawFaceRects，计算主人脸个数
+        int total = 0;
+        int maxRects = -1;
+        int maxMainFaces = -1;
+        for(FrameFaceRects ffr: ffrs){
+            int rectsCount = ffr.getRectsCount();
+            if(rectsCount > maxRects){
+                maxRects = rectsCount;
+            }
+            //main face
+            int mainFaceCount = ffr.getMainFaceCount();
+            if(mainFaceCount > maxMainFaces){
+                maxMainFaces = mainFaceCount;
+            }
+            total += mainFaceCount;
+        }
+        float mainFaces = total * 1f/ ffrs.size();
+        // 双人脸判断（最大主人脸个数为2，倾向将mainFace设置为2）
+        if(maxMainFaces == 2 && (int)mainFaces == 1){
+            mainFaces = 2;
+        }
+        // 多人脸判断（若1<mainFace<3，切shot中的maxFace>3，则将mainFace提升到3
+        if(maxRects > 3 && mainFaces > 1 && mainFaces < 3){
+            mainFaces = 3;
+        }
+        imageMeta.setMainFaceCount((int)mainFaces);
+    }
+    private List<Integer> calculateTags(List<FrameTags> rawVideoTags,int vocabularyType) {
+        return calculateTags(rawVideoTags, 3, 0.7f, vocabularyType);
+    }
     // 根据镜头的rawVideoTags统计计算tags
-    private List<Integer> calculateTags(List<FrameTags> rawVideoTags) {
-        final int count = Integer.MAX_VALUE;
-        final float minPossibility = 0.8f;
+    private List<Integer> calculateTags(List<FrameTags> rawVideoTags, int count,
+                                        float minPossibility, int vocabularyType) {
         SparseArray<List<Float>> dict = new SparseArray<>();
         for (FrameTags ft : rawVideoTags){
-            List<Tag> topTags = ft.getTopTags(count, minPossibility);
+            List<Tag> topTags = ft.getTopTags(count, minPossibility, vocabularyType);
             for(Tag tag : topTags){
                 List<Float> value = dict.get(tag.getIndex());
                 if(value == null){
@@ -255,29 +415,22 @@ public class MediaPartItem implements ItemDelegate {
         //build tag idx
         List<Integer> result = new ArrayList<>();
         VisitServices.from(tags).subService(new PredicateVisitor<Tag>() {
+            @Override
+            public Boolean visit(Tag tag, Object param) {
+                return tag.getPossibility() >= minPossibility;
+            }
+        }).asListService().sortService(
+                (o1, o2) -> Float.compare(o2.getPossibility(), o1.getPossibility()), true)
+                .transformToCollection(null, new ResultVisitor<Tag, Integer>() {
                     @Override
-                    public Boolean visit(Tag tag, Object param) {
-                        return tag.getPossibility() >= minPossibility;
+                    public Integer visit(Tag tag, Object param) {
+                        return tag.getIndex();
                     }
-                }).asListService().sortService(
-                        (o1, o2) -> Float.compare(o2.getPossibility(), o1.getPossibility()), true)
-               .transformToCollection(null, new ResultVisitor<Tag, Integer>() {
-                   @Override
-                   public Integer visit(Tag tag, Object param) {
-                       return tag.getIndex();
-                   }
-               }).save(result);
+                }).save(result);
         if(tags.size() <= count){
-             return result;
+            return result;
         }else{
             return result.subList(0, count);
         }
-    }
-
-    // exclude .
-    static String getFileName(MediaResourceItem item) {
-        String path = item.getFilePath();
-        int index = path.lastIndexOf("/");
-        return path.substring(index + 1, path.lastIndexOf("."));
     }
 }

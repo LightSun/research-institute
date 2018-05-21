@@ -1,8 +1,10 @@
 package com.heaven7.ve.colorgap;
 
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -14,6 +16,9 @@ public class FrameFaceRects {
 
     private int frameIdx;
     private List<FaceRect> rects;
+
+    //temp
+    private List<Float> sortedFrameAreas;
 
     public int getFrameIdx() {
         return frameIdx;
@@ -38,5 +43,30 @@ public class FrameFaceRects {
             rects = new ArrayList<>();
         }
         rects.add(rect);
+    }
+
+    public List<Float> getSortedFrameAreas() {
+        if(sortedFrameAreas == null){
+            sortedFrameAreas = new ArrayList<>();
+            //面积降序
+            VisitServices.from(getRects()).transformToCollection(null,
+                    new Comparator<Float>() {
+                        @Override
+                        public int compare(Float o1, Float o2) {
+                            return Float.compare(o2, o1);
+                        }
+                    },
+                    (faceRect, param) -> faceRect.getWidth() * faceRect.getHeight()
+            ).save(sortedFrameAreas);
+        }
+        return sortedFrameAreas;
+    }
+
+    public int getMainFaceCount() {
+        return VEGapUtils.getMainFaceCount(getSortedFrameAreas());
+    }
+
+    public int getRectsCount() {
+        return rects != null ? rects.size() : 0;
     }
 }

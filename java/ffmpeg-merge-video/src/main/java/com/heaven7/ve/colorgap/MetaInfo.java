@@ -401,6 +401,10 @@ public interface MetaInfo {
         /** 人脸框信息 */
         private List<FrameFaceRects> rawFaceRects;
 
+        private List<Integer> nounTags;
+        private List<Integer> domainTags;
+        private List<Integer> adjTags;
+
         public SparseArray<VideoDataLoadUtils.FrameData> getFrameDataMap() {
             if(frameDataMap == null){
                 frameDataMap = new SparseArray<>();
@@ -413,6 +417,27 @@ public interface MetaInfo {
         public void travelAllFrameDatas(Map.MapTravelCallback<Integer, VideoDataLoadUtils.FrameData> traveller){
             Throwables.checkNull(frameDataMap);
             CollectionUtils.travel(frameDataMap, traveller);
+        }
+
+        public List<Integer> getNounTags() {
+            return nounTags;
+        }
+        public void setNounTags(List<Integer> nounTags) {
+            this.nounTags = nounTags;
+        }
+
+        public List<Integer> getDomainTags() {
+            return domainTags;
+        }
+        public void setDomainTags(List<Integer> domainTags) {
+            this.domainTags = domainTags;
+        }
+
+        public List<Integer> getAdjTags() {
+            return adjTags;
+        }
+        public void setAdjTags(List<Integer> adjTags) {
+            this.adjTags = adjTags;
         }
 
         public String getShotKey() {
@@ -619,6 +644,10 @@ public interface MetaInfo {
                  setWidth(src.getWidth());
                  //not deep copy
                  setTags(src.tags);
+                 setAdjTags(src.adjTags);
+                 setNounTags(src.nounTags);
+                 setDomainTags(src.domainTags);
+
                  setLocation(src.getLocation());
                  setRawFaceRects(src.getRawFaceRects());
                  setRawVideoTags(src.getRawVideoTags());
