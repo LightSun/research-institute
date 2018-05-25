@@ -550,6 +550,8 @@ public interface MetaInfo {
                 FrameFaceRects faceRects = frameDataMap.valueAt(i).getFaceRects();
                 if(faceRects != null) {
                     result.add(faceRects);
+                }else{
+                    //no face we just add a mock
                 }
             }
             return result;

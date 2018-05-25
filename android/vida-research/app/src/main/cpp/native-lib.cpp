@@ -87,10 +87,11 @@ void drawBitmap(JNIEnv *env, ANativeWindow_Buffer *buffer, jobject bitmap) {
     }
     unsigned char *toBuffer = (unsigned char *) buffer->bits;
     unsigned char *fromBuffer = (unsigned char*)pixels;
+    size_t from_len = info.width * 4;
 
     for (int i = 0; i< info.height; i++) {
-        memcpy(toBuffer, fromBuffer, info.width * 4);
-        fromBuffer += info.width * 4;
+        memcpy(toBuffer, fromBuffer, from_len);
+        fromBuffer += from_len;
         toBuffer += buffer->stride * 4;
     }
 

@@ -1,7 +1,9 @@
 package com.heaven7.ve.test;
 
 import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.ArrayUtils;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.utils.Arrays2;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.ve.MediaResourceItem;
@@ -11,6 +13,7 @@ import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.colorgap.ResourceInitializer;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
 import com.heaven7.ve.colorgap.impl.TagBasedShotCutter;
+import com.heaven7.ve.test.util.FFmpegVideoHelper;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -24,7 +27,7 @@ import java.util.concurrent.CyclicBarrier;
 public class CutShotTest extends TestCase{
 
     private static final String TAG = "CutShotTest";
-    public static final String CUT_DIR = "E:\\study\\github\\ffmpeg-merge-video\\cut_videos";
+    public static final String CUT_DIR = "E:\\study\\github\\research-institute\\java\\ffmpeg-merge-video\\cut_videos";
 
     MediaAnalyser mediaAnalyser;
     TagBasedShotCutter cutter;
@@ -51,11 +54,22 @@ public class CutShotTest extends TestCase{
     /**  测试镜头切割 */
     @Test
     public void testCutShot(){
+        testCutShot(createItems());
+    }
+
+    @Test
+    public void testCutShot2(){
+        //00:04:22 // 262
+        MediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\story2\\church\\C0187.mp4", 262000);
+        ArrayList<MediaResourceItem> list = new ArrayList<>(Arrays.asList(item));
+        testCutShot(list);
+    }
+
+    private void testCutShot(List<MediaResourceItem> items) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 CyclicBarrier barrier = new CyclicBarrier(2);
-                List<MediaResourceItem> items = createItems();
                 List<MediaPartItem> partItems = cutItems(items, barrier);
 
                  for(MediaPartItem item : partItems){
@@ -74,6 +88,7 @@ public class CutShotTest extends TestCase{
             e.printStackTrace();
         }
     }
+
 
     private List<MediaResourceItem> createItems() {
         List<MediaResourceItem> items = new ArrayList<>();

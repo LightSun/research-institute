@@ -106,13 +106,13 @@ public class ColorGapManager {
                 //fill plaid
                 gapItems = filler.fillPlaids(plaids, newItems);
             }
-            return new FillResult(gapItems, srcTemplate);
+            return new FillResult(gapItems, srcTemplate , resultTemplate);
         } catch (InterruptedException e) {
             //ignored e.printStackTrace();
         } catch (BrokenBarrierException e) {
             throw new RuntimeException(e);
         }catch (RuntimeException e){
-            e.printStackTrace();
+            Logger.w(TAG, "fill", Logger.toString(e));
             return null;
         }
         return null;
@@ -247,9 +247,13 @@ public class ColorGapManager {
     public static class FillResult{
         public List<GapManager.GapItem> nodes;
         public VETemplate srcTemplate;
-        public FillResult(List<GapManager.GapItem> nodes, VETemplate srcTemplate) {
+        public VETemplate resultTemplate;
+
+        public FillResult(List<GapManager.GapItem> nodes, VETemplate srcTemplate , VETemplate resultTemplate) {
             this.nodes = nodes;
             this.srcTemplate = srcTemplate;
+            this.resultTemplate = resultTemplate;
         }
+
     }
 }

@@ -43,6 +43,8 @@ public class ShotTypeFilter extends GapColorFilter {
                     return CATEGORY_CLOSE_UP;
 
                 case SHOT_TYPE_MEDIUM_SHOT:
+                case SHOT_TYPE_MEDIUM_CLOSE_UP:
+                case SHOT_TYPE_MEDIUM_LONG_SHOT:
                     return CATEGORY_MIDDLE_VIEW;
 
                 case SHOT_TYPE_LONG_SHORT:

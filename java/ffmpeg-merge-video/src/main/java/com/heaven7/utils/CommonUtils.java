@@ -5,13 +5,11 @@ import java.util.concurrent.TimeUnit;
 
 public class CommonUtils {
 
-    public static String getFileExtension(File file) {
-        String name = file.getName();
-        try {
-            return name.substring(name.lastIndexOf(".") + 1);
-        } catch (Exception e) {
-            return null;
+    public static boolean strEquals(String str1, String str2){
+        if(str1 == null){
+            return str2 == null;
         }
+        return str1.equals(str2);
     }
 
     public static float frameToTime(long frames, TimeUnit unit) {

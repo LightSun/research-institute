@@ -3,11 +3,14 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.java.visitor.util.Collections2;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,6 +21,8 @@ import java.util.List;
 public class StoryLineShaderImpl implements StoryLineShader {
 
     private static final String TAG = "StoryLineShaderImpl";
+    private static final Comparator<MediaPartItem> TIME_COMPARATOR
+            = (Comparator<MediaPartItem>) (o1, o2) -> Long.compare(o1.getStartTime(), o2.getStartTime());
 
     @Override
     public List<GapManager.GapItem> tintAndFill(List<CutInfo.PlaidInfo> plaids, VETemplate template, List<MediaPartItem> items,
@@ -64,7 +69,14 @@ public class StoryLineShaderImpl implements StoryLineShader {
         for(Chapter chapter : chapters){
             result.addAll(chapter.getFilledItems());
         }
+        if(DEBUG){
+            onPostFill(chapters);
+        }
         return result;
+    }
+
+    protected void onPostFill(List<Chapter> chapters) {
+
     }
 
     private List<Chapter> groupChapter(VETemplate template, List<MediaPartItem> items) {
@@ -73,13 +85,15 @@ public class StoryLineShaderImpl implements StoryLineShader {
         //only one dir (often for c user.)
         if(sentences.size() == 1){
             //only one
+            items.sort(TIME_COMPARATOR);
             chapters.add(new Chapter(sentences.get(0).getPlaids(), items, 0));
             return chapters;
         }
 
         for(int i = 0 , size = sentences.size() ; i < size ; i ++){
             VETemplate.LogicSentence ls = sentences.get(i);
-            List<MediaPartItem> filterItems = VisitServices.from(items).visitForQueryList(
+            List<MediaPartItem> filterItems = VisitServices.from(items)
+                    .visitForQueryList(
                     new PredicateVisitor<MediaPartItem>() {
                 @Override
                 public Boolean visit(MediaPartItem partItem, Object param) {
@@ -87,6 +101,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
                     return dir != null && dir.equals(ls.getDir());
                 }
             }, null);
+            filterItems.sort(TIME_COMPARATOR);
             if(filterItems.isEmpty()){
                 throw new IllegalStateException("RawScript error. dir = " + ls.getDir());
             }

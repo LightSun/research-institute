@@ -1,17 +1,16 @@
 package com.heaven7.ve.test;
 
 import com.heaven7.core.util.Logger;
-import com.heaven7.java.base.util.DefaultPrinter;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.ColorGapManager;
-import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.test.util.FFmpegVideoHelper;
+import com.heaven7.ve.test.util.FileHelper;
 import junit.framework.TestCase;
 
 import java.io.*;
@@ -19,32 +18,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 测试故事线
- * TODO
+ * 测试故事线 doing
  */
-public class StoreLineTest extends TestCase{
+public class StoreLineTest extends TestCase {
 
     private static final String TAG = "StoreLineTest";
-    private static final String WEDDING_DIR = "F:\\videos\\wedding";
-    private static final String CUT_OUT_WEDDING_DIR = "E:\\study\\github\\ffmpeg-merge-video\\cut_videos\\wedding";
+    // private static final String WEDDING_DIR = "F:\\videos\\wedding";
+  /*  private static final String CUT_OUT_WEDDING_DIR =
+  "E:\\study\\github\\ffmpeg-merge-video\\cut_videos\\wedding";*/
+    private static final String STORY2_DIR = "F:\\videos\\story1";
+    private static final String CUT_OUT_WEDDING_DIR =
+            "E:\\study\\github\\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story1";
 
     List<MediaResourceItem> mItems;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mItems = scanWeddingItems();
     }
 
-    private List<MediaResourceItem> scanWeddingItems() {
+    //filter: help we filter files.
+    private List<MediaResourceItem> scanWeddingItems(FileFilter filter) {
         List<MediaResourceItem> items = new ArrayList<>();
-        File file = new File(WEDDING_DIR);
+        File file = new File(STORY2_DIR);
         List<String> videos = new ArrayList<>();
-        getVideos(file, videos);
+        FileHelper.getFiles(file, "mp4", filter, videos);
+        //getVideos(file, filter, videos);
 
         CmdHelper.VideoDurationCallback durationCallback = new CmdHelper.VideoDurationCallback();
-        for(String fileName : videos){
-            Logger.d(TAG , "scanWeddingItems", "video file = "+ fileName);
+        for (String fileName : videos) {
+            Logger.d(TAG, "scanWeddingItems", "video file = " + fileName);
             new CmdHelper(FFmpegUtils.buildGetDurationCmd(fileName)).execute(durationCallback);
             long duration = durationCallback.getDuration();
             assert duration > 0;
@@ -53,52 +56,32 @@ public class StoreLineTest extends TestCase{
         return items;
     }
 
-    private void getVideos(File dir, List<String> outVideos) {
-        File[] videoFiles = dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                if(!pathname.isFile()){
-                    return false;
-                }
-                String extension = CommonUtils.getFileExtension(pathname);
-                return "mp4".equalsIgnoreCase(extension);
-            }
-        });
-        if(!Predicates.isEmpty(videoFiles)){
-            for (File file : videoFiles){
-                outVideos.add(file.getAbsolutePath());
-            }
-        }
-        File[] dirs = dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-        });
-        if(!Predicates.isEmpty(dirs)){
-            for (File dir1 : dirs){
-                getVideos(dir1, outVideos);
-            }
-        }
+    public void test1() {
     }
 
-    public void test1(){
-
-    }
-
-    public void testStory(){
+    //bug 183.镜头得分 3.5 = 1.0 + 1 （face）+ 1.5（镜头 ）
+    public void testStory() {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                ColorGapManager cgm = new ColorGapManager(null, new MediaAnalyserImpl(),
-                        new MusicCutterImpl(), new MusicShaderImpl(), new PlaidFillerImpl());
+                FileHelper.deleteDir(new File(CUT_OUT_WEDDING_DIR));
+                //scan items
+                //mItems = scanWeddingItems(FileHelper.TRUE_FILE_FILTER);
+                mItems = scanWeddingItems(FileHelper.ofDirFileFilter("churchOut"));
+
+                ColorGapManager cgm = new ColorGapManager(null,
+                                new MediaAnalyserImpl(),
+                                new MusicCutterImpl2(10),
+                                new MusicShaderImpl(),
+                                new PlaidFillerImpl());
+                // 先不设置模版。表示只按照一个章节来测试
+               // cgm.setTemplateScriptProvider(new TemplateProviderImpl_ST2());
                 cgm.setStoryLineShader(new StoryLineShaderImpl());
-                cgm.setTemplateScriptProvider(new TemplateProviderImpl());
 
-                ColorGapManager.FillResult result = cgm.fill(null, null,  mItems);
+                ColorGapManager.FillResult result = cgm.fill(null, null, mItems);
                 List<GapManager.GapItem> gapItems = result.nodes;
-
-                FFmpegVideoHelper.buildVideo(gapItems, CUT_OUT_WEDDING_DIR);
+//ffmpeg -safe 0 -f concat -i E:\\study\\github\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story2\\concat.txt -c copy concat_output.mp4 -y
+                FFmpegVideoHelper.buildVideo(result.resultTemplate, gapItems, CUT_OUT_WEDDING_DIR);
                 System.out.println("testStory run done...");
             }
         };
@@ -110,5 +93,11 @@ public class StoreLineTest extends TestCase{
         }
     }
 
-
+    //can't build right video . why ? may be the ffmpeg is busy.
+    public void testConcatVideo() {
+        File file = new File(CUT_OUT_WEDDING_DIR + File.separator + "concat.txt");
+        String outVidePath = CUT_OUT_WEDDING_DIR + File.separator + "merged.mp4";
+        String[] cmds = FFmpegUtils.buildMergeVideoCmd(file.getAbsolutePath(), outVidePath);
+        new CmdHelper(cmds).execute(new CmdHelper.LogCallback());
+    }
 }

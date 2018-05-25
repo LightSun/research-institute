@@ -35,12 +35,13 @@ import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
 
 public class TagBasedShotCutter extends VideoCutter {
 
-    private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
-    private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
+    //move to VEGapUtils.
+   // private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
+   // private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
     private static final int MIN_SHOT_BUFFER_LENGTH         = 6 ;           // FrameBuffer中生成Shot的最小Frame数
     private static final int MULTI_FACE_THRESHOLD           = 3 ;           // 多人脸下限为3个人脸
-    private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY = false ;        // 一段segment是否只返回“domain score”最高的Item
-    private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = false ;    // 一段segment是否只返回“face rect score”最高的Item
+    private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY = true ;        // 一段segment是否只返回“domain score”最高的Item
+    private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = true ;    // 一段segment是否只返回“face rect score”最高的Item
     private static final boolean CUT_BY_TAG = false;
 
     private static final String TAG = "TagBasedShotCutter";
@@ -60,7 +61,7 @@ public class TagBasedShotCutter extends VideoCutter {
                 //cut by face
                 List<MediaPartItem> faceItems = cutByFace(item);
                 dump(faceItems, item, "cutByFace");
-                if(MAX_FACE_RECT_SCORE_SHOT_ONLY){
+                if(MAX_FACE_RECT_SCORE_SHOT_ONLY && item.item.getDuration() < 180*1000){
                     faceItems = getMaxFaceRectsScoreShot(faceItems, item);
                 }
                 resultList.addAll(faceItems);
@@ -69,7 +70,7 @@ public class TagBasedShotCutter extends VideoCutter {
                 //cut by common tag
                 List<MediaPartItem> faceItems = cutByCommonTag(item);
                 dump(faceItems, item, "cutByCommonTag");
-                if(MAX_DOMAIN_SCORE_SHOT_ONLY){
+                if(MAX_DOMAIN_SCORE_SHOT_ONLY && item.item.getDuration() < 180*1000){
                     MediaPartItem shot = getMaxDomainScoreShot(faceItems, item);
                     if(shot != null) {
                         resultList.add(shot);
@@ -182,12 +183,12 @@ public class TagBasedShotCutter extends VideoCutter {
         List<MediaPartItem> oneFaceShots = cutByFaceArea(item, 1);
         List<MediaPartItem> twoFaceShots = cutByFaceArea(item, 2);
         List<MediaPartItem> multiFaceShots = cutForMultiFaces(item);
-        List<MediaPartItem> noFaceShots = cutByFaceArea(item, 0);
+       // List<MediaPartItem> noFaceShots = cutByFaceArea(item, 0);
 
         list.addAll(oneFaceShots);
         list.addAll(twoFaceShots);
         list.addAll(multiFaceShots);
-        list.addAll(noFaceShots);
+       // list.addAll(noFaceShots);
 
         // 确保至少有一个
         if(list.isEmpty()){
@@ -197,7 +198,7 @@ public class TagBasedShotCutter extends VideoCutter {
         Collections.sort(list, new Comparator<MediaPartItem>() {
             @Override
             public int compare(MediaPartItem o1, MediaPartItem o2) {
-                return Long.compare(o1.videoPart.getStartTime(), o2.videoPart.getStartTime());
+                return Long.compare(o1.getStartTime(), o2.getStartTime());
             }
         });
         return list;
@@ -221,10 +222,10 @@ public class TagBasedShotCutter extends VideoCutter {
                     result.add(shot);
                 }
                 frameBuffer.clear();
-                Logger.d(TAG, "cutForMultiFaces", "clear frame buffer");
+              //  Logger.d(TAG, "cutForMultiFaces", "clear frame buffer");
             }else{
                 frameBuffer.add(new FrameItem(i, faceRects.getSortedFrameAreas()));
-                Logger.d(TAG, "cutForMultiFaces", "append idx = "+ i +" into frame buffer.");
+             //   Logger.d(TAG, "cutForMultiFaces", "append idx = "+ i +" into frame buffer.");
             }
         }
         // 判断最后buffer中残留的frame能否构成一个镜头
@@ -233,7 +234,7 @@ public class TagBasedShotCutter extends VideoCutter {
             result.add(shot);
         }
         frameBuffer.clear();
-        Logger.d(TAG, "cutForMultiFaces", "clear frame buffer -- 2");
+      //  Logger.d(TAG, "cutForMultiFaces", "clear frame buffer -- 2");
         return result;
     }
 
@@ -247,11 +248,6 @@ public class TagBasedShotCutter extends VideoCutter {
 
             MediaPartItem shot = new MediaPartItem((MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, tt);
             shot.imageMeta.setMainFaceCount(MULTI_FACE_THRESHOLD);
-            float averMainFaceArea = getAverMainFaceArea(frameBuffer, MULTI_FACE_THRESHOLD);
-            String shortType = getShotType(averMainFaceArea);
-            if(shortType != null){
-                shot.imageMeta.setShotType(shortType);
-            }
             return shot;
         }
         return null;
@@ -278,7 +274,7 @@ public class TagBasedShotCutter extends VideoCutter {
                     result.add(shot);
                 }
                 frameBuffer.clear();
-                Logger.d(TAG, "cutByFaceArea", "");
+              //  Logger.d(TAG, "cutByFaceArea", "");
             }else{
                 frameBuffer.add(new FrameItem(ffr.getFrameIdx(), ffr.getSortedFrameAreas()));
             }
@@ -289,7 +285,7 @@ public class TagBasedShotCutter extends VideoCutter {
             result.add(shot);
         }
         frameBuffer.clear();
-        Logger.d(TAG, "cutByFaceArea", "");
+       // Logger.d(TAG, "cutByFaceArea", "");
         return result;
     }
 
@@ -303,13 +299,6 @@ public class TagBasedShotCutter extends VideoCutter {
             tt.setEndTime(CommonUtils.timeToFrame(bf_item.id + frameBuffer.size() - 1, TimeUnit.SECONDS));
 
             MediaPartItem mpi = new MediaPartItem((MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, tt);
-            mpi.imageMeta.setMainFaceCount(mainFaceCount);
-            //set shot type
-            float averMainFaceArea = getAverMainFaceArea(frameBuffer, MULTI_FACE_THRESHOLD);
-            String shotType = getShotType(averMainFaceArea);
-            if(!TextUtils.isEmpty(shotType)){
-                mpi.imageMeta.setShotType(shotType);
-            }
             return mpi;
         }
         return null;
@@ -351,6 +340,10 @@ public class TagBasedShotCutter extends VideoCutter {
         public void onTravel(Integer key, VideoDataLoadUtils.FrameData value) {
 
             FrameTags ft = value.getTag();
+            if(ft == null){
+                //sparse array bug
+                return;
+            }
             Set<Integer> frameTagSet = ft.getTopTagSet();
             // 跳出条件检测（新tags与currentTagSet的相似度小于1/2）
             if(currentTagSet.size() > 0){
@@ -362,7 +355,7 @@ public class TagBasedShotCutter extends VideoCutter {
                     }
                     frameBuffer.clear();
                     currentTagSet = new HashSet<>();
-                    Logger.d(TAG, "cutByCommonTag", "clear frame buffer");
+                  //  Logger.d(TAG, "cutByCommonTag", "clear frame buffer");
                 }
             }
 
@@ -389,7 +382,7 @@ public class TagBasedShotCutter extends VideoCutter {
                 result.add(shot);
             }
             frameBuffer.clear();
-            Logger.d(TAG, "cutByCommonTag", "clear frame buffer -- 2");
+           // Logger.d(TAG, "cutByCommonTag", "clear frame buffer -- 2");
         }
     }
 

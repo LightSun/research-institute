@@ -1,5 +1,6 @@
 package com.heaven7.ve.colorgap;
 
+import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
@@ -27,6 +28,7 @@ import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
 public class MediaPartItem implements ItemDelegate {
 
     private static final Integer TAG_ID_BLACK = 20;
+    private static final String TAG = "MediaPartItem";
 
     final public MetaInfo.ImageMeta imageMeta;
     final public MediaResourceItem item;
@@ -44,6 +46,9 @@ public class MediaPartItem implements ItemDelegate {
     /** 偏差镜头标志 */
     private boolean planed;
 
+    /** the cause be deleted from story */
+    private String cause = "";
+
     /**
      * create media part item.
      * @param imageMeta the image meta
@@ -55,7 +60,7 @@ public class MediaPartItem implements ItemDelegate {
         this.item = item;
         this.videoPart = videoPart;
         //set shot-key
-        imageMeta.setShotKey(getFileName(item) + "_" + videoPart.getStartTime() + "_" + videoPart.getEndTime());
+        imageMeta.setShotKey(getFileName(item.getFilePath()) + "_" + videoPart.getStartTime() + "_" + videoPart.getEndTime());
         //set max duration
         videoPart.setMaxDuration(CommonUtils.timeToFrame(item.getDuration(), TimeUnit.MILLISECONDS));
         setRawTags();
@@ -68,8 +73,15 @@ public class MediaPartItem implements ItemDelegate {
         this.planed = planed;
         this.selectedInStory = planed;
     }
-    public void setSelectedInStory(boolean selectedInStory) {
+    public void setSelectedInStory(boolean selectedInStory, String cause) {
         this.selectedInStory = selectedInStory;
+        if(!selectedInStory) {
+            this.cause += cause + "\r\n";
+        }
+    }
+
+    public String getDetail() {
+        return cause;
     }
     public boolean isSelectedInStory() {
         return selectedInStory;
@@ -97,9 +109,11 @@ public class MediaPartItem implements ItemDelegate {
     public String toString() {
         return "MediaPartItem{" +
                 "path =" + item.getFilePath() +
-                ", part_time =" + videoPart +
+                ", part_time =" + videoPart.toString2() +
                 ", selectedInStory =" + selectedInStory +
                 ", planed =" + planed +
+                ", tagScore =" + getDomainTagScore() +
+                ", detail =" + getDetail() +
                 '}';
     }
 
@@ -146,6 +160,7 @@ public class MediaPartItem implements ItemDelegate {
         if(Predicates.isEmpty(framesTags)){
             return 0;
         }
+
         float score = 0f;
         for(FrameTags ft : framesTags){
             //先对common tag进行分组， 并且只考虑top tags.(WeddingTagIte.description, score)
@@ -181,17 +196,19 @@ public class MediaPartItem implements ItemDelegate {
         // 3. 增加镜头类型得分
         if(imageMeta != null){
             String shotType = imageMeta.getShotType();
-            switch (MetaInfo.getShotTypeFrom(shotType)){
-                case MetaInfo.SHOT_TYPE_CLOSE_UP :
+            if (!TextUtils.isEmpty(shotType)) {
+                switch (MetaInfo.getShotTypeFrom(shotType)) {
+                  case MetaInfo.SHOT_TYPE_CLOSE_UP:
                     score += 2f;
                     break;
-                case MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP :
+                  case MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP:
                     score += 1.5f;
                     break;
-                case MetaInfo.SHOT_TYPE_MEDIUM_SHOT :
-                case MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT :
+                  case MetaInfo.SHOT_TYPE_MEDIUM_SHOT:
+                  case MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT:
                     score += 0.5f;
                     break;
+                }
             }
         }
 
@@ -244,6 +261,15 @@ public class MediaPartItem implements ItemDelegate {
             imageMeta.setRawVideoTags(framesTags);
 
             List<Integer> tags = calculateTags(framesTags, Vocabulary.TYPE_WEDDING_ALL);
+
+           /* List<String> tags_str = new ArrayList<>();
+            VisitServices.from(tags).transformToCollection(new ResultVisitor<Integer, String>() {
+                @Override
+                public String visit(Integer index, Object param) {
+                    return Vocabulary.getTagStr(index);
+                }
+            }).save(tags_str);
+            Logger.d(TAG , "setRawTags", "path = "+ item.getFilePath() + ",  main tags: " + tags_str);*/
             List<List<Integer>> tmp_tags = new ArrayList<>();
             tmp_tags.add(tags);
             imageMeta.setTags(tmp_tags);
@@ -275,19 +301,24 @@ public class MediaPartItem implements ItemDelegate {
         if(!Predicates.isEmpty(imageMeta.getRawFaceRects()) && imageMeta.getMainFaceCount() > 0){
             List<FrameFaceRects> faceRects = imageMeta.getRawFaceRects();
             List<FrameItem> fis = new ArrayList<>();
-            for(int i = 0 , size = imageMeta.getRawFaceRects().size() ; i < size ; i ++){
-                List<Float> areas = new ArrayList<>();
-                //面积降序
-                VisitServices.from(faceRects.get(i).getRects()).transformToCollection(null,
-                        new Comparator<Float>() {
-                            @Override
-                            public int compare(Float o1, Float o2) {
-                                return Float.compare(o2, o1);
-                            }
-                        },
-                        (faceRect, param) -> faceRect.getWidth() * faceRect.getHeight()
-                ).save(areas);
-                fis.add(new FrameItem(i, areas));
+            for(int i = 0 , size = faceRects.size() ; i < size ; i ++){
+                FrameFaceRects frameFaceRects = faceRects.get(i);
+                if(!frameFaceRects.hasRect()){
+                    fis.add(new FrameItem(i, Collections.emptyList()));
+                }else {
+                    List<Float> areas = new ArrayList<>();
+                    //面积降序
+                    VisitServices.from(frameFaceRects.getRects()).transformToCollection(null,
+                            new Comparator<Float>() {
+                                @Override
+                                public int compare(Float o1, Float o2) {
+                                    return Float.compare(o2, o1);
+                                }
+                            },
+                            (faceRect, param) -> faceRect.getWidth() * faceRect.getHeight()
+                    ).save(areas);
+                    fis.add(new FrameItem(i, areas));
+                }
             }
             float averMainFaceArea = getAverMainFaceArea(fis, imageMeta.getMainFaceCount());
             String shotType = getShotType(averMainFaceArea);
@@ -388,9 +419,11 @@ public class MediaPartItem implements ItemDelegate {
     private List<Integer> calculateTags(List<FrameTags> rawVideoTags,int vocabularyType) {
         return calculateTags(rawVideoTags, 3, 0.7f, vocabularyType);
     }
-    // 根据镜头的rawVideoTags统计计算tags
+    // 根据镜头的rawVideoTags统计计算tags. 得到对应的tag-index 数组
     private List<Integer> calculateTags(List<FrameTags> rawVideoTags, int count,
                                         float minPossibility, int vocabularyType) {
+        //map: tag_index - > possibility
+        //统计 tag 出现的概率(整个镜头中)。 -- 指定tag个数， min 概率
         SparseArray<List<Float>> dict = new SparseArray<>();
         for (FrameTags ft : rawVideoTags){
             List<Tag> topTags = ft.getTopTags(count, minPossibility, vocabularyType);
@@ -403,7 +436,7 @@ public class MediaPartItem implements ItemDelegate {
                 value.add(tag.getPossibility());
             }
         }
-        // 统计dict中的tag概率
+        // 统计dict中的tag概率 (平均)
         List<Tag> tags = new ArrayList<>();
         for(int i = 0 , size = dict.size() ; i < size ; i ++){
             int tagIdx = dict.keyAt(i);
@@ -417,7 +450,7 @@ public class MediaPartItem implements ItemDelegate {
         VisitServices.from(tags).subService(new PredicateVisitor<Tag>() {
             @Override
             public Boolean visit(Tag tag, Object param) {
-                return tag.getPossibility() >= minPossibility;
+                return tag.getPossibility() >= minPossibility;//平均概率 大于限定
             }
         }).asListService().sortService(
                 (o1, o2) -> Float.compare(o2.getPossibility(), o1.getPossibility()), true)

@@ -13,19 +13,31 @@ import java.io.InputStreamReader;
 public class CmdHelper {
 
     private final String[] cmds;
+    private final String cmd_log;
 
     public CmdHelper(String... cmds) {
         this.cmds = cmds;
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0 , size = cmds.length ; i < size ; i ++){
+            sb.append(cmds[i]);
+            if(i != size -1){
+                sb.append(" ");
+            }
+        }
+        cmd_log = sb.toString();
     }
-
+    public void execute(){
+        execute(new LogCallback());
+    }
     public void execute(Callback callback){
         BufferedReader reader = null;
         try {
             ProcessBuilder pb = new ProcessBuilder(cmds);
             pb.redirectErrorStream(true);
+            callback.beforeStartCmd(this, pb);
             Process process = pb.start();
             process.waitFor();
-            System.out.println(process.exitValue());
+            System.out.println(cmd_log + "  ,exitValue = " + process.exitValue());
 
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             callback.onStart(this);
@@ -53,6 +65,8 @@ public class CmdHelper {
         void onStart(CmdHelper helper);
 
         void onEnd(CmdHelper helper);
+
+        void beforeStartCmd(CmdHelper helper, ProcessBuilder pb);
     }
 
     public static class LogCallback implements Callback{
@@ -71,6 +85,10 @@ public class CmdHelper {
         }
         @Override
         public void onEnd(CmdHelper helper) {
+
+        }
+        @Override
+        public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
 
         }
     }
@@ -92,6 +110,10 @@ public class CmdHelper {
         }
         @Override
         public void onEnd(CmdHelper helper) {
+
+        }
+        @Override
+        public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
 
         }
         /** in mill-seconds */

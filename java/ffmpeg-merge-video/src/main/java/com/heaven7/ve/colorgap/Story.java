@@ -8,9 +8,9 @@ import com.heaven7.java.visitor.Visitors;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.TextUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+
+import static com.heaven7.utils.CommonUtils.strEquals;
 
 /**
  * 1 video -> multi chapter.<br>
@@ -44,10 +44,10 @@ public class Story {
     }
 
     public void replaceLastShot(MediaPartItem shot) {
-        List<MediaPartItem> shots = getShots(Visitors.truePredicateVisitor());
+        List<MediaPartItem> shots = getSortedShots(Visitors.truePredicateVisitor());
         int index = shots.size() - 1;
         MediaPartItem preShot = shots.get(shots.size() - 1);
-        if(preShot.isPlaned()){
+        if(shot.isPlaned()){
             throw new IllegalStateException("already planed by bias shot.");
         }
         items.set(index, shot);
@@ -56,7 +56,10 @@ public class Story {
                 + preShot + " ,new shot = " + shot);
     }
     public void replaceFirstShot(MediaPartItem shot) {
-        List<MediaPartItem> shots = getShots(Visitors.truePredicateVisitor());
+        if(shot.isPlaned()){
+            throw new IllegalStateException("already planed by bias shot.");
+        }
+        List<MediaPartItem> shots = getSortedShots(Visitors.truePredicateVisitor());
         MediaPartItem preShot = shots.get(0);
         int index = 0;
         items.set(index, shot);
@@ -65,6 +68,9 @@ public class Story {
                 + preShot + " ,new shot = " + shot);
     }
     public boolean replaceShot(MediaPartItem oldItem, MediaPartItem newItem) {
+        if(newItem.isPlaned()){
+            throw new IllegalStateException("already planed");
+        }
         int index = items.indexOf(oldItem);
         if(index >=0 ){
             items.set(index, newItem);
@@ -73,12 +79,24 @@ public class Story {
         }
         return false;
     }
-
-    public List<MediaPartItem> getShots() {
-        return getShots(Visitors.truePredicateVisitor());
+    public List<MediaPartItem> getShots(boolean includeUnselect) {
+        if(includeUnselect){
+            return Collections.unmodifiableList(this.items);
+        }
+        List<MediaPartItem> out = new ArrayList<>();
+        for(MediaPartItem item : this.items){
+            if(item.isSelectedInStory()){
+                out.add(item);
+            }
+        }
+        return out;
+    }
+    /** get all shots which is sorted by domain tag score. */
+    public List<MediaPartItem> getSortedShots() {
+        return getSortedShots(Visitors.truePredicateVisitor());
     }
 
-    public List<MediaPartItem> getShots(PredicateVisitor<MediaPartItem> visitor) {
+    public List<MediaPartItem> getSortedShots(PredicateVisitor<MediaPartItem> visitor) {
         return filterAndSortShots(visitor, false);
     }
     public List<MediaPartItem> getItems() {
@@ -100,10 +118,13 @@ public class Story {
             @Override
             public Boolean visit(MediaPartItem partItem, Object param) {
                 boolean selected = partItem.getDomainTagScore() >= 0.5f;
-                partItem.setSelectedInStory(selected);
+                partItem.setSelectedInStory(selected, "分数太低");
                 return selected;
             }
         }, null);
+
+        //3, 内容相似的画面不超过5个
+        deleteShotsByLimit(Visitors.truePredicateVisitor(), 5, "内容相似的画面不超过5个");
 
         //2, 镜头类型相同的镜头 不连续超过3个， 非人脸类型，不得超过2个
         //   先处理镜头，再出路相似的画面。
@@ -132,12 +153,10 @@ public class Story {
             int size = list.size();
             if(size > limit){
                 for(int i = 0 ; i < size - limit ; i++){
-                    list.get(i).setSelectedInStory(false);
+                    list.get(i).setSelectedInStory(false, "镜头类型相同不连续超过3个");
                 }
             }
         }
-        //3, 内容相似的画面不超过5个
-        deleteShotsByLimit(Visitors.truePredicateVisitor(), 5);
 
         //4, 重复镜头. 得分，类型都相同，则只保留1个
         List<MediaPartItem> partItems = filterAndSortShots(Visitors.truePredicateVisitor(), false);
@@ -149,9 +168,8 @@ public class Story {
                 MediaPartItem item1 = partItems.get(i);
                 MediaPartItem item2 = partItems.get(j);
                 if(item1.getDomainTagScore() == item2.getDomainTagScore() &&
-                       MetaInfo.getShotTypeFrom(item1.imageMeta.getShotType()) ==
-                               MetaInfo.getShotTypeFrom(item2.imageMeta.getShotType())){
-                    item1.setSelectedInStory(false);
+                        strEquals(item1.imageMeta.getShotType(), item2.imageMeta.getShotType())){
+                    item1.setSelectedInStory(false, "重复镜头. 得分，类型都相同，则只保留1个");
                 }
                 i++;
                 j++;
@@ -179,21 +197,34 @@ public class Story {
         return out;
     }
 
-    private void deleteShotsByLimit(PredicateVisitor<MediaPartItem> predicate, int limit){
+    private void deleteShotsByLimit(PredicateVisitor<MediaPartItem> predicate, int limit, String cause){
         List<MediaPartItem> selectItems = filterAndSortShots(predicate, false);
         int size = selectItems.size();
         if(size > limit){
             for(int i = 0 ; i < size - limit ; i++){
-                selectItems.get(i).setSelectedInStory(false);
+                selectItems.get(i).setSelectedInStory(false, cause);
             }
         }
+    }
+
+    private String logItems() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\r\n");
+        for(int i = 0 , size = items.size() ; i < size ; i ++){
+            sb.append(items.get(i).toString());
+            if(i != size - 1){
+                sb.append("\n");
+            }
+        }
+        sb.append("\r\n");
+        return sb.toString();
     }
 
     @Override
     public String toString() {
         return "Story{" +
                 "storyId=" + storyId +
-                ", items=" + items +
+                ", items=" + logItems() +
                 '}';
     }
 

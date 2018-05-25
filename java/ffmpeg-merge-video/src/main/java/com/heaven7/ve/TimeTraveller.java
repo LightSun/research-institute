@@ -1,5 +1,9 @@
 package com.heaven7.ve;
 
+import com.heaven7.utils.CommonUtils;
+
+import java.util.concurrent.TimeUnit;
+
 /**
  * 时间性的. in frames
  * Created by heaven7 on 2018/1/16 0016.
@@ -167,6 +171,13 @@ public class TimeTraveller extends SimpleCopyDelegate {
                 "startTime=" + getStartTime() +
                 ", endTime=" + getEndTime() +
                 ", maxEndTime=" + getMaxDuration() +
+                '}';
+    }
+    public String toString2() {
+        return "TimeTraveller{" +
+                "startTime=" + CommonUtils.frameToTime(getStartTime(), TimeUnit.SECONDS) +
+                ", endTime=" +  CommonUtils.frameToTime(getEndTime(), TimeUnit.SECONDS) +
+                ", maxEndTime=" +  CommonUtils.frameToTime(getMaxDuration(), TimeUnit.SECONDS) +
                 '}';
     }
 

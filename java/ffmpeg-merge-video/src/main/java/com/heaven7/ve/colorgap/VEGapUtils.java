@@ -28,9 +28,11 @@ public class VEGapUtils {
 
 
     /** get the file name only. exclude extension and dir. */
-    public static String getFileName(MediaResourceItem item) {
-        String path = item.getFilePath();
+    public static String getFileName(String path) {
         int index = path.lastIndexOf("/");
+        if(index == -1){
+            index = path.lastIndexOf("\\");
+        }
         return path.substring(index + 1, path.lastIndexOf("."));
     }
 
@@ -112,7 +114,7 @@ public class VEGapUtils {
       /*  let closeUp         = 0.12..<1.0    // 特写（头）
         let mediaCloseUp    = 0.08..<0.12   // 特写（胸）
         let mediumShot      = 0.050..<0.08  // 中景（腰）
-        let mediaLongShot   = 0.020..<0.050 // 中远景（膝）
+        let mediumLongShot   = 0.020..<0.050 // 中远景（膝）
         let longShot        = 0.003..<0.020 // 远景（全身）
         let veryLongShot    = 0.001..<0.003 // 大远景*/
 
@@ -123,7 +125,7 @@ public class VEGapUtils {
         } else if (isInRange(mainFaceArea,0.04f, 0.06f)) {
             return "mediumShot";
         } else if (isInRange(mainFaceArea,0.02f, 0.04f)) {
-            return "mediaLongShot";
+            return "mediumLongShot";
         } else if (isInRange(mainFaceArea,0.003f, 0.02f)) {
             return "longShot";
         } else if (isInRange(mainFaceArea,0.001f, 0.003f)) {
@@ -142,7 +144,13 @@ public class VEGapUtils {
         if(mainFaceCount == 1){
             List<Float> areas = new ArrayList<>();
             VisitServices.from(frameBuffer).visitForResultList(
-                    (fbi, param) -> fbi.areas.get(0), areas);
+                    new ResultVisitor<FrameItem, Float>() {
+                        @Override
+                        public Float visit(FrameItem fbi, Object param) {
+                            return !fbi.areas.isEmpty() ? fbi.areas.get(0) : 0f;
+                        }
+                    }, areas);
+                    // (fbi, param) -> fbi.areas.get(0), areas);
             totalFaceAreas = CollectionUtils.sum(areas);
         }else if(mainFaceCount == 2){
             List<Float> list = VisitServices.from(frameBuffer).transformToCollection(new ResultVisitor<FrameItem, List<Float>>() {
@@ -184,13 +192,13 @@ public class VEGapUtils {
     /** 主人脸个数， frameAreas 人脸面积数组 */
     public static int getMainFaceCount(List<Float> frameAreas) {
         int size = frameAreas.size();
-        int mainFaces = size;
-        Collections.sort(frameAreas, (o1, o2) -> Float.compare(o2, o1));
         if(size <= 1){
             return size;
         }
+        int mainFaces = size;
+        Collections.sort(frameAreas, (o1, o2) -> Float.compare(o2, o1));
         //用人脸面积比区分 2-5
-        if(size > 1 && size <= 5){
+        if(size <= 3){
             int p_idx = 0;
             int q_idx = 1;
             while (q_idx < size) {

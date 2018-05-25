@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap;
 
 
 import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.DefaultPrinter;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.LoadException;
@@ -243,7 +244,7 @@ public class VideoDataLoadUtils {
     private static class CsvFaceRectCallback extends TextReadHelper.BaseAssetsCallback<FrameFaceRects>{
         @Override
         public FrameFaceRects parse(String line) {
-            if(TextUtils.isEmpty(line) || !line.contains(",")){
+            if(TextUtils.isEmpty(line)){
                 return null;
             }
             String[] strs = line.split(",");
@@ -253,24 +254,26 @@ public class VideoDataLoadUtils {
             }catch (NumberFormatException e){
                 return null;
             }
+            FrameFaceRects rects = new FrameFaceRects();
+            rects.setFrameIdx(frameIdx);
             try {
-                FrameFaceRects rects = new FrameFaceRects();
-                rects.setFrameIdx(frameIdx);
-                String[] floats = strs[1].split(" ");
-                int len = floats.length;
-                for(int i = 0 ; i < len  ; i += 4 ){
-                    // "0.146632 0.054032 0.096487 0.171532"
-                    FaceRect rect = new FaceRect();
-                    rect.setX(Float.parseFloat(floats[i]));
-                    rect.setY(Float.parseFloat(floats[i + 1]));
-                    rect.setWidth(Float.parseFloat(floats[i + 2]));
-                    rect.setHeight(Float.parseFloat(floats[i + 3]));
-                    rects.addFaceRect(rect);
+                for(int k = 1, size = strs.length ;  k < size ; k ++) {
+                    String[] floats = strs[k].split(" ");
+                    int len = floats.length;
+                    for (int i = 0; i < len; i += 4) {
+                        // "0.146632 0.054032 0.096487 0.171532"
+                        FaceRect rect = new FaceRect();
+                        rect.setX(Float.parseFloat(floats[i]));
+                        rect.setY(Float.parseFloat(floats[i + 1]));
+                        rect.setWidth(Float.parseFloat(floats[i + 2]));
+                        rect.setHeight(Float.parseFloat(floats[i + 3]));
+                        rects.addFaceRect(rect);
+                    }
                 }
-                return rects;
             }catch (RuntimeException e){
                 return null;
             }
+            return rects;
         }
     }
 

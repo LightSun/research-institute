@@ -4,6 +4,7 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -39,13 +40,16 @@ public class FrameFaceRects {
     }
 
     public void addFaceRect(FaceRect rect) {
-        if(rects ==null){
+        if(rects == null){
             rects = new ArrayList<>();
         }
         rects.add(rect);
     }
 
     public List<Float> getSortedFrameAreas() {
+        if(!hasRect()){
+            return Collections.emptyList();
+        }
         if(sortedFrameAreas == null){
             sortedFrameAreas = new ArrayList<>();
             //面积降序
@@ -63,6 +67,9 @@ public class FrameFaceRects {
     }
 
     public int getMainFaceCount() {
+        if(!hasRect()){
+            return 0;
+        }
         return VEGapUtils.getMainFaceCount(getSortedFrameAreas());
     }
 
