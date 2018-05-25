@@ -34,6 +34,8 @@
         <activity android:name=".sample.TestZoomDrawableActivity"/>
         <activity android:name=".sample.TestDiscViewActivity"/>
         <activity android:name=".sample.TestBaiduFaceActivity"/>
+
+        <activity android:name=".sample.NativeSurfaceActivity"/>
     </application>
 
 </manifest>

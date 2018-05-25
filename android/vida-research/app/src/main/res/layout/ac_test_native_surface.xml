@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.heaven7.vida.research.widget.SimpleTextureView
+        android:id="@+id/textureView"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
+        android:text="点击，绘制"
+        android:onClick="doDraw"
+        />
+
+
+</FrameLayout>
