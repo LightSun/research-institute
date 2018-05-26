@@ -19,7 +19,7 @@ public class GenerateNameMapping {
 
   public static void main(String[] args) {
       //F:\videos\story2
-      File dir = new File("F:\\videos\\story1");
+      File dir = new File("F:\\videos\\story4");
       List<String> videos = new ArrayList<>();
       FileHelper.getVideos(dir, videos);
 

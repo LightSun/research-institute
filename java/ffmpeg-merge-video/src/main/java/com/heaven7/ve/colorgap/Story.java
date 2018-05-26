@@ -28,6 +28,11 @@ public class Story {
         this.items = items;
     }
 
+    /** indicate the story is empty or not. exclude un-select shot. */
+    public boolean isEmpty() {
+        return getShots(false).isEmpty();
+    }
+
     public void setStoryId(int storyId) {
         this.storyId = storyId;
         for (MediaPartItem item : items) {
@@ -35,11 +40,11 @@ public class Story {
         }
     }
     public long getStartTime(){
-        return filterAndSortShots(Visitors.truePredicateVisitor(),false)
-                .get(0).imageMeta.getDate();
+        List<MediaPartItem> list = getShots(false);
+        return list.get(0).imageMeta.getDate();
     }
     public long getEndTime(){
-        List<MediaPartItem> list = filterAndSortShots(Visitors.truePredicateVisitor(), false);
+        List<MediaPartItem> list = getShots(false);
         return list.get(list.size() - 1).imageMeta.getDate();
     }
 

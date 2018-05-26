@@ -141,11 +141,11 @@ public class FFmpegVideoHelper {
             String[] cmds = FFmpegUtils.buildCutCmd(mpi, dir, outPath);
             new CmdHelper(cmds).execute();
             //sleep for some case . cut video not done.
-            try {
-                Thread.sleep(500);
+            /*try {
+                Thread.sleep(800);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
             //build cutted item
             CuttedItem ci = new CuttedItem();
             ci.setItem(gapItem);

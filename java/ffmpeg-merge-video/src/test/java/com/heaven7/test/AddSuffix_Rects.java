@@ -20,8 +20,8 @@ public class AddSuffix_Rects {
        String dst = "F:\\test\\data\\story1\\dinner\\rects";
        copyFilesAndAddRects(src , dst, true);*/
 
-        String src = "F:\\videos\\story3\\outSence\\tags";
-        String dst = "F:\\test\\data\\story3\\outSence\\tags";
+        String src = "F:\\videos\\故事线\\婚礼4\\晚宴\\tags";
+        String dst = "F:\\test\\data\\story4\\dinner\\tags";
         copyFilesAndAddRects(src , dst, false);
     }
 

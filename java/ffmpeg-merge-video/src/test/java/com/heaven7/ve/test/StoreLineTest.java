@@ -26,9 +26,9 @@ public class StoreLineTest extends TestCase {
     // private static final String WEDDING_DIR = "F:\\videos\\wedding";
   /*  private static final String CUT_OUT_WEDDING_DIR =
   "E:\\study\\github\\ffmpeg-merge-video\\cut_videos\\wedding";*/
-    private static final String STORY2_DIR = "F:\\videos\\story1";
+    private static final String STORY2_DIR = "F:\\videos\\story4";
     private static final String CUT_OUT_WEDDING_DIR =
-            "E:\\study\\github\\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story1";
+            "E:\\study\\github\\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story4";
 
     List<MediaResourceItem> mItems;
 
@@ -67,11 +67,11 @@ public class StoreLineTest extends TestCase {
                 FileHelper.deleteDir(new File(CUT_OUT_WEDDING_DIR));
                 //scan items
                 //mItems = scanWeddingItems(FileHelper.TRUE_FILE_FILTER);
-                mItems = scanWeddingItems(FileHelper.ofDirFileFilter("churchOut"));
+                mItems = scanWeddingItems(FileHelper.ofDirFileFilter("storyTest"));
 
                 ColorGapManager cgm = new ColorGapManager(null,
                                 new MediaAnalyserImpl(),
-                                new MusicCutterImpl2(10),
+                                new MusicCutterImpl2(60),
                                 new MusicShaderImpl(),
                                 new PlaidFillerImpl());
                 // 先不设置模版。表示只按照一个章节来测试
@@ -83,6 +83,7 @@ public class StoreLineTest extends TestCase {
 //ffmpeg -safe 0 -f concat -i E:\\study\\github\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story2\\concat.txt -c copy concat_output.mp4 -y
                 FFmpegVideoHelper.buildVideo(result.resultTemplate, gapItems, CUT_OUT_WEDDING_DIR);
                 System.out.println("testStory run done...");
+
             }
         };
         new Thread(r).start();
@@ -94,10 +95,21 @@ public class StoreLineTest extends TestCase {
     }
 
     //can't build right video . why ? may be the ffmpeg is busy.
+   // ffmpeg -safe 0 -f concat -i E:\\study\\github\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story3\\concat.txt -c copy E:\\study\\github\\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story3\\merged.mp4 -y
     public void testConcatVideo() {
-        File file = new File(CUT_OUT_WEDDING_DIR + File.separator + "concat.txt");
-        String outVidePath = CUT_OUT_WEDDING_DIR + File.separator + "merged.mp4";
-        String[] cmds = FFmpegUtils.buildMergeVideoCmd(file.getAbsolutePath(), outVidePath);
-        new CmdHelper(cmds).execute(new CmdHelper.LogCallback());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file = new File(CUT_OUT_WEDDING_DIR + File.separator + "concat.txt");
+                String outVidePath = CUT_OUT_WEDDING_DIR + File.separator + "merged.mp4";
+                String[] cmds = FFmpegUtils.buildMergeVideoCmd(file.getAbsolutePath(), outVidePath);
+                new CmdHelper(cmds).execute(new CmdHelper.LogCallback());
+            }
+        }).start();
+        try {
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

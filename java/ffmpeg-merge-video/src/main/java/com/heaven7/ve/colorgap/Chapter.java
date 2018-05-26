@@ -4,18 +4,14 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.PredicateVisitor;
+import com.heaven7.java.visitor.collection.VisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.gap.GapManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * the chapter.(a chapter correspond one logic-sentence)
@@ -142,6 +138,9 @@ public class Chapter {
             }
         }
         dump(stories, "delete min score shot");
+        // remove empty story
+        stories.removeIf(Story::isEmpty);
+
         //5, 处理偏差镜头
         List<MediaPartItem> biasItems = VisitServices.from(items).visitForQueryList(
                 new PredicateVisitor<MediaPartItem>() {
@@ -150,6 +149,7 @@ public class Chapter {
                         return partItem.getStoryId() == -1;
                     }
                 }, null);
+
         //TODO 如果没有偏差镜头， 而且镜头个数不够？ 用空镜头填充？
         if (shotCount == plaidCount) {
             replaceByBaisShots(stories, biasItems, 3);
@@ -162,7 +162,7 @@ public class Chapter {
             }
             dump(stories, "after-process  insert by biasItems");
         }
-        //reset story id.
+        //reset story id.(change by insert or replace or etc.)
         setAllStoryId(stories);
 
         //5, 给 MediaPartItem 着色。（shot-key). default by gap
@@ -216,6 +216,7 @@ public class Chapter {
     }
 
     private void insertByBaisShots(List<Story> stories, List<MediaPartItem> biasItems, int musicSize) {
+       //TODO filter empty story. VisitServices.from(stories)
         // DESC
         Collections.sort(biasItems, new Comparator<MediaPartItem>() {
             @Override

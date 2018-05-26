@@ -12,4 +12,7 @@ VEGapUtils
 声音识别
 黑镜头(比较暗的镜头)--  可能有比较好的暗的镜头
 
+============================= TODO =================================
 
+https://blog.csdn.net/qq249356520/article/details/78864244
+java Color, ImageIO, BufferImage
