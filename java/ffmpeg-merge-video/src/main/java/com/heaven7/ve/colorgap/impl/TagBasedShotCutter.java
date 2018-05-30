@@ -4,29 +4,17 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
-import com.heaven7.java.visitor.ResultVisitor;
-import com.heaven7.java.visitor.Visitors;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static com.heaven7.utils.CommonUtils.isInRange;
-import static com.heaven7.ve.colorgap.VEGapUtils.getAverMainFaceArea;
-import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
 
 /**
  * 基于Tag的视频切割器：通用Tag，人脸Tag等
@@ -43,6 +31,7 @@ public class TagBasedShotCutter extends VideoCutter {
     private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY = true ;        // 一段segment是否只返回“domain score”最高的Item
     private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = true ;    // 一段segment是否只返回“face rect score”最高的Item
     private static final boolean CUT_BY_TAG = false;
+    private static final long DURATION_THRESOLD = CommonUtils.timeToFrame(15, TimeUnit.SECONDS); //人脸视频part大于15s 会用tag切割
 
     private static final String TAG = "TagBasedShotCutter";
 
@@ -51,24 +40,56 @@ public class TagBasedShotCutter extends VideoCutter {
         List<MediaPartItem> resultList = new ArrayList<>();
 
         for(MediaItem item : items){
+            if(item.item.getFilePath().endsWith("C0218.MP4")){
+                System.out.println("--------------");
+            }
             if(item.item.isImage()){
                 resultList.add(item.asPart());
                 continue;
             }
-            //TODO  MAX_SHOT_ONLY参数只对3分钟以内的视频生效，超过的一定是长纪录片
+            //MAX_SHOT_ONLY参数只对3分钟以内的视频生效，超过的一定是长纪录片
             if(!CUT_BY_TAG && item.imageMeta.containsFaces()){
                 Logger.d(TAG, "cut", "As human content. path = " + item.item.getFilePath());
                 //cut by face
-                List<MediaPartItem> faceItems = cutByFace(item);
+                final List<MediaPartItem> faceItems = cutByFace(item);
                 dump(faceItems, item, "cutByFace");
                 if(MAX_FACE_RECT_SCORE_SHOT_ONLY && item.item.getDuration() < 180*1000){
-                    faceItems = getMaxFaceRectsScoreShot(faceItems, item);
+                    List<MediaPartItem> faceItems2 = getMaxFaceRectsScoreShot(faceItems, item);
+                    resultList.addAll(faceItems2);
+                }else {
+                    List<MediaPartItem> unUsedShots = getUnUsedShots(item, faceItems);
+                    if (!Predicates.isEmpty(unUsedShots)) {
+                        VisitServices.from(unUsedShots).fire(new FireVisitor<MediaPartItem>() {
+                            @Override
+                            public Boolean visit(MediaPartItem item, Object param) {
+                                List<MediaPartItem> newItems = cutByCommonTag(item, false);
+                               /* newItems = VisitServices.from(newItems).filter(null, new PredicateVisitor<MediaPartItem>() {
+                                    @Override
+                                    public Boolean visit(MediaPartItem item, Object param) {
+                                        return item.getFacePercent() >= 0.5f;
+                                    }
+                                }, null).asListService().getAsList();*/
+                                if(!Predicates.isEmpty(newItems)){
+                                    faceItems.addAll(newItems);
+                                    Logger.d(TAG, "unused part ,use tag to cut. part = " + item + "\n ---> " + newItems);
+                                }
+                                return null;
+                            }
+                        });
+                    }
+                    //AESC
+                    VisitServices.from(faceItems).sortService(new Comparator<MediaPartItem>() {
+                        @Override
+                        public int compare(MediaPartItem o1, MediaPartItem o2) {
+                            return Long.compare(o1.videoPart.getStartTime(), o2.videoPart.getStartTime());
+                        }
+                    });
+                    resultList.addAll(faceItems);
                 }
-                resultList.addAll(faceItems);
             }else{
                 Logger.d(TAG, "cut", "As common tag. path = " + item.item.getFilePath());
                 //cut by common tag
-                List<MediaPartItem> faceItems = cutByCommonTag(item);
+                List<MediaPartItem> faceItems = cutByCommonTag(item, true);
                 dump(faceItems, item, "cutByCommonTag");
                 if(MAX_DOMAIN_SCORE_SHOT_ONLY && item.item.getDuration() < 180*1000){
                     MediaPartItem shot = getMaxDomainScoreShot(faceItems, item);
@@ -81,6 +102,58 @@ public class TagBasedShotCutter extends VideoCutter {
             }
         }
         return resultList;
+    }
+
+    /** 根据已经使用的item， 计算出剩余的part item(未被使用的, 人脸为主的) */
+    private List<MediaPartItem> getUnUsedShots(MediaItem item, List<MediaPartItem> faceItems) {
+        List<MediaPartItem> result = new ArrayList<>();
+        //升序
+        List<MediaPartItem> items = VisitServices.from(faceItems).sortService(new Comparator<MediaPartItem>() {
+            @Override
+            public int compare(MediaPartItem o1, MediaPartItem o2) {
+                return Long.compare(o1.videoPart.getStartTime(), o2.videoPart.getStartTime());
+            }
+        }).getAsList();
+
+        for(int i = 0 , j = i + 1 ; j < items.size() ; i ++, j ++){
+            MediaPartItem item1 = items.get(i);
+            MediaPartItem item2 = items.get(j);
+
+            long startTime1 = item1.videoPart.getStartTime();
+            long endTime1 = item1.videoPart.getEndTime();
+            long startTime2 = item2.videoPart.getStartTime();
+            long endTime2 = item2.videoPart.getEndTime();
+            final long maxDuration = item1.videoPart.getMaxDuration();
+            //first
+            if(i == 0){
+                //前面有未使用的
+                if(startTime1 > 0 && CommonUtils.frameToTime(startTime1,
+                        TimeUnit.SECONDS) >= MIN_SHOT_BUFFER_LENGTH){
+                    //判断是否人脸为主
+                    MediaPartItem partItem = new MediaPartItem((MetaInfo.ImageMeta) item.getImageMeta().copy(),
+                            item.getItem(), TimeTraveller.of(0, startTime1, maxDuration));
+                    result.add(partItem);
+                }
+            }
+            //last
+            if(j == items.size() - 1){
+                //末尾没使用的
+                long delta = maxDuration - endTime2;
+                if(CommonUtils.frameToTime(delta, TimeUnit.SECONDS) >= MIN_SHOT_BUFFER_LENGTH){
+                    MediaPartItem partItem = new MediaPartItem((MetaInfo.ImageMeta) item.getImageMeta().copy(),
+                            item.getItem(), TimeTraveller.of(endTime2, maxDuration, maxDuration));
+                    result.add(partItem);
+                }
+            }
+            //between
+            long delta = startTime2 - endTime1;
+            if(CommonUtils.frameToTime(delta, TimeUnit.SECONDS) >= MIN_SHOT_BUFFER_LENGTH){
+                MediaPartItem partItem = new MediaPartItem((MetaInfo.ImageMeta) item.getImageMeta().copy(),
+                        item.getItem(), TimeTraveller.of(endTime1, startTime2, maxDuration));
+                result.add(partItem);
+            }
+        }
+        return result;
     }
 
     /**
@@ -147,8 +220,8 @@ public class TagBasedShotCutter extends VideoCutter {
     }
 
     /** 从一个segment中根据tag切出tag稳定的镜头 */
-    private static List<MediaPartItem> cutByCommonTag(MediaItem item) {
-        if(item.imageMeta == null){
+    private static List<MediaPartItem> cutByCommonTag(CutItemDelegate item, boolean ensureOne) {
+        if(item.getImageMeta() == null){
             return Collections.emptyList();
         }
         final List<MediaPartItem> result = new ArrayList<>();
@@ -156,7 +229,7 @@ public class TagBasedShotCutter extends VideoCutter {
         traveller.cut();
 
         // 确保至少有一个
-        if(result.isEmpty()){
+        if(ensureOne && result.isEmpty()){
             result.add(item.asPart());
         }
 
@@ -164,14 +237,15 @@ public class TagBasedShotCutter extends VideoCutter {
     }
 
     /** 从frameBuffer中提取镜头：通过通用tags */
-    private static MediaPartItem createShotByTag(List<FrameTags> frameBuffer, Set<Integer> tagSet, MediaItem item) {
+    private static MediaPartItem createShotByTag(List<FrameTags> frameBuffer, Set<Integer> tagSet, CutItemDelegate item) {
         if(frameBuffer.size() >= MIN_SHOT_BUFFER_LENGTH){
             FrameTags first = frameBuffer.get(0);
             TimeTraveller tt = new TimeTraveller();
             tt.setStartTime(CommonUtils.timeToFrame(first.getFrameIdx(), TimeUnit.SECONDS));
             tt.setEndTime(tt.getStartTime() + CommonUtils.timeToFrame(frameBuffer.size() - 1, TimeUnit.SECONDS));
 
-            MediaPartItem shot = new MediaPartItem((MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, tt);
+            MediaPartItem shot = new MediaPartItem((MetaInfo.ImageMeta) item.getImageMeta().copy(), item.getItem(), tt);
+            shot.addDetail("createShotByTag");
             return shot;
         }
         return null;
@@ -304,11 +378,11 @@ public class TagBasedShotCutter extends VideoCutter {
         return null;
     }
 
-    private static void dump(List<MediaPartItem> items, MediaItem item, String tag) {
+    private static void dump(List<MediaPartItem> items, CutItemDelegate item, String tag) {
         StringBuilder sb = new StringBuilder();
         sb.append(tag)
                 .append(" success, for path = ")
-                .append(item.item.getFilePath())
+                .append(item.getItem().getFilePath())
                 .append(" ;parts = ");
         for(MediaPartItem mpi : items){
             float start = CommonUtils.frameToTime(mpi.videoPart.getStartTime(), TimeUnit.SECONDS);
@@ -320,19 +394,27 @@ public class TagBasedShotCutter extends VideoCutter {
 
     private static class CommonTagTraveller implements Map.MapTravelCallback<Integer, VideoDataLoadUtils.FrameData>{
 
-        private final MediaItem item;
+        private final CutItemDelegate item;
         private final List<MediaPartItem> result;
         List<FrameTags> frameBuffer = new ArrayList<>();
         Set<Integer> currentTagSet = new HashSet<>();
 
-        public CommonTagTraveller(MediaItem item, List<MediaPartItem> outItems) {
+        public CommonTagTraveller(CutItemDelegate item, List<MediaPartItem> outItems) {
             this.item = item;
             this.result = outItems;
         }
 
         /** cut by frame tags */
         public void cut() {
-            item.imageMeta.travelAllFrameDatas(this);
+            List<FrameTags> tags = item.getVideoTags();
+            VisitServices.from(tags).fire(new FireVisitor<FrameTags>() {
+                @Override
+                public Boolean visit(FrameTags frameTags, Object param) {
+                    travelFrameTags(frameTags);
+                    return null;
+                }
+            });
+            //item.imageMeta.travelAllFrameDatas(this);
             processRetainShot();
         }
 
@@ -344,6 +426,10 @@ public class TagBasedShotCutter extends VideoCutter {
                 //sparse array bug
                 return;
             }
+            travelFrameTags(ft);
+        }
+
+        private void travelFrameTags(FrameTags ft) {
             Set<Integer> frameTagSet = ft.getTopTagSet();
             // 跳出条件检测（新tags与currentTagSet的相似度小于1/2）
             if(currentTagSet.size() > 0){

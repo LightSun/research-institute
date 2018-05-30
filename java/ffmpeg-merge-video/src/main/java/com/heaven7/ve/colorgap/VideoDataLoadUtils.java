@@ -216,7 +216,7 @@ public class VideoDataLoadUtils {
     private static class CsvVideoTagCallback extends TextReadHelper.BaseAssetsCallback<FrameTags>{
         @Override
         public FrameTags parse(String line) {
-            if(TextUtils.isEmpty(line) || !line.contains(",")){
+            if(TextUtils.isEmpty(line)){
                 return null;
             }
             String[] strs = line.split(",");
@@ -229,13 +229,17 @@ public class VideoDataLoadUtils {
             FrameTags ft = new FrameTags();
             ft.setFrameIdx(frameIdx);
 
-            // 69 1.000000 67 1.000000 520 0.996915 377 0.976848 220 0.967641 1 0.528127 645 0.400145
-            String[] strs2 = strs[1].split(" ");
-            for(int i = 0 , size = strs2.length ; i < size ; i += 2){
-                Tag tag = new Tag(Integer.parseInt(strs2[i]), Float.parseFloat(strs2[i + 1]));
-                if(tag.getPossibility() > -1f){
-                    ft.addTag(tag);
+            try {
+                // 69 1.000000 67 1.000000 520 0.996915 377 0.976848 220 0.967641 1 0.528127 645 0.400145
+                String[] strs2 = strs[1].split(" ");
+                for (int i = 0, size = strs2.length; i < size; i += 2) {
+                    Tag tag = new Tag(Integer.parseInt(strs2[i]), Float.parseFloat(strs2[i + 1]));
+                    if (tag.getPossibility() > -1f) {
+                        ft.addTag(tag);
+                    }
                 }
+            }catch (ArrayIndexOutOfBoundsException e){
+                //ignore
             }
             return ft;
         }

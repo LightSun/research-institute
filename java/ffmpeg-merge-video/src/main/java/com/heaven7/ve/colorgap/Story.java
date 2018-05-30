@@ -39,6 +39,24 @@ public class Story {
             item.setStoryId(storyId);
         }
     }
+
+    public MediaPartItem getFirstShot() {
+        return getShots(false).get(0);
+    }
+    public MediaPartItem getLastShot() {
+        List<MediaPartItem> shots = getShots(false);
+        return shots.get(shots.size() - 1);
+    }
+    /** based on {@linkplain MediaPartItem#getEndTime()} ()} */
+    public long getEndTimeActually() {
+        List<MediaPartItem> list = getShots(false);
+        return list.get(list.size() - 1).getEndTime();
+    }
+    /** based on {@linkplain MediaPartItem#getStartTime()} */
+    public long getStartTimeActually() {
+        List<MediaPartItem> list = getShots(false);
+        return list.get(0).getStartTime();
+    }
     public long getStartTime(){
         List<MediaPartItem> list = getShots(false);
         return list.get(0).imageMeta.getDate();
@@ -49,12 +67,12 @@ public class Story {
     }
 
     public void replaceLastShot(MediaPartItem shot) {
-        List<MediaPartItem> shots = getSortedShots(Visitors.truePredicateVisitor());
-        int index = shots.size() - 1;
+        List<MediaPartItem> shots = getShots(false);
         MediaPartItem preShot = shots.get(shots.size() - 1);
         if(shot.isPlaned()){
             throw new IllegalStateException("already planed by bias shot.");
         }
+        int index = items.indexOf(preShot);
         items.set(index, shot);
         shot.setStoryId(getStoryId());
         Logger.d(TAG, "replaceLastShot", "index("+ index +") of story. old shot = "
@@ -64,9 +82,9 @@ public class Story {
         if(shot.isPlaned()){
             throw new IllegalStateException("already planed by bias shot.");
         }
-        List<MediaPartItem> shots = getSortedShots(Visitors.truePredicateVisitor());
+        List<MediaPartItem> shots = getShots(false);
         MediaPartItem preShot = shots.get(0);
-        int index = 0;
+        int index = items.indexOf(preShot);
         items.set(index, shot);
         shot.setStoryId(getStoryId());
         Logger.d(TAG, "replaceFirstShot", "index("+ index +") of story. old shot = "
@@ -128,9 +146,6 @@ public class Story {
             }
         }, null);
 
-        //3, 内容相似的画面不超过5个
-        deleteShotsByLimit(Visitors.truePredicateVisitor(), 5, "内容相似的画面不超过5个");
-
         //2, 镜头类型相同的镜头 不连续超过3个， 非人脸类型，不得超过2个
         //   先处理镜头，再出路相似的画面。
         int[] shotTypes = { MetaInfo.SHOT_TYPE_BIG_LONG_SHORT,
@@ -162,6 +177,8 @@ public class Story {
                 }
             }
         }
+        //3, 内容相似的画面不超过5个
+        deleteShotsByLimit(Visitors.truePredicateVisitor(), 5, "内容相似的画面不超过5个");
 
         //4, 重复镜头. 得分，类型都相同，则只保留1个
         List<MediaPartItem> partItems = filterAndSortShots(Visitors.truePredicateVisitor(), false);
@@ -232,5 +249,4 @@ public class Story {
                 ", items=" + logItems() +
                 '}';
     }
-
 }

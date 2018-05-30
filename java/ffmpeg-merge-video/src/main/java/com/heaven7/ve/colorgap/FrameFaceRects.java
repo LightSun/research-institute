@@ -53,7 +53,7 @@ public class FrameFaceRects {
         if(sortedFrameAreas == null){
             sortedFrameAreas = new ArrayList<>();
             //面积降序
-            VisitServices.from(getRects()).transformToCollection(null,
+            VisitServices.from(getRects()).map(null,
                     new Comparator<Float>() {
                         @Override
                         public int compare(Float o1, Float o2) {

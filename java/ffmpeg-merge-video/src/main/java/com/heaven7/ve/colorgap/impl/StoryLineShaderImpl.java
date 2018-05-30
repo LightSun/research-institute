@@ -21,8 +21,8 @@ import java.util.List;
 public class StoryLineShaderImpl implements StoryLineShader {
 
     private static final String TAG = "StoryLineShaderImpl";
-   /* private static final Comparator<MediaPartItem> TIME_COMPARATOR
-            = (Comparator<MediaPartItem>) (o1, o2) -> Long.compare(o1.getStartTime(), o2.getStartTime());*/
+    private static final Comparator<MediaPartItem> TIME_COMPARATOR
+            = (Comparator<MediaPartItem>) (o1, o2) -> Long.compare(o1.getDate(), o2.getDate());
 
     @Override
     public List<GapManager.GapItem> tintAndFill(List<CutInfo.PlaidInfo> plaids, VETemplate template, List<MediaPartItem> items,
@@ -78,7 +78,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
         //only one dir (often for c user.)
         if(sentences.size() == 1){
             //only one
-           // items.sort(TIME_COMPARATOR);
+            items.sort(TIME_COMPARATOR);
             chapters.add(new Chapter(sentences.get(0).getPlaids(), items, 0));
             return chapters;
         }
@@ -94,7 +94,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
                     return dir != null && dir.equals(ls.getDir());
                 }
             }, null);
-           // filterItems.sort(TIME_COMPARATOR);
+            filterItems.sort(TIME_COMPARATOR);
             if(filterItems.isEmpty()){
                 throw new IllegalStateException("RawScript error. dir = " + ls.getDir());
             }

@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * Created by heaven7 on 2018/3/15 0015.
  */
 
-public class MediaItem {
+public class MediaItem implements CutItemDelegate{
 
    // public static final int FLAG_HOLD     = 0x0001;
     public static final int FLAG_INVALID  = 0x0002;
@@ -57,5 +57,18 @@ public class MediaItem {
         tt.setStartTime(0);
         tt.setEndTime(CommonUtils.timeToFrame(item.getDuration(), TimeUnit.MILLISECONDS));
         return new MediaPartItem((MetaInfo.ImageMeta) imageMeta.copy(), this.item, tt);
+    }
+
+    @Override
+    public MetaInfo.ImageMeta getImageMeta() {
+        return imageMeta;
+    }
+    @Override
+    public List<FrameTags> getVideoTags() {
+        return imageMeta.getAllVideoTags();
+    }
+    @Override
+    public MediaResourceItem getItem() {
+        return item;
     }
 }

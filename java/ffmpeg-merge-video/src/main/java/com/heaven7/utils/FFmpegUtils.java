@@ -16,6 +16,21 @@ import java.util.concurrent.TimeUnit;
 public class FFmpegUtils {
 
     /**
+     * build get create time of video
+     * @param videoPath the video path
+     * @return the cmds
+     */
+    public static String[] buildGetCreateTimeCmd(String videoPath){
+        //ffmpeg -safe 0 -f concat -i E:\\study\\github\\ffmpeg-merge-video\\concat.txt -c copy concat_output.mp4 -y
+        List<String> cmds = new ArrayList<>();
+        cmds.add("ffprobe");
+        cmds.add("-i");
+        cmds.add(videoPath);
+        String[] arr = new String[cmds.size()];
+        return cmds.toArray(arr);
+    }
+
+    /**
      * build merge video cmd
      * @param concatPath the concat path
      * @param outVideoPath the out video path

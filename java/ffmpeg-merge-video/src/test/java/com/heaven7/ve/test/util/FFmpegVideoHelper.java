@@ -93,7 +93,7 @@ public class FFmpegVideoHelper {
 
             for (CuttedItem item : cutItems){
                 //file 'F:\\videos\\wedding\\empty\\empty_C0015.mp4'
-                fw.write("file '"+ item.getSavePath() + "'  tagScore = "+ item.getTagScore()
+                fw.write("file '"+ item.getSavePath() + "'  tagScore = "+ item.getTagScore() + " ,bias = " + item.isBiasShot()
                         + " ,time = "  + SDF.format(item.getLastModifyTime()) + "\r\n");
             }
         } catch (IOException e) {
@@ -141,7 +141,7 @@ public class FFmpegVideoHelper {
             String[] cmds = FFmpegUtils.buildCutCmd(mpi, dir, outPath);
             new CmdHelper(cmds).execute();
             //sleep for some case . cut video not done.
-            /*try {
+           /* try {
                 Thread.sleep(800);
             } catch (InterruptedException e) {
                 e.printStackTrace();

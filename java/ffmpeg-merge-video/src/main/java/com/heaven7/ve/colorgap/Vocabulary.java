@@ -297,6 +297,9 @@ public class Vocabulary {
         });
 
         //名词
+        WEDDING_NOUN_DICT.put("气球", new WeddingTagItem[]{
+                new WeddingTagItem(695,"Balloon",2.0,"mediumShot","closeUp"),
+        });
         WEDDING_NOUN_DICT.put("天空", new WeddingTagItem[]{
                 new WeddingTagItem(223,"Weather",1.0,"longShot",""),
                 new WeddingTagItem(502,"Sky",1.0,"longShot",""),

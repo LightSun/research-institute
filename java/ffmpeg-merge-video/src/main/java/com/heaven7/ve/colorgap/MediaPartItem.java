@@ -25,7 +25,7 @@ import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
  * the media part item, Equivalent to a video camera-shot
  * @author heaven7
  */
-public class MediaPartItem implements ItemDelegate {
+public class MediaPartItem implements ItemDelegate , CutItemDelegate{
 
     private static final Integer TAG_ID_BLACK = 20;
     private static final String TAG = "MediaPartItem";
@@ -78,6 +78,10 @@ public class MediaPartItem implements ItemDelegate {
         if(!selectedInStory) {
             this.cause += cause + "\r\n";
         }
+    }
+
+    public void addDetail(String desc){
+        this.cause += desc + "\r\n";
     }
 
     public String getDetail() {
@@ -160,6 +164,10 @@ public class MediaPartItem implements ItemDelegate {
         if(Predicates.isEmpty(framesTags)){
             return 0;
         }
+/*
+        if(item.getFilePath().endsWith("C0073.MP4") || item.getFilePath().endsWith("C0075.MP4")){
+            System.out.println("------------");
+        }*/
 
         float score = 0f;
         for(FrameTags ft : framesTags){
@@ -188,9 +196,9 @@ public class MediaPartItem implements ItemDelegate {
             if(faces == 1){
                 score += 1.0f;
             }else if(faces == 2){
-                score += 1.5f;
+                score += 2f;
             }else if(faces > 2){
-                score += 1.0f;
+                score += 1.5f;
             }
         }
         // 3. 增加镜头类型得分
@@ -308,7 +316,7 @@ public class MediaPartItem implements ItemDelegate {
                 }else {
                     List<Float> areas = new ArrayList<>();
                     //面积降序
-                    VisitServices.from(frameFaceRects.getRects()).transformToCollection(null,
+                    VisitServices.from(frameFaceRects.getRects()).map(null,
                             new Comparator<Float>() {
                                 @Override
                                 public int compare(Float o1, Float o2) {
@@ -454,7 +462,7 @@ public class MediaPartItem implements ItemDelegate {
             }
         }).asListService().sortService(
                 (o1, o2) -> Float.compare(o2.getPossibility(), o1.getPossibility()), true)
-                .transformToCollection(null, new ResultVisitor<Tag, Integer>() {
+                .map(null, new ResultVisitor<Tag, Integer>() {
                     @Override
                     public Integer visit(Tag tag, Object param) {
                         return tag.getIndex();
@@ -465,5 +473,70 @@ public class MediaPartItem implements ItemDelegate {
         }else{
             return result.subList(0, count);
         }
+    }
+
+    public long getDate() {
+        return imageMeta.getDate();
+    }
+
+    public boolean isBiasShot() {
+        return isPlaned();
+    }
+
+    @Override
+    public MetaInfo.ImageMeta getImageMeta() {
+        return imageMeta;
+    }
+    @Override
+    public MediaPartItem asPart() {
+        return (MediaPartItem) copy();
+    }
+    @Override
+    public List<FrameTags> getVideoTags() {
+        return imageMeta.getVideoTags(videoPart);
+    }
+    @Override
+    public MediaResourceItem getItem() {
+        return item;
+    }
+    /*** for debug */
+    public String getFullPath() {
+        return item.getFilePath() + " ," + videoPart.toString2();
+    }
+    public float getFacePercent() {
+        List<FrameFaceRects> rects = imageMeta.getFaceRects(videoPart);
+        if(Predicates.isEmpty(rects)){
+            return 0f;
+        }
+        List<FrameFaceRects> tempList = new ArrayList<>();
+        VisitServices.from(rects).visitForQueryList((ffr, param) -> ffr.hasRect(), tempList);
+        return  tempList.size() * 1f / rects.size();
+    }
+
+    /** indicate current media part can put after target or not. */
+    public boolean canPutAfter(MediaPartItem target) {
+        long shotTime;
+        long targetTime;
+        if(getVideoPath().equals(target.getVideoPath())){
+            shotTime = getStartTime();
+            targetTime = target.getEndTime();
+        }else{
+            shotTime = getDate();
+            targetTime = target.getDate();
+        }
+        return shotTime >= targetTime;
+    }
+    /** indicate current media part can put after target or not. */
+    public boolean canPutBefore(MediaPartItem target) {
+        long shotTime;
+        long targetTime;
+        if(getVideoPath().equals(target.getVideoPath())){
+            shotTime = getEndTime();
+            targetTime = target.getStartTime();
+        }else{
+            shotTime = getDate();
+            targetTime = target.getDate();
+        }
+        return shotTime <= targetTime;
     }
 }

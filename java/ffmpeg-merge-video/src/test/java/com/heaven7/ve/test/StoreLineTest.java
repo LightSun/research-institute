@@ -1,9 +1,7 @@
 package com.heaven7.ve.test;
 
 import com.heaven7.core.util.Logger;
-import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.CmdHelper;
-import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.ColorGapManager;
@@ -71,7 +69,7 @@ public class StoreLineTest extends TestCase {
 
                 ColorGapManager cgm = new ColorGapManager(null,
                                 new MediaAnalyserImpl(),
-                                new MusicCutterImpl2(60),
+                                new MusicCutterImpl2(45   ),
                                 new MusicShaderImpl(),
                                 new PlaidFillerImpl());
                 // 先不设置模版。表示只按照一个章节来测试
@@ -95,7 +93,7 @@ public class StoreLineTest extends TestCase {
     }
 
     //can't build right video . why ? may be the ffmpeg is busy.
-   // ffmpeg -safe 0 -f concat -i E:\\study\\github\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story3\\concat.txt -c copy E:\\study\\github\\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story3\\merged.mp4 -y
+   // ffmpeg -safe 0 -f concat -i E:\\study\\github\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story4\\concat.txt -c copy E:\\study\\github\\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story4\\merged.mp4 -y
     public void testConcatVideo() {
         new Thread(new Runnable() {
             @Override

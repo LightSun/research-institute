@@ -10,6 +10,7 @@ import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.SimpleCopyDelegate;
+import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.filter.*;
 
 import java.util.ArrayList;
@@ -556,6 +557,10 @@ public interface MetaInfo {
             }
             return result;
         }
+        public List<FrameTags> getVideoTags(TimeTraveller part) {
+            return getVideoTags(part.getStartTime(), part.getEndTime());
+        }
+
         /** get all video tags.  startTime and endTime in frames */
         public List<FrameTags> getVideoTags(long startTime, long endTime) {
             if(frameDataMap == null){
@@ -573,6 +578,24 @@ public interface MetaInfo {
                 }
             }
             return result;
+        }
+        public List<FrameTags> getAllVideoTags() {
+            if(frameDataMap == null){
+                return Collections.emptyList();
+            }
+            List<FrameTags> result = new ArrayList<>();
+            final int size = frameDataMap.size();
+            for (int i = 0; i < size ; i++) {
+                //long key = CommonUtils.timeToFrame(frameDataMap.keyAt(i), TimeUnit.SECONDS);
+                FrameTags tag = frameDataMap.valueAt(i).getTag();
+                if(tag != null) {
+                    result.add(tag);
+                }
+            }
+            return result;
+        }
+        public List<FrameFaceRects> getFaceRects(TimeTraveller part) {
+            return getFaceRects(part.getStartTime(), part.getEndTime());
         }
         /** get all face rects.  startTime and endTime in frames */
         public List<FrameFaceRects> getFaceRects(long startTime, long endTime) {

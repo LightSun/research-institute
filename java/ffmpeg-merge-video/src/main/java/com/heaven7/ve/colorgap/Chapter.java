@@ -152,7 +152,8 @@ public class Chapter {
 
         //TODO 如果没有偏差镜头， 而且镜头个数不够？ 用空镜头填充？
         if (shotCount == plaidCount) {
-            replaceByBaisShots(stories, biasItems, 3);
+            int base = new Random().nextInt(2) == 1 ?  3 : 4;
+            replaceByBaisShots(stories, biasItems,  stories.size() / base );
             dump(stories, "after-process  replace by biasItems");
         } else if (shotCount < plaidCount) {
             insertByBaisShots(stories, biasItems, plaidCount);
@@ -231,27 +232,29 @@ public class Chapter {
             if (shot.isPlaned()) {
                 continue;
             }
-            Story tail = stories.get(stories.size() - 1);
-            long ctime = shot.imageMeta.getDate();
-            long endTime = tail.getEndTime();
+            //偏差镜头只可能出现在故事之间
+          /*  Story tail = stories.get(stories.size() - 1);
             //insert last
-            if (ctime >= endTime) {
+            if(shot.canPutAfter(tail.getLastShot())){
                 Logger.d(TAG, "insertByBaisShots", "insert at last.");
                 shot.setPlaned(true);
                 Story story = new Story(new ArrayList<>(Arrays.asList(shot)));
                 stories.add(story);
                 continue;
-            }
+            }*/
             //insert between stories
             int i = 0, j = 1;
             while (j < stories.size()) {
-                long time0 = stories.get(i).getEndTime();
-                long time1 = stories.get(j).getStartTime();
-                if (ctime >= time0 && ctime <= time1) {
-                    shot.setPlaned(true);
-                    Story story = new Story(new ArrayList<>(Arrays.asList(shot)));
-                    stories.add(j, story);
-                    break;
+                MediaPartItem preShot = stories.get(i).getLastShot();
+                MediaPartItem nextShot = stories.get(j).getFirstShot();
+                //left and right can't be bias shot.
+                if(!preShot.isBiasShot() && !nextShot.isBiasShot()) {
+                    if(shot.canPutAfter(preShot) && shot.canPutBefore(nextShot)){
+                        shot.setPlaned(true);
+                        Story story = new Story(new ArrayList<>(Arrays.asList(shot)));
+                        stories.add(j, story);
+                        break;
+                    }
                 }
                 i += 1;
                 j += 1;
@@ -275,35 +278,36 @@ public class Chapter {
             if (shot.isPlaned()) {
                 continue;
             }
-            Story headStory = stories.get(0);
-            //try insert head
-            long ctime = shot.imageMeta.getDate();
-            long headTime = headStory.getStartTime();
-            if (ctime < headTime) {
+            //偏差镜头只可能出现在故事之间
+          /*  Story headStory = stories.get(0);
+            //try replace head
+            if(shot.canPutBefore(headStory.getFirstShot())){
                 Logger.d(TAG, "replaceByBaisShots", "replace head.");
                 headStory.replaceFirstShot(shot);
                 shot.setPlaned(true);
                 continue;
             }
-            //try insert tail
+
+            //try replace tail
             Story tail = stories.get(stories.size() - 1);
-            long tailTime = tail.getEndTime();
-            if (ctime >= tailTime) {
+            if(shot.canPutAfter(tail.getLastShot())){
                 Logger.d(TAG, "replaceByBaisShots", "replace tail.");
                 tail.replaceLastShot(shot);
                 shot.setPlaned(true);
                 continue;
-            }
-            //try insert between stories
+            }*/
+            //try replace between stories
             int k = 0, j = 1;
             while (j < stories.size()) {
-                long time0 = stories.get(k).getEndTime();
-                long time1 = stories.get(j).getStartTime();
-                if (ctime >= time0 && ctime <= time1) {
-                    Logger.d(TAG, "replaceByBaisShots", "replace at " + k);
-                    stories.get(k).replaceLastShot(shot);
-                    shot.setPlaned(true);
-                    break;
+                MediaPartItem preShot = stories.get(k).getLastShot();
+                MediaPartItem nextShot = stories.get(j).getFirstShot();
+                if(!preShot.isBiasShot() && !nextShot.isBiasShot()){
+                    if(shot.canPutAfter(preShot) && shot.canPutBefore(nextShot)){
+                        Logger.d(TAG, "replaceByBaisShots", "replace at " + k);
+                        stories.get(k).replaceLastShot(shot);
+                        shot.setPlaned(true);
+                        break;
+                    }
                 }
                 k++;
                 j++;

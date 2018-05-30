@@ -5,6 +5,11 @@ import com.heaven7.java.base.util.DefaultPrinter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * the command helper.
@@ -119,6 +124,47 @@ public class CmdHelper {
         /** in mill-seconds */
         public long getDuration(){
             return (long) (duration * 1000);
+        }
+    }
+    public static class VideoCreateTimeCallback implements Callback{
+
+        private long dateTime;
+        @Override
+        public void collect(CmdHelper helper, String line) {
+            if(dateTime == 0 && line.contains("creation_time")){
+                int index = line.indexOf(":");
+                String time = line.substring(index + 1).trim()/*.replace("Z",  " UTC")*/;
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                try {
+                    dateTime = format.parse(time).getTime();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+              /*  SimpleDateFormat target = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                target.setTimeZone(TimeZone.getDefault());
+                DefaultPrinter.getDefault().info("VideoCreateTimeCallback", "collect", "raw = "
+                        + time + " ,new date = "+ target.format(new Date(dateTime)));*/
+            }
+        }
+        @Override
+        public void onFailed(CmdHelper helper, Exception e) {
+            DefaultPrinter.getDefault().warn("VideoCreateTimeCallback", "onFailed", e);
+        }
+        @Override
+        public void onStart(CmdHelper helper) {
+
+        }
+        @Override
+        public void onEnd(CmdHelper helper) {
+
+        }
+        @Override
+        public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
+
+        }
+        public long getDateTime(){
+            return dateTime;
         }
     }
 }

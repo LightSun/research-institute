@@ -67,4 +67,9 @@ public class CuttedItem {
         }).save(tags_str);
         return tags_str.toString();
     }
+
+    public boolean isBiasShot() {
+        MediaPartItem mpi = (MediaPartItem)item.item;
+        return mpi.isPlaned();
+    }
 }
