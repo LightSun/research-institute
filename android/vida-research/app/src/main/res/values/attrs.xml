@@ -25,4 +25,9 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="RectangleProgressView">
+        <attr name="rect_progress_height" format="dimension|reference"/>
+        <attr name="rect_progress_color" format="color|reference"/>
+    </declare-styleable>
+
 </resources>
