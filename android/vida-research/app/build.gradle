@@ -16,6 +16,10 @@ android {
                // abiFilters 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips', 'mips64'
             }
         }
+
+        renderscriptTargetApi 20
+        renderscriptSupportModeEnabled true
+       // vectorDrawables.useSupportLibrary = true
     }
     externalNativeBuild {
         cmake {

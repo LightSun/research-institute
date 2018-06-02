@@ -122,7 +122,7 @@ public class RectangleProgressView extends View {
             int hOffset = mDistance - width;
             mRect.set(mRect.right - mPHeight, mRect.bottom, mRect.right, mRect.bottom + hOffset);
             canvas.drawRect(mRect, mPaint);
-            Logger.d(TAG, "onDraw", "draw  top and right");
+          //  Logger.d(TAG, "onDraw", "draw  top and right");
         } else if (mDistance <= width * 2 + height) {
             //draw  top,right,bottom.
             mRect.set(mPHeight, 0, width + mPHeight, mPHeight);
@@ -137,7 +137,7 @@ public class RectangleProgressView extends View {
             //right = last left, bottom = last bottom
             mRect.set(mRect.left - wOffset, mRect.bottom - mPHeight, mRect.left, mRect.bottom);
             canvas.drawRect(mRect, mPaint);
-            Logger.d(TAG, "onDraw", "draw  top,right,bottom");
+           // Logger.d(TAG, "onDraw", "draw  top,right,bottom");
         } else if (mDistance <= width * 2 + height * 2) {
             //draw  left,top,right,bottom.
             mRect.set(mPHeight, 0, width + mPHeight, mPHeight);
@@ -156,7 +156,7 @@ public class RectangleProgressView extends View {
             //bottom = last top, left = last left
             mRect.set(mRect.left, mRect.top - hOffset, mRect.left + mPHeight, mRect.top);
             canvas.drawRect(mRect, mPaint);
-            Logger.d(TAG, "onDraw", "draw  left,top,right,bottom");
+           // Logger.d(TAG, "onDraw", "draw  left,top,right,bottom");
         } else {
             throw new IllegalStateException("distance is error");
         }
