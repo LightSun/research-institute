@@ -7,6 +7,7 @@ import com.heaven7.vida.research.sample.TestDiscViewActivity;
 import com.heaven7.vida.research.sample.TestRectProgresActivity;
 import com.heaven7.vida.research.sample.TestRoundViewActivity;
 import com.heaven7.vida.research.sample.TestShadowShapeActivity;
+import com.heaven7.vida.research.sample.TestV7_CircleImageViewActivity;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
 import com.heaven7.vida.research.widget.RectangleProgressView;
 
@@ -33,6 +34,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(NativeSurfaceActivity.class));
         list.add(new ActivityInfo(TestRectProgresActivity.class));
         list.add(new ActivityInfo(TestShadowShapeActivity.class));
+        list.add(new ActivityInfo(TestV7_CircleImageViewActivity.class));
     }
 
 }

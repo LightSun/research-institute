@@ -38,6 +38,7 @@
         <activity android:name=".sample.NativeSurfaceActivity"/>
         <activity android:name=".sample.TestRectProgresActivity"/>
         <activity android:name=".sample.TestShadowShapeActivity"/>
+        <activity android:name=".sample.TestV7_CircleImageViewActivity"/>
     </application>
 
 </manifest>

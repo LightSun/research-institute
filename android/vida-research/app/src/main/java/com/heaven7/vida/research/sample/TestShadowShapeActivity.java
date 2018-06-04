@@ -89,7 +89,7 @@ public class TestShadowShapeActivity extends AppCompatActivity {
         canvas.drawBitmap(bitmap, null, rect, null);
         drawable2.draw(canvas);
 
-        v.setBackground(new BitmapDrawable(getResources(),result));
+        v.setBackground(new BitmapDrawable(getResources(), result));
     }
 //can apply shadow to any drawable
     private void shadow1(View v) {
