@@ -241,9 +241,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
                 return true;
             }else if(tags.size() == 1){
                 List<Integer> list = tags.get(0);
-                if(list.size() == 1 && list.contains(TAG_ID_BLACK)){
-                    return true;
-                }
+                return list.size() == 1 && list.contains(TAG_ID_BLACK);
             }
         }
         return false;
@@ -391,7 +389,8 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         if(Predicates.isEmpty(imageMeta.getRawFaceRects())){
             return;
         }
-        List<FrameFaceRects> ffrs = VisitServices.from(imageMeta.getRawFaceRects()).visitForQueryList(new PredicateVisitor<FrameFaceRects>() {
+        List<FrameFaceRects> ffrs = VisitServices.from(imageMeta.getRawFaceRects())
+                .visitForQueryList(new PredicateVisitor<FrameFaceRects>() {
             @Override
             public Boolean visit(FrameFaceRects ffr, Object param) {
                 return ffr.hasRect();

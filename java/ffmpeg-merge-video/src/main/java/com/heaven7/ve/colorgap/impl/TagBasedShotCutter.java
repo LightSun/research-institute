@@ -47,7 +47,7 @@ public class TagBasedShotCutter extends VideoCutter {
                 resultList.add(item.asPart());
                 continue;
             }
-            //MAX_SHOT_ONLY参数只对3分钟以内的视频生效，超过的一定是长纪录片
+            //MAX_SHOT_ONLY参数只对3分钟以内的视频生效，超过的一定是长纪录片 (小于3min的一般是慢速镜头)
             if(!CUT_BY_TAG && item.imageMeta.containsFaces()){
                 Logger.d(TAG, "cut", "As human content. path = " + item.item.getFilePath());
                 //cut by face
@@ -57,18 +57,16 @@ public class TagBasedShotCutter extends VideoCutter {
                     List<MediaPartItem> faceItems2 = getMaxFaceRectsScoreShot(faceItems, item);
                     resultList.addAll(faceItems2);
                 }else {
+                    //cut more face shots.
                     List<MediaPartItem> unUsedShots = getUnUsedShots(item, faceItems);
                     if (!Predicates.isEmpty(unUsedShots)) {
                         VisitServices.from(unUsedShots).fire(new FireVisitor<MediaPartItem>() {
                             @Override
                             public Boolean visit(MediaPartItem item, Object param) {
                                 List<MediaPartItem> newItems = cutByCommonTag(item, false);
-                               /* newItems = VisitServices.from(newItems).filter(null, new PredicateVisitor<MediaPartItem>() {
-                                    @Override
-                                    public Boolean visit(MediaPartItem item, Object param) {
-                                        return item.getFacePercent() >= 0.5f;
-                                    }
-                                }, null).asListService().getAsList();*/
+                                newItems = VisitServices.from(newItems).filter(null,
+                                        (item1, param1) -> item1.getFacePercent() >= 0.7f,
+                                        null).getAsList();
                                 if(!Predicates.isEmpty(newItems)){
                                     faceItems.addAll(newItems);
                                     Logger.d(TAG, "unused part ,use tag to cut. part = " + item + "\n ---> " + newItems);

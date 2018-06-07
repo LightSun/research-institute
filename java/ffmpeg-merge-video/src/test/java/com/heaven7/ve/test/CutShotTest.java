@@ -64,7 +64,8 @@ public class CutShotTest extends TestCase {
     @Test
     public void testCutShot2() {
         //00:04:22 // 262
-        MediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\story4\\storyTest\\C0218.MP4", 411000);
+       // MediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\story4\\storyTest\\C0218.MP4", 411000);
+        MediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\story4\\storyTest\\C0013.MP4", 91000);
         ArrayList<MediaResourceItem> list = new ArrayList<>(Arrays.asList(item));
         testCutShot(list);
     }

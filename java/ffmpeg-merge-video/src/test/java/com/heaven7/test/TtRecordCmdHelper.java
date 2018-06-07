@@ -10,9 +10,8 @@ public class TtRecordCmdHelper {
 
     public static void main(String[] args) {
         try {
-            executeDir("F:\\videos\\故事线\\婚礼4\\晚宴");
-            /*String file = "F:\\videos\\故事线\\婚礼4\\故事线测试素材\\GP5A0862.mp4";
-            executeFile(file);*/
+            executeDir("F:\\videos\\jinliang\\tb女装");
+           // executeFile("F:\\videos\\jiege_1\\dongsen_his\\13.mp4");
         } catch (Exception e) {
             e.printStackTrace();
         }

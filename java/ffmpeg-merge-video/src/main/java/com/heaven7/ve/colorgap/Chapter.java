@@ -143,12 +143,7 @@ public class Chapter {
 
         //5, 处理偏差镜头
         List<MediaPartItem> biasItems = VisitServices.from(items).visitForQueryList(
-                new PredicateVisitor<MediaPartItem>() {
-                    @Override
-                    public Boolean visit(MediaPartItem partItem, Object param) {
-                        return partItem.getStoryId() == -1;
-                    }
-                }, null);
+                (partItem, param) -> partItem.getStoryId() == -1, null);
 
         //TODO 如果没有偏差镜头， 而且镜头个数不够？ 用空镜头填充？
         if (shotCount == plaidCount) {

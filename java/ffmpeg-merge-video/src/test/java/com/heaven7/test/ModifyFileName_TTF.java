@@ -26,7 +26,7 @@ public class ModifyFileName_TTF {
 
     @Test
     public void modifyFileNameOfDir() {
-        String dir = "F:\\videos\\故事线\\婚礼1\\教堂内\\tfrecord";
+        String dir = "F:\\videos\\jinliang\\tb女装\\tfrecord";
         modifyFileNameByDir(dir, new RenameDelegateImpl(false));
     }
 
