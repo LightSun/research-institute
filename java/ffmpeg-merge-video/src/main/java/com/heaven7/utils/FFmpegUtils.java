@@ -133,7 +133,8 @@ public class FFmpegUtils {
         return sb.toString();*/
     }
     //整数s, 小数ms
-    private static String transferTime(float time) {
+    /** time in seconds */
+    public static String transferTime(float time) {
         String str = String.format("%.2f", time);
         int second = (int) time;
         int minute = 0;
@@ -152,6 +153,192 @@ public class FFmpegUtils {
                 .append(second > 9 ? second : ("0" + second))
                 .append(str.substring(str.lastIndexOf(".")))
                 .toString();
+    }
+
+    /**
+     * build the cmd of extract image from video .
+     * @param cmd the image extract cmd
+     * @return the cmds
+     */
+    public static String[] buildImageExtractCmd(ImageExtractCmd cmd, boolean addStartPrefix){
+        List<String> cmds = new ArrayList<>();
+        //"cmd","/c","start"
+        if(addStartPrefix) {
+            cmds.add("cmd");
+            cmds.add("/c");
+            cmds.add("start");
+        }
+        cmds.add("ffmpeg");
+        cmds.add("-i");
+        cmds.add(cmd.getVideoPath());
+        cmds.add("-r");
+        cmds.add(cmd.getCountEverySecond() + "");
+        cmds.add("-ss");
+        cmds.add(FFmpegUtils.transferTime(cmd.getStartTime()));
+        if(cmd.getFrameCount() > 0){
+            cmds.add("-vframes");
+            cmds.add(cmd.getFrameCount() + "");
+        }
+        // cmds.add("-f");
+        // cmds.add("image2");
+        if(!TextUtils.isEmpty(cmd.getResolution())){
+            cmds.add("-s");
+            cmds.add(cmd.getResolution());
+        }
+        //5bit int
+        if(cmd.getSavePath().contains(".")){//a file path
+            cmds.add(cmd.getSavePath());
+        }else {
+            cmds.add(cmd.getSavePath() + File.separator + "img_%05d.jpeg");
+        }
+        cmds.add("-y");
+
+        String[] arr = new String[cmds.size()];
+        return cmds.toArray(arr);
+    }
+
+    /**
+     * the cmds of image extract from video
+     * @author heaven7
+     */
+    public static class ImageExtractCmd{
+        /** -i,  MUST */
+        private String videoPath;
+        /** extract image rate in every second(-r) . MUST*/
+        private int countEverySecond = 1;
+        /** the image save format(-f) */
+        private String imageFormat;
+
+        /** the start time (in seconds) to extract(-ss) */
+        private float startTime;
+        /** the extract count.(-vframes) */
+        private int frameCount;
+
+        /** like '-s 800*600' */
+        private String resolution;
+
+        /** can be a jpeg file path or just a dir. MUST */
+        private String savePath;
+
+        protected ImageExtractCmd(ImageExtractCmd.Builder builder) {
+            this.videoPath = builder.videoPath;
+            this.countEverySecond = builder.countEverySecond;
+            this.imageFormat = builder.imageFormat;
+            this.startTime = builder.startTime;
+            this.frameCount = builder.frameCount;
+            this.resolution = builder.resolution;
+            this.savePath = builder.savePath;
+        }
+
+        public void setVideoPath(String videoPath) {
+            this.videoPath = videoPath;
+        }
+
+        public void setCountEverySecond(int countEverySecond) {
+            this.countEverySecond = countEverySecond;
+        }
+        public void setImageFormat(String imageFormat) {
+            this.imageFormat = imageFormat;
+        }
+        /** the start time (in seconds)*/
+        public void setStartTime(float startTime) {
+            this.startTime = startTime;
+        }
+        public void setFrameCount(int frameCount) {
+            this.frameCount = frameCount;
+        }
+
+        public void setSavePath(String savePath) {
+            this.savePath = savePath;
+        }
+
+        public void setResolution(String resolution) {
+            this.resolution = resolution;
+        }
+
+        public String getVideoPath() {
+            return this.videoPath;
+        }
+
+        public int getCountEverySecond() {
+            return this.countEverySecond;
+        }
+
+        public String getImageFormat() {
+            return this.imageFormat;
+        }
+
+        public float getStartTime() {
+            return this.startTime;
+        }
+
+        public int getFrameCount() {
+            return this.frameCount;
+        }
+
+        public String getResolution() {
+            return this.resolution;
+        }
+
+        public String getSavePath() {
+            return this.savePath;
+        }
+
+        public static class Builder {
+            /** -i,  MUST */
+            private String videoPath;
+            /** extract image rate in every second(-r) . MUST*/
+            private int countEverySecond = 1;
+            /** the image save format(-f) */
+            private String imageFormat;
+            /** the start time (in seconds) to extract(-ss) */
+            private float startTime = 0f;
+            /** the extract count.(-vframes) */
+            private int frameCount;
+            /** like '-s 800*600' */
+            private String resolution;
+            /** can be a jpeg file path or just a dir. MUST */
+            private String savePath;
+
+            public Builder setVideoPath(String videoPath) {
+                this.videoPath = videoPath;
+                return this;
+            }
+
+            public Builder setCountEverySecond(int countEverySecond) {
+                this.countEverySecond = countEverySecond;
+                return this;
+            }
+
+            public Builder setImageFormat(String imageFormat) {
+                this.imageFormat = imageFormat;
+                return this;
+            }
+
+            public Builder setStartTime(float startTime) {
+                this.startTime = startTime;
+                return this;
+            }
+
+            public Builder setFrameCount(int frameCount) {
+                this.frameCount = frameCount;
+                return this;
+            }
+
+            public Builder setResolution(String resolution) {
+                this.resolution = resolution;
+                return this;
+            }
+
+            public Builder setSavePath(String savePath) {
+                this.savePath = savePath;
+                return this;
+            }
+
+            public ImageExtractCmd build() {
+                return new ImageExtractCmd(this);
+            }
+        }
     }
 
 }

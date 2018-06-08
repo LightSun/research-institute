@@ -4,18 +4,16 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.ArrayUtils;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
-import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.StartEndVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.Arrays2;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
+import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
 import com.heaven7.ve.colorgap.impl.TagBasedShotCutter;
 import com.heaven7.ve.test.util.FFmpegVideoHelper;
-import com.heaven7.ve.test.util.FileHelper;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -74,7 +72,7 @@ public class CutShotTest extends TestCase {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                FileHelper.deleteDir(new File(CUT_DIR));
+                FileUtils.deleteDir(new File(CUT_DIR));
 
                 CyclicBarrier barrier = new CyclicBarrier(2);
                 List<MediaPartItem> partItems = cutItems(items, barrier);
@@ -106,7 +104,7 @@ public class CutShotTest extends TestCase {
                     // runCmd(() -> new CmdHelper(cmd).execute(new CmdHelper.LogCallback()));
                     new CmdHelper(cmd).execute(new CmdHelper.LogCallback());
                 }
-                FileHelper.writeTo(new File(CUT_DIR,  "tmp_cut_detail.txt"), sb.toString());
+                FileUtils.writeTo(new File(CUT_DIR,  "tmp_cut_detail.txt"), sb.toString());
                 //ffmpeg  -i  F:\\videos\\wedding\\churchIn\\churchIn_C0006.mp4  -vcodec copy  -acodec copy -ss 00:00:25 -to 00:00:30 .cutout.mp4 -y
                 // new CmdHelper("");
             }

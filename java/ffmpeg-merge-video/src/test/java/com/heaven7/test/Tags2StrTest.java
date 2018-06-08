@@ -1,6 +1,5 @@
 package com.heaven7.test;
 
-import com.heaven7.ve.test.util.FileHelper;
 import org.junit.Test;
 
 import java.io.File;
@@ -16,7 +15,7 @@ public class Tags2StrTest {
     public void test(){
         String dir = "F:\\videos\\jinliang\\tb女装\\tags";
       /*  List<String> paths = new ArrayList<>();
-        FileHelper.getFiles(new File(dir), "csv", paths);
+        FileUtils.getFiles(new File(dir), "csv", paths);
         try {
             for(String path : paths){
                 execute(path);

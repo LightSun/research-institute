@@ -1,14 +1,47 @@
-package com.heaven7.ve.test.util;
+package com.heaven7.utils;
 
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
-import com.heaven7.utils.CommonUtils;
-import com.heaven7.ve.colorgap.VEGapUtils;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
-public class FileHelper {
+/**
+ * the file utils
+ */
+public class FileUtils {
+
+    /** get the file name only. exclude extension and dir. */
+    public static String getFileName(String path) {
+        int index = path.lastIndexOf("/");
+        if(index == -1){
+            index = path.lastIndexOf("\\");
+        }
+        return path.substring(index + 1, path.lastIndexOf("."));
+    }
+
+    /**
+     * 视频文件的关键目录 为2级目录模式,比如:
+     empty/dinner/xxx.mp4 , empty/white/xxx2.mp4.
+     那么empty就是文件的关键目录
+     */
+    public static String getFileDir(String filepath, int depth, boolean fullPath){
+        if(depth < 1) throw new IllegalArgumentException("depth must > 0");
+        File file = new File(filepath);
+        if(file.exists() && file.isFile()){
+            File parent = file;
+            while (depth > 0){
+                depth --;
+                parent = parent.getParentFile();
+                if(parent == null){
+                    throw new IllegalStateException("file path is wrong or depth is wrong");
+                }
+            }
+            return fullPath ? parent.getAbsolutePath() :parent.getName();
+        }
+        return null;
+    }
 
     public static final FileFilter TRUE_FILE_FILTER =
             new FileFilter() {
@@ -51,6 +84,18 @@ public class FileHelper {
         if ((mustExist && !file.exists()) || file.isFile()) {
             throw new IllegalStateException("must be dir");
         }
+    }
+
+    public static List<String> getFiles(File dir, String extension,
+                                        FileFilter filter) {
+        List<String> paths = new ArrayList<>();
+        getFiles(dir, extension, filter, paths);
+        return paths;
+    }
+    public static List<String> getFiles(File dir, String extension) {
+        List<String> paths = new ArrayList<>();
+        getFiles(dir, extension, TRUE_FILE_FILTER, paths);
+        return paths;
     }
 
     public static void getVideos(File dir, List<String> outVideos) {
@@ -181,7 +226,7 @@ public class FileHelper {
         }
         @Override
         public boolean accept(File pathname) {
-            return dir.equals(VEGapUtils.getFileDir(pathname.getAbsolutePath(), 1, false));
+            return dir.equals(FileUtils.getFileDir(pathname.getAbsolutePath(), 1, false));
         }
     }
 }

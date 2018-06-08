@@ -3,15 +3,12 @@ package com.heaven7.advance;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.StartEndVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.ve.colorgap.VEGapUtils;
-import com.heaven7.ve.test.util.FileHelper;
+import com.heaven7.utils.FileUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,7 +31,8 @@ public class ImageExposeTest {
        // String dir = "F:\\test\\imgs_dark"; //dark
         String dir = "F:\\test\\img_expose";
         List<String> files = new ArrayList<>();
-        FileHelper.getFiles(new File(dir), "jpg", files);
+        FileUtils.getFiles(new File(dir), "jpg", files);
+        FileUtils.getFiles(new File(dir), "jpeg", files);
         for(String darkPath : files){
             Matrix2<Float> matrix = new Matrix2<>(getImageBrightness(darkPath));
             List<Matrix2<Float>> list = matrix.divideChunk(STEP, STEP);
@@ -73,8 +71,8 @@ public class ImageExposeTest {
             sb.append(String.format(",  overExpose/total = %d/%d = ", overExpose.get(), list.size()))
                     .append(overExpose.get() * 1f/list.size());//0.7f曝光比较严重
 
-            FileHelper.writeTo(new File(VEGapUtils.getFileDir(darkPath, 1, true),
-                    VEGapUtils.getFileName(darkPath)+ "__hsv_v_info.txt"), sb.toString());
+            FileUtils.writeTo(new File(FileUtils.getFileDir(darkPath, 1, true),
+                    FileUtils.getFileName(darkPath)+ "__hsv_v_info.txt"), sb.toString());
         }
     }
 
@@ -130,23 +128,5 @@ public class ImageExposeTest {
             colors.add(cols);
         }
     }
-
-    private static class Helper {
-        final String path;
-
-        public Helper(String path) {
-            this.path = path;
-        }
-
-        public void start() {
-            try {
-                BufferedImage image = ImageIO.read(new File(path));
-                ColorModel colorModel = image.getColorModel();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
 }

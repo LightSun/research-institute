@@ -4,6 +4,7 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Collections2;
+import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
@@ -90,7 +91,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
                     new PredicateVisitor<MediaPartItem>() {
                 @Override
                 public Boolean visit(MediaPartItem partItem, Object param) {
-                    String dir = VEGapUtils.getFileDir(partItem.item.getFilePath(), 1, false);
+                    String dir = FileUtils.getFileDir(partItem.item.getFilePath(), 1, false);
                     return dir != null && dir.equals(ls.getDir());
                 }
             }, null);
@@ -108,7 +109,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
         return VisitServices.from(items).visitForQueryList(new PredicateVisitor<MediaPartItem>() {
             @Override
             public Boolean visit(MediaPartItem partItem, Object param) {
-                String dir = VEGapUtils.getFileDir(partItem.item.getFilePath(), 1,  false);
+                String dir = FileUtils.getFileDir(partItem.item.getFilePath(), 1,  false);
                 return dir != null && MetaInfo.DIR_EMPTY.equals(dir);
             }
         }, null);

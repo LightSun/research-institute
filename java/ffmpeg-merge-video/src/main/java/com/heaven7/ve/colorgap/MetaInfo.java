@@ -8,6 +8,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.utils.FileUtils;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.TimeTraveller;
@@ -233,7 +234,7 @@ public interface MetaInfo {
         if(path.startsWith(prefix_android)){
             path = path.substring(prefix_android.length());
         }
-        String fileDir = VEGapUtils.getFileDir(path, 1, false);
+        String fileDir = FileUtils.getFileDir(path, 1, false);
         if(fileDir != null) {
             MediaDirFilter.MediaDirCondition mdc = new MediaDirFilter.MediaDirCondition();
             mdc.addTag(fileDir);

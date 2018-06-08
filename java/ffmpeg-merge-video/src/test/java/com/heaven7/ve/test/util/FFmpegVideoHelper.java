@@ -6,6 +6,7 @@ import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
+import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.colorgap.VEGapUtils;
 import com.heaven7.ve.gap.GapManager;
@@ -78,7 +79,7 @@ public class FFmpegVideoHelper {
                             nfw.write("Story " + key + " files :\r\n");
                             nfw.write("     ");
                             for (CuttedItem item : pair.getValue()){
-                                nfw.write(VEGapUtils.getFileName(item.getPath()) + "(" + item.getTagsStr() +  ")" + ", ");
+                                nfw.write(FileUtils.getFileName(item.getPath()) + "(" + item.getTagsStr() +  ")" + ", ");
                             }
                             nfw.write("\r\n");
                         } catch (IOException e) {

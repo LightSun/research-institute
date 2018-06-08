@@ -1,7 +1,6 @@
 package com.heaven7.test;
 
-import com.heaven7.ve.colorgap.VEGapUtils;
-import com.heaven7.ve.test.util.FileHelper;
+import com.heaven7.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,10 +42,10 @@ public class AddSuffix_Rects {
         }
         //copy files
         List<String> list = new ArrayList<>();
-        FileHelper.getFiles(srcFile, extension, list);
+        FileUtils.getFiles(srcFile, extension, list);
         for(String path : list){
-            String fileName = VEGapUtils.getFileName(path);
-            FileHelper.copyFile(new File(path), new File(dstFile, fileName + "." + extension));
+            String fileName = FileUtils.getFileName(path);
+            FileUtils.copyFile(new File(path), new File(dstFile, fileName + "." + extension));
         }
         if(addRectsSuffix) {
             addRects(dst);
@@ -55,9 +54,9 @@ public class AddSuffix_Rects {
 
     private static void addRects(String dir) {
         File file = new File(dir);
-        FileHelper.checkDir(dir, true);
+        FileUtils.checkDir(dir, true);
         List<String> files = new ArrayList<>();
-        FileHelper.getFiles(file, "csv", files
+        FileUtils.getFiles(file, "csv", files
                   /*  , new FileFilter() {
                   @Override
                   public boolean accept(File pathname) {
@@ -69,10 +68,10 @@ public class AddSuffix_Rects {
 
         for (String fn : files) {
             // System.out.println("file = " + fn);
-            String fileName = VEGapUtils.getFileName(fn);
-            String fileDir = VEGapUtils.getFileDir(fn, 1, true);
+            String fileName = FileUtils.getFileName(fn);
+            String fileDir = FileUtils.getFileDir(fn, 1, true);
             File f = new File(fn);
-            String extension = FileHelper.getFileExtension(f);
+            String extension = FileUtils.getFileExtension(f);
             String target = fileDir + File.separator + fileName + "_rects" + "." + extension;
             if (!f.renameTo(new File(target))) {
                 System.out.println("rename failed. file = " + fn);

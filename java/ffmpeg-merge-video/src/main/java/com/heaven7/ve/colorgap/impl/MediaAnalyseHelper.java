@@ -6,6 +6,7 @@ import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.utils.FileUtils;
 import com.heaven7.utils.LoadException;
 import com.heaven7.ve.Context;
 import com.heaven7.ve.MediaResourceItem;
@@ -86,7 +87,7 @@ public class MediaAnalyseHelper {
                         //get the dir of this file
                        /* String filePath = item.item.getFilePath();
                         return filePath.substring(0, filePath.lastIndexOf("/"));*/
-                       return VEGapUtils.getFileDir(item.item.getFilePath(), 2, true);
+                       return FileUtils.getFileDir(item.item.getFilePath(), 2, true);
                     });
             mGroupCount = new AtomicInteger(mapService.size());
             mapService.fire((pair, param) -> {

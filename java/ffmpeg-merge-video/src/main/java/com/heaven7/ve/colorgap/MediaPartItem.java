@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.heaven7.ve.colorgap.VEGapUtils.getAverMainFaceArea;
-import static com.heaven7.ve.colorgap.VEGapUtils.getFileName;
+import static com.heaven7.utils.FileUtils.getFileName;
 import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
 
 /**

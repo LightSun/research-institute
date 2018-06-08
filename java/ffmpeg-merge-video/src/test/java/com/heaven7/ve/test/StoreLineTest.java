@@ -3,12 +3,12 @@ package com.heaven7.ve.test;
 import com.heaven7.core.util.Logger;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
+import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.ColorGapManager;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.test.util.FFmpegVideoHelper;
-import com.heaven7.ve.test.util.FileHelper;
 import junit.framework.TestCase;
 
 import java.io.*;
@@ -40,7 +40,7 @@ public class StoreLineTest extends TestCase {
         List<MediaResourceItem> items = new ArrayList<>();
         File file = new File(STORY2_DIR);
         List<String> videos = new ArrayList<>();
-        FileHelper.getFiles(file, "mp4", filter, videos);
+        FileUtils.getFiles(file, "mp4", filter, videos);
         //getVideos(file, filter, videos);
 
         CmdHelper.VideoDurationCallback durationCallback = new CmdHelper.VideoDurationCallback();
@@ -62,10 +62,10 @@ public class StoreLineTest extends TestCase {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                FileHelper.deleteDir(new File(CUT_OUT_WEDDING_DIR));
+                FileUtils.deleteDir(new File(CUT_OUT_WEDDING_DIR));
                 //scan items
-                //mItems = scanWeddingItems(FileHelper.TRUE_FILE_FILTER);
-                mItems = scanWeddingItems(FileHelper.ofDirFileFilter("storyTest"));
+                //mItems = scanWeddingItems(FileUtils.TRUE_FILE_FILTER);
+                mItems = scanWeddingItems(FileUtils.ofDirFileFilter("storyTest"));
 
                 ColorGapManager cgm = new ColorGapManager(null,
                                 new MediaAnalyserImpl(),

@@ -26,61 +26,6 @@ public class VEGapUtils {
     private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
     private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
 
-
-    /** get the file name only. exclude extension and dir. */
-    public static String getFileName(String path) {
-        int index = path.lastIndexOf("/");
-        if(index == -1){
-            index = path.lastIndexOf("\\");
-        }
-        return path.substring(index + 1, path.lastIndexOf("."));
-    }
-
-    /**
-     * 视频文件的关键目录 为2级目录模式,比如:
-     empty/dinner/xxx.mp4 , empty/white/xxx2.mp4.
-     那么empty就是文件的关键目录
-     */
-    public static String getFileDir(String filepath, boolean fullPath){
-        File file = new File(filepath);
-        if(file.exists() && file.isFile()){
-            File parent = file.getParentFile();
-            if(parent != null && parent.isDirectory()){
-               /* String dir = parent.getName();
-                if(MetaInfo.DIR_EMPTY.equals(dir)){
-                    return fullPath ? parent.getAbsolutePath() :MetaInfo.DIR_EMPTY;
-                }*/
-                parent = parent.getParentFile();
-                if(parent != null && parent.isDirectory()){
-                    return fullPath ? parent.getAbsolutePath() :parent.getName();
-                }
-               //return fullPath ? parent.getAbsolutePath() : dir;
-            }
-        }
-        return null;
-    }
-    /**
-     * 视频文件的关键目录 为2级目录模式,比如:
-     empty/dinner/xxx.mp4 , empty/white/xxx2.mp4.
-     那么empty就是文件的关键目录
-     */
-    public static String getFileDir(String filepath, int depth, boolean fullPath){
-        if(depth < 1) throw new IllegalArgumentException("depth must > 0");
-        File file = new File(filepath);
-        if(file.exists() && file.isFile()){
-            File parent = file;
-            while (depth > 0){
-                depth --;
-                parent = parent.getParentFile();
-                if(parent == null || !parent.isDirectory()){
-                    throw new IllegalStateException("file path is wrong or depth is wrong");
-                }
-            }
-            return fullPath ? parent.getAbsolutePath() :parent.getName();
-        }
-        return null;
-    }
-
     public static <Item extends ItemDelegate> Item filterByScore(PlaidDelegate plaid, List<Item> items){
         //check hold until find , if not found , not check hold
         Item item = filterByScore0(plaid, items, true);

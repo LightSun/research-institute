@@ -1,7 +1,6 @@
 package com.heaven7.test;
 
-import com.heaven7.ve.colorgap.VEGapUtils;
-import com.heaven7.ve.test.util.FileHelper;
+import com.heaven7.utils.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -20,7 +19,7 @@ public class ModifyFileName_TTF {
     public void generateTags_Help(){
         String dir = "F:\\videos\\故事线\\婚礼1\\空镜素材\\tfrecord";
         List<String> files = new ArrayList<>();
-        FileHelper.getFiles(new File(dir), "tfrecord", files);
+        FileUtils.getFiles(new File(dir), "tfrecord", files);
         generateFileOfTags_Help(dir, files);
     }
 
@@ -65,7 +64,7 @@ public class ModifyFileName_TTF {
             throw new IllegalStateException("must exist and be dir");
         }
         List<String> files = new ArrayList<>();
-        FileHelper.getFiles(file, "tfrecord'", files);
+        FileUtils.getFiles(file, "tfrecord'", files);
         //dst file for generate 'tags_help' file
         List<String> dstFiles = new ArrayList<>();
         for (String fn : files) {
@@ -74,7 +73,7 @@ public class ModifyFileName_TTF {
 
         //生成["xxx.mp4", "xxx.mp4"] 的字符串
         if (files.isEmpty()) {
-            FileHelper.getFiles(file, "tfrecord", files);
+            FileUtils.getFiles(file, "tfrecord", files);
             for (String fn : files) {
                 dstFiles.add(modifyFileName(fn, delegate));
             }
@@ -88,7 +87,7 @@ public class ModifyFileName_TTF {
         sb.append("fnames = [");
         for (int i = 0, size = dstFiles.size(); i < size; i++) {
             String path = dstFiles.get(i);
-            String fileName = VEGapUtils.getFileName(path);
+            String fileName = FileUtils.getFileName(path);
             if (fileName.endsWith("_output")) {
                 fileName = fileName.substring(0, fileName.lastIndexOf("_output"));
             }
@@ -103,7 +102,7 @@ public class ModifyFileName_TTF {
         //log and write to file
         System.out.println(sb.toString());
         File helpFile = new File(dir + File.separator + "tags_help.txt");
-        FileHelper.writeTo(helpFile, sb.toString());
+        FileUtils.writeTo(helpFile, sb.toString());
     }
 
     /**
@@ -186,7 +185,7 @@ public class ModifyFileName_TTF {
                 throw new IllegalStateException();
             }
             String prefix = path.substring(0, index);
-            String fileName = VEGapUtils.getFileName(path);
+            String fileName = FileUtils.getFileName(path);
             int index_step = fileName.indexOf("_"); //下划线
             if (index_step == -1) {
                 throw new UnsupportedOperationException();
@@ -197,7 +196,7 @@ public class ModifyFileName_TTF {
                 return null;
             }
             return prefix + File.separator + targets.get(index)
-                    + fileName.substring(index_step)+ "." + FileHelper.getFileExtension(path);
+                    + fileName.substring(index_step)+ "." + FileUtils.getFileExtension(path);
         }
     }
 

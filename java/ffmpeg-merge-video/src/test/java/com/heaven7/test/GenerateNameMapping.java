@@ -5,8 +5,7 @@ import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.ve.colorgap.VEGapUtils;
-import com.heaven7.ve.test.util.FileHelper;
+import com.heaven7.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,12 +20,12 @@ public class GenerateNameMapping {
       //F:\videos\story2
       File dir = new File("F:\\videos\\story4");
       List<String> videos = new ArrayList<>();
-      FileHelper.getVideos(dir, videos);
+      FileUtils.getVideos(dir, videos);
 
       VisitServices.from(videos).groupService(new ResultVisitor<String, String>() {
           @Override
           public String visit(String s, Object param) {
-              return VEGapUtils.getFileDir(s, 1, false);
+              return FileUtils.getFileDir(s, 1, false);
           }
       }).fire(new MapFireVisitor<String, List<String>>() {
           @Override
@@ -35,7 +34,7 @@ public class GenerateNameMapping {
               List<String> list = pair.getValue();
               StringBuilder sb = new StringBuilder();
               for(int i = 0 , size = list.size() ; i < size ; i ++){
-                  sb.append(VEGapUtils.getFileName(list.get(i)));
+                  sb.append(FileUtils.getFileName(list.get(i)));
                   if(i != size - 1){
                       sb.append(",");
                   }
