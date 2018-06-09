@@ -27,7 +27,7 @@ public class FFmpegImageExtractTest extends BaseTest{
                 .setStartTime(8)
                 .setSavePath("F:\\videos\\jiege_1\\褂子\\imgs")
                 .build();
-        String[] cmds = FFmpegUtils.buildImageExtractCmd(cmd, false);
+        String[] cmds = FFmpegUtils.buildImageExtractCmd(cmd, true);
         new CmdHelper(cmds).execute();
         waitDone();
         System.out.println("Done");

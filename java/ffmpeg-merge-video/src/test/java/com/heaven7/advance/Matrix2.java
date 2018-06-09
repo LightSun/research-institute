@@ -1,21 +1,22 @@
 package com.heaven7.advance;
 
 import com.heaven7.java.base.anno.Nullable;
-import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.Visitors;
 import com.heaven7.java.visitor.collection.VisitServices;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * 2维矩阵
- *
- * @param <T>
+ * Two-dimensional matrix
+ * @param <T> the type of element
  */
 public class Matrix2<T> {
 
@@ -25,10 +26,10 @@ public class Matrix2<T> {
         this.values = values;
     }
 
-    public static Matrix2<Integer> ofInt(int[][] data) {
+    public static Matrix2<Integer> ofIntArrayArray(int[][] data) {
         List<List<Integer>> list = new ArrayList<>();
-        int w = data.length;
-        int h = data[0].length;
+        final int w = data.length;
+        final int h = data[0].length;
         for (int i = 0; i < w; i++) {
             List<Integer> cols = new ArrayList<>();
             for (int j = 0; j < h; j++) {
@@ -69,7 +70,7 @@ public class Matrix2<T> {
         return new Matrix2<>(list);
     }
 
-    public static Matrix2<Double> ofFloatArray(int w, int h, double[] arr) {
+    public static Matrix2<Double> ofDoubleArray(int w, int h, double[] arr) {
         if (arr.length != w * h) {
             throw new IllegalArgumentException();
         }
@@ -84,7 +85,7 @@ public class Matrix2<T> {
         return new Matrix2<>(list);
     }
 
-    public static <T> Matrix2<T> ofArray(int w, int h, T[] arr) {
+    public static <T> Matrix2<T> ofObjectArray(int w, int h, T[] arr) {
         if (arr.length != w * h) {
             throw new IllegalArgumentException();
         }
@@ -107,12 +108,10 @@ public class Matrix2<T> {
     public int getWidth() {
         return values.size();
     }
-
     //col
     public int getHeight() {
         return values.isEmpty() ? 0 : values.get(0).size();
     }
-
     public int getTotalSize() {
         return getWidth() * getHeight();
     }
@@ -166,6 +165,49 @@ public class Matrix2<T> {
     }
 
     /**
+     * compute the variance.
+     * @param transformer the transformer
+     * @param sum the sum visitor
+     * @param average the average callback
+     * @param variance the variance visitor
+     * @param <R> the result type.
+     * @return the variance value.
+     */
+    public <R> R variance(ResultVisitor<T, R> transformer, PileVisitor<R> sum,
+                          AverageCallback<R> average, PileVisitor<R> variance){
+        return variance(null, transformer, sum, average, variance);
+    }
+    /**
+     * compute the variance.
+     * @param param the extra parameter
+     * @param transformer the transformer
+     * @param sum the sum visitor
+     * @param average the average callback
+     * @param variance the variance visitor
+     * @param <R> the result type.
+     * @return the variance value.
+     */
+    public <R> R variance(@Nullable Object param, ResultVisitor<T, R> transformer, PileVisitor<R> sum,
+                          AverageCallback<R> average, PileVisitor<R> variance){
+        final int w = getWidth();
+        final int h = getHeight();
+        R averageVal = average.average(sum(transformer, sum), w * h);
+
+        R total = null;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                R result = variance.visit(param, averageVal,
+                        transformer.visit(values.get(j).get(i), param));
+                if(total != null){
+                    total = sum.visit(param, total, result);
+                }else{
+                    total = result;
+                }
+            }
+        }
+        return average.average(total, w * h);
+    }
+    /**
      * AT
      */
     public Matrix2<T> transpose() {
@@ -198,26 +240,40 @@ public class Matrix2<T> {
         return new Matrix2<>(lists);
     }
 
-    @SuppressWarnings("unchecked")
-    public T[] toArray(@Nullable T[] out) {
-        if (getWidth() == 0 || getHeight() == 0) {
-            return null;
-        }
-        int w = getWidth();
-        int h = getHeight();
-        if (out == null) {
-            out = (T[]) Array.newInstance(getRawValues().get(0).get(0).getClass(), w * h);
-        }
-        //相当于右旋转90.
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
-                out[i * w + j] = values.get(j).get(i);
-            }
-        }
-        return out;
+    public Matrix2<T> turnRight90(){
+        return ofObjectArray(getWidth(), getHeight(), toArray(null));
     }
 
-    public void dump() {
+    /**
+     * rotate the matrix2 clockwise.
+     * @param degree the degree to rotate
+     * @return the result matrix2
+     */
+    public Matrix2<T> rotateClockwise(int degree){
+        if(degree % 90 != 0){
+            throw new IllegalArgumentException();
+        }
+        degree %= 360;
+        if(degree < 0){
+            degree += 360;
+        }
+        if(degree == 0){
+            return this;
+        }
+        switch (degree){
+            case 90:
+               return turnRight90().turnLeftRight();
+
+            case 180:
+                return turnTopBottom().turnLeftRight();
+
+            case 270:
+                return turnRight90().turnTopBottom();
+        }
+        throw new IllegalStateException("can't reach here");
+    }
+
+    public void dump(Writer writer) {
         StringBuilder sb = new StringBuilder();
         sb.append("[\n");
         final int wSize = values.size();
@@ -233,7 +289,62 @@ public class Matrix2<T> {
         }
         sb.append("]\n");
 
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
+        try {
+            writer.write(sb.toString());
+        } catch (IOException e) {
+           throw new RuntimeException(e);
+        }
+    }
+
+    public T[] toArray(){
+        return toArray(null);
+    }
+    /**
+     * make Two-dimensional matrix to One-dimensional matrix.
+     * for usage. see {@linkplain #turnRight90()}.
+     * @param out the out array . can be null
+     * @return the One-dimensional matrix.
+     */
+    @SuppressWarnings("unchecked")
+    public T[] toArray(@Nullable T[] out) {
+        if (getWidth() == 0 || getHeight() == 0) {
+            return null;
+        }
+        int w = getWidth();
+        int h = getHeight();
+        if (out == null) {
+            out = (T[]) Array.newInstance(values.get(0).get(0).getClass(), w * h);
+        }
+        //Equivalent to right rotation 90
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                out[i * w + j] = values.get(j).get(i);
+            }
+        }
+        return out;
+    }
+
+    /**
+     * copy the matrix to new matrix.
+     * @return the matrix
+     */
+    public Matrix2<T> copy(){
+        ArrayList<List<T>> lists = new ArrayList<>();
+        for (List<T> list : values) {
+            lists.add(new ArrayList<>(list));
+        }
+        return new Matrix2<>(lists);
+    }
+
+    public interface AverageCallback<T>{
+        /**
+         * compute the average
+         * @param total the total value
+         * @param count the count to average
+         * @return the average result
+         */
+        T average(T total, int count);
     }
 
     //test
@@ -265,9 +376,11 @@ public class Matrix2<T> {
         if (list.size() != 9) {
             throw new IllegalStateException();
         }
-
+        StringWriter writer = new StringWriter();
         for (int i = 0, size = list.size(); i < size; i++) {
-            list.get(i).dump();
+            list.get(i).dump(writer);
+            System.out.println(writer.toString());
+            writer.getBuffer().delete(0, writer.getBuffer().length());
         }
     }
 

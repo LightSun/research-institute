@@ -167,6 +167,7 @@ public class FFmpegUtils {
             cmds.add("cmd");
             cmds.add("/c");
             cmds.add("start");
+            cmds.add("/wait");
         }
         cmds.add("ffmpeg");
         cmds.add("-i");
@@ -189,7 +190,8 @@ public class FFmpegUtils {
         if(cmd.getSavePath().contains(".")){//a file path
             cmds.add(cmd.getSavePath());
         }else {
-            cmds.add(cmd.getSavePath() + File.separator + "img_%05d.jpeg");
+            //jpg and jpeg Lossy for image quality
+            cmds.add(cmd.getSavePath() + File.separator + "img_%05d.png");
         }
         cmds.add("-y");
 
