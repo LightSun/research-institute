@@ -1,10 +1,12 @@
 package com.heaven7.advance;
 
+import com.heaven7.java.base.anno.Nullable;
+
 import java.awt.image.BufferedImage;
 
 public abstract class AbstractBufferedImageOp {
 
-    public abstract BufferedImage filter(BufferedImage src, BufferedImage dest);
+    public abstract BufferedImage filter(BufferedImage src, @Nullable BufferedImage dest);
 
     public static void setRGB(BufferedImage dest, int startX, int startY, int width, int height, int[] outPixels) {
         dest.setRGB(startX, startY, width, height, outPixels, 0, width);
@@ -14,9 +16,8 @@ public abstract class AbstractBufferedImageOp {
         src.getRGB(startX, startY, width, height, inPixels, 0, width);
     }
 
-    public BufferedImage createCompatibleDestImage(BufferedImage src, String suffix) {
-
-        return null;
+    public BufferedImage createCompatibleDestImage(BufferedImage src) {
+        return  new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
     }
 
     public static int clamp(int value) {

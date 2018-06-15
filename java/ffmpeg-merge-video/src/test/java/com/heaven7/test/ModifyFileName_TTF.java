@@ -25,7 +25,7 @@ public class ModifyFileName_TTF {
 
     @Test
     public void modifyFileNameOfDir() {
-        String dir = "F:\\videos\\jinliang\\tb女装\\tfrecord";
+        String dir = "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\tfrecord";
         modifyFileNameByDir(dir, new RenameDelegateImpl(false));
     }
 
@@ -58,7 +58,7 @@ public class ModifyFileName_TTF {
     }
 
 
-    private static void modifyFileNameByDir(String dir, RenameDelegate delegate) {
+    public static void modifyFileNameByDir(String dir, RenameDelegate delegate) {
         File file = new File(dir);
         if (!file.exists() || !file.isDirectory()) {
             throw new IllegalStateException("must exist and be dir");

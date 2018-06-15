@@ -59,6 +59,9 @@ public class FileUtils {
         if (dst.isDirectory()) {
             throw new IllegalStateException();
         }
+        if(!dst.getParentFile().exists()){
+            dst.getParentFile().mkdirs();
+        }
         if (dst.exists()) {
             dst.delete();
         }

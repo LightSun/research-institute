@@ -1,6 +1,7 @@
 package com.heaven7.advance;
 
 import com.heaven7.java.base.anno.Nullable;
+import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.Visitors;
@@ -16,6 +17,7 @@ import java.util.List;
 
 /**
  * Two-dimensional matrix
+ *
  * @param <T> the type of element
  */
 public class Matrix2<T> {
@@ -38,6 +40,34 @@ public class Matrix2<T> {
             list.add(cols);
         }
         return new Matrix2<Integer>(list);
+    }
+
+    public static Matrix2<Float> ofFloatArrayArray(float[][] data) {
+        List<List<Float>> list = new ArrayList<>();
+        final int w = data.length;
+        final int h = data[0].length;
+        for (int i = 0; i < w; i++) {
+            List<Float> cols = new ArrayList<>();
+            for (int j = 0; j < h; j++) {
+                cols.add(data[i][j]);
+            }
+            list.add(cols);
+        }
+        return new Matrix2<Float>(list);
+    }
+
+    public static Matrix2<Double> ofDoubleArrayArray(double[][] data) {
+        List<List<Double>> list = new ArrayList<>();
+        final int w = data.length;
+        final int h = data[0].length;
+        for (int i = 0; i < w; i++) {
+            List<Double> cols = new ArrayList<>();
+            for (int j = 0; j < h; j++) {
+                cols.add(data[i][j]);
+            }
+            list.add(cols);
+        }
+        return new Matrix2<Double>(list);
     }
 
     public static Matrix2<Integer> ofIntArray(int w, int h, int[] arr) {
@@ -101,19 +131,91 @@ public class Matrix2<T> {
     }
 
     public List<List<T>> getRawValues() {
-        return Collections.unmodifiableList(values);
+        return values;
     }
 
     //row
     public int getWidth() {
         return values.size();
     }
+
     //col
     public int getHeight() {
         return values.isEmpty() ? 0 : values.get(0).size();
     }
+
     public int getTotalSize() {
         return getWidth() * getHeight();
+    }
+
+    //================================================================================================================
+
+    /**
+     * compute the convolution. this should called after call fill.
+     *
+     * @param core the core matrix of convolution
+     * @param <C>  the type of core convolution
+     * @param <R>  the result type of convolution
+     * @return the result of convolution
+     */
+    public <C, R> Matrix2<R> computeConvolution(Matrix2<C> core, double coreSum, int outW, int outH,
+                                                int strideX, int strideY,
+                                                ConvolutionCallback<T, C, R>  callback, PileVisitor<R> sum,
+                                                AverageCallback<R> average, Matrix2Utils.ElementProvider<R> provider) {
+        List<List<R>> results = new ArrayList<>();
+        for(int i = outW - 1 ; i >= 0 ; i-- ){
+            results.add(new ArrayList<>());
+        }
+        int w_core = core.getWidth();
+        int h_core = core.getHeight();
+        int w = getWidth();
+        int h = getHeight();
+
+        int wIndex = 0;
+        //int hIndex = 0;
+        int lastWidthIndex = 0, lastHeightIndex = 0;
+        while (true) {
+            R total = null;
+            for (int i = 0; i < w_core; i++) {
+                for (int i2 = 0; i2 < h_core; i2++) {
+                    T cur = values.get(i + lastWidthIndex).get(i2 + lastHeightIndex);
+                    C factor = core.getRawValues().get(i).get(i2);
+                    R result = callback.multiple(cur, factor);
+                    if(total == null){
+                        total = result;
+                    }else{
+                        total = sum.visit(null, total, result);
+                    }
+                }
+            }
+            if(coreSum != 0 && coreSum != 1){
+                total = average.average(total, coreSum);
+            }
+            results.get(wIndex).add(total);
+            lastHeightIndex += strideY;
+            if (lastHeightIndex >= h - strideY) {
+                lastHeightIndex = 0;
+                lastWidthIndex += strideX;
+                if(lastWidthIndex > w - strideX){
+                    break;
+                }
+                wIndex ++;
+            }
+        }
+        //Filling in the gaps
+        VisitServices.from(results).fireWithIndex(new FireIndexedVisitor<List<R>>() {
+            @Override
+            public Void visit(Object param, List<R> list, int index, int size) {
+                if(list.size() < outH){
+                    int count = outH - list.size();
+                    for (int i = 0 ; i < count ; i ++){
+                        list.add(provider.provide(index, i, null));
+                    }
+                }
+                return null;
+            }
+        });
+        return new Matrix2<>(results);
     }
 
     public T sum(final PileVisitor<T> pileVisitor) {
@@ -166,29 +268,32 @@ public class Matrix2<T> {
 
     /**
      * compute the variance.
+     *
      * @param transformer the transformer
-     * @param sum the sum visitor
-     * @param average the average callback
-     * @param variance the variance visitor
-     * @param <R> the result type.
+     * @param sum         the sum visitor
+     * @param average     the average callback
+     * @param variance    the variance visitor
+     * @param <R>         the result type.
      * @return the variance value.
      */
     public <R> R variance(ResultVisitor<T, R> transformer, PileVisitor<R> sum,
-                          AverageCallback<R> average, PileVisitor<R> variance){
+                          AverageCallback<R> average, PileVisitor<R> variance) {
         return variance(null, transformer, sum, average, variance);
     }
+
     /**
      * compute the variance.
-     * @param param the extra parameter
+     *
+     * @param param       the extra parameter
      * @param transformer the transformer
-     * @param sum the sum visitor
-     * @param average the average callback
-     * @param variance the variance visitor
-     * @param <R> the result type.
+     * @param sum         the sum visitor
+     * @param average     the average callback
+     * @param variance    the variance visitor
+     * @param <R>         the result type.
      * @return the variance value.
      */
     public <R> R variance(@Nullable Object param, ResultVisitor<T, R> transformer, PileVisitor<R> sum,
-                          AverageCallback<R> average, PileVisitor<R> variance){
+                          AverageCallback<R> average, PileVisitor<R> variance) {
         final int w = getWidth();
         final int h = getHeight();
         R averageVal = average.average(sum(transformer, sum), w * h);
@@ -198,15 +303,16 @@ public class Matrix2<T> {
             for (int j = 0; j < w; j++) {
                 R result = variance.visit(param, averageVal,
                         transformer.visit(values.get(j).get(i), param));
-                if(total != null){
+                if (total != null) {
                     total = sum.visit(param, total, result);
-                }else{
+                } else {
                     total = result;
                 }
             }
         }
         return average.average(total, w * h);
     }
+
     /**
      * AT
      */
@@ -240,29 +346,30 @@ public class Matrix2<T> {
         return new Matrix2<>(lists);
     }
 
-    public Matrix2<T> turnRight90(){
+    public Matrix2<T> turnRight90() {
         return ofObjectArray(getWidth(), getHeight(), toArray(null));
     }
 
     /**
      * rotate the matrix2 clockwise.
+     *
      * @param degree the degree to rotate
      * @return the result matrix2
      */
-    public Matrix2<T> rotateClockwise(int degree){
-        if(degree % 90 != 0){
+    public Matrix2<T> rotateClockwise(int degree) {
+        if (degree % 90 != 0) {
             throw new IllegalArgumentException();
         }
         degree %= 360;
-        if(degree < 0){
+        if (degree < 0) {
             degree += 360;
         }
-        if(degree == 0){
+        if (degree == 0) {
             return this;
         }
-        switch (degree){
+        switch (degree) {
             case 90:
-               return turnRight90().turnLeftRight();
+                return turnRight90().turnLeftRight();
 
             case 180:
                 return turnTopBottom().turnLeftRight();
@@ -273,36 +380,37 @@ public class Matrix2<T> {
         throw new IllegalStateException("can't reach here");
     }
 
+    public String toString() {
+        StringWriter sw = new StringWriter();
+        dump(sw);
+        return sw.toString();
+    }
+
     public void dump(Writer writer) {
         StringBuilder sb = new StringBuilder();
         sb.append("[\n");
         final int wSize = values.size();
-        final int hSize = values.get(0).size();
+        // final int hSize = values.get(0).size();
         for (int i = 0; i < wSize; i++) {
             List<T> cols = values.get(i);
-            List<T> tmp = new ArrayList<>();
-            for (int i2 = 0; i2 < hSize; i2++) {
-                T t = cols.get(i2);
-                tmp.add(t);
-            }
-            sb.append("Raw ").append(i).append(": ").append(tmp.toString()).append("\r\n");
+            sb.append("Row ").append(i).append(": ").append(cols.toString()).append("\r\n");
         }
         sb.append("]\n");
-
-        //System.out.println(sb.toString());
         try {
             writer.write(sb.toString());
         } catch (IOException e) {
-           throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 
-    public T[] toArray(){
+    public T[] toArray() {
         return toArray(null);
     }
+
     /**
      * make Two-dimensional matrix to One-dimensional matrix.
      * for usage. see {@linkplain #turnRight90()}.
+     *
      * @param out the out array . can be null
      * @return the One-dimensional matrix.
      */
@@ -327,9 +435,10 @@ public class Matrix2<T> {
 
     /**
      * copy the matrix to new matrix.
+     *
      * @return the matrix
      */
-    public Matrix2<T> copy(){
+    public Matrix2<T> copy() {
         ArrayList<List<T>> lists = new ArrayList<>();
         for (List<T> list : values) {
             lists.add(new ArrayList<>(list));
@@ -337,51 +446,32 @@ public class Matrix2<T> {
         return new Matrix2<>(lists);
     }
 
-    public interface AverageCallback<T>{
+    public interface AverageCallback<T> {
         /**
          * compute the average
+         *
          * @param total the total value
          * @param count the count to average
          * @return the average result
          */
-        T average(T total, int count);
+        T average(T total, double count);
     }
 
-    //test
-    public static void main(String[] args) {
-        List<List<Integer>> result = new ArrayList<>();
-        for (int i = 0; i < 9; i++) {
-            List<Integer> cols = new ArrayList<>();
-            for (int i2 = 0; i2 < 9; i2++) {
-                cols.add(i2);
-            }
-            result.add(cols);
-            Integer sum = VisitServices.from(cols).pile(new PileVisitor<Integer>() {
-                @Override
-                public Integer visit(Object o, Integer integer, Integer integer2) {
-                    return integer + integer2;
-                }
-            });
-            System.out.println("raw " + i + ", mean = " + sum / cols.size());
-        }
-        Matrix2<Integer> matrix = new Matrix2<>(result);
-
-        Integer sum = matrix.sum(new PileVisitor<Integer>() {
-            @Override
-            public Integer visit(Object o, Integer val1, Integer val2) {
-                return val1 + val2;
-            }
-        });
-        List<Matrix2<Integer>> list = matrix.divideChunk(3, 3);
-        if (list.size() != 9) {
-            throw new IllegalStateException();
-        }
-        StringWriter writer = new StringWriter();
-        for (int i = 0, size = list.size(); i < size; i++) {
-            list.get(i).dump(writer);
-            System.out.println(writer.toString());
-            writer.getBuffer().delete(0, writer.getBuffer().length());
-        }
+    /**
+     * the convolution callback
+     *
+     * @param <T> the element type of current matrix
+     * @param <C> the type of convolution core
+     * @param <R> the result type matrix
+     */
+    public interface ConvolutionCallback<T, C, R> {
+        /**
+         * compute the convolution .
+         * @param t the element from current matrix
+         * @param c the element from convolution core
+         * @return the result
+         */
+        R multiple(T t, C c);
     }
 
 }

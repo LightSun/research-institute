@@ -1,5 +1,7 @@
 package com.heaven7.advance;
 
+import com.heaven7.java.base.anno.Nullable;
+
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
@@ -55,11 +57,11 @@ public class CannyEdgeFilter extends AbstractBufferedImageOp  {
 	}
 
 	@Override
-	public BufferedImage filter(BufferedImage src, BufferedImage dest) {
+	public BufferedImage filter(BufferedImage src, @Nullable BufferedImage dest) {
 		width = src.getWidth();
 		height = src.getHeight();
 		if (dest == null)
-			dest = createCompatibleDestImage(src, null);
+			dest = createCompatibleDestImage(src);
 		// 图像灰度化
 		int[] inPixels = new int[width * height];
 		int[] outPixels = new int[width * height];

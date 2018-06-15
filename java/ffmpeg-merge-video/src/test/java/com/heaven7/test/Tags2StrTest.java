@@ -40,6 +40,7 @@ public class Tags2StrTest {
         cmds.add("cmd");
         cmds.add("/c");
         cmds.add("start");
+        cmds.add("/wait");
         cmds.add("python");
         cmds.add("tags2.py");
         cmds.add("0.5");

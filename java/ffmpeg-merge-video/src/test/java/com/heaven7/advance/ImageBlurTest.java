@@ -34,6 +34,8 @@ public class ImageBlurTest {
             list.add(cols);
         }
         Matrix2<Integer> mat = new Matrix2<>(list);
+        System.out.println(mat.getWidth());
+        System.out.println(mat.getHeight());
         //now mat2 is same with mat
         Matrix2<Integer> mat2 = Matrix2.ofObjectArray(w, h, mat.toArray()).transpose();
         //now mat3 is same with mat
@@ -51,6 +53,28 @@ public class ImageBlurTest {
         testGenImage(srcFile, mat.rotateClockwise(270), image.getType(), "test_rotateClockwise_270");
 
         // System.out.println("variance: " + (Matrix2Utils.varIntFloat(mat) > 100000)); // true
+    }
+
+    @Test
+    public void testCannyEdgeFilter(){
+       // String path = "F:\\test\\imgs_tmp\\test.jpg";
+        String path = "F:\\test\\imgs\\story0\\churchIn\\C0181\\img_00012.png";
+        File srcFile = new File(path);
+        BufferedImage image;
+        try {
+            image = ImageIO.read(srcFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        CannyEdgeFilter filter = new CannyEdgeFilter();
+
+        BufferedImage result = filter.filter(image, null);
+        File dstFile = getTargetFile(srcFile, "cannyEdgeFilter");
+        try {
+            ImageIO.write(result, "png", dstFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

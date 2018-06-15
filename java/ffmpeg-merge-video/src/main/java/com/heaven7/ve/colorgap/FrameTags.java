@@ -38,7 +38,7 @@ public class FrameTags {
     public Set<Integer> getTopTagSet(int maxCount, float minPossibility){
         List<Tag> topTags = getTopTags(maxCount, minPossibility, Vocabulary.TYPE_WEDDING_ALL);
         HashSet<Integer> set = new HashSet<>();
-        VisitServices.from(topTags).transformToCollection(new ResultVisitor<Tag, Integer>() {
+        VisitServices.from(topTags).map(new ResultVisitor<Tag, Integer>() {
             @Override
             public Integer visit(Tag tag, Object param) {
                 return tag.getIndex();

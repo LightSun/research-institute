@@ -152,10 +152,13 @@ public class VideoDataLoadUtils {
     }
 
     private static int getFrameIdxFromVideoId(String videoId){
-        // /Users/jiechen/Developer/Python/tensorflow/feature_extractor/tmp/0.mp4
+        // /Users/jiechen/Developer/Python/tensorflow/feature_extractor/tmp/0.mp4 or 0
         String[] strs = videoId.split("/");
         String str = strs[strs.length - 1 ]; //0.mp4
-        return Integer.parseInt(str.split("\\.")[0]);
+        if(str.contains(".")){
+            return Integer.parseInt(str.split("\\.")[0]);
+        }
+        return Integer.parseInt(str);
     }
 
     private static List<String> travelFiles(Context context, String dir) {
