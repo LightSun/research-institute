@@ -150,20 +150,33 @@ public class Matrix2<T> {
 
     //================================================================================================================
 
+    public void padding(int left, int top, int right, int bottom){
+        
+    }
+
     /**
      * compute the convolution. this should called after call fill.
      *
-     * @param core the core matrix of convolution
-     * @param <C>  the type of core convolution
-     * @param <R>  the result type of convolution
+     * @param core     the core matrix of convolution
+     * @param coreSum  the sum of core convolution
+     * @param outW     the out width of matrix
+     * @param outH     the out height of matrix
+     * @param strideX  the stride x of row
+     * @param strideY  the  stride y of column
+     * @param callback the convolution callback
+     * @param sum      the sum visitor of result type
+     * @param average  the  average callback of result type
+     * @param provider the provider of fill gap.
+     * @param <C>      the type of core convolution
+     * @param <R>      the result type of convolution
      * @return the result of convolution
      */
     public <C, R> Matrix2<R> computeConvolution(Matrix2<C> core, double coreSum, int outW, int outH,
                                                 int strideX, int strideY,
-                                                ConvolutionCallback<T, C, R>  callback, PileVisitor<R> sum,
+                                                ConvolutionCallback<T, C, R> callback, PileVisitor<R> sum,
                                                 AverageCallback<R> average, Matrix2Utils.ElementProvider<R> provider) {
         List<List<R>> results = new ArrayList<>();
-        for(int i = outW - 1 ; i >= 0 ; i-- ){
+        for (int i = outW - 1; i >= 0; i--) {
             results.add(new ArrayList<>());
         }
         int w_core = core.getWidth();
@@ -181,14 +194,14 @@ public class Matrix2<T> {
                     T cur = values.get(i + lastWidthIndex).get(i2 + lastHeightIndex);
                     C factor = core.getRawValues().get(i).get(i2);
                     R result = callback.multiple(cur, factor);
-                    if(total == null){
+                    if (total == null) {
                         total = result;
-                    }else{
+                    } else {
                         total = sum.visit(null, total, result);
                     }
                 }
             }
-            if(coreSum != 0 && coreSum != 1){
+            if (coreSum != 0 && coreSum != 1) {
                 total = average.average(total, coreSum);
             }
             results.get(wIndex).add(total);
@@ -196,19 +209,19 @@ public class Matrix2<T> {
             if (lastHeightIndex >= h - strideY) {
                 lastHeightIndex = 0;
                 lastWidthIndex += strideX;
-                if(lastWidthIndex > w - strideX){
+                if (lastWidthIndex > w - strideX) {
                     break;
                 }
-                wIndex ++;
+                wIndex++;
             }
         }
         //Filling in the gaps
         VisitServices.from(results).fireWithIndex(new FireIndexedVisitor<List<R>>() {
             @Override
             public Void visit(Object param, List<R> list, int index, int size) {
-                if(list.size() < outH){
+                if (list.size() < outH) {
                     int count = outH - list.size();
-                    for (int i = 0 ; i < count ; i ++){
+                    for (int i = 0; i < count; i++) {
                         list.add(provider.provide(index, i, null));
                     }
                 }
@@ -467,6 +480,7 @@ public class Matrix2<T> {
     public interface ConvolutionCallback<T, C, R> {
         /**
          * compute the convolution .
+         *
          * @param t the element from current matrix
          * @param c the element from convolution core
          * @return the result

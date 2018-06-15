@@ -111,53 +111,6 @@ public abstract class Convolution<T> {
     public abstract Matrix2<Double> computeDoubleDouble(double[][] core);
 
     /**
-     * get apposite matrix. which may be filled as new matrix.
-     * That means the matrix is effect by {@linkplain #getStrideX()}, {@linkplain #getStrideY()} and {@linkplain #getMode()}.
-     *
-     * @return the new matrix
-     */
-    protected Matrix2<T> getAppositeMatrix() {
-        Matrix2<T> mat = this.mat.copy();
-        final int strideX = getStrideX();
-        final int strideY = getStrideY();
-
-        switch (getMode()) {
-            case MODE_SAME_ORIGIN:
-            case MODE_SAME_VALID:
-            {
-                //fill x if need
-                int leftX = mat.getWidth() % strideX;
-                if (leftX > 0) {
-                    Matrix2Utils.fillWidth(mat, strideX - leftX, null, getElementProvider());
-                }
-                //fill y if need
-                int leftY = mat.getHeight() % strideY;
-                if (leftY > 0) {
-                    Matrix2Utils.fillHeight(mat, strideY - leftY, null, getElementProvider());
-                }
-            }
-            break;
-
-            case MODE_VALID_ORIGIN:
-            case MODE_VALID_VALID:
-            {
-                int leftX = mat.getWidth() % strideX;
-                if (leftX > 0) {
-                    Matrix2Utils.dropWidth(mat, leftX, true);
-                }
-                int leftY = mat.getHeight() % strideY;
-                if (leftY > 0) {
-                    Matrix2Utils.dropHeight(mat, leftY, true);
-                }
-            }
-            break;
-        }
-        System.out.println(mat.toString());
-        System.out.println("strideX = " + strideX + " ,strideY = " + strideY);
-        return mat;
-    }
-
-    /**
      * compute the convolution .
      *
      * @param core     the core matrix of convolution
@@ -172,12 +125,13 @@ public abstract class Convolution<T> {
     protected final <C, R> Matrix2<R> computeConvolution(Matrix2<C> core, double coreSum,
                                                          Matrix2.ConvolutionCallback<T, C, R> callback, PileVisitor<R> sum,
                                                          Matrix2.AverageCallback<R> average, Matrix2Utils.ElementProvider<R> provider) {
-        Matrix2<T> appositeMatrix = getAppositeMatrix();
+        Matrix2<T> appositeMatrix = getAppositeMatrix(core.getWidth(), core.getHeight());
         final int outWidth = getOutputWidth(appositeMatrix, core.getWidth());
         final int outHeight = getOutputHeight(appositeMatrix, core.getHeight());
         return appositeMatrix.computeConvolution(core, coreSum, outWidth, outHeight,
                 getStrideX(), getStrideY(), callback, sum, average,provider);
     }
+
     /**
      * compute the convolution .
      *
@@ -277,7 +231,6 @@ public abstract class Convolution<T> {
         return computeConvolution(core, Matrix2Utils.sumDouble(core),
                 callback, PileVisitor.DOUBLE_ADD, Matrix2Utils.DOUBLE_AVERAGE, DOUBLE_0_PROVIDER);
     }
-
     public static String modeToString(int mode){
         switch (mode){
             case MODE_SAME_ORIGIN:
@@ -300,6 +253,58 @@ public abstract class Convolution<T> {
      * @return the element provider
      */
     protected abstract Matrix2Utils.ElementProvider<T> getElementProvider();
+
+    /**
+     * get apposite matrix. which may be filled as new matrix.
+     * That means the matrix is effect by {@linkplain #getStrideX()}, {@linkplain #getStrideY()} and {@linkplain #getMode()}.
+     * @param coreWidth  the width of core convolution
+     * @param coreHeight the height of core convolution
+     * @return the new matrix
+     */
+    protected Matrix2<T> getAppositeMatrix(int coreWidth, int coreHeight) {
+        Matrix2<T> mat = this.mat.copy();
+        final int strideX = getStrideX();
+        final int strideY = getStrideY();
+
+        switch (getMode()) {
+            case MODE_SAME_ORIGIN:
+            case MODE_SAME_VALID:
+            {
+                //fill x if need
+                final int deltaX = mat.getWidth() - coreWidth;
+                int leftX = deltaX % strideX;
+                if (leftX > 0) {
+                    Matrix2Utils.fillWidth(mat, strideX - leftX, null, getElementProvider());
+                }
+                //fill y if need
+                final int deltaY = mat.getHeight() - coreHeight;
+                int leftY = deltaY % strideY;
+                if (leftY > 0) {
+                    Matrix2Utils.fillHeight(mat, strideY - leftY, null, getElementProvider());
+                }
+            }
+            break;
+
+            case MODE_VALID_ORIGIN:
+            case MODE_VALID_VALID:
+            {
+                final int deltaX = mat.getWidth() - coreWidth;
+                int leftX = deltaX % strideX;
+                if (leftX > 0) {
+                    Matrix2Utils.dropWidth(mat, leftX, true);
+                }
+                final int deltaY = mat.getHeight() - coreHeight;
+                int leftY = deltaY % strideY;
+                if (leftY > 0) {
+                    Matrix2Utils.dropHeight(mat, leftY, true);
+                }
+            }
+            break;
+        }
+        System.out.println(mat.toString());
+        System.out.println("strideX = " + strideX + " ,strideY = " + strideY);
+        return mat;
+    }
 
     private int getOutputWidth(Matrix2<T> src, int coreWidth) {
         int originWidth;
