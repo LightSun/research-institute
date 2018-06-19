@@ -1,0 +1,14 @@
+
+对数符号：
+   In 是自然对数，lnx=log(e)x,底就是e=2.718.。。。。
+
+
+S 型函数:
+   sigmoid 函数，是BP神经网络中常用的非线性作用函数。
+   Sigmoid函数:
+       分 Log-Sigmoid函数(一般s型函数就指这个) and Tan-Sigmoid函数(又称为双曲正切S型函数).
+   Log-Sigmoid 公式：
+      f(x) = 1/(1+e^-x)(-x是幂数)
+
+   Tan-sigmoid 公式：
+      f(x) = 2/(1+e^-2x) - 1 (-2x是幂数)

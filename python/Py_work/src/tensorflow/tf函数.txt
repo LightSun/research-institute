@@ -1,0 +1,13 @@
+
+求张量tensor的 阶 ，一般0-3
+r = tf.rank(tensor)
+
+tf.reshape  重构张量 降低或者升级阶 都是可以的。
+
+tf.train.Saver()  模型保存对象
+       save and store
+tf.train.latest_checkpoint(str)  模型恢复到最后一次的
+
+其他模型构造可能会使评估 tf.Tensor 变得较为复杂。TensorFlow 无法直接评估函数内部或控制流结构内部定义的 tf.Tensor。
+如果 tf.Tensor 取决于队列中的值，那么只有在某些东西加入队列后才能评估 tf.Tensor；否则，评估将被搁置。
+在处理队列时，请先调用 tf.train.start_queue_runners，再评估 tf.Tensor.
