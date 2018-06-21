@@ -6,6 +6,7 @@ import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.utils.LoadException;
 import com.heaven7.ve.Context;
@@ -15,21 +16,16 @@ import com.heaven7.ve.colorgap.*;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * this class can only used for video.
  * Created by heaven7 on 2018/4/16 0016.
  */
 
 public class MediaAnalyseHelper {
 
     private static final String TAG = "MediaAnalyseHelper";
-
-    private ExecutorService mService;
 
     private final MediaResourceScanner rectsScanner;
     private final MediaResourceScanner tagsScanner;
@@ -46,17 +42,10 @@ public class MediaAnalyseHelper {
         this.rectsLoader = rectsLoader;
     }
     public void cancel() {
-        if(mService != null) {
-            mService.shutdownNow();
-            mService = null;
-        }
+        ConcurrentUtils.shutDownNow();
     }
     public void scanAndLoad(Context context, List<MediaItem> items, final CyclicBarrier outBarrier) {
-        if(mService == null){
-            mService = new ThreadPoolExecutor(3, 8,
-                    60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-        }
-        mService.submit(() -> scanAndLoad0(context, items, outBarrier));
+        ConcurrentUtils.submit(() -> scanAndLoad0(context, items, outBarrier));
     }
 
     /**
@@ -74,19 +63,11 @@ public class MediaAnalyseHelper {
         }, null);
         //no tasks release directly.
         if(Predicates.isEmpty(videoItems)){
-            try {
-                barrier.await();
-            } catch (InterruptedException e) {
-                //ignore e.printStackTrace();
-            } catch (BrokenBarrierException e) {
-                throw new RuntimeException(e);
-            }
+            ConcurrentUtils.awaitBarrier(barrier);
         }else {
             MapVisitService<String, List<MediaItem>> mapService = VisitServices.from(videoItems)
                     .groupService((item, param) -> {
                         //get the dir of this file
-                       /* String filePath = item.item.getFilePath();
-                        return filePath.substring(0, filePath.lastIndexOf("/"));*/
                        return FileUtils.getFileDir(item.item.getFilePath(), 2, true);
                     });
             mGroupCount = new AtomicInteger(mapService.size());
@@ -118,8 +99,8 @@ public class MediaAnalyseHelper {
             Logger.i(TAG, "process", "start batch process >>> dir = " + dir);
             for (MediaItem item : sameDirItems) {
                 //Logger.d(TAG, "process", "start scan ---> item.path = " + item.item.getFilePath());
-                mService.submit(new ScanTask(context, item, dir, rectsScanner, rectsLoader, this, "rects"));
-                mService.submit(new ScanTask(context, item, dir, tagsScanner, tagsLoader, this,"tags"));
+                ConcurrentUtils.submit(new ScanTask(context, item, dir, rectsScanner, rectsLoader, this, "rects"));
+                ConcurrentUtils.submit(new ScanTask(context, item, dir, tagsScanner, tagsLoader, this,"tags"));
             }
         }
 
@@ -178,7 +159,7 @@ public class MediaAnalyseHelper {
                 parent.decreaseTask();
             }else {
                 Logger.d(TAG, "run", "<<< scan done "+ tag + ": path = " + item.item.getFilePath());
-                mService.submit(new LoadTask(context, item.item, path, item.imageMeta, loader, parent));
+                ConcurrentUtils.submit(new LoadTask(context, item.item, path, item.imageMeta, loader, parent));
             }
         }
     }

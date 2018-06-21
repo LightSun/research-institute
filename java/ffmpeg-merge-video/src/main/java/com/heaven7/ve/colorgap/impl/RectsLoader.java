@@ -6,6 +6,7 @@ import com.heaven7.ve.colorgap.MediaResourceLoader;
 import com.heaven7.ve.colorgap.VideoDataLoadUtils;
 
 /**
+ * only used for video
  * Created by heaven7 on 2018/4/16 0016.
  */
 

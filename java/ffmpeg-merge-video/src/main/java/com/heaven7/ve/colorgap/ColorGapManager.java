@@ -5,6 +5,7 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.ArrayUtils;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.ve.Context;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.filter.MediaDirFilter;
@@ -25,9 +26,6 @@ import java.util.concurrent.CyclicBarrier;
 public class ColorGapManager {
 
     private static final String TAG = "ColorGapManager";
-    // 音乐格子切点，染色
-    // 原始视频切片
-    // 染色匹配计算.(时长过滤)
 
     private final Context mContext;
     private final MusicCutter musicCut;
@@ -64,7 +62,7 @@ public class ColorGapManager {
     }
 
     /**
-     * fill the music plaids by videos, may be parts of video
+     * fill the music plaids by videos, may be parts of video. must called in sub-thread
      * @param musicPath the music paths
      * @param srcTemplate the src template which comes from {@linkplain #createVETemplate(List)},
      * @param items the media resource item
@@ -73,7 +71,7 @@ public class ColorGapManager {
     public FillResult fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<MediaResourceItem> items) {
         ResourceInitializer.init(mContext);
         //the barrier help we do two tasks: analyse, tint.
-        CyclicBarrier barrier = new CyclicBarrier(2);
+        CyclicBarrier barrier = new CyclicBarrier(mediaAnalyser.getAsyncModuleCount() + 1);
         //analyse
         List<MediaItem> mediaItems = mediaAnalyser.analyse(mContext, items, barrier);
         //cut music
@@ -95,6 +93,8 @@ public class ColorGapManager {
             Logger.d(TAG, "fill", "tint done");
             barrier.await();
             Logger.d(TAG, "fill", "start cut video");
+            //all done. shut down service.
+            ConcurrentUtils.shutDownNow();
             //cut video
             List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(plaids, mediaItems);
             //process story to color filter(生成shot key, 过滤)

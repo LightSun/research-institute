@@ -268,14 +268,6 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
 
             List<Integer> tags = calculateTags(framesTags, Vocabulary.TYPE_WEDDING_ALL);
 
-           /* List<String> tags_str = new ArrayList<>();
-            VisitServices.from(tags).transformToCollection(new ResultVisitor<Integer, String>() {
-                @Override
-                public String visit(Integer index, Object param) {
-                    return Vocabulary.getTagStr(index);
-                }
-            }).save(tags_str);
-            Logger.d(TAG , "setRawTags", "path = "+ item.getFilePath() + ",  main tags: " + tags_str);*/
             List<List<Integer>> tmp_tags = new ArrayList<>();
             tmp_tags.add(tags);
             imageMeta.setTags(tmp_tags);
@@ -327,6 +319,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
                 }
             }
             float averMainFaceArea = getAverMainFaceArea(fis, imageMeta.getMainFaceCount());
+            System.out.println("averMainFaceArea = " + averMainFaceArea);
             String shotType = getShotType(averMainFaceArea);
             if(shotType != null){
                 imageMeta.setShotType(shotType);

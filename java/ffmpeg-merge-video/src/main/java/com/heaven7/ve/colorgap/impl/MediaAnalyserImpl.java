@@ -1,6 +1,8 @@
 package com.heaven7.ve.colorgap.impl;
 
 
+import com.heaven7.java.visitor.PredicateVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.Context;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.PathTimeTraveller;
@@ -10,6 +12,7 @@ import com.heaven7.ve.colorgap.MetaInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 /**
@@ -21,8 +24,10 @@ import java.util.concurrent.CyclicBarrier;
 
 public class MediaAnalyserImpl implements MediaAnalyser {
 
-    private final MediaAnalyseHelper mHelper = new MediaAnalyseHelper(new MockRectsScanner(), new MockTagsScanner(),
+    private final MediaAnalyseHelper mVideoHelper = new MediaAnalyseHelper(new MockRectsScanner(), new MockTagsScanner(),
             new RectsLoader(), new TagsLoader());
+    private final ImageMediumFileHelper mImageHelper = new ImageMediumFileHelper(ImageMediumFileHelper.MODE_SINGLE_TAG
+            | ImageMediumFileHelper.MODE_RECTS);
 
     @Override
     public List<MediaItem> analyse(Context context, List<MediaResourceItem> items, CyclicBarrier barrier) {
@@ -33,13 +38,28 @@ public class MediaAnalyserImpl implements MediaAnalyser {
             mediaItem.imageMeta = analyseMeta(context, item);
             outItems.add(mediaItem);
         }
-        mHelper.scanAndLoad(context, outItems, barrier);
+        List<MediaItem> images = new ArrayList<>();
+        List<MediaItem> videoItems = VisitServices.from(outItems).filter(null, new PredicateVisitor<MediaItem>() {
+            @Override
+            public Boolean visit(MediaItem mediaItem, Object param) {
+                return mediaItem.item.isVideo();
+            }
+        }, images).getAsList();
+        //auto handle empty videos
+        mVideoHelper.scanAndLoad(context, videoItems, barrier);
+        mImageHelper.scanAndLoad(context, images, barrier);
         return outItems;
     }
 
     @Override
+    public int getAsyncModuleCount() {
+        return 2;
+    }
+
+    @Override
     public void cancel() {
-        mHelper.cancel();
+        mVideoHelper.cancel();
+        mImageHelper.cancel();
     }
 
     protected MetaInfo.ImageMeta analyseMeta(Context context, MediaResourceItem item) {

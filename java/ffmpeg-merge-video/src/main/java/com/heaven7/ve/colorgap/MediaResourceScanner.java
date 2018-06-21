@@ -15,8 +15,8 @@ public abstract class MediaResourceScanner {
      * scan the media file and put it to the target ImageMeta.
      *
      * @param context the context
-     * @param item the media file item
-     * @param srcDir the source dir
+     * @param item    the media file item
+     * @param srcDir  the source dir
      * @return the full path of scan result file. eg: rects, tags.
      */
     public abstract String scan(Context context, MediaResourceItem item, String srcDir);

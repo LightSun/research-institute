@@ -155,4 +155,56 @@ public class CountUtils {
         });
         return allTags;
     }
+
+    public static String getContentFromFrames(List<FrameTags> frames, float minPoss) {
+        //TODO getContentFromFrames
+        final StringBuilder sb = new StringBuilder();
+        VisitServices.from(frames).sortService(new Comparator<FrameTags>() {
+            @Override
+            public int compare(FrameTags o1, FrameTags o2) {
+                return Integer.compare(o1.getFrameIdx(), o2.getFrameIdx());
+            }
+        }).fire(new FireVisitor<FrameTags>() {
+            @Override
+            public Boolean visit(FrameTags frameTags, Object param) {
+                //1;(123,str),()...
+                sb.append(frameTags.getFrameIdx()).append(";");
+                List<Tag> tags = frameTags.getTopTags(Integer.MAX_VALUE, minPoss, Vocabulary.TYPE_WEDDING_ALL);
+                VisitServices.from(tags).fireWithStartEnd(new StartEndVisitor<Tag>() {
+                    @Override
+                    public boolean visit(Object param, Tag tag, boolean start, boolean end) {
+                        sb.append("(").append(Vocabulary.getTagStr(tag.getIndex()))
+                                .append(":").append(tag.getPossibility())
+                                .append(")");
+                        if(!end){
+                            sb.append(",");
+                        }
+                        return false;
+                    }
+                });
+                sb.append("\r\n");
+                return null;
+            }
+        });
+        return sb.toString();
+    }
+
+    public static String getContentFromDetails(List<CsvDetail> details, float minPoss) {
+        final StringBuilder sb = new StringBuilder();
+        VisitServices.from(details).fireWithStartEnd(new StartEndVisitor<CsvDetail>() {
+            @Override
+            public boolean visit(Object param, CsvDetail detail, boolean start, boolean end) {
+                String path = detail.getFilePath();
+                sb.append(FileUtils.getFileName(path))
+                        .append(".")
+                        .append(FileUtils.getFileExtension(path))
+                        .append("\r\n");
+                sb.append(getContentFromFrames(detail.getFrames(), minPoss)).append("\r\n");
+                return false;
+            }
+        });
+        return sb.toString();
+    }
 }
+
+//ffmpeg -f concat -safe 0 -i input.txt -vsync vfr -pix_fmt yuv420p Desktop/output.mp4

@@ -40,9 +40,6 @@ public class TagBasedShotCutter extends VideoCutter {
         List<MediaPartItem> resultList = new ArrayList<>();
 
         for(MediaItem item : items){
-            if(item.item.getFilePath().endsWith("C0218.MP4")){
-                System.out.println("--------------");
-            }
             if(item.item.isImage()){
                 resultList.add(item.asPart());
                 continue;

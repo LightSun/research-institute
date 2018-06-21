@@ -15,6 +15,12 @@ public interface MediaAnalyser {
 
     List<MediaItem> analyse(Context context, List<MediaResourceItem> items, CyclicBarrier barrier);
 
+    /**
+     * get the async module count .
+     * @return the async module count
+     */
+    int getAsyncModuleCount();
+
     void cancel();
 
 }

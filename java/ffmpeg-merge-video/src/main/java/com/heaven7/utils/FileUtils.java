@@ -1,9 +1,15 @@
 package com.heaven7.utils;
 
+import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +17,18 @@ import java.util.List;
  * the file utils
  */
 public class FileUtils {
+
+    /**
+     * the filename transformer
+     */
+    public interface FilenameTransformer{
+        /**
+         * transform the name
+         * @param name the dir name or file name, exclude "/" and "\"
+         * @return the result.
+         */
+        String transform(String name);
+    }
 
     /** get the file name only. exclude extension and dir. */
     public static String getFileName(String path) {
@@ -35,12 +53,79 @@ public class FileUtils {
                 depth --;
                 parent = parent.getParentFile();
                 if(parent == null){
-                    throw new IllegalStateException("file path is wrong or depth is wrong");
+                    return null;
                 }
             }
             return fullPath ? parent.getAbsolutePath() :parent.getName();
         }
         return null;
+    }
+
+    public static String encodeChinesePath(String path){
+        return transformPath(path, new FilenameTransformer() {
+            @Override
+            public String transform(String name) {
+                try {
+                    return URLEncoder.encode(name, "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    return name;
+                }
+            }
+        });
+    }
+    public static String decodeChinesePath(String path){
+        return transformPath(path, new FilenameTransformer() {
+            @Override
+            public String transform(String name) {
+                try {
+                    return URLDecoder.decode(name, "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    return name;
+                }
+            }
+        });
+    }
+
+    /** get file path which is encode by path */
+    public static String transformPath(String path, FilenameTransformer transformer){
+        List<String> names = new ArrayList<>();
+        //c:\xxx\xxx1\xxx2.jpg -> c:\xxx\xxx1\xxx2
+        String tmpPath = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : path;
+        File file = new File(tmpPath);
+        if(!file.exists()){
+            Logger.d("", "transformPath", "path not exists. path = " + path);
+        }
+        File parent = file;
+        do {
+            names.add(parent.getName());
+            parent = parent.getParentFile();
+            if(parent == null){
+                break;
+            }
+        }while (true);
+
+        final StringBuilder sb = new StringBuilder();
+        int index = path.indexOf(File.separator);
+        if(index == -1){
+            throw new IllegalArgumentException();
+        }
+        sb.append(path.substring(0, index));
+        VisitServices.from(names).reverseService().fire(new FireVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                sb.append(File.separator).append(transformer.transform(s));
+                return false;
+            }
+        });
+        if(path.contains(".")){
+            sb.append(".").append(getFileExtension(path));
+
+        }
+        String s = sb.toString();
+        if(s.contains(":\\\\")){
+            s = s.replace(":\\\\", ":\\");
+        }
+        return s;
     }
 
     public static final FileFilter TRUE_FILE_FILTER =

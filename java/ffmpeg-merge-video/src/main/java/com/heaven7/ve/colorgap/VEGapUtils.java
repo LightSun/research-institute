@@ -98,12 +98,12 @@ public class VEGapUtils {
                     // (fbi, param) -> fbi.areas.get(0), areas);
             totalFaceAreas = CollectionUtils.sum(areas);
         }else if(mainFaceCount == 2){
-            List<Float> list = VisitServices.from(frameBuffer).transformToCollection(new ResultVisitor<FrameItem, List<Float>>() {
+            List<Float> list = VisitServices.from(frameBuffer).map(new ResultVisitor<FrameItem, List<Float>>() {
                 @Override
                 public List<Float> visit(FrameItem fbi, Object param) {
                     return fbi.areas;
                 }
-            }).transformToCollection(new ResultVisitor<List<Float>, Float>() {
+            }).map(new ResultVisitor<List<Float>, Float>() {
                 @Override
                 public Float visit(List<Float> floats, Object param) {
                     if(floats.size() < 2){
@@ -115,12 +115,12 @@ public class VEGapUtils {
             totalFaceAreas = CollectionUtils.sum(list);
         }else{
             //统计前3张脸
-            List<Float> list = VisitServices.from(frameBuffer).transformToCollection(new ResultVisitor<FrameItem, List<Float>>() {
+            List<Float> list = VisitServices.from(frameBuffer).map(new ResultVisitor<FrameItem, List<Float>>() {
                 @Override
                 public List<Float> visit(FrameItem fbi, Object param) {
                     return fbi.areas;
                 }
-            }).transformToCollection(new ResultVisitor<List<Float>, Float>() {
+            }).map(new ResultVisitor<List<Float>, Float>() {
                 @Override
                 public Float visit(List<Float> floats, Object param) {
                     if(floats.size() < 3){
