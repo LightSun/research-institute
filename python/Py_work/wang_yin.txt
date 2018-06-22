@@ -1,0 +1,22 @@
+王垠：https://blog.csdn.net/cos_sin_tan/article/details/7960491
+
+books:
+     the Art of Computer Programming
+     The TeXbook
+     数学天才John Nash的传记
+
+语言：
+   Scheme，   Common LISP
+
+MIT课程6.001
+
+电影 A Beautiful Mind
+
+
+作品：
+《完全用Linux工作》与TeX
+
+
+
+科目：
+  计算几何
