@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
 
-    <com.heaven7.vida.research.widget.BalanceView
+   <!-- <com.heaven7.vida.research.widget.BalanceView
         android:id="@+id/balanceView"
         android:layout_width="276dp"
         android:layout_height="58dp"
@@ -29,6 +29,25 @@
         app:balance_indicator_text_size="10sp"
         app:balance_indicator_rect_width="17dp"
         app:balance_indicator_rect_height="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        />-->
+
+    <com.heaven7.vida.research.widget.BalanceView
+        android:id="@+id/balanceView"
+        style="@style/Common_Balance"
+        android:layout_width="276dp"
+        android:layout_height="58dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         />

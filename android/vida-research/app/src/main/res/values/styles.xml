@@ -9,4 +9,16 @@
     </style>
 
 
+    <style name="Common_Balance">
+        <item name="balance_progress_color">#3f3f3f</item>
+        <item name="balance_progress_height">2dp</item>
+        <item name="balance_default_color">#ffe0e0e0</item>
+        <item name="balance_ball_color">#3f3f3f</item>
+        <item name="balance_ball_radius">11dp</item>
+        <item name="balance_indicator_margin_ball">4dp</item>
+        <item name="balance_indicator_text_size">10sp</item>
+        <item name="balance_indicator_rect_width">17dp</item>
+        <item name="balance_indicator_rect_height">10dp</item>
+    </style>
+
 </resources>
