@@ -150,8 +150,47 @@ public class Matrix2<T> {
 
     //================================================================================================================
 
-    public void padding(int left, int top, int right, int bottom){
-        
+    public void padding(int left, int top, int right, int bottom, Matrix2Utils.ElementProvider<T> provider){
+        //TODO IMPL
+        //left and right make add columns, top and bottom make add rows
+        if(left > 0){
+            int w = getWidth();
+           // int h = getHeight();
+            int size;
+            for (int i = 0; i < w; i++) {
+                List<T> ts = values.get(i);
+                for(int j = 0 ; j < left ; j ++){
+                    ts.add(0, provider.provide(i, j, null));
+                }
+                if(right > 0){
+                    size = ts.size();
+                    for(int j = 0 ; j < right ; j ++){
+                        ts.add(provider.provide(i, size + j, null));
+                    }
+                }
+            }
+        }else {
+            if (right > 0) {
+                int w = getWidth();
+                int size;
+                for (int i = 0; i < w; i++) {
+                    List<T> ts = values.get(i);
+                    size = ts.size();
+                    for (int j = 0; j < right; j++) {
+                        ts.add(provider.provide(i, size + j, null));
+                    }
+                }
+            }
+        }
+
+        if(top > 0){
+            int h = getHeight();
+            for(int t = 0 ; t < top ; t ++){
+                for(int  i = 0 ; i < h ; i ++){
+                    //TODO
+                }
+            }
+        }
     }
 
     /**
