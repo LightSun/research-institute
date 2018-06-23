@@ -30,4 +30,30 @@
         <attr name="rect_progress_color" format="color|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="BalanceView">
+        <attr name="balance_progress_color" format="color|reference"/>
+        <attr name="balance_default_color" format="color|reference"/>
+        <attr name="balance_progress_height" format="dimension|reference"/>
+        <attr name="balance_ball_radius" format="dimension|reference"/>
+        <attr name="balance_ball_color" format="color|reference"/>
+        <attr name="balance_indicator_text_size" format="dimension|reference"/>
+        <attr name="balance_indicator_margin_ball" format="dimension|reference"/>
+        <attr name="balance_indicator_rect_width" format="dimension|reference"/>
+        <attr name="balance_indicator_rect_height" format="dimension|reference"/>
+        <attr name="balance_narrowly_when_click" format="boolean|reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="SeekView">
+        <attr name="seek_progress_color" format="color|reference"/>
+        <attr name="seek_default_color" format="color|reference"/>
+        <attr name="seek_progress_height" format="dimension|reference"/>
+        <attr name="seek_ball_radius" format="dimension|reference"/>
+        <attr name="seek_ball_color" format="color|reference"/>
+        <attr name="seek_indicator_text_size" format="dimension|reference"/>
+        <attr name="seek_indicator_margin_ball" format="dimension|reference"/>
+        <attr name="seek_indicator_rect_width" format="dimension|reference"/>
+        <attr name="seek_indicator_rect_height" format="dimension|reference"/>
+        <attr name="seek_narrowly_when_click" format="boolean|reference"/>
+    </declare-styleable>
+
 </resources>

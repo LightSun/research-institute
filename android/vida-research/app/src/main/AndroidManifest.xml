@@ -39,6 +39,7 @@
         <activity android:name=".sample.TestRectProgresActivity"/>
         <activity android:name=".sample.TestShadowShapeActivity"/>
         <activity android:name=".sample.TestV7_CircleImageViewActivity"/>
+        <activity android:name=".sample.BalanceViewTest"/>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.heaven7.vida.research;
 
 import com.heaven7.vida.research.drag.DragActivity;
+import com.heaven7.vida.research.sample.BalanceViewTest;
 import com.heaven7.vida.research.sample.NativeSurfaceActivity;
 import com.heaven7.vida.research.sample.TestBaiduFaceActivity;
 import com.heaven7.vida.research.sample.TestDiscViewActivity;
@@ -9,7 +10,6 @@ import com.heaven7.vida.research.sample.TestRoundViewActivity;
 import com.heaven7.vida.research.sample.TestShadowShapeActivity;
 import com.heaven7.vida.research.sample.TestV7_CircleImageViewActivity;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
-import com.heaven7.vida.research.widget.RectangleProgressView;
 
 import java.util.List;
 
@@ -35,6 +35,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestRectProgresActivity.class));
         list.add(new ActivityInfo(TestShadowShapeActivity.class));
         list.add(new ActivityInfo(TestV7_CircleImageViewActivity.class));
+        list.add(new ActivityInfo(BalanceViewTest.class));
     }
 
 }
