@@ -33,8 +33,8 @@ public class Image {
             this.data = bufferedImage.getRGB(0, 0, w, h, null, 0, w);
             //just test
            /* Matrix2<Integer> mat = toMatrix().transpose();
-            System.out.println(mat.getWidth());
-            System.out.println(mat.getHeight());
+            System.out.println(mat.getRowCount());
+            System.out.println(mat.getColumnCount());
             BufferedImage image = new BufferedImage(this.w, this.h, imageType);
             for (int i = 0 ; i < w ; i ++){
                 for (int j = 0 ; j < h ; j ++){
@@ -177,4 +177,3 @@ public class Image {
     }
 
 }
- 

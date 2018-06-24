@@ -14,8 +14,8 @@ public class ImageBlur {
 
     public ImageBlur(Matrix2<Integer> imageMat) {
         data = imageMat.toArray();
-        width = imageMat.getWidth();
-        height = imageMat.getHeight();
+        width = imageMat.getRowCount();
+        height = imageMat.getColumnCount();
     }
 
     public int getWidth() {

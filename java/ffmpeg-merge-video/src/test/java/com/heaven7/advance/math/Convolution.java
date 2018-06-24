@@ -4,6 +4,10 @@ import com.heaven7.advance.Matrix2;
 import com.heaven7.advance.Matrix2Utils;
 import com.heaven7.java.visitor.PileVisitor;
 
+import static com.heaven7.advance.Matrix2Utils.DOUBLE_0_PROVIDER;
+import static com.heaven7.advance.Matrix2Utils.FLOAT_0_PROVIDER;
+import static com.heaven7.advance.Matrix2Utils.INT_0_PROVIDER;
+
 /**
  * 卷积
  * n 是输入矩阵，f是卷积核, padding p(四周都有),  步长s
@@ -11,49 +15,29 @@ import com.heaven7.java.visitor.PileVisitor;
  *  输出 (n + 2p -f)/s + 1
  * @author heaven7
  */
-//TODO Matrix 增加padding的支持
 public abstract class Convolution<T> {
 
     /**
-     * pre process 'SAME': fill 0 if not enough
+     * pre process 'SAME': fill 0 if not enough.
      * result 'ORIGIN ': means out put matrix size is decide by raw matrix and convolution core.
      */
     public static final int MODE_SAME_ORIGIN = 1;
     /**
-     * pre process 'SAME': fill 0 if not enough
-     * result 'VALID'    : drop if not enough
+     * pre process 'SAME': fill 0 if not enough.
+     * result 'VALID'    : drop if not enough.
      */
     public static final int MODE_SAME_VALID = 2;
     /**
-     * pre process 'VALID': drop if not enough
+     * pre process 'VALID': drop if not enough.
      * result 'ORIGIN ': means out put matrix size is decide by raw matrix and convolution core.
      */
     public static final int MODE_VALID_ORIGIN = 3;
     /**
-     * pre process 'VALID': drop if not enough
-     * result 'VALID' : drop if not enough
+     * pre process 'VALID': drop if not enough.
+     * result 'VALID' : drop if not enough.
      */
     public static final int MODE_VALID_VALID = 4;
 
-
-    protected static final Matrix2Utils.ElementProvider<Integer> INT_0_PROVIDER = new Matrix2Utils.ElementProvider<Integer>() {
-        @Override
-        public Integer provide(int wIndex, int hIndex, Object param) {
-            return 0;
-        }
-    };
-    protected static final Matrix2Utils.ElementProvider<Float> FLOAT_0_PROVIDER = new Matrix2Utils.ElementProvider<Float>() {
-        @Override
-        public Float provide(int wIndex, int hIndex, Object param) {
-            return 0f;
-        }
-    };
-    protected static final Matrix2Utils.ElementProvider<Double> DOUBLE_0_PROVIDER = new Matrix2Utils.ElementProvider<Double>() {
-        @Override
-        public Double provide(int wIndex, int hIndex, Object param) {
-            return 0d;
-        }
-    };
 
     private final Matrix2<T> mat;
     private int strideX = 1;
@@ -125,9 +109,9 @@ public abstract class Convolution<T> {
     protected final <C, R> Matrix2<R> computeConvolution(Matrix2<C> core, double coreSum,
                                                          Matrix2.ConvolutionCallback<T, C, R> callback, PileVisitor<R> sum,
                                                          Matrix2.AverageCallback<R> average, Matrix2Utils.ElementProvider<R> provider) {
-        Matrix2<T> appositeMatrix = getAppositeMatrix(core.getWidth(), core.getHeight());
-        final int outWidth = getOutputWidth(appositeMatrix, core.getWidth());
-        final int outHeight = getOutputHeight(appositeMatrix, core.getHeight());
+        Matrix2<T> appositeMatrix = getAppositeMatrix(core.getRowCount(), core.getColumnCount());
+        final int outWidth = getOutputWidth(appositeMatrix, core.getRowCount());
+        final int outHeight = getOutputHeight(appositeMatrix, core.getColumnCount());
         return appositeMatrix.computeConvolution(core, coreSum, outWidth, outHeight,
                 getStrideX(), getStrideY(), callback, sum, average,provider);
     }
@@ -271,13 +255,13 @@ public abstract class Convolution<T> {
             case MODE_SAME_VALID:
             {
                 //fill x if need
-                final int deltaX = mat.getWidth() - coreWidth;
+                final int deltaX = mat.getRowCount() - coreWidth;
                 int leftX = deltaX % strideX;
                 if (leftX > 0) {
                     Matrix2Utils.fillWidth(mat, strideX - leftX, null, getElementProvider());
                 }
                 //fill y if need
-                final int deltaY = mat.getHeight() - coreHeight;
+                final int deltaY = mat.getColumnCount() - coreHeight;
                 int leftY = deltaY % strideY;
                 if (leftY > 0) {
                     Matrix2Utils.fillHeight(mat, strideY - leftY, null, getElementProvider());
@@ -288,12 +272,12 @@ public abstract class Convolution<T> {
             case MODE_VALID_ORIGIN:
             case MODE_VALID_VALID:
             {
-                final int deltaX = mat.getWidth() - coreWidth;
+                final int deltaX = mat.getRowCount() - coreWidth;
                 int leftX = deltaX % strideX;
                 if (leftX > 0) {
                     Matrix2Utils.dropWidth(mat, leftX, true);
                 }
-                final int deltaY = mat.getHeight() - coreHeight;
+                final int deltaY = mat.getColumnCount() - coreHeight;
                 int leftY = deltaY % strideY;
                 if (leftY > 0) {
                     Matrix2Utils.dropHeight(mat, leftY, true);
@@ -311,12 +295,12 @@ public abstract class Convolution<T> {
         switch (getMode()){
             case MODE_SAME_ORIGIN:
             case MODE_VALID_ORIGIN:
-                originWidth = this.mat.getWidth();
+                originWidth = this.mat.getRowCount();
                 break;
 
             case MODE_SAME_VALID:
             case MODE_VALID_VALID:
-                originWidth = src.getWidth();
+                originWidth = src.getRowCount();
                 break;
 
             default:
@@ -336,12 +320,12 @@ public abstract class Convolution<T> {
         switch (getMode()){
             case MODE_SAME_ORIGIN:
             case MODE_VALID_ORIGIN:
-                originHeight = this.mat.getHeight();
+                originHeight = this.mat.getColumnCount();
                 break;
 
             case MODE_SAME_VALID:
             case MODE_VALID_VALID:
-                originHeight = src.getHeight();
+                originHeight = src.getColumnCount();
                 break;
 
             default:

@@ -20,8 +20,8 @@ public class ConvolutionTest {
                 new int[]{-1, 1},
         };
         Matrix2<Integer> mat = Matrix2.ofIntArrayArray(data);
-        System.out.println(mat.getWidth());
-        System.out.println(mat.getHeight());
+        System.out.println(mat.getRowCount());
+        System.out.println(mat.getColumnCount());
 
         logByMode(core, mat, IntConvolution.MODE_SAME_ORIGIN);
         logByMode(core, mat, IntConvolution.MODE_SAME_VALID);
@@ -53,8 +53,8 @@ public class ConvolutionTest {
                 new int[]{-1, 1},
         };
         Matrix2<Integer> mat = Matrix2.ofIntArrayArray(data);
-        System.out.println(mat.getWidth());
-        System.out.println(mat.getHeight());
+        System.out.println(mat.getRowCount());
+        System.out.println(mat.getColumnCount());
         IntConvolution ic = new IntConvolution(mat);
         ic.setStrideX(2);
         Matrix2<Integer> matResult = ic.computeIntInt(core);

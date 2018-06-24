@@ -9,8 +9,8 @@ public class JavaImageGenerator implements ImageGenerator {
 
     @Override
     public boolean generate(Matrix2<Integer> mat, File dst, int imageType, String format) {
-        int w = mat.getWidth();
-        int h = mat.getHeight();
+        int w = mat.getRowCount();
+        int h = mat.getColumnCount();
        // System.out.println(w);
        // System.out.println(h);
         BufferedImage image = new BufferedImage(w, h, imageType);

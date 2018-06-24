@@ -34,8 +34,8 @@ public class ImageBlurTest {
             list.add(cols);
         }
         Matrix2<Integer> mat = new Matrix2<>(list);
-        System.out.println(mat.getWidth());
-        System.out.println(mat.getHeight());
+        System.out.println(mat.getRowCount());
+        System.out.println(mat.getColumnCount());
         //now mat2 is same with mat
         Matrix2<Integer> mat2 = Matrix2.ofObjectArray(w, h, mat.toArray()).transpose();
         //now mat3 is same with mat
@@ -84,8 +84,8 @@ public class ImageBlurTest {
         JavaImageReader reader = new JavaImageReader();
         Matrix2<Integer> mat = reader.read(path);
         int imageType = reader.getImageType();
-        int w = mat.getWidth();
-        int h = mat.getHeight();
+        int w = mat.getRowCount();
+        int h = mat.getColumnCount();
 
         ImageBlur blur = new ImageBlur(mat);
         int[] data = blur.laplacian(true, false);
@@ -151,8 +151,8 @@ public class ImageBlurTest {
     }
 
     private static void testGenImage(File srcFile, Matrix2<Integer> mat, int imageType, String suffix) {
-        int w = mat.getWidth();
-        int h = mat.getHeight();
+        int w = mat.getRowCount();
+        int h = mat.getColumnCount();
         System.out.println(w);
         System.out.println(h);
         BufferedImage image = new BufferedImage(w, h, imageType);

@@ -51,8 +51,11 @@ public class MatrixTest {
                 new int[]{7,8,9,10},
         };
         Matrix2<Integer> mat = Matrix2.ofIntArrayArray(data);
-        System.out.println(mat.getWidth());
-        System.out.println(mat.getHeight());
+        System.out.println(mat.getRowCount());
+        System.out.println(mat.getColumnCount());
 
+        System.out.println(mat.copy()
+                .padding(1,2,3,4, Matrix2Utils.INT_0_PROVIDER)
+                .toString());
     }
 }

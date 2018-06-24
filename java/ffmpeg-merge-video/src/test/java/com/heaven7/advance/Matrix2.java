@@ -135,27 +135,36 @@ public class Matrix2<T> {
     }
 
     //row
-    public int getWidth() {
+    public int getRowCount() {
         return values.size();
     }
 
     //col
-    public int getHeight() {
+    public int getColumnCount() {
         return values.isEmpty() ? 0 : values.get(0).size();
     }
 
     public int getTotalSize() {
-        return getWidth() * getHeight();
+        return getRowCount() * getColumnCount();
     }
 
     //================================================================================================================
 
-    public void padding(int left, int top, int right, int bottom, Matrix2Utils.ElementProvider<T> provider){
-        //TODO IMPL
+    /**
+     * padding the matrix by target element provider
+     * @param left the left padding
+     * @param top the top padding
+     * @param right the right padding
+     * @param bottom the bottom padding
+     * @param provider the element provider
+     * @return
+     */
+    public Matrix2<T> padding(int left, int top, int right, int bottom,
+                              Matrix2Utils.ElementProvider<T> provider){
         //left and right make add columns, top and bottom make add rows
         if(left > 0){
-            int w = getWidth();
-           // int h = getHeight();
+            int w = getRowCount();
+           // int h = getColumnCount();
             int size;
             for (int i = 0; i < w; i++) {
                 List<T> ts = values.get(i);
@@ -171,7 +180,7 @@ public class Matrix2<T> {
             }
         }else {
             if (right > 0) {
-                int w = getWidth();
+                int w = getRowCount();
                 int size;
                 for (int i = 0; i < w; i++) {
                     List<T> ts = values.get(i);
@@ -182,15 +191,29 @@ public class Matrix2<T> {
                 }
             }
         }
-
+         //top and bottom
         if(top > 0){
-            int h = getHeight();
-            for(int t = 0 ; t < top ; t ++){
-                for(int  i = 0 ; i < h ; i ++){
-                    //TODO
+            int h = getColumnCount();
+            for(int t = 0 ; t < top ; t ++) {
+                List<T> list = new ArrayList<>();
+                for (int i = 0; i < h; i++) {
+                    list.add(provider.provide(t, i, null));
                 }
+                values.add(t, list);
             }
         }
+        if(bottom > 0) {
+            final int h = getColumnCount();
+            final int rowCount = values.size();
+            for (int b = 0; b < bottom; b++) {
+                List<T> list = new ArrayList<>();
+                for (int i = 0; i < h; i++) {
+                    list.add(provider.provide(rowCount + b, i, null));
+                }
+                values.add(rowCount + b, list);
+            }
+        }
+        return this;
     }
 
     /**
@@ -198,10 +221,10 @@ public class Matrix2<T> {
      *
      * @param core     the core matrix of convolution
      * @param coreSum  the sum of core convolution
-     * @param outW     the out width of matrix
-     * @param outH     the out height of matrix
+     * @param outW     the out width(row count) of matrix
+     * @param outH     the out height(column count) of matrix
      * @param strideX  the stride x of row
-     * @param strideY  the  stride y of column
+     * @param strideY  the stride y of column
      * @param callback the convolution callback
      * @param sum      the sum visitor of result type
      * @param average  the  average callback of result type
@@ -218,10 +241,10 @@ public class Matrix2<T> {
         for (int i = outW - 1; i >= 0; i--) {
             results.add(new ArrayList<>());
         }
-        int w_core = core.getWidth();
-        int h_core = core.getHeight();
-        int w = getWidth();
-        int h = getHeight();
+        int w_core = core.getRowCount();
+        int h_core = core.getColumnCount();
+        int w = getRowCount();
+        int h = getColumnCount();
 
         int wIndex = 0;
         //int hIndex = 0;
@@ -346,8 +369,8 @@ public class Matrix2<T> {
      */
     public <R> R variance(@Nullable Object param, ResultVisitor<T, R> transformer, PileVisitor<R> sum,
                           AverageCallback<R> average, PileVisitor<R> variance) {
-        final int w = getWidth();
-        final int h = getHeight();
+        final int w = getRowCount();
+        final int h = getColumnCount();
         R averageVal = average.average(sum(transformer, sum), w * h);
 
         R total = null;
@@ -370,8 +393,8 @@ public class Matrix2<T> {
      */
     public Matrix2<T> transpose() {
         List<List<T>> list = new ArrayList<>();
-        int w = getWidth();
-        int h = getHeight();
+        int w = getRowCount();
+        int h = getColumnCount();
         for (int i = 0; i < h; i++) {
             List<T> cols = new ArrayList<>();
             for (int j = 0; j < w; j++) {
@@ -399,7 +422,7 @@ public class Matrix2<T> {
     }
 
     public Matrix2<T> turnRight90() {
-        return ofObjectArray(getWidth(), getHeight(), toArray(null));
+        return ofObjectArray(getRowCount(), getColumnCount(), toArray(null));
     }
 
     /**
@@ -468,11 +491,11 @@ public class Matrix2<T> {
      */
     @SuppressWarnings("unchecked")
     public T[] toArray(@Nullable T[] out) {
-        if (getWidth() == 0 || getHeight() == 0) {
+        if (getRowCount() == 0 || getColumnCount() == 0) {
             return null;
         }
-        int w = getWidth();
-        int h = getHeight();
+        int w = getRowCount();
+        int h = getColumnCount();
         if (out == null) {
             out = (T[]) Array.newInstance(values.get(0).get(0).getClass(), w * h);
         }

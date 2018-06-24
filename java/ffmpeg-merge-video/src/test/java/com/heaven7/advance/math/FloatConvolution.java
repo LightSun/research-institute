@@ -2,7 +2,8 @@ package com.heaven7.advance.math;
 
 import com.heaven7.advance.Matrix2;
 import com.heaven7.advance.Matrix2Utils;
-import com.heaven7.java.visitor.PileVisitor;
+
+import static com.heaven7.advance.Matrix2Utils.FLOAT_0_PROVIDER;
 
 public class FloatConvolution extends Convolution<Float> {
 

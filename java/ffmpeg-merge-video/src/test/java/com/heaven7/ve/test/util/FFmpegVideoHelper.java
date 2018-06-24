@@ -8,7 +8,6 @@ import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.colorgap.MediaPartItem;
-import com.heaven7.ve.colorgap.VEGapUtils;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
 import com.heaven7.ve.test.CuttedItem;
@@ -51,7 +50,7 @@ public class FFmpegVideoHelper {
         try {
             fw = new FileWriter(file);
             final FileWriter nfw = fw;
-            assert plaidScatter.getTotalPlaidCount() == cutItems.size();
+            //assert plaidScatter.getTotalPlaidCount() == cutItems.size();
            //build chapter items
             List<List<CuttedItem>> chapterItems = new ArrayList<>();
             int lastIndex = 0;

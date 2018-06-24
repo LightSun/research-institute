@@ -3,6 +3,8 @@ package com.heaven7.advance.math;
 import com.heaven7.advance.Matrix2;
 import com.heaven7.advance.Matrix2Utils;
 
+import static com.heaven7.advance.Matrix2Utils.DOUBLE_0_PROVIDER;
+
 public class DoubleConvolution extends Convolution<Double> {
 
     public DoubleConvolution(Matrix2<Double> mat) {

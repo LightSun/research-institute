@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 图像曝光度. https://blog.csdn.net/qq249356520/article/details/78864244
- * 模糊图像识别有影响
+ * 模糊图像识别有影响(景声图)
  */
 public class ImageExposeTest {
 

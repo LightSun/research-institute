@@ -3,6 +3,8 @@ package com.heaven7.advance.math;
 import com.heaven7.advance.Matrix2;
 import com.heaven7.advance.Matrix2Utils;
 
+import static com.heaven7.advance.Matrix2Utils.INT_0_PROVIDER;
+
 public class IntConvolution extends Convolution<Integer> {
 
     public IntConvolution(Matrix2<Integer> mat) {
