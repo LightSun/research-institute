@@ -2,8 +2,8 @@ package com.heaven7.advance;
 
 import org.junit.Test;
 
-import static com.heaven7.advance.Matrix2Utils.fillHeight;
-import static com.heaven7.advance.Matrix2Utils.fillWidth;
+import static com.heaven7.advance.Matrix2Utils.fillColumn;
+import static com.heaven7.advance.Matrix2Utils.fillRow;
 
 public class Matrix2UtilsTest {
 
@@ -57,7 +57,7 @@ public class Matrix2UtilsTest {
                 new int[]{-1, -2, -3, -4},
                 new int[]{-4, -5, -6, -7},
         };
-        fillWidth(mat, wArr.length, wArr, new Matrix2Utils.ElementProvider<Integer>() {
+        fillRow(mat, wArr.length, wArr, new Matrix2.ElementProvider<Integer>() {
             @Override
             public Integer provide(int wIndex, int hIndex, Object param) {
                 int[][] arr = (int[][]) param;
@@ -73,7 +73,7 @@ public class Matrix2UtilsTest {
                 new int[]{103, 203},
                 new int[]{104, 204},
         };
-        fillHeight(mat, hArr[0].length, hArr, new Matrix2Utils.ElementProvider<Integer>() {
+        fillColumn(mat, hArr[0].length, hArr, new Matrix2.ElementProvider<Integer>() {
             @Override
             public Integer provide(int wIndex, int hIndex, Object param) {
                 int[][] arr = (int[][]) param;
@@ -82,10 +82,10 @@ public class Matrix2UtilsTest {
         });
         System.out.println(mat.toString());
 
-        Matrix2Utils.mergeByWidth(mat2, Matrix2.ofIntArrayArray(wArr));
+        Matrix2Utils.mergeByRow(mat2, Matrix2.ofIntArrayArray(wArr));
         System.out.println(mat2.toString());
 
-        Matrix2Utils.mergeByHeight(mat2, Matrix2.ofIntArrayArray(hArr));
+        Matrix2Utils.mergeByColumn(mat2, Matrix2.ofIntArrayArray(hArr));
         System.out.println(mat2.toString());
     }
 }

@@ -108,7 +108,7 @@ public abstract class Convolution<T> {
      */
     protected final <C, R> Matrix2<R> computeConvolution(Matrix2<C> core, double coreSum,
                                                          Matrix2.ConvolutionCallback<T, C, R> callback, PileVisitor<R> sum,
-                                                         Matrix2.AverageCallback<R> average, Matrix2Utils.ElementProvider<R> provider) {
+                                                         Matrix2.AverageCallback<R> average, Matrix2.ElementProvider<R> provider) {
         Matrix2<T> appositeMatrix = getAppositeMatrix(core.getRowCount(), core.getColumnCount());
         final int outWidth = getOutputWidth(appositeMatrix, core.getRowCount());
         final int outHeight = getOutputHeight(appositeMatrix, core.getColumnCount());
@@ -236,7 +236,7 @@ public abstract class Convolution<T> {
      *
      * @return the element provider
      */
-    protected abstract Matrix2Utils.ElementProvider<T> getElementProvider();
+    protected abstract Matrix2.ElementProvider<T> getElementProvider();
 
     /**
      * get apposite matrix. which may be filled as new matrix.
@@ -258,13 +258,13 @@ public abstract class Convolution<T> {
                 final int deltaX = mat.getRowCount() - coreWidth;
                 int leftX = deltaX % strideX;
                 if (leftX > 0) {
-                    Matrix2Utils.fillWidth(mat, strideX - leftX, null, getElementProvider());
+                    Matrix2Utils.fillRow(mat, strideX - leftX, null, getElementProvider());
                 }
                 //fill y if need
                 final int deltaY = mat.getColumnCount() - coreHeight;
                 int leftY = deltaY % strideY;
                 if (leftY > 0) {
-                    Matrix2Utils.fillHeight(mat, strideY - leftY, null, getElementProvider());
+                    Matrix2Utils.fillColumn(mat, strideY - leftY, null, getElementProvider());
                 }
             }
             break;

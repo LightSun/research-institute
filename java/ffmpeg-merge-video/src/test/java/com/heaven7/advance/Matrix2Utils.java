@@ -14,36 +14,20 @@ import java.util.List;
  */
 public class Matrix2Utils {
 
-    /**
-     * the element provider.
-     *
-     * @param <T> the element type
-     */
-    public interface ElementProvider<T> {
 
-        /**
-         *  provide the element
-         * @param wIndex the row index
-         * @param hIndex the column index
-         * @param param the extra param
-         * @return the element
-         */
-        T provide(int wIndex, int hIndex, Object param);
-    }
-
-    public static final Matrix2Utils.ElementProvider<Integer> INT_0_PROVIDER = new Matrix2Utils.ElementProvider<Integer>() {
+    public static final Matrix2.ElementProvider<Integer> INT_0_PROVIDER = new Matrix2.ElementProvider<Integer>() {
         @Override
         public Integer provide(int wIndex, int hIndex, Object param) {
             return 0;
         }
     };
-    public static final Matrix2Utils.ElementProvider<Float> FLOAT_0_PROVIDER = new Matrix2Utils.ElementProvider<Float>() {
+    public static final Matrix2.ElementProvider<Float> FLOAT_0_PROVIDER = new Matrix2.ElementProvider<Float>() {
         @Override
         public Float provide(int wIndex, int hIndex, Object param) {
             return 0f;
         }
     };
-    public static final Matrix2Utils.ElementProvider<Double> DOUBLE_0_PROVIDER = new Matrix2Utils.ElementProvider<Double>() {
+    public static final Matrix2.ElementProvider<Double> DOUBLE_0_PROVIDER = new Matrix2.ElementProvider<Double>() {
         @Override
         public Double provide(int wIndex, int hIndex, Object param) {
             return 0d;
@@ -57,11 +41,11 @@ public class Matrix2Utils {
      * @param other the other matrix
      * @param <T>   the element type
      */
-    public static <T> void mergeByWidth(Matrix2<T> main, Matrix2<T> other) {
+    public static <T> void mergeByRow(Matrix2<T> main, Matrix2<T> other) {
         if (main.getColumnCount() != other.getColumnCount()) {
             throw new IllegalArgumentException("height must be equals.");
         }
-        fillWidth(main, other.getRowCount(), null, providerFromMatrix(other));
+        fillRow(main, other.getRowCount(), null, Matrix2.ElementProvider.ofMatrix(other));
     }
 
     /**
@@ -71,31 +55,15 @@ public class Matrix2Utils {
      * @param other the other matrix
      * @param <T>   the element type
      */
-    public static <T> void mergeByHeight(Matrix2<T> main, Matrix2<T> other) {
+    public static <T> void mergeByColumn(Matrix2<T> main, Matrix2<T> other) {
         if (main.getRowCount() != other.getRowCount()) {
             throw new IllegalArgumentException("width must be equals.");
         }
-        fillHeight(main, other.getColumnCount(), null, providerFromMatrix(other));
+        fillColumn(main, other.getColumnCount(), null, Matrix2.ElementProvider.ofMatrix(other));
     }
 
     /**
-     * create element provider from matrix
-     *
-     * @param mat the matrix
-     * @param <T> the element type
-     * @return the element provider
-     */
-    public static <T> ElementProvider<T> providerFromMatrix(Matrix2<T> mat) {
-        return new ElementProvider<T>() {
-            @Override
-            public T provide(int wIndex, int hIndex, Object param) {
-                return mat.getRawValues().get(wIndex).get(hIndex);
-            }
-        };
-    }
-
-    /**
-     * fill the width by target delta width
+     * fill the row by target delta row
      *
      * @param src      the src matrix
      * @param delta    the delta width
@@ -103,7 +71,7 @@ public class Matrix2Utils {
      * @param provider the element provider
      * @param <T>      the type of element.
      */
-    public static <T> void fillWidth(Matrix2<T> src, int delta, Object param, ElementProvider<T> provider) {
+    public static <T> void fillRow(Matrix2<T> src, int delta, Object param, Matrix2.ElementProvider<T> provider) {
         List<List<T>> rawValues = src.getRawValues();
         int height = src.getColumnCount();
         for (int i = 0; i < delta; i++) {
@@ -116,7 +84,7 @@ public class Matrix2Utils {
     }
 
     /**
-     * fill the width by target delta height
+     * fill the column by target delta column
      *
      * @param src      the src matrix
      * @param delta    the delta height
@@ -124,7 +92,7 @@ public class Matrix2Utils {
      * @param provider the element provider
      * @param <T>      the type of element.
      */
-    public static <T> void fillHeight(Matrix2<T> src, int delta, Object param, ElementProvider<T> provider) {
+    public static <T> void fillColumn(Matrix2<T> src, int delta, Object param, Matrix2.ElementProvider<T> provider) {
         List<List<T>> rawValues = src.getRawValues();
         final int width = src.getRowCount();
         int originSize;

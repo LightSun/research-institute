@@ -12,7 +12,7 @@ public class IntConvolution extends Convolution<Integer> {
     }
 
     @Override
-    protected Matrix2Utils.ElementProvider<Integer> getElementProvider() {
+    protected Matrix2.ElementProvider<Integer> getElementProvider() {
         return INT_0_PROVIDER;
     }
 

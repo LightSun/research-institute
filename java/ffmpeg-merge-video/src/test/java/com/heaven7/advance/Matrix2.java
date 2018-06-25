@@ -157,10 +157,10 @@ public class Matrix2<T> {
      * @param right the right padding
      * @param bottom the bottom padding
      * @param provider the element provider
-     * @return
+     * @return this.
      */
     public Matrix2<T> padding(int left, int top, int right, int bottom,
-                              Matrix2Utils.ElementProvider<T> provider){
+                              ElementProvider<T> provider){
         //left and right make add columns, top and bottom make add rows
         if(left > 0){
             int w = getRowCount();
@@ -236,7 +236,7 @@ public class Matrix2<T> {
     public <C, R> Matrix2<R> computeConvolution(Matrix2<C> core, double coreSum, int outW, int outH,
                                                 int strideX, int strideY,
                                                 ConvolutionCallback<T, C, R> callback, PileVisitor<R> sum,
-                                                AverageCallback<R> average, Matrix2Utils.ElementProvider<R> provider) {
+                                                AverageCallback<R> average, ElementProvider<R> provider) {
         List<List<R>> results = new ArrayList<>();
         for (int i = outW - 1; i >= 0; i--) {
             results.add(new ArrayList<>());
@@ -521,6 +521,10 @@ public class Matrix2<T> {
         return new Matrix2<>(lists);
     }
 
+    /**
+     * the average callback
+     * @param <T> the element type
+     */
     public interface AverageCallback<T> {
         /**
          * compute the average
@@ -550,4 +554,60 @@ public class Matrix2<T> {
         R multiple(T t, C c);
     }
 
+    /**
+     * the element provider.
+     *
+     * @param <T> the element type
+     */
+    public interface ElementProvider<T> {
+
+        /**
+         *  provide the element
+         * @param wIndex the row index
+         * @param hIndex the column index
+         * @param param the extra param
+         * @return the element
+         */
+        T provide(int wIndex, int hIndex, Object param);
+
+        /**
+         * create element provider from matrix
+         *
+         * @param mat the matrix
+         * @param <T> the element type
+         * @return the element provider
+         */
+        static <T> Matrix2.ElementProvider<T> ofMatrix(Matrix2<T> mat) {
+            return new Matrix2.ElementProvider<T>() {
+                @Override
+                public T provide(int wIndex, int hIndex, Object param) {
+                    return mat.getRawValues().get(wIndex).get(hIndex);
+                }
+            };
+        }
+        static Matrix2.ElementProvider<Integer> ofIntArrayArray(int[][] mat){
+            return new ElementProvider<Integer>() {
+                @Override
+                public Integer provide(int wIndex, int hIndex, Object param) {
+                    return mat[wIndex][hIndex];
+                }
+            };
+        }
+        static Matrix2.ElementProvider<Float> ofFloatArrayArray(float[][] mat){
+            return new ElementProvider<Float>() {
+                @Override
+                public Float provide(int wIndex, int hIndex, Object param) {
+                    return mat[wIndex][hIndex];
+                }
+            };
+        }
+        static Matrix2.ElementProvider<Double> ofDoubleArrayArray(double[][] mat){
+            return new ElementProvider<Double>() {
+                @Override
+                public Double provide(int wIndex, int hIndex, Object param) {
+                    return mat[wIndex][hIndex];
+                }
+            };
+        }
+    }
 }

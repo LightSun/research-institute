@@ -12,7 +12,7 @@ public class FloatConvolution extends Convolution<Float> {
     }
 
     @Override
-    protected Matrix2Utils.ElementProvider<Float> getElementProvider() {
+    protected Matrix2.ElementProvider<Float> getElementProvider() {
         return FLOAT_0_PROVIDER;
     }
 

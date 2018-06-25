@@ -12,7 +12,7 @@ public class DoubleConvolution extends Convolution<Double> {
     }
 
     @Override
-    protected Matrix2Utils.ElementProvider<Double> getElementProvider() {
+    protected Matrix2.ElementProvider<Double> getElementProvider() {
         return DOUBLE_0_PROVIDER;
     }
 
