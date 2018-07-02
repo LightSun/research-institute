@@ -34,12 +34,14 @@
         <activity android:name=".sample.TestZoomDrawableActivity"/>
         <activity android:name=".sample.TestDiscViewActivity"/>
         <activity android:name=".sample.TestBaiduFaceActivity"/>
+        <activity android:name=".sample.TestBaiduFace2Activity"/>
 
         <activity android:name=".sample.NativeSurfaceActivity"/>
         <activity android:name=".sample.TestRectProgresActivity"/>
         <activity android:name=".sample.TestShadowShapeActivity"/>
         <activity android:name=".sample.TestV7_CircleImageViewActivity"/>
         <activity android:name=".sample.BalanceViewTest"/>
+
     </application>
 
 </manifest>

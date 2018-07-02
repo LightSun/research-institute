@@ -37,6 +37,8 @@ public class FaceRequest {
     private static final String TAG = "FaceRequest";
     private static final String URL2 = "https://aip.baidubce.com/rest/2.0/face/v2/detect";
     private static final String URL3 = "https://aip.baidubce.com/rest/2.0/face/v3/detect";
+     //主体内容识别
+    private static final String URL_MAIN_CLASSIFY = "https://aip.baidubce.com/rest/2.0/image-classify/v1/object_detect";
     private static final String FACE_FIELDS = "age,beauty,expression,faceshape,gender,glasses,landmark,race,qualities";
     private ExecutorService mService = Executors.newCachedThreadPool();
     private String imageUrl;
@@ -120,6 +122,32 @@ public class FaceRequest {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    public void startMainClassify(Context context, final @DrawableRes int imageId ,
+                                  final AbstractRetrofitCallback<MainClassifyBean> callback){
+        if (mService == null) {
+            mService = Executors.newCachedThreadPool();
+        }
+        final Context appContext = context.getApplicationContext();
+        mService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = BitmapFactory.decodeResource(appContext.getResources(), imageId);
+                final String imgStr = Base64Util.encode(DrawableUtils2.bitmap2Bytes(bitmap));
+                final String url = URL_MAIN_CLASSIFY + "?access_token=" + AuthService.getClassifyToken();
+
+                RetrofitCaller<IBaiduFaceService, MainClassifyBean> caller = RetrofitCaller.create(IBaiduFaceService.class);
+                caller.callFactory(new RetrofitCaller.CallFactory<IBaiduFaceService, MainClassifyBean>() {
+                    @Override
+                    public Call<Result<MainClassifyBean>> create(Class<IBaiduFaceService> clazz, String baseUrl) {
+
+                        return RetrofitHelper.build(VidaTestApplication.URL_FACE, clazz)
+                                .getMainClassifyResult(url, imgStr, 1);
+                    }
+                }).callback(callback).call();
             }
         });
     }

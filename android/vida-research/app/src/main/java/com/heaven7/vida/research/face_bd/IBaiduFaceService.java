@@ -30,6 +30,14 @@ public interface IBaiduFaceService {
                                                   @Field("max_face_num") int max_face_num,   //option
                                                   @Field("face_fields") String face_fields); //option
 
+    @POST
+    @FormUrlEncoded
+    Call<Result<MainClassifyBean>> getMainClassifyResult(@Url String url,
+                                                  @Field("image")String base64Image,
+                                                  @Field("with_face")int with_face);
+
+
+
 }
 /*
  * image	是	string	base64编码后的图片数据，需urlencode，编码后的图片大小不超过2M
