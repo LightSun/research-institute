@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.vida.research.R;
+import com.heaven7.vida.research.face_bd.BodyAttrData;
+import com.heaven7.vida.research.face_bd.BodyData;
 import com.heaven7.vida.research.face_bd.FaceRequest;
 import com.heaven7.vida.research.face_bd.MainClassifyBean;
 import com.heaven7.vida.research.retrofit.AbstractRetrofitCallback;
@@ -25,8 +27,9 @@ public class TestBaiduFace2Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_test_face_bd);
 
-        startRequest(R.drawable.zhaoliyin);
+       // startRequest(R.drawable.zhaoliyin);
       //  startRequest(R.drawable.zhaoliyin2);
+        startRequestBody(R.drawable.test_body2);
     }
 
     //(width, cx, cy, angle) = (366, 370, 472, 0 )
@@ -34,7 +37,21 @@ public class TestBaiduFace2Activity extends AppCompatActivity {
         faceRequest.startMainClassify(this, resid, new AbstractRetrofitCallback<MainClassifyBean>() {
             @Override
             public void onSuccess(MainClassifyBean result) {
-                 Logger.i(TAG, "onSuccess", "" + result.toString());
+                 Logger.i(TAG, "startMainClassify", "" + result.toString());
+            }
+        });
+    }
+    private void startRequestBody(int resid) {
+        faceRequest.getBodyAnalyse(this, resid, new AbstractRetrofitCallback<BodyData>() {
+            @Override
+            public void onSuccess(BodyData result) {
+                Logger.i(TAG, "getBodyAnalyse", "" + result.toString());
+            }
+        });
+        faceRequest.getBodyAttr(this, resid, new AbstractRetrofitCallback<BodyAttrData>() {
+            @Override
+            public void onSuccess(BodyAttrData result) {
+                Logger.i(TAG, "getBodyAttr", "" + result.toString());
             }
         });
     }

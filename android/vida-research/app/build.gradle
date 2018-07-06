@@ -16,6 +16,10 @@ android {
                // abiFilters 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips', 'mips64'
             }
         }
+        ndk{
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86' // <- only the supported ones
+            stl "gnustl_shared" // fix build pro like : https://stackoverflow.com/questions/38274943/android-ndk-linker-errorerror-undefined-reference-to-stdbasic-string
+        }
 
         renderscriptTargetApi 20
         renderscriptSupportModeEnabled true
@@ -31,6 +35,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    packagingOptions{
+        doNotStrip '*/mips/*.so'
     }
 }
 

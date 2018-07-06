@@ -35,6 +35,10 @@ public class AuthService {
     public static String getClassifyToken(){
         return getAuth("Ks7VUh4QkswyPUkiDOvf6LxT", "k2zETjGkdW6WvGVUfO4Axr955YWqk2o4");
     }
+    //杰哥的账号创建的app
+    public static String getClassifyToken2(){
+        return getAuth("rv0aOwbmlytBTc2qe1dVwa0L", "G1S8r0e5exx2LL8kCXRkPi7v9GKjXkCR");
+    }
 
     /**
      * 获取API访问token

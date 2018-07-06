@@ -13,7 +13,7 @@ import retrofit2.http.Url;
 /**
  * Created by heaven7 on 2018/4/27 0027.
  */
-
+//all image min width or height >= 50px, max width or height <= 4090px
 public interface IBaiduFaceService {
 
 
@@ -31,12 +31,35 @@ public interface IBaiduFaceService {
                                                   @Field("face_fields") String face_fields); //option
 
     @POST
-    @FormUrlEncoded
+    @FormUrlEncoded //主体内容识别
     Call<Result<MainClassifyBean>> getMainClassifyResult(@Url String url,
                                                   @Field("image")String base64Image,
                                                   @Field("with_face")int with_face);
 
+    @POST
+    @FormUrlEncoded //人体关键点
+    Call<Result<BodyData>> getBodyAnalyse(@Url String url, @Field("image")String base64Image);
 
+    /**
+     * 可选参数 type
+     * ender,
+     age,
+     lower_wear,
+     upper_wear,
+     headwear,
+     glasses,
+     upper_color,
+     lower_color,
+     cellphone,
+     upper_wear_fg,
+     upper_wear_texture,
+     lower_wear_texture,
+     orientation,
+     umbrella
+     */
+    @POST
+    @FormUrlEncoded //人体关键点
+    Call<Result<BodyAttrData>> getBodyAttr(@Url String url, @Field("image")String base64Image);
 
 }
 /*
