@@ -110,8 +110,10 @@ _ = linear_regressor.train(
 prediction_input_fn = lambda :my_input_fn(my_feature, targets, num_epochs=1, shuffle=False)
 
 predictions = linear_regressor.predict(input_fn=prediction_input_fn)
+print("predictions 1", type(predictions))
 
 predictions = np.array([item["predictions"][0] for item in predictions])
+print("predictions 2", type(predictions))
 # 均方误差(MSE),
 mean_squared_error = metrics.mean_squared_error(predictions, targets)
 # 均方根误差 (RMSE)

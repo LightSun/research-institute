@@ -29,7 +29,7 @@ import os
 import sys
 
 import cv2
-import feature_extractor
+from src.libs import feature_extractor
 import numpy
 import tensorflow as tf
 from tensorflow import app
@@ -140,6 +140,7 @@ def main(unused_argv):
   total_written = 0
   total_error = 0
   print("$$$$$ %s" % (FLAGS.input_videos_csv))
+  # input_videos_csv  = os.path.abspath(".") + "/tmp/" + str(i) + ".MP4"
   for video_file, labels in csv.reader(open(FLAGS.input_videos_csv)):
     rgb_features = []
     for rgb in frame_iterator(

@@ -1,0 +1,8 @@
+
+python2 vs python3
+
+1, urlencode 不同
+2, print 不同
+3, p3 : os.getenv('HOME') 这个是None(p2没有None)
+   p2 是字符串
+
