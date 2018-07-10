@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 @EnableConfigurationProperties({
         SystemProperties.class
 })
+//@EnableAutoConfiguration(exclude = { JacksonAutoConfiguration.class }) //如果你用了gson 可以在classpath排除jackson
 public class FundaApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(FundaApplication.class);
@@ -39,12 +40,12 @@ public class FundaApplication {
     }
 
     //过滤器
-    @Bean
+   /* @Bean
     public FilterRegistrationBean jwtFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         registrationBean.setFilter(new JwtFilter());
         registrationBean.addUrlPatterns("/api/*");
         return registrationBean;
-    }
+    }*/
 
 }

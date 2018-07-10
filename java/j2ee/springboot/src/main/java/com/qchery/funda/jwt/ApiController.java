@@ -14,8 +14,8 @@ import java.util.List;
 @RequestMapping("/api")
 public class ApiController {
 
-    @SuppressWarnings("unchecked")
-    @RequestMapping(value = "role/{role}", method = RequestMethod.GET)
+    /*@SuppressWarnings("unchecked")
+    @RequestMapping(value = "role/{role}", method = RequestMethod.GET)*/
     public Boolean login(@PathVariable final String role, final HttpServletRequest request)
             throws ServletException {
         //JwtFilter 过滤

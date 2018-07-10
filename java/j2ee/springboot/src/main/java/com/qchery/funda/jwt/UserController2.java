@@ -12,7 +12,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class UserController2 {
 
     //这里模拟数据库
     private final Map<String, List<String>> userDb = new HashMap<>();
@@ -23,14 +23,14 @@ public class UserController {
         public String password;
     }
 
-    public UserController() {
+    public UserController2() {
         userDb.put("tom", Arrays.asList("user"));
         userDb.put("wen", Arrays.asList("user", "admin"));
     }
     /*以上是模拟数据库，并往数据库插入tom和sally两条记录*/
 
 
-    @RequestMapping(value = "login", method = RequestMethod.POST)
+    @RequestMapping(value = "login3", method = RequestMethod.POST)
     public LoginResponse login(@RequestBody final UserLogin login)
         throws ServletException {
         if (login.name == null || !userDb.containsKey(login.name)) {
