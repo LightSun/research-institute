@@ -44,3 +44,22 @@ security:
     name: root
     password: pkjjun123.
 
+
+# config application property
+app:
+  cache:
+    ttl: 1000
+    max-entries: 1000
+  cors:
+    allowed-origins:
+      - "*"
+    allowed-methods:
+      - "GET"
+      - "PUT"
+      - "POST"
+      - "DELETE"
+      - "OPTIONS"
+    allowed-headers:
+      - "*"
+    allow-credentials: true
+    max-age: 3600

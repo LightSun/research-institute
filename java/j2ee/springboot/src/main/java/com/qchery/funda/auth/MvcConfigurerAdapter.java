@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
- * spring Mvc Configurer Adapter扩展
+ * 通过自定义注解，简化 HandlerInterceptor
  *
  * @author sdcuike
  *     <p>Created on 2017.02.13
