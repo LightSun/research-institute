@@ -2,8 +2,15 @@ from PIL import Image
 import face_recognition
 
 # Load the jpg file into a numpy array
-file = "E:\\test\\lfw\\lfw\\Abdul_Majeed_Shobokshi\\Abdul_Majeed_Shobokshi_0001.jpg"
+# file = "E:\\test\\lfw\\lfw\\Abdul_Majeed_Shobokshi\\Abdul_Majeed_Shobokshi_0001.jpg"
+# file = "E:\\test\\lfw\\lfw\\Abdel_Nasser_Assidi\\Abdel_Nasser_Assidi_0001.jpg"
+# file = "E:\\test\\lfw\\lfw\\Abdel_Aziz_Al-Hakim\\Abdel_Aziz_Al-Hakim_0001.jpg"
+file = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\黑色满襟衫\\1-11.jpg"
 image = face_recognition.load_image_file(file)
+
+print("shape: ", image.shape)
+print("shape: ", image.shape[0]) # height
+print("shape: ", image.shape[1]) # width
 
 # Find all the faces in the image using the default HOG-based model.
 # This method is fairly accurate, but not as accurate as the CNN model and not GPU accelerated.
