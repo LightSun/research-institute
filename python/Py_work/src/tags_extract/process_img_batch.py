@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
-import os,sys
+import os, sys
 
 import ntpath
 import cv2
 import feature_extractor
 import numpy
 import tensorflow as tf
+import time
 from tensorflow import app
 from tensorflow import flags
 from urllib.parse import quote
@@ -18,6 +19,7 @@ FLAGS = flags.FLAGS
 # In OpenCV3.X, this is available as cv2.CAP_PROP_POS_MSEC
 # In OpenCV2.X, this is available as cv2.cv.CV_CAP_PROP_POS_MSEC
 CAP_PROP_POS_MSEC = 0
+IMG_FORMATS = ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG']
 
 if __name__ == '__main__':
     # Required flags for input and output.
@@ -51,6 +53,7 @@ if __name__ == '__main__':
                          'zero vectors. This allows you to use YouTube-8M '
                          'pre-trained model.')
 
+
 def _int64_list_feature(int64_list):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=int64_list))
 
@@ -77,32 +80,26 @@ def quantize(features, min_quantized_value=-2.0, max_quantized_value=2.0):
 
     return _make_bytes(features)
 
+
 def path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 
-## 读取图像，解决imread不能读取中文路径的问题
+
+## 读取图像，解决imread不能读取中文路径的问题. 效率要低点
 def cv_imread(file_path):
     return cv2.imdecode(numpy.fromfile(file_path, dtype=numpy.uint8), -1)
 
-def process_img(filename):
-    print(filename)
-    # print(filename.encode("utf-8"))
 
-    prefix = path_leaf(filename).split(".")[0] # prefix is simple filename
-    output = "%s_output.tfrecord" % prefix
-    extractor = feature_extractor.YouTube8MFeatureExtractor(FLAGS.model_dir)
-    writer = tf.python_io.TFRecordWriter(output)
-    # print("$$$$$ %s" % (FLAGS.input_videos_csv))
+def writeTfrecord(filename, extractor, writer):
     labels = "0"
-
     rgb_features = []
     # rgb = cv2.imread(filename, cv2.IMREAD_COLOR)
     rgb = cv_imread(filename)
     features = extractor.extract_rgb_frame_features(rgb[:, :, ::-1])
     rgb_features.append(_bytes_feature(quantize(features)))
     if not rgb_features:
-        print( 'Could not get features for ' + video_file, file=sys.stderr)
+        print('Could not get features for ' + filename, file=sys.stderr)
         return
         # Create SequenceExample proto and write to output.
     feature_list = {
@@ -118,22 +115,74 @@ def process_img(filename):
             FLAGS.labels_feature_key:
                 _int64_list_feature(sorted(map(int, labels.split(';')))),
             FLAGS.video_file_key_feature_key:
-                _bytes_feature(_make_bytes(map(ord, quote(filename)))), # filename should not have chinese, or else causeproblem
+                _bytes_feature(_make_bytes(map(ord, quote(filename)))),
+            # filename should not have chinese, or else causeproblem
         }),
         feature_lists=tf.train.FeatureLists(feature_list=feature_list))
     writer.write(example.SerializeToString())
+
+
+def process_img(filename, output):
+    print(filename)
+
+    # prefix = path_leaf(filename).split(".")[0]  # prefix is simple filename
+    # output = "%s/%s_output.tfrecord" % (dir, prefix)
+    extractor = feature_extractor.YouTube8MFeatureExtractor(FLAGS.model_dir)
+    writer = tf.python_io.TFRecordWriter(output)
+
+    writeTfrecord(filename, extractor, writer)
     writer.close()
     print('Successfully encoded path = %s ' % filename)
 
+
+def printError(msg):
+    print(msg, file=sys.stderr)
+
+
+def getTimeInMills():
+    return int(round(time.time() * 1000))
+
+
 # MAIN
-if len(sys.argv) < 2:
-    print("Error!")
-video_file = sys.argv[1].strip()
-if os.path.isdir(video_file):
-    for file in os.listdir(video_file):
-        file_path = os.path.join(video_file, file)
-        if file_path.startswith("."):
-            continue
-        process_img(file_path)
+if len(sys.argv) < 3:
+    printError(" Error! argument is not enough.")
 else:
-    process_img(video_file)
+    img_file = sys.argv[1].strip()
+    dir = sys.argv[2].strip()  # for single file, this is absolute filename
+
+    if os.path.isdir(img_file):
+        extractor = feature_extractor.YouTube8MFeatureExtractor(FLAGS.model_dir)
+        # tfs_time_outputs.tfrecord
+        tfs_path = 'tfs_%s_outputs.tfrecord' % str(getTimeInMills())
+        tfs_full_path = '%s\%s' % (dir, tfs_path)
+        # tfs_config.txt
+        tfsConfigWriter = open('%s%stfs_config.txt' % (dir, '\\'), "at")
+
+        tfWriter = tf.python_io.TFRecordWriter(tfs_full_path)
+        first = True
+        for file in os.listdir(img_file):
+            file_path = os.path.join(img_file, file)
+            if file_path.startswith("."):
+                continue
+            if not os.path.isfile(file_path):
+                continue
+            extension = os.path.splitext(file_path)[1]  # get the extension of file
+            if extension not in IMG_FORMATS:
+                continue
+
+            # write tfrecord
+            writeTfrecord(file_path, extractor, tfWriter)
+            # write to congig
+            if first:
+                tfsConfigWriter.write(tfs_full_path)
+                tfsConfigWriter.write(",")
+                tfsConfigWriter.write(file_path)
+                first = False
+            else:
+                tfsConfigWriter.write(" " + file_path)
+
+        tfsConfigWriter.write("\n")
+        tfsConfigWriter.close()
+        tfWriter.close()
+    else:
+        process_img(img_file, dir)

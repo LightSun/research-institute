@@ -8,6 +8,7 @@ import os
 
 CAP_PROP_POS_MSEC = 0
 
+
 def frame_iterator(filename, every_ms=1000):
     """Uses OpenCV to iterate over all frames of filename at a given frequency.
 
@@ -44,7 +45,7 @@ def frame_iterator(filename, every_ms=1000):
 
 
 def getFace(videofile, tagfile, model='hog'):
-    print("tagfile: ",tagfile)
+    # print("tagfile: ", tagfile)
     fileWriter = open(tagfile, "wt")
     for num_retrieved, rgb in frame_iterator(videofile, every_ms=1000):
         print("num_retrieved: ", num_retrieved)
@@ -52,29 +53,37 @@ def getFace(videofile, tagfile, model='hog'):
         height = rgb.shape[0]
         width = rgb.shape[1]
         fileWriter.write(str(num_retrieved))
-        if(face_locations):
+        if (face_locations):
             fileWriter.write(",")
+            first = True
             for face_location in face_locations:
                 # Print the location of each face in this image
                 top, right, bottom, left = face_location
                 # x ,y, width, height
-
-                tem = '%s %s %s %s' % ('%.16f' % (float(left)/width),
+                tem = '%s %s %s %s' % ('%.16f' % (float(left) / width),
                                        '%.16f' % (float(bottom) / height),
-                                       '%.16f' % (right - left), '%.16f' % (bottom - top))
-                fileWriter.write(tem)
+                                       '%.16f' % (float(right - left) / width),
+                                       '%.16f' % (float(bottom - top) / height))
+                if first:
+                   fileWriter.write(tem)
+                   first = False
+                else:
+                    fileWriter.write(" " + tem)
+
         fileWriter.write("\n")
     fileWriter.close()
+
 
 def printError(msg):
     print(msg, file=sys.stderr)
 
+
 #################################################
-if len(sys.argv) < 3:
-    printError("Error!")
+if len(sys.argv) < 2:
+    printError("argument is not enough Error!")
 else:
     video_file = sys.argv[1].strip()
-    if( len(sys.argv) >= 3 ):
+    if (len(sys.argv) >= 3):
         outTagfile = sys.argv[2].strip()
     else:
         outTagfile = ""
@@ -87,4 +96,6 @@ else:
             tmp = os.path.splitext(file_path)[0]
             getFace(file_path, tmp + ".csv")
     else:
+        if len(sys.argv) < 3:
+             printError("for single file , need a out path, Error!")
         getFace(video_file, outTagfile)
