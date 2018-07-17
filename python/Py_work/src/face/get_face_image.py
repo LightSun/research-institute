@@ -44,7 +44,6 @@ def getTimeInMills():
 
 def printError(msg):
     print(msg, file=sys.stderr)
-
 #################################################
 if len(sys.argv) < 3:
     printError(" Error! argument is not enough.")

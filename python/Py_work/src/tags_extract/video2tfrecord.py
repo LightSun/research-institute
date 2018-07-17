@@ -18,7 +18,7 @@ FLAGS = flags.FLAGS
 # In OpenCV3.X, this is available as cv2.CAP_PROP_POS_MSEC
 # In OpenCV2.X, this is available as cv2.cv.CV_CAP_PROP_POS_MSEC
 CAP_PROP_POS_MSEC = 0
-VIDEO_FORMAT = ['mp4', 'MP4']
+VIDEO_FORMAT = ['.mp4', '.MP4']
 
 if __name__ == '__main__':
     # Required flags for input and output.
@@ -140,14 +140,11 @@ def process(videofile, tfrecordDir=''):
 
 
 #################################################
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
     printError("Error!")
 else:
     video_file = sys.argv[1].strip()
-    if (len(sys.argv) >= 4):
-        out_dir = sys.argv[2].strip()
-    else:
-        out_dir = ""
+    out_dir = sys.argv[2].strip()
 
     if os.path.isdir(video_file):
         for file in os.listdir(video_file):
