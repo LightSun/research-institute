@@ -1,4 +1,3 @@
-
 """
 在实践中，如果视频不切割成每秒的小视频。 得到的tag。无法切割镜头。也就是说只能1个镜头
 """
@@ -19,6 +18,7 @@ FLAGS = flags.FLAGS
 # In OpenCV3.X, this is available as cv2.CAP_PROP_POS_MSEC
 # In OpenCV2.X, this is available as cv2.cv.CV_CAP_PROP_POS_MSEC
 CAP_PROP_POS_MSEC = 0
+VIDEO_FORMAT = ['mp4', 'MP4']
 
 if __name__ == '__main__':
     # Required flags for input and output.
@@ -52,6 +52,7 @@ if __name__ == '__main__':
                          'zero vectors. This allows you to use YouTube-8M '
                          'pre-trained model.')
 
+
 def _int64_list_feature(int64_list):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=int64_list))
 
@@ -66,6 +67,7 @@ def _make_bytes(int_array):
     else:
         return bytes(int_array)
 
+
 def quantize(features, min_quantized_value=-2.0, max_quantized_value=2.0):
     """Quantizes float32 `features` into string."""
     assert features.dtype == 'float32'
@@ -76,12 +78,15 @@ def quantize(features, min_quantized_value=-2.0, max_quantized_value=2.0):
     features = [int(round(f)) for f in features]
 
     return _make_bytes(features)
+
+
 def printError(msg):
     print(msg, file=sys.stderr)
 
+
 def process(videofile, tfrecordDir=''):
     file_arr = os.path.splitext(videofile)
-    if(tfrecordDir): # valid
+    if (tfrecordDir):  # valid
         filename = os.path.basename(videofile).split(".")[0]
         output_tfrecords_file = "%s_output.tfrecord" % (tfrecordDir + '/' + str(filename))
     else:
@@ -97,7 +102,7 @@ def process(videofile, tfrecordDir=''):
     labels = "0"
     vh = cv_video_helper.VideoHelper()
 
-    for num_retrieved, rgb in vh.frame_iterator(videofile, every_ms=1000.0/FLAGS.frames_per_second):
+    for num_retrieved, rgb in vh.frame_iterator(videofile, every_ms=1000.0 / FLAGS.frames_per_second):
         rgb_features = []
         features = extractor.extract_rgb_frame_features(rgb[:, :, ::-1])
         rgb_features.append(_bytes_feature(quantize(features)))
@@ -115,7 +120,7 @@ def process(videofile, tfrecordDir=''):
                 feature=[_bytes_feature(_make_bytes([0] * 128))] * len(rgb_features))
 
         # print(feature_list)
-        #E:/work/ai_script/tmp.MP4 -> E:/work/ai_script/tmp/%d.MP4
+        # E:/work/ai_script/tmp.MP4 -> E:/work/ai_script/tmp/%d.MP4
         # url encode
         virtualPath = quote(file_arr[0]) + '/' + str(num_retrieved) + file_arr[1]
         print("virtualPath = ", virtualPath)
@@ -131,14 +136,15 @@ def process(videofile, tfrecordDir=''):
         total_written += 1
 
     writer.close()
-    print('Successfully encoded %i out of %i videos' % ( total_written, total_written + total_error))
+    print('Successfully encoded %i out of %i videos' % (total_written, total_written + total_error))
+
 
 #################################################
 if len(sys.argv) < 2:
     printError("Error!")
 else:
     video_file = sys.argv[1].strip()
-    if( len(sys.argv) >= 4 ):
+    if (len(sys.argv) >= 4):
         out_dir = sys.argv[2].strip()
     else:
         out_dir = ""
@@ -147,6 +153,11 @@ else:
         for file in os.listdir(video_file):
             file_path = os.path.join(video_file, file)
             if file_path.startswith("."):
+                continue
+            if not os.path.isfile(file_path):
+                continue
+            extension = os.path.splitext(file_path)[1]  # get the extension of file
+            if extension not in VIDEO_FORMAT:
                 continue
             process(file_path, out_dir)
     else:

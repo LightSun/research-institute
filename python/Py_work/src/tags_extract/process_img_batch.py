@@ -156,7 +156,7 @@ else:
         tfs_path = 'tfs_%s_outputs.tfrecord' % str(getTimeInMills())
         tfs_full_path = '%s\%s' % (dir, tfs_path)
         # tfs_config.txt
-        tfsConfigWriter = open('%s%stfs_config.txt' % (dir, '\\'), "at")
+        tfsConfigWriter = open('%s%stfs_config.txt' % (dir, '\\'), "at")  # append
 
         tfWriter = tf.python_io.TFRecordWriter(tfs_full_path)
         first = True
