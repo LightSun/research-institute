@@ -5,13 +5,14 @@
 import os
 import sys
 
-import cv2
 import numpy
 import tensorflow as tf
-from src.libs import feature_extractor
 from tensorflow import app
 from tensorflow import flags
 from urllib.parse import quote
+
+import cv_video_helper
+import feature_extractor
 
 FLAGS = flags.FLAGS
 
@@ -50,40 +51,6 @@ if __name__ == '__main__':
                          'If set, inserts features with name "audio" to be 128-D '
                          'zero vectors. This allows you to use YouTube-8M '
                          'pre-trained model.')
-
-def frame_iterator(filename, every_ms=1000):
-    """Uses OpenCV to iterate over all frames of filename at a given frequency.
-
-    Args:
-      filename: Path to video file (e.g. mp4)
-      every_ms: The duration (in milliseconds) to skip between frames.
-    # max_num_frames: Maximum number of frames to process, taken from the
-        beginning of the video.
-
-    Yields:
-      RGB frame with shape (image height, image width, channels)
-    """
-    print("every_ms: ", every_ms)
-    video_capture = cv2.VideoCapture()
-    if not video_capture.open(filename):
-        print('Error: Cannot open video file ' + filename, file=sys.stderr)
-        return
-    last_ts = -99999  # The timestamp of last retrieved frame.
-    num_retrieved = 0
-
-    while True:
-        # Skip frames
-        while video_capture.get(CAP_PROP_POS_MSEC) < every_ms + last_ts:
-            if not video_capture.read()[0]:
-                return
-
-        last_ts = video_capture.get(CAP_PROP_POS_MSEC)
-        has_frames, frame = video_capture.read()
-        if not has_frames:
-            break
-        # cv2.imwrite('image_'+ str(num_retrieved) + '.jpg',frame)
-        yield num_retrieved, frame
-        num_retrieved += 1
 
 def _int64_list_feature(int64_list):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=int64_list))
@@ -128,8 +95,9 @@ def process(videofile, tfrecordDir=''):
     total_written = 0
     total_error = 0
     labels = "0"
+    vh = cv_video_helper.VideoHelper()
 
-    for num_retrieved, rgb in frame_iterator(videofile, every_ms=1000.0/FLAGS.frames_per_second):
+    for num_retrieved, rgb in vh.frame_iterator(videofile, every_ms=1000.0/FLAGS.frames_per_second):
         rgb_features = []
         features = extractor.extract_rgb_frame_features(rgb[:, :, ::-1])
         rgb_features.append(_bytes_feature(quantize(features)))
