@@ -53,6 +53,8 @@ else:
     outTagfile = sys.argv[2].strip() # if for dir, this is out dir
     # F:\videos\story1\churchOut\character_C0200.mp4 F:\\videos\\story1\\churchOut\\test.csv
     if os.path.isdir(video_file):
+        if not os.path.exists(outTagfile):
+            os.makedirs(outTagfile)
         # dir , dir
         for file in os.listdir(video_file):
             file_path = os.path.join(video_file, file)

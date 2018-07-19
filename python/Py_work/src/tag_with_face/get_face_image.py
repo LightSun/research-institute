@@ -51,7 +51,10 @@ if len(sys.argv) < 3:
 else:
     img_file = sys.argv[1].strip()
     outTagfile = sys.argv[2].strip()  # if img_file is dir . this is dir
+    
     if os.path.isdir(img_file):
+        if not os.path.exists(outTagfile):
+            os.makedirs(outTagfile)
         # face_time.csv
         csv_name = 'face_%s_rects.csv' % str(getTimeInMills())
         csvPath = '%s\%s' % (outTagfile, csv_name)

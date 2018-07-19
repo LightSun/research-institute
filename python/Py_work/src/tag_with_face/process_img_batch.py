@@ -151,6 +151,9 @@ else:
     dir = sys.argv[2].strip()  # for single file, this is absolute filename
 
     if os.path.isdir(img_file):
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+
         extractor = feature_extractor.YouTube8MFeatureExtractor(FLAGS.model_dir)
         # tfs_time_outputs.tfrecord
         tfs_path = 'tfs_%s_outputs.tfrecord' % str(getTimeInMills())

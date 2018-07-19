@@ -85,6 +85,8 @@ def printError(msg):
 
 
 def process(videofile, tfrecordDir=''):
+    if not os.path.exists(tfrecordDir):
+        os.makedirs(tfrecordDir)
     file_arr = os.path.splitext(videofile)
     if (tfrecordDir):  # valid
         filename = os.path.basename(videofile).split(".")[0]
