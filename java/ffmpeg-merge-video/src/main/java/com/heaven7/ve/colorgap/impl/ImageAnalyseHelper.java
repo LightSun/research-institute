@@ -93,6 +93,25 @@ import java.util.concurrent.atomic.AtomicInteger;
             });
         }
 
+        /**1, 生成时： 分组，生成tag和face.
+         * 2. 加载时, 预先加载 tfs_config.txt, 读取对应的文件路径
+         *                     face_config.txt
+         */
+        public void startScanByDir() {
+            VisitServices.from(mMediaItems).groupService(new ResultVisitor<MediaItem, String>() {
+                @Override
+                public String visit(MediaItem mediaItem, Object param) {
+                    return FileUtils.getFileDir(mediaItem.item.getFilePath(), 1, true);
+                }
+            }).fire(new MapFireVisitor<String, List<MediaItem>>() {
+                @Override
+                public Boolean visit(KeyValuePair<String, List<MediaItem>> pair, Object param) {
+
+                    return null;
+                }
+            });
+        }
+
         private void doWidthRects(Group group, boolean singleRect) {
             if (rectsScanner != null) {
                 //filename prefix

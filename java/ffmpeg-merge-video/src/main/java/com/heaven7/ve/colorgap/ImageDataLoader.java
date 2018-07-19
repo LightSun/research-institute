@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap;
 
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.utils.TextReadHelper;
 import com.heaven7.utils.TextUtils;

@@ -1,9 +1,28 @@
 package com.heaven7.utils;
 
-import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
 public class CommonUtils {
+
+    public static String urlEncode(String  str){
+        try {
+            return URLEncoder.encode(str, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return str;
+        }
+    }
+    public static String urlDecode(String  str){
+        try {
+            return URLDecoder.decode(str, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return str;
+        }
+    }
 
     public static boolean strEquals(String str1, String str2){
         if(str1 == null){

@@ -90,7 +90,7 @@ public class CmdHelper {
         }
         @Override
         public void onEnd(CmdHelper helper) {
-
+            System.out.println(sb.toString());
         }
         @Override
         public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
