@@ -7,3 +7,4 @@ CREATE TABLE sys_user (
   nick_name VARCHAR(20) COMMENT '昵称',
   PRIMARY KEY (id)
 ) COMMENT '用户表';
+

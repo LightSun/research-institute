@@ -1,6 +1,5 @@
 package com.qchery.funda;
 
-import com.qchery.funda.jwt.JwtFilter;
 import com.qchery.funda.props.ApplicationProperties;
 import com.qchery.funda.props.SystemProperties;
 import org.slf4j.Logger;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PostConstruct;
 
