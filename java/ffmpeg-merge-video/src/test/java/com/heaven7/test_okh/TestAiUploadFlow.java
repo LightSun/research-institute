@@ -6,6 +6,7 @@ import okhttp3.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.heaven7.test_okh.OkHttpHelper.getMimeType;
@@ -20,9 +21,15 @@ public class TestAiUploadFlow {
 
     private static void testUpload() {
         String url = "http://192.168.3.142:12563/media/upload";
-        List<String> filenames = new ArrayList<>();
-        filenames.add("E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\浅蓝围巾领开衫\\1-10.jpg");
-        OkHttpHelper.post(url, getRequestBody(filenames), new Callback() {
+        String[] medias = {
+               // "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\浅蓝围巾领开衫\\1-10.jpg",
+                "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141100.mp4",
+                "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141029.mp4",
+                "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140824.mp4",
+                "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140749.mp4",
+                //"E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140458.mp4",
+        };
+        OkHttpHelper.post(url, getRequestBody(Arrays.asList(medias)), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Logger.w(TAG, "testUpload", Logger.toString(e));
@@ -31,13 +38,12 @@ public class TestAiUploadFlow {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 Logger.i(TAG, "testUpload", body != null ? body.string() : "Null");
+                response.close();
             }
         });
-        try {
-            Thread.currentThread().join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        /**
+         https://oauth.jd.com/oauth/authorize?response_type=code&client_id=446F683F1B27A0468779367E33D7CF43&redirect_uri=http://192.168.3.142&state=1
+         */
     }
     private static RequestBody getRequestBody(List<String> fileNames) {
         MultipartBody.Builder builder = new MultipartBody.Builder();

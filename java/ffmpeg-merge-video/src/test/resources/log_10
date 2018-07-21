@@ -1,0 +1,33 @@
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_141029.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_141029.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:31 ,costTime = 29356ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140341.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140341.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:32 ,costTime = 30124ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140258.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140258.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:34 ,costTime = 32459ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140059.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140059.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:34 ,costTime = 32859ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_141041.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_141041.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:37 ,costTime = 35031ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140007.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140007.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:39 ,costTime = 37254ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140031.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140031.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:39 ,costTime = 37927ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_141256.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_141256.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:43 ,costTime = 41092ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_141100.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_141100.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:44 ,costTime = 42419ms
+cmd /c start /wait python cmd_proxy.py python+video2tfrecord.py+%s+%s -input=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140122.mp4 -output=E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子  ,exitValue = 0
+
+time : E:\BaiduNetdiskDownload\taobao_service\东森（服装）\女装南泉外拍第二次视频2\扎染褙子\VID_20180507_140122.mp4 >>> startTime = 2018-07-20 20:07:02 ,endTime = 2018-07-20 20:07:44 ,costTime = 42816ms
+
+
+#最多 42 , 37
