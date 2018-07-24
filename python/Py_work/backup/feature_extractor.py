@@ -149,10 +149,6 @@ class YouTube8MFeatureExtractor(object):
         self._inception_graph = tf.Graph()
         with self._inception_graph.as_default():
             _ = tf.import_graph_def(graph_def, name='')
-            # config = tf.ConfigProto(allow_soft_placement=True)
-            # config.gpu_options.allow_growth = True
-            # config.gpu_options.per_process_gpu_memory_fraction = 0.7
-            # self.session = tf.Session(config=config)
             self.session = tf.Session()
 
     def _load_pca(self):
@@ -163,3 +159,5 @@ class YouTube8MFeatureExtractor(object):
         self.pca_eigenvecs = numpy.load(
             os.path.join(self._model_dir, 'eigenvecs.npy')).T[:, :1024]
 
+
+default_extractor = YouTube8MFeatureExtractor()

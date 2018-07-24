@@ -48,6 +48,7 @@ class VideoHelper(object):
         if not video_capture.open(filename):
             print('Error: Cannot open video file ' + filename, file=sys.stderr)
             return
+        total = self.getFrameCount(video_capture)
         step = self.getFrameStep(every_ms, video_capture)
         frame_pos = 0
         num_retrieved = 0
@@ -60,5 +61,7 @@ class VideoHelper(object):
             # cv2.imwrite('image_'+ str(num_retrieved) + '.jpg',frame)
             yield num_retrieved, frame
             frame_pos += step
+            if frame_pos > total:
+                break
             num_retrieved += 1
         video_capture.release()

@@ -1,6 +1,6 @@
 import ntpath
 import sys
-import tensorflow
+import tensorflow as tf
 import csv
 import os
 import urllib
@@ -47,3 +47,8 @@ else:
         fps = video_capture.get(cv2.CAP_PROP_FPS)
         print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
     video_capture.release()
+
+
+# sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices()[0].device_type)
