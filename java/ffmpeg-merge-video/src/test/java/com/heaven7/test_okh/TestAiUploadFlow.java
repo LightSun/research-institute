@@ -5,9 +5,7 @@ import okhttp3.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.heaven7.test_okh.OkHttpHelper.getMimeType;
 
@@ -22,14 +20,17 @@ public class TestAiUploadFlow {
     private static void testUpload() {
         String url = "http://192.168.3.142:12563/media/upload";
         String[] medias = {
-               // "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\浅蓝围巾领开衫\\1-10.jpg",
-                "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141100.mp4",
-                "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141029.mp4",
-                "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140824.mp4",
-                "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140749.mp4",
+                "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\浅蓝围巾领开衫\\1-10.jpg",
+               // "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141100.mp4",
+                //"E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141029.mp4",
+                //"E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140824.mp4",
+                //"E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140749.mp4",
                 //"E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140458.mp4",
         };
-        OkHttpHelper.post(url, getRequestBody(Arrays.asList(medias)), new Callback() {
+        Map<String,String> map = new HashMap<>();
+        map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzI1ODg5NTYsImV4cCI6MTUzMzE5Mzc1Nn0.0qhooMVp4yDmQ92TAPXbuRO1J6ZBjLUJgqERuADaSVw");
+
+        OkHttpHelper.post(url, map, getRequestBody(Arrays.asList(medias)), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Logger.w(TAG, "testUpload", Logger.toString(e));
@@ -57,8 +58,7 @@ public class TestAiUploadFlow {
                     RequestBody.create(MediaType.parse(fileType), file)
             );
         }
-        builder.addFormDataPart("project_id", "pro_123456");
-        builder.addFormDataPart("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJoZWF2ZW43IiwiaWF0IjoxNTMyMDAzNjg5LCJzdWIiOiI0ZTk3NDY4MTY3ZGI2ZWRiMTIzMjBjYmU3ZjY1NzYzNyIsImV4cCI6MTUzMjYwODQ4OX0.jKDA4vWucIru5pGNsvwh-rTR6cds-rgvYg2bJjqL9GQ");
+        builder.addFormDataPart("project_id", "1");
         return builder.build();
     }
 

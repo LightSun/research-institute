@@ -12,7 +12,6 @@ import com.heaven7.ve.colorgap.MetaInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 /**
@@ -48,6 +47,12 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         //auto handle empty videos
         mVideoHelper.scanAndLoad(context, videoItems, barrier);
         mImageHelper.scanAndLoad(context, images, barrier);
+        //for images need split batch
+
+        //body-key-point
+//TODO
+        //main-part. lazy
+
         return outItems;
     }
 

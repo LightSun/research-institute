@@ -1,6 +1,5 @@
 package com.heaven7.ve.colorgap;
 
-import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
@@ -17,8 +16,8 @@ import com.heaven7.ve.gap.ItemDelegate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.heaven7.ve.colorgap.VEGapUtils.getAverMainFaceArea;
 import static com.heaven7.utils.FileUtils.getFileName;
+import static com.heaven7.ve.colorgap.VEGapUtils.getAverMainFaceArea;
 import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
 
 /**

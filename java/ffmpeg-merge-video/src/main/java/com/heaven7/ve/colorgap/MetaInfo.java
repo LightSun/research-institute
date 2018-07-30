@@ -403,6 +403,7 @@ public interface MetaInfo {
         /** 人脸框信息 */
         private List<FrameFaceRects> rawFaceRects;
 
+
         private List<Integer> nounTags;
         private List<Integer> domainTags;
         private List<Integer> adjTags;

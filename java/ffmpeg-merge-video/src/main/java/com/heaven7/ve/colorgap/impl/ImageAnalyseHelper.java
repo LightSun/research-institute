@@ -1,18 +1,22 @@
 package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.*;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.ListVisitService;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.ConcurrentUtils;
-import com.heaven7.utils.FileUtils;
-import com.heaven7.utils.TextUtils;
+import com.heaven7.utils.*;
 import com.heaven7.ve.Context;
 import com.heaven7.ve.colorgap.*;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
@@ -29,6 +33,9 @@ import java.util.concurrent.atomic.AtomicInteger;
     private static final String TAG = "ImageAnalyseHelper";
     private final ImageResourceScanner rectsScanner;
     private final ImageResourceScanner tagsScanner;
+
+    private ImageDataDirMapper mDataDirMapper;//TODO data dir mapper.
+    private List<ImageResource> mImageRess;
 
     public ImageAnalyseHelper(ImageResourceScanner rectsScanner, ImageResourceScanner tagsScanner) {
         this.rectsScanner = rectsScanner;
@@ -49,6 +56,155 @@ import java.util.concurrent.atomic.AtomicInteger;
             new BatchScanner(context, imageItems, barrier).startScan(singleRect, singleTag);
         }
     }
+
+    /**
+     * load all image resource for batch images.such as rects_path, tag_path.
+     * note this must called in sub thread.
+     * @param resourceDir the resource dir of save all medias.
+     */
+    public void loadImageResource(String resourceDir){
+        File batchFileList = new File(resourceDir, "image_batch_list.txt");
+        if(!batchFileList.exists()){
+            return;
+        }
+        List<ImageResBatchLine> lines = new TextReadHelper<ImageResBatchLine>(
+                new TextReadHelper.BaseAssetsCallback<ImageResBatchLine>() {
+            @Override
+            public ImageResBatchLine parse(String line) {
+                return new ImageResBatchLine(line);
+            }
+        }).read(null, batchFileList.getAbsolutePath());
+        final TextReadHelper<ConfigLine> reader = new TextReadHelper<>(new ConfigLineCallback());
+        mImageRess = VisitServices.from(lines).map(new ResultVisitor<ImageResBatchLine, ImageResource>() {
+            @Override
+            public ImageResource visit(ImageResBatchLine line, Object param) {
+                String dataDir = mDataDirMapper.map(line.imageResourceDir);
+                ImageResource imageRes = new ImageResource();
+                imageRes.setBatchDir(line.imageResourceDir);
+
+                File face_config = new File(dataDir, "face_config.txt");
+                File tfs_config = new File(dataDir, "tfs_config.txt");
+                //csv, imapath imgpath ...
+                if(face_config.exists()){
+                    List<ConfigLine> faceLines = reader.read(null, face_config.getAbsolutePath());
+                    if(!Predicates.isEmpty(faceLines)){
+                        String rectsPath = faceLines.get(0).getCsvRectsPath();
+                        imageRes.setRectsPath(rectsPath);
+                    }
+                }
+                //tfs_config
+                if(tfs_config.exists()){
+                    List<ConfigLine> faceLines = reader.read(null, face_config.getAbsolutePath());
+                    if(!Predicates.isEmpty(faceLines)){
+                        String tagPath = faceLines.get(0).getCsvTagPath();
+                        imageRes.setTagPath(tagPath);
+                    }
+                }
+                return imageRes;
+            }
+        }).getAsList();
+    }
+
+    private static class ImageResource{
+         String batchDir;
+         String rectsPath;
+         String tagPath;
+
+        public String getBatchDir() {
+            return batchDir;
+        }
+        public void setBatchDir(String batchDir) {
+            this.batchDir = batchDir;
+        }
+        public String getRectsPath() {
+            return rectsPath;
+        }
+        public void setRectsPath(String rectsPath) {
+            this.rectsPath = rectsPath;
+        }
+
+        public String getTagPath() {
+            return tagPath;
+        }
+        public void setTagPath(String tagPath) {
+            this.tagPath = tagPath;
+        }
+    }
+
+    /**
+     * the image data dir mapper.
+     */
+    public interface ImageDataDirMapper{
+        /**
+         * map the source dir to data dir.
+         * @param imageResDir the image resource dir
+         * @return the image data dir
+         */
+        String map(String imageResDir);
+    }
+
+    /**
+     * the line of config file
+     */
+    private static class ConfigLine{
+        String dataPath;// may be rects or tfrecord path
+        List<String> imagePaths;
+
+        public ConfigLine(String line) {
+            String[] strs = line.split(",");
+            if(!Predicates.isEmpty(strs)){
+                this.dataPath = strs[0];
+                if(strs.length >= 2){
+                    imagePaths = Arrays.asList(strs[1].split(" "));
+                }
+            }
+        }
+
+        public String getCsvRectsPath(){
+            return dataPath;
+        }
+        public String getCsvTagPath(){
+            if(TextUtils.isEmpty(dataPath)){
+                return null;
+            }
+            String dir = FileUtils.getFileDir(dataPath, 1, true);
+            String fileName = FileUtils.getFileName(dataPath);
+            final String baseFileName;
+            if(fileName.endsWith("_outputs")){
+                baseFileName = fileName.substring(0, fileName.lastIndexOf("outputs"));
+            }else if(fileName.endsWith("_output")){
+                baseFileName = fileName.substring(0, fileName.lastIndexOf("output"));
+            }else{
+                throw new IllegalStateException("wrong file. please check your py script of gen.");
+            }
+            return dir + File.separator + baseFileName + "predictions.csv";
+        }
+    }
+
+    private static class ImageResBatchLine{
+        String imageResourceDir;
+        int imageCount;
+
+        public ImageResBatchLine(String line) {
+            String[] strs = line.split(",");
+            if(!Predicates.isEmpty(strs)){
+                this.imageResourceDir = strs[0];
+                if(strs.length >= 2){
+                    imageCount = Integer.valueOf(strs[1]);
+                }
+            }
+        }
+    }
+    private static class ConfigLineCallback extends TextReadHelper.BaseAssetsCallback<ConfigLine>{
+        @Override
+        public ConfigLine parse(String line) {
+            return new ConfigLine(line);
+        }
+    }
+
+    /*
+     * 1, 加载所有图片相关的路径
+     */
 
     private class BatchScanner {
 
@@ -93,9 +249,9 @@ import java.util.concurrent.atomic.AtomicInteger;
             });
         }
 
-        /**1, 生成时： 分组，生成tag和face.
-         * 2. 加载时, 预先加载 tfs_config.txt, 读取对应的文件路径
-         *                     face_config.txt
+        /**
+         * 1, 生成时： 分批，生成tag和face.
+         * 2. 加载时, 预先加载 tfs_config.txt and face_config.txt, 读取对应的文件路径
          */
         public void startScanByDir() {
             VisitServices.from(mMediaItems).groupService(new ResultVisitor<MediaItem, String>() {
@@ -103,13 +259,52 @@ import java.util.concurrent.atomic.AtomicInteger;
                 public String visit(MediaItem mediaItem, Object param) {
                     return FileUtils.getFileDir(mediaItem.item.getFilePath(), 1, true);
                 }
-            }).fire(new MapFireVisitor<String, List<MediaItem>>() {
+            }).map(new MapResultVisitor<String, List<MediaItem>, Group>() {
                 @Override
-                public Boolean visit(KeyValuePair<String, List<MediaItem>> pair, Object param) {
-
+                public Group visit(KeyValuePair<String, List<MediaItem>> t, Object param) {
+                    Group group = new Group(t.getValue());
+                    group.dir = t.getKey();
+                    return group;
+                }
+            }).fire(new FireVisitor<Group>() {
+                @Override
+                public Boolean visit(Group group, Object param) {
+                    List<ImageResource> list = VisitServices.from(mImageRess).filter(new PredicateVisitor<ImageResource>() {
+                        @Override
+                        public Boolean visit(ImageResource imageResource, Object param) {
+                            return imageResource.batchDir.equals(group.dir);
+                        }
+                    }).getAsList();
+                    if(list.isEmpty()){
+                        throw new IllegalStateException("you must call #loadImageResource");
+                    }
+                    ImageResource imageRes = list.get(0);
+                    ConcurrentManager.getDefault().schedule(() -> doWithBacthRects(group, imageRes));
+                    ConcurrentManager.getDefault().schedule(() -> doWithBacthTags(group, imageRes));
                     return null;
                 }
             });
+        }
+
+        private void doWithBacthRects(Group group, ImageResource imageRes) {
+            if(TextUtils.isEmpty(imageRes.rectsPath)){
+                Logger.w(TAG, "doWithBacthRects", "no rect file for face data. group dir = " + group.dir);
+                group.markDownRects();
+                return;
+            }
+            group.rects = ImageDataLoader.loadRects(mContext, imageRes.rectsPath, null);
+            group.markDownRects();
+            doIfAllDone(group);
+        }
+        private void doWithBacthTags(Group group, ImageResource imageRes) {
+            if(TextUtils.isEmpty(imageRes.tagPath)){
+                Logger.w(TAG, "doWithBacthTags", "no tag file for tag data. group dir = " + group.dir);
+                group.markDownTags();
+                return;
+            }
+            group.tags = ImageDataLoader.loadTags(mContext, imageRes.tagPath, null);
+            group.markDownTags();
+            doIfAllDone(group);
         }
 
         private void doWidthRects(Group group, boolean singleRect) {
@@ -245,6 +440,8 @@ import java.util.concurrent.atomic.AtomicInteger;
         final List<MediaItem> items;
         List<ImageDataLoader.ImageFaceRects> rects = new ArrayList<>();
         List<ImageDataLoader.ImageTags> tags = new ArrayList<>();
+        /** the die of all media items */
+        String dir;
 
         String filenamePrefix;
 

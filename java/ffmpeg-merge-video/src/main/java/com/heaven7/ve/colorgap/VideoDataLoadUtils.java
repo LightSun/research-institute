@@ -88,11 +88,6 @@ public class VideoDataLoadUtils {
                 url = tagPath + File.separator + url;
                 List<FrameTags> tags = reader.read(context, url);
                 callback.onFrameTagsLoaded(simpleFilename, url, tags);
-               /* for(FrameTags ft : tags){
-                    FrameData frameData = csvDatas.get(ft.getFrameIdx());
-                    frameData.setTagPath(url);
-                    frameData.setTag(ft);
-                }*/
             }
         }else{
             Logger.w(TAG, "loadTagsData", "load tags failed for dir = " + dir);
@@ -133,11 +128,6 @@ public class VideoDataLoadUtils {
                 url = rectsPath + File.separator + url;
                 List<FrameFaceRects> result = reader.read(context, url);
                 callback.onFaceRectsLoaded(simpleFilename, url, result);
-               /* for(FrameFaceRects rects : result){
-                    FrameData frameData = csvDatas.get(rects.getFrameIdx());
-                    frameData.setFaceRectPath(url);
-                    frameData.setFaceRects(rects);
-                }*/
             }
         }else{
             Logger.w(TAG, "loadRectsData", "load rects failed for dir = " + dir);
@@ -146,7 +136,7 @@ public class VideoDataLoadUtils {
 
     //here only load csv,
     private static boolean filter(String url) {
-        //TODO may be other file format
+        //may be other file format
         return !url.endsWith(".csv");
     }
 

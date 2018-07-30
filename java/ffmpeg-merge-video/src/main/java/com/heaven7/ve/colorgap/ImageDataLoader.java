@@ -72,7 +72,7 @@ public class ImageDataLoader {
                 return ImageTags.DEFAULT;
             }
             ImageTags tags = new ImageTags();
-            tags.setSrcPath(FileUtils.decodeChinesePath(strs[0]));
+            tags.setSrcPath(CommonUtils.urlDecode(strs[0]));
             tags.setTagPath(csvPath);
 
             FrameTags ft = new FrameTags();
@@ -112,7 +112,7 @@ public class ImageDataLoader {
             }
             ImageFaceRects imgRects = new ImageFaceRects();
             imgRects.setRectsPath(csvPath);
-            imgRects.setSrcPath(FileUtils.decodeChinesePath(strs[0]));
+            imgRects.setSrcPath(strs[0]);
 
             FrameFaceRects rects = new FrameFaceRects();
             rects.setFrameIdx(0);
