@@ -30,8 +30,8 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
     }
 
     @Override
-    protected void onDetectBatch(ImageDetector detector, Callback<List<IHighLightData>> callback, List<Integer> times, byte[] batchData) {
-        detector.detectHighLightBatch(batchData, new InternalCallback(times));
+    protected void onDetectBatch(int batchSize,ImageDetector detector, Callback<List<IHighLightData>> callback, List<Integer> times, byte[] batchData) {
+        detector.detectHighLightBatch(batchSize, batchData, new InternalCallback(times));
     }
 
     public interface ScoreProvider {

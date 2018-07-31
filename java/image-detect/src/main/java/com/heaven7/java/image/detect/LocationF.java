@@ -1,16 +1,16 @@
 package com.heaven7.java.image.detect;
 
-public class Location {
+public class LocationF {
 
-    public int left, top, width, height;
+    public float left, top, width, height;
 
-    public Rect toRect() {
-        return new Rect(left, top, left + width, top + height);
+    public RectF toRect() {
+        return new RectF(left, top, left + width, top + height);
     }
 
     @Override
     public String toString() {
-        return "Location{" +
+        return "LocationF{" +
                 "left=" + left +
                 ", top=" + top +
                 ", width=" + width +

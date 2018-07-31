@@ -4,7 +4,7 @@ public class RectF {
 
     private float left, top, right, bottom;
 
-    public RectF(int left, int top, int right, int bottom) {
+    public RectF(float left, float top, float right, float bottom) {
         this.left = left;
         this.top = top;
         this.right = right;

@@ -6,7 +6,7 @@ import java.util.List;
  * subject identify video manager
  * @author heaven7
  */
-public class VideoSubjectIdentifyManager extends AbstractVideoManager<Rect> {
+public class VideoSubjectIdentifyManager extends AbstractVideoManager<Location> {
 
     public VideoSubjectIdentifyManager(VideoFrameDelegate vfd, String videoSrc) {
         super(vfd, videoSrc);
@@ -17,12 +17,12 @@ public class VideoSubjectIdentifyManager extends AbstractVideoManager<Rect> {
     }
 
     @Override
-    protected void onDetect(ImageDetector detector, Callback<Rect> callback, int time, byte[] data) {
+    protected void onDetect(ImageDetector detector, Callback<Location> callback, int time, byte[] data) {
         detector.detectSubjectIdentification(data,  new InternalCallback(time));
     }
 
     @Override
-    protected void onDetectBatch(ImageDetector detector, Callback<Rect> callback, List<Integer> times, byte[] batchData) {
-        detector.detectSubjectIdentificationBatch(batchData, new InternalCallback(times));
+    protected void onDetectBatch(int batchSize, ImageDetector detector, Callback<Location> callback, List<Integer> times, byte[] batchData) {
+        detector.detectSubjectIdentificationBatch(batchSize, batchData, new InternalCallback(times));
     }
 }

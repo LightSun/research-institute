@@ -35,7 +35,9 @@ public abstract class AbstractVideoManager<T> {
     private final SparseArray<T> dataMap = new SparseArray<>();
 
     private final AtomicBoolean markDone = new AtomicBoolean(false);
-    /** the request count of network */
+    /**
+     * the request count of network
+     */
     private AtomicInteger count;
 
     private Callback<T> mCallback;
@@ -104,9 +106,9 @@ public abstract class AbstractVideoManager<T> {
         this.count = new AtomicInteger();
         int time = 0;
         int pileSize = 0;
-        //the times list
+        // the times list
         List<Integer> times = newList(1);
-        //every two mat is a line
+        // every two mat is a line
         List<Matrix2<Integer>> matLines = newList(2);
         Matrix2<Integer> single = null;
         while (time <= duration) {
@@ -120,11 +122,13 @@ public abstract class AbstractVideoManager<T> {
                 matLines.add(single);
                 single = null;
             }
+            pileSize++;
             if (pileSize == batchSize) {
                 doDetectBatch(callback, times, matLines);
                 // reset
                 times = newList(1);
                 matLines = newList(2);
+                pileSize = 0;
             }
             time += frameGap;
         }
@@ -134,7 +138,7 @@ public abstract class AbstractVideoManager<T> {
                 if (matLines.isEmpty()) {
                     // only one
                     count.incrementAndGet();
-                    onDetectBatch(detector, callback, times, transformMat(single));
+                    onDetectBatch(1, detector, callback, times, transformMat(single));
                 } else {
                     // just copy a new data. and merge as a line
                     Matrix2<Integer> mat2 = single.copy();
@@ -155,8 +159,7 @@ public abstract class AbstractVideoManager<T> {
         checkDone();
     }
 
-    private void doDetectBatch(
-            Callback<T> callback, List<Integer> times, List<Matrix2<Integer>> matLines) {
+    private void doDetectBatch(Callback<T> callback, List<Integer> times, List<Matrix2<Integer>> matLines) {
         count.incrementAndGet();
         Matrix2<Integer> mergedMat =
                 VisitServices.from(matLines)
@@ -171,7 +174,7 @@ public abstract class AbstractVideoManager<T> {
                                         return mat1;
                                     }
                                 });
-        onDetectBatch(detector, callback, times, transformMat(mergedMat));
+        onDetectBatch(matLines.size() * 2, detector, callback, times, transformMat(mergedMat));
     }
 
     private <E> ArrayList<E> newList(int divide) {
@@ -188,13 +191,14 @@ public abstract class AbstractVideoManager<T> {
 
     /**
      * transform matrix to byte array. default image type is 1. format is 'jpg'.
+     *
      * @param mat the matrix
      * @return the byte array
      */
-    protected byte[] transformMat(Matrix2<Integer> mat){
+    protected byte[] transformMat(Matrix2<Integer> mat) {
         ImageInitializer initer = ImageFactory.getImageInitializer();
         Throwables.checkNull(initer);
-        //default BufferImage.TYPE_RGB = 1;
+        // default BufferImage.TYPE_RGB = 1;
         return initer.getMatrix2Transformer().transform(mat, 1, "jpg");
     }
 
@@ -214,13 +218,14 @@ public abstract class AbstractVideoManager<T> {
      * @param callback the callback
      * @param duration the duration of video
      */
-    protected void onPreDetect(Callback<T> callback, int duration) {}
+    protected void onPreDetect(Callback<T> callback, int duration) {
+    }
 
     /**
      * called on all frames of video detect done
      *
      * @param mCallback the callback
-     * @param videoSrc the video file. absolute file name
+     * @param videoSrc  the video file. absolute file name
      */
     protected void onDetectDone(Callback<T> mCallback, String videoSrc) {
         mCallback.onCallback(videoSrc, dataMap);
@@ -231,8 +236,8 @@ public abstract class AbstractVideoManager<T> {
      *
      * @param detector the image detector
      * @param callback the callback
-     * @param time the time of this frame in seconds
-     * @param data the image data.
+     * @param time     the time of this frame in seconds
+     * @param data     the image data.
      */
     protected abstract void onDetect(
             ImageDetector detector, Callback<T> callback, int time, byte[] data);
@@ -240,22 +245,20 @@ public abstract class AbstractVideoManager<T> {
     /**
      * called on detect image which is from frame
      *
-     * @param detector the image detector
-     * @param callback the callback
-     * @param times the times indicate the frames
+     * @param batchSize the actually batch size
+     * @param detector  the image detector
+     * @param callback  the callback
+     * @param times     the times indicate the frames
      * @param batchData the batch image data.
      */
-    protected abstract void onDetectBatch(
-            ImageDetector detector,
-            Callback<T> callback,
-            List<Integer> times,
-            byte[] batchData);
+    protected abstract void onDetectBatch(int batchSize,
+                                          ImageDetector detector, Callback<T> callback, List<Integer> times, byte[] batchData);
 
     public interface VideoFrameDelegate {
         /**
          * get the frame from video file.
          *
-         * @param videoFile the video file
+         * @param videoFile     the video file
          * @param timeInSeconds the time to get the frame . in seconds
          * @return the frame data.
          */
@@ -264,13 +267,15 @@ public abstract class AbstractVideoManager<T> {
         /**
          * get the frame as int array. the stride is width
          *
-         * @param videoFile the video file
+         * @param videoFile     the video file
          * @param timeInSeconds the time in seconds
          * @return the int array.
          */
         Matrix2<Integer> getFrameMatrix(String videoFile, long timeInSeconds);
 
-        /** get the video duration. in seconds */
+        /**
+         * get the video duration. in seconds
+         */
         int getDuration(String videoFile);
     }
 
@@ -279,20 +284,19 @@ public abstract class AbstractVideoManager<T> {
          * callback on all frames data done for video
          *
          * @param videoSrc the video file
-         * @param dataMap key is frame time is seconds, value is core data
+         * @param dataMap  key is frame time is seconds, value is core data
          */
         void onCallback(String videoSrc, SparseArray<T> dataMap);
     }
 
     protected class InternalCallback implements ImageDetector.OnDetectCallback<T> {
-        public final List<Integer> times;
+        private final List<Integer> times;
 
         public InternalCallback(int time) {
             this.times = Arrays.asList(time);
         }
 
         public InternalCallback(List<Integer> times) {
-            Throwables.checkEmpty(times);
             this.times = times;
         }
 
