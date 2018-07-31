@@ -1,5 +1,7 @@
 package com.heaven7.java.image.detect;
 
+import com.heaven7.java.visitor.util.SparseArray;
+
 import java.util.List;
 
 /**
@@ -36,29 +38,29 @@ public interface ImageDetector {
     /**
      * detect high light in batch
      *
-     * @param count     the image count
+     * @param info     the batch info
      * @param imageData the image data
      * @param callback  the callback
      */
-    void detectHighLightBatch(int count, byte[] imageData, OnDetectCallback<List<IHighLightData>> callback);
+    void detectHighLightBatch(BatchInfo info, byte[] imageData, OnDetectCallback<List<IHighLightData>> callback);
 
     /**
      * detect key-points in batch
      *
-     * @param count     the image count
+     * @param info     the batch info
      * @param imageData the image data
      * @param callback  the callback
      */
-    void detectKeyPointsBatch(int count, byte[] imageData, OnDetectCallback<List<KeyPointData>> callback);
+    void detectKeyPointsBatch(BatchInfo info, byte[] imageData, OnDetectCallback<List<KeyPointData>> callback);
 
     /**
      * detect subject identification in batch
      *
-     * @param count     the image count
+     * @param info     the batch info
      * @param imageData the image data
      * @param callback  the callback
      */
-    void detectSubjectIdentificationBatch(int count, byte[] imageData, OnDetectCallback<Location> callback);
+    void detectSubjectIdentificationBatch(BatchInfo info, byte[] imageData, OnDetectCallback<Location> callback);
 
     /**
      * the detect callback
@@ -84,9 +86,9 @@ public interface ImageDetector {
         /**
          * called on batch success. note you should keep the result order of request frames.
          *
-         * @param batchList the batch list.
+         * @param batchData the batch data. key is the order of image. start from 1.
          */
-        void onBatchSuccess(List<T> batchList);
+        void onBatchSuccess(SparseArray<T> batchData);
     }
 
 }

@@ -1,10 +1,9 @@
 package com.heaven7.test.baidu;
 
-import com.heaven7.java.image.detect.IHighLightData;
-import com.heaven7.java.image.detect.ImageDetector;
-import com.heaven7.java.image.detect.KeyPointData;
-import com.heaven7.java.image.detect.Location;
-import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.image.ImageBatchDataSplitter;
+import com.heaven7.java.image.detect.*;
+import com.heaven7.java.visitor.util.SparseArray;
 import com.heaven7.test.baidu.entity.VBodyAnalysis;
 import com.heaven7.test.baidu.entity.VDetectionVidaSKI;
 import com.heaven7.test.baidu.entity.VObjectDetect;
@@ -17,7 +16,9 @@ import java.util.List;
  */
 public class BaiduImageDetector implements ImageDetector {
 
-    protected final VThirdBaiduService mService = new VThirdBaiduService();
+    private final VThirdBaiduService mService = new VThirdBaiduService();
+    private final ImageBatchDataSplitter<VBodyAnalysis.PersonInfo> mPerson_splitter = new ImageBatchDataSplitter.DefaultImageBatchDataSplitter<>();
+    private final ImageBatchDataSplitter<VDetectionVidaSKI.Results> mSki_splitter = new ImageBatchDataSplitter.DefaultImageBatchDataSplitter<>();
 
     @Override
     public void detectHighLight(byte[] imageData, OnDetectCallback<List<IHighLightData>> callback) {
@@ -62,34 +63,49 @@ public class BaiduImageDetector implements ImageDetector {
     }
 
     @Override
-    public void detectHighLightBatch(int count, byte[] imageData, OnDetectCallback<List<IHighLightData>> callback) {
-        throw new UnsupportedOperationException();
+    public void detectHighLightBatch(BatchInfo info, byte[] imageData, OnDetectCallback<List<IHighLightData>> callback) {
+        mService.postDetectionVidaSKI(imageData, new VThirdBaiduCallback<VDetectionVidaSKI>() {
+            @Override
+            protected void onSuccess(Call call, VDetectionVidaSKI obj) {
+                List<VDetectionVidaSKI.Results> results = obj.getResults();
+                if(!Predicates.isEmpty(results)){
+                    SparseArray<List<VDetectionVidaSKI.Results>> map = mSki_splitter.split(info.getCount(),
+                            info.getWidth(), info.getHeight(), results);
+                    callback.onBatchSuccess(convert2(map));
+                }else{
+                    callback.onFailed(0, "no data");
+                }
+            }
+            @Override
+            protected void onFailed(Call call, String msg) {
+                callback.onFailed(0, msg);
+            }
+        });
     }
 
     @Override
-    public void detectKeyPointsBatch(int count, byte[] imageData, OnDetectCallback<List<KeyPointData>> callback) {
-        //have bugs for person not equals.
-        throw new UnsupportedOperationException();
-        /*mService.postBodyAnalysis(imageData, new VThirdBaiduCallback<VBodyAnalysis>() {
+    public void detectKeyPointsBatch(BatchInfo info, byte[] imageData, OnDetectCallback<List<KeyPointData>> callback) {
+        mService.postBodyAnalysis(imageData, new VThirdBaiduCallback<VBodyAnalysis>() {
             @Override
             protected void onSuccess(Call call, VBodyAnalysis obj) {
                 List<VBodyAnalysis.PersonInfo> personInfos = obj.getPersonInfos();
-                //倒序
-                int size = personInfos.size();
-                if(size % count != 0){
-                    System.err.println("error .detectKeyPointsBatch  wrong... request count = "
-                            + count + " ,real size = " + size);
+                if(Predicates.isEmpty(personInfos)){
+                    callback.onFailed(0, "no data");
                     return;
                 }
-                List<List<VBodyAnalysis.PersonInfo>> list = VisitServices.from(personInfos)
-                        .groupService(size / count).reverseService().getAsList();
-                callback.onBatchSuccess(convertHighLight2(list));
+                SparseArray<List<VBodyAnalysis.PersonInfo>> lists = mPerson_splitter.split(info.getCount(),
+                        info.getWidth(), info.getHeight(), personInfos);
+                callback.onBatchSuccess(convert2(lists));
             }
-        });*/
+            @Override
+            protected void onFailed(Call call, String msg) {
+                callback.onFailed(0, msg);
+            }
+        });
     }
 
     @Override
-    public void detectSubjectIdentificationBatch(int count, byte[] imageData, OnDetectCallback<Location> callback) {
+    public void detectSubjectIdentificationBatch(BatchInfo info, byte[] imageData, OnDetectCallback<Location> callback) {
         throw new UnsupportedOperationException("Subject identification don't support .");
     }
 
@@ -99,7 +115,7 @@ public class BaiduImageDetector implements ImageDetector {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> List<List<T>> convert2(List<?> data){
-        return (List<List<T>>) data;
+    public static <T> SparseArray<List<T>> convert2(SparseArray<?> data){
+        return (SparseArray<List<T>>) data;
     }
 }

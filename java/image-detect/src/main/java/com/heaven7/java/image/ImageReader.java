@@ -4,6 +4,8 @@ public interface ImageReader {
 
      ImageInfo read(String imgFile);
 
+     byte[] readBytes(String imgFile, String format);
+
      class ImageInfo{
           private Matrix2<Integer> mat;
           private int imageType;

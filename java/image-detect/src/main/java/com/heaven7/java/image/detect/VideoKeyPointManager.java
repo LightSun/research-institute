@@ -10,8 +10,8 @@ public class VideoKeyPointManager extends AbstractVideoManager<List<KeyPointData
     public VideoKeyPointManager(VideoFrameDelegate vfd, String videoSrc) {
         super(vfd, videoSrc);
     }
-    public VideoKeyPointManager(VideoFrameDelegate vfd, String videoSrc, int gap, ImageDetector detector) {
-        super(vfd, videoSrc, gap, detector);
+    public VideoKeyPointManager(VideoFrameDelegate vfd, String videoSrc, int gap) {
+        super(vfd, videoSrc, gap);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class VideoKeyPointManager extends AbstractVideoManager<List<KeyPointData
     }
 
     @Override
-    protected void onDetectBatch(int batchSize, ImageDetector detector, Callback<List<KeyPointData>> callback, List<Integer> times, byte[] batchData) {
-        detector.detectKeyPointsBatch(batchSize, batchData, new InternalCallback(times));
+    protected void onDetectBatch(BatchInfo info, ImageDetector detector, Callback<List<KeyPointData>> callback, List<Integer> times, byte[] batchData) {
+        detector.detectKeyPointsBatch(info, batchData, new InternalCallback(times));
     }
 }

@@ -5,6 +5,7 @@ import com.heaven7.java.image.Matrix2;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,5 +35,24 @@ public class JavaImageReader implements ImageReader {
             list.add(cols);
         }
         return new ImageInfo(new Matrix2<>(list), imageType);
+    }
+
+    @Override
+    public byte[] readBytes(String imgFile,String format) {
+        File srcFile = new File(imgFile);
+        BufferedImage image;
+        try {
+            image = ImageIO.read(srcFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image, format, baos);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return baos.toByteArray();
     }
 }

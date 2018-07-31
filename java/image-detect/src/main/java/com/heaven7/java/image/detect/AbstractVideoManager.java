@@ -2,8 +2,8 @@ package com.heaven7.java.image.detect;
 
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
-import com.heaven7.java.image.ImageFactory;
-import com.heaven7.java.image.ImageInitializer;
+import com.heaven7.java.image.ImageDetectFactory;
+import com.heaven7.java.image.ImageDetectInitializer;
 import com.heaven7.java.image.Matrix2;
 import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.PileVisitor;
@@ -43,14 +43,16 @@ public abstract class AbstractVideoManager<T> {
     private Callback<T> mCallback;
 
     private int batchSize = DEFAULT_BATCH_SIZE;
+    private int width;
+    private int height;
 
     public AbstractVideoManager(VideoFrameDelegate vfd, String videoSrc) {
-        this(vfd, videoSrc, 1, ImageFactory.getImageInitializer().getImageDetector());
+        this(vfd, videoSrc, 1);
     }
 
     public AbstractVideoManager(
-            VideoFrameDelegate vfd, String videoSrc, int gap, ImageDetector detector) {
-        this.detector = detector;
+            VideoFrameDelegate vfd, String videoSrc, int gap) {
+        this.detector = ImageDetectFactory.getImageInitializer().getImageDetector();
         this.videoSrc = videoSrc;
         this.vfd = vfd;
         this.frameGap = gap;
@@ -114,6 +116,10 @@ public abstract class AbstractVideoManager<T> {
         while (time <= duration) {
             times.add(time);
             Matrix2<Integer> mat = vfd.getFrameMatrix(videoSrc, time);
+            if(width == 0){
+                width = mat.getRowCount();
+                height = mat.getColumnCount();
+            }
             if (single == null) {
                 single = mat;
             } else {
@@ -138,7 +144,8 @@ public abstract class AbstractVideoManager<T> {
                 if (matLines.isEmpty()) {
                     // only one
                     count.incrementAndGet();
-                    onDetectBatch(1, detector, callback, times, transformMat(single));
+                    onDetectBatch(BatchInfo.of(1, width, height), detector,
+                            callback, times, transformMat(single));
                 } else {
                     // just copy a new data. and merge as a line
                     Matrix2<Integer> mat2 = single.copy();
@@ -174,7 +181,8 @@ public abstract class AbstractVideoManager<T> {
                                         return mat1;
                                     }
                                 });
-        onDetectBatch(matLines.size() * 2, detector, callback, times, transformMat(mergedMat));
+        BatchInfo info = BatchInfo.of(matLines.size() * 2, width, height);
+        onDetectBatch(info, detector, callback, times, transformMat(mergedMat));
     }
 
     private <E> ArrayList<E> newList(int divide) {
@@ -186,6 +194,7 @@ public abstract class AbstractVideoManager<T> {
         if (markDone.get() && count.get() == 0) {
             onDetectDone(mCallback, videoSrc);
             mCallback = null;
+            markDone.compareAndSet(true, false);
         }
     }
 
@@ -196,7 +205,7 @@ public abstract class AbstractVideoManager<T> {
      * @return the byte array
      */
     protected byte[] transformMat(Matrix2<Integer> mat) {
-        ImageInitializer initer = ImageFactory.getImageInitializer();
+        ImageDetectInitializer initer = ImageDetectFactory.getImageInitializer();
         Throwables.checkNull(initer);
         // default BufferImage.TYPE_RGB = 1;
         return initer.getMatrix2Transformer().transform(mat, 1, "jpg");
@@ -245,13 +254,13 @@ public abstract class AbstractVideoManager<T> {
     /**
      * called on detect image which is from frame
      *
-     * @param batchSize the actually batch size
+     * @param bi the batch info
      * @param detector  the image detector
      * @param callback  the callback
      * @param times     the times indicate the frames
      * @param batchData the batch image data.
      */
-    protected abstract void onDetectBatch(int batchSize,
+    protected abstract void onDetectBatch(BatchInfo bi,
                                           ImageDetector detector, Callback<T> callback, List<Integer> times, byte[] batchData);
 
     public interface VideoFrameDelegate {
@@ -316,13 +325,13 @@ public abstract class AbstractVideoManager<T> {
         }
 
         @Override
-        public void onBatchSuccess(List<T> batchList) {
+        public void onBatchSuccess(SparseArray<T> batch) {
             VisitServices.from(times)
                     .fireWithIndex(
                             new FireIndexedVisitor<Integer>() {
                                 @Override
                                 public Void visit(Object param, Integer time, int index, int size) {
-                                    T t = batchList.get(index);
+                                    T t = batch.get(index + 1);
                                     if (t != null) {
                                         dataMap.put(time, t);
                                     }

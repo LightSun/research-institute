@@ -12,8 +12,8 @@ public class VideoSubjectIdentifyManager extends AbstractVideoManager<Location> 
         super(vfd, videoSrc);
     }
 
-    public VideoSubjectIdentifyManager(VideoFrameDelegate vfd, String videoSrc, int gap, ImageDetector detector) {
-        super(vfd, videoSrc, gap, detector);
+    public VideoSubjectIdentifyManager(VideoFrameDelegate vfd, String videoSrc, int gap) {
+        super(vfd, videoSrc, gap);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class VideoSubjectIdentifyManager extends AbstractVideoManager<Location> 
     }
 
     @Override
-    protected void onDetectBatch(int batchSize, ImageDetector detector, Callback<Location> callback, List<Integer> times, byte[] batchData) {
-        detector.detectSubjectIdentificationBatch(batchSize, batchData, new InternalCallback(times));
+    protected void onDetectBatch(BatchInfo info, ImageDetector detector, Callback<Location> callback, List<Integer> times, byte[] batchData) {
+        detector.detectSubjectIdentificationBatch(info, batchData, new InternalCallback(times));
     }
 }

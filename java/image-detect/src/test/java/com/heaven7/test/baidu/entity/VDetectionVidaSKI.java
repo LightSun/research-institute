@@ -1,5 +1,6 @@
 package com.heaven7.test.baidu.entity;
 
+import com.heaven7.java.image.ImageBatchDataSplitter;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.image.detect.Location;
 
@@ -26,7 +27,7 @@ public class VDetectionVidaSKI {
                 '}';
     }
 
-    public static class Results implements IHighLightData{
+    public static class Results implements IHighLightData, ImageBatchDataSplitter.IPositionData{
         private String  name; //高光自定义名称
         private float score; //分数
         private Location location; //坐标
@@ -50,6 +51,15 @@ public class VDetectionVidaSKI {
                     ", score=" + score +
                     ", location=" + location +
                     '}';
+        }
+
+        @Override
+        public float getX() {
+            return location.left;
+        }
+        @Override
+        public float getY() {
+            return location.top;
         }
     }
 }

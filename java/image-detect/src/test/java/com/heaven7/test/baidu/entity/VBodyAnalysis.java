@@ -1,6 +1,7 @@
 package com.heaven7.test.baidu.entity;
 
 import com.google.gson.annotations.SerializedName;
+import com.heaven7.java.image.ImageBatchDataSplitter;
 import com.heaven7.java.image.detect.KeyPointData;
 import com.heaven7.java.image.detect.LocationF;
 
@@ -26,7 +27,7 @@ public class VBodyAnalysis {
                 '}';
     }
 
-    public static class PersonInfo implements KeyPointData{
+    public static class PersonInfo implements KeyPointData, ImageBatchDataSplitter.IPositionData{
         private Body_parts body_parts;
         private LocationF location;
 
@@ -40,6 +41,15 @@ public class VBodyAnalysis {
         @Override
         public int getKeyPointCount() {
             return body_parts != null ? body_parts.getKeyPointCount(): 0;
+        }
+
+        @Override
+        public float getX() {
+            return location.left;
+        }
+        @Override
+        public float getY() {
+            return location.top;
         }
     }
 

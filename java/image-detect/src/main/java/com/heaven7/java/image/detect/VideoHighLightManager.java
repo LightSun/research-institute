@@ -20,8 +20,8 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
         super(vfd, videoSrc);
     }
 
-    public VideoHighLightManager(VideoFrameDelegate vfd, String videoSrc, int gap, ImageDetector detector) {
-        super(vfd, videoSrc, gap, detector);
+    public VideoHighLightManager(VideoFrameDelegate vfd, String videoSrc, int gap) {
+        super(vfd, videoSrc, gap);
     }
 
     @Override
@@ -30,8 +30,8 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
     }
 
     @Override
-    protected void onDetectBatch(int batchSize,ImageDetector detector, Callback<List<IHighLightData>> callback, List<Integer> times, byte[] batchData) {
-        detector.detectHighLightBatch(batchSize, batchData, new InternalCallback(times));
+    protected void onDetectBatch(BatchInfo info,ImageDetector detector, Callback<List<IHighLightData>> callback, List<Integer> times, byte[] batchData) {
+        detector.detectHighLightBatch(info, batchData, new InternalCallback(times));
     }
 
     public interface ScoreProvider {
