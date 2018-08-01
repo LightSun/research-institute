@@ -1,19 +1,18 @@
 package com.heaven7.java.image.detect;
 
-import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
-import com.heaven7.java.image.ImageDetectFactory;
-import com.heaven7.java.image.ImageDetectInitializer;
+import com.heaven7.java.image.ImageFactory;
+import com.heaven7.java.image.ImageInitializer;
 import com.heaven7.java.image.Matrix2;
+import com.heaven7.java.image.utils.BatchProcessor;
 import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.java.visitor.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.heaven7.java.image.Matrix2Utils.mergeByColumn;
 import static com.heaven7.java.image.Matrix2Utils.mergeByRow;
@@ -23,7 +22,7 @@ import static com.heaven7.java.image.Matrix2Utils.mergeByRow;
  *
  * @param <T> the core data type
  */
-public abstract class AbstractVideoManager<T> {
+public abstract class AbstractVideoManager<T> extends BatchProcessor{
 
     public static final int DEFAULT_BATCH_SIZE = 4;
 
@@ -32,13 +31,7 @@ public abstract class AbstractVideoManager<T> {
     private final int frameGap;
     private final ImageDetector detector;
 
-    private final SparseArray<T> dataMap = new SparseArray<>();
-
-    private final AtomicBoolean markDone = new AtomicBoolean(false);
-    /**
-     * the request count of network
-     */
-    private AtomicInteger count;
+    private SparseArray<T> dataMap;
 
     private Callback<T> mCallback;
 
@@ -52,7 +45,7 @@ public abstract class AbstractVideoManager<T> {
 
     public AbstractVideoManager(
             VideoFrameDelegate vfd, String videoSrc, int gap) {
-        this.detector = ImageDetectFactory.getImageInitializer().getImageDetector();
+        this.detector = ImageFactory.getImageInitializer().getImageDetector();
         this.videoSrc = videoSrc;
         this.vfd = vfd;
         this.frameGap = gap;
@@ -72,24 +65,19 @@ public abstract class AbstractVideoManager<T> {
      * @param callback the callback
      */
     public final void detect(Callback<T> callback) {
-        if (mCallback != null) {
-            throw new IllegalStateException();
-        }
+        markStart();
         this.mCallback = callback;
         final int duration = vfd.getDuration(videoSrc);
         onPreDetect(callback, duration);
 
-        this.count = new AtomicInteger();
         int time = 0;
         while (time <= duration) {
             byte[] data = vfd.getFrame(videoSrc, time);
-            count.incrementAndGet();
+            addCount(1);
             onDetect(detector, callback, time, data);
             time += frameGap;
         }
-        // mark done
-        markDone.compareAndSet(false, true);
-        checkDone();
+        markEnd();
     }
 
     /**
@@ -98,14 +86,11 @@ public abstract class AbstractVideoManager<T> {
      * @param callback the callback
      */
     public final void detectBatch(Callback<T> callback) {
-        if (mCallback != null) {
-            throw new IllegalStateException();
-        }
+        markStart();
         this.mCallback = callback;
         final int duration = vfd.getDuration(videoSrc);
         onPreDetect(callback, duration);
 
-        this.count = new AtomicInteger();
         int time = 0;
         int pileSize = 0;
         // the times list
@@ -143,7 +128,7 @@ public abstract class AbstractVideoManager<T> {
             if (single != null) {
                 if (matLines.isEmpty()) {
                     // only one
-                    count.incrementAndGet();
+                    addCount(1);
                     onDetectBatch(BatchInfo.of(1, width, height), detector,
                             callback, times, transformMat(single));
                 } else {
@@ -162,12 +147,11 @@ public abstract class AbstractVideoManager<T> {
         }
 
         // mark done
-        markDone.compareAndSet(false, true);
-        checkDone();
+        markEnd();
     }
 
     private void doDetectBatch(Callback<T> callback, List<Integer> times, List<Matrix2<Integer>> matLines) {
-        count.incrementAndGet();
+        addCount(1);
         Matrix2<Integer> mergedMat =
                 VisitServices.from(matLines)
                         .pile(
@@ -190,12 +174,21 @@ public abstract class AbstractVideoManager<T> {
         return new ArrayList<>(batchSize * 4 / 3 / divide + 1);
     }
 
-    private void checkDone() {
-        if (markDone.get() && count.get() == 0) {
-            onDetectDone(mCallback, videoSrc);
-            mCallback = null;
-            markDone.compareAndSet(true, false);
-        }
+    @Override
+    public void markStart() {
+        super.markStart();
+        dataMap = new SparseArray<>();
+    }
+
+    @Override
+    protected void reset() {
+        super.reset();
+        mCallback = null;
+    }
+
+    @Override
+    protected void onDone() {
+        onDetectDone(mCallback, videoSrc);
     }
 
     /**
@@ -205,20 +198,10 @@ public abstract class AbstractVideoManager<T> {
      * @return the byte array
      */
     protected byte[] transformMat(Matrix2<Integer> mat) {
-        ImageDetectInitializer initer = ImageDetectFactory.getImageInitializer();
+        ImageInitializer initer = ImageFactory.getImageInitializer();
         Throwables.checkNull(initer);
         // default BufferImage.TYPE_RGB = 1;
         return initer.getMatrix2Transformer().transform(mat, 1, "jpg");
-    }
-
-    /**
-     * called when one time of image is detect done.
-     *
-     * @param time the times list, every element is time in seconds.
-     */
-    protected void publishDetectDone(List<Integer> time) {
-        count.decrementAndGet();
-        checkDone();
     }
 
     /**
@@ -310,7 +293,7 @@ public abstract class AbstractVideoManager<T> {
         }
 
         public void markEnd() {
-            publishDetectDone(times);
+            onTasksEnd(1);
         }
 
         @Override

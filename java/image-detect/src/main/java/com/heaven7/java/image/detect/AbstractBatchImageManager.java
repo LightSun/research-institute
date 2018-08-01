@@ -1,7 +1,8 @@
 package com.heaven7.java.image.detect;
 
-import com.heaven7.java.image.ImageDetectFactory;
+import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.ImageReader;
+import com.heaven7.java.image.utils.BatchProcessor;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.SparseArray;
@@ -9,21 +10,17 @@ import com.heaven7.java.visitor.util.SparseArray;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * the batch image manager
  *
  * @author heaven7
  */
-public abstract class AbstractBatchImageManager<T> {
+public abstract class AbstractBatchImageManager<T> extends BatchProcessor{
 
     private final List<String> mImages;
     private final ImageDetector mImageDetector;
-    private final ImageReader mImageReader = ImageDetectFactory.getImageInitializer().getImageReader();
-    private final AtomicInteger mCount = new AtomicInteger();
-    private final AtomicBoolean mMarkDone = new AtomicBoolean();
+    private final ImageReader mImageReader = ImageFactory.getImageInitializer().getImageReader();
     private Callback<T> mCallback;
 
     private Map<String, T> mDataMap;
@@ -34,42 +31,33 @@ public abstract class AbstractBatchImageManager<T> {
     }
 
     public void detect(Callback<T> callback) {
-        if (mCallback != null) {
-            throw new IllegalStateException();
-        }
+        markStart();
         this.mCallback = callback;
         this.mDataMap = new HashMap<>();
         VisitServices.from(mImages).fire(new FireVisitor<String>() {
             @Override
             public Boolean visit(String file, Object param) {
-                byte[] data = readBytes(file);
-                mCount.incrementAndGet();
+                byte[] data = readBytes(file).getData();
+                addCount(1);
                 onDetect(mImageDetector, mCallback, file, data);
                 return null;
             }
         });
-        mMarkDone.compareAndSet(false, true);
-        checkDone();
+        markEnd();
     }
 
-    private void checkDone() {
-        if (mMarkDone.get() && mCount.get() == 0) {
-            onDetectDone();
-        }
+    @Override
+    protected void reset() {
+        super.reset();
+        mCallback = null;
     }
 
-    private void onDetectDone() {
+    @Override
+    protected void onDone() {
         mCallback.onCallback(mDataMap);
-        mMarkDone.compareAndSet(true, false);
-        mCount.set(0);
     }
 
-    protected void publishDetectDone() {
-        mCount.decrementAndGet();
-        checkDone();
-    }
-
-    protected byte[] readBytes(String imgFile) {
+    protected ImageReader.ImageInfo readBytes(String imgFile) {
         return mImageReader.readBytes(imgFile, "jpg");
     }
 
@@ -94,12 +82,12 @@ public abstract class AbstractBatchImageManager<T> {
 
         @Override
         public void onFailed(int code, String msg) {
-            publishDetectDone();
+            onTasksEnd(1);
         }
         @Override
         public void onSuccess(T data) {
             mDataMap.put(imageFile, data);
-            publishDetectDone();
+            onTasksEnd(1);
         }
         @Override
         public void onBatchSuccess(SparseArray<T> batchList) {

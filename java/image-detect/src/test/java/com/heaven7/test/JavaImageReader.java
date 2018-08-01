@@ -14,7 +14,7 @@ import java.util.List;
 public class JavaImageReader implements ImageReader {
 
     @Override
-    public ImageInfo read(String img) {
+    public ImageInfo readMatrix(String img) {
         File srcFile = new File(img);
         BufferedImage image;
         int imageType;
@@ -34,11 +34,14 @@ public class JavaImageReader implements ImageReader {
             }
             list.add(cols);
         }
-        return new ImageInfo(new Matrix2<>(list), imageType);
+        ImageInfo imageInfo = new ImageInfo(new Matrix2<>(list), imageType);
+        imageInfo.setWidth(w);
+        imageInfo.setHeight(h);
+        return imageInfo;
     }
 
     @Override
-    public byte[] readBytes(String imgFile,String format) {
+    public ImageInfo readBytes(String imgFile,String format) {
         File srcFile = new File(imgFile);
         BufferedImage image;
         try {
@@ -53,6 +56,9 @@ public class JavaImageReader implements ImageReader {
             e.printStackTrace();
             return null;
         }
-        return baos.toByteArray();
+        ImageInfo imageInfo = new ImageInfo(baos.toByteArray(), image.getType());
+        imageInfo.setWidth(image.getWidth());
+        imageInfo.setHeight(image.getHeight());
+        return imageInfo;
     }
 }

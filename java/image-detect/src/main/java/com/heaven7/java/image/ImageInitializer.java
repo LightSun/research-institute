@@ -4,22 +4,20 @@ import com.heaven7.java.image.detect.AbstractVideoManager;
 import com.heaven7.java.image.detect.ImageDetector;
 
 /** @author heaven7 */
-public class ImageDetectInitializer {
+public class ImageInitializer {
 
     private ImageReader imageReader;
     private ImageWriter imageWriter;
     private ImageDetector imageDetector;
     private Matrix2Transformer matrix2Transformer;
     private AbstractVideoManager.VideoFrameDelegate videoFrameDelegate;
-    private ImageBatchSplitter imageBatchSplitter;
 
-    protected ImageDetectInitializer(ImageDetectInitializer.Builder builder) {
+    protected ImageInitializer(ImageInitializer.Builder builder) {
         this.imageReader = builder.imageReader;
         this.imageWriter = builder.imageWriter;
         this.imageDetector = builder.imageDetector;
         this.matrix2Transformer = builder.matrix2Transformer;
         this.videoFrameDelegate = builder.videoFrameDelegate;
-        this.imageBatchSplitter = builder.imageBatchSplitter;
     }
 
     public void setImageReader(ImageReader imageReader) {
@@ -59,17 +57,12 @@ public class ImageDetectInitializer {
         return this.videoFrameDelegate;
     }
 
-    public ImageBatchSplitter getImageBatchSplitter() {
-        return this.imageBatchSplitter;
-    }
-
     public static class Builder {
         private ImageReader imageReader;
         private ImageWriter imageWriter;
         private ImageDetector imageDetector;
         private Matrix2Transformer matrix2Transformer;
         private AbstractVideoManager.VideoFrameDelegate videoFrameDelegate;
-        private ImageBatchSplitter imageBatchSplitter;
 
         public Builder setImageReader(ImageReader imageReader) {
             this.imageReader = imageReader;
@@ -96,13 +89,8 @@ public class ImageDetectInitializer {
             return this;
         }
 
-        public Builder setImageBatchSplitter(ImageBatchSplitter imageBatchSplitter) {
-            this.imageBatchSplitter = imageBatchSplitter;
-            return this;
-        }
-
-        public ImageDetectInitializer build() {
-            return new ImageDetectInitializer(this);
+        public ImageInitializer build() {
+            return new ImageInitializer(this);
         }
     }
 }

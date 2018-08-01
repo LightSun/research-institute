@@ -32,7 +32,7 @@ public abstract class VThirdBaiduCallback<T> implements Callback {
         }
         String json = body.string();
         response.close();
-       // System.out.println(json);
+        System.out.println(json);
         VThirdBaiduErrorResponse vThirdBaiduErrorResponse = new GsonBuilder().create().fromJson(json, VThirdBaiduErrorResponse.class);
         if (vThirdBaiduErrorResponse.getError_code() != null) {
             onFailed(call, vThirdBaiduErrorResponse.getError_msg());
