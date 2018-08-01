@@ -20,11 +20,11 @@ public class ConcurrentManager {
         return Creator.INSTANCE;
     }
 
-    public void schedule(Runnable r){
+    public void submit(Runnable r){
         mCoreService.submit(r);
     }
 
-    public <R> R schedule(Callable<R> r) throws ExecutionException {
+    public <R> R submit(Callable<R> r) throws ExecutionException {
         Future<R> future = mCoreService.submit(r);
         try {
             return future.get();
@@ -33,9 +33,9 @@ public class ConcurrentManager {
             return null;
         }
     }
-    public <R> R scheduleWithoutException(Callable<R> r){
+    public <R> R submitWithoutException(Callable<R> r){
         try {
-            return schedule(r);
+            return submit(r);
         } catch (ExecutionException e) {
             e.printStackTrace();
             return null;

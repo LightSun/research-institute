@@ -2,19 +2,16 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
-import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.*;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.ListVisitService;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 import com.heaven7.ve.colorgap.*;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,12 +39,12 @@ import java.util.concurrent.atomic.AtomicInteger;
         this.tagsScanner = tagsScanner;
     }
 
-    public void scanAndLoad(Context context, List<MediaItem> imageItems, boolean singleTag,
+    public void scanAndLoad(VEContext context, List<MediaItem> imageItems, boolean singleTag,
                             boolean singleRect, final CyclicBarrier barrier) {
-        ConcurrentUtils.submit(() -> scanAndLoad0(context, imageItems, singleTag, singleRect, barrier));
+        ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, imageItems, singleTag, singleRect, barrier));
     }
 
-    private void scanAndLoad0(Context context, List<MediaItem> imageItems, boolean singleTag,
+    private void scanAndLoad0(VEContext context, List<MediaItem> imageItems, boolean singleTag,
                               boolean singleRect, CyclicBarrier barrier) {
         if (imageItems.isEmpty() || (rectsScanner == null && tagsScanner == null)) {
             ConcurrentUtils.awaitBarrier(barrier);
@@ -210,10 +207,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
         private final List<MediaItem> mMediaItems;
         private final CyclicBarrier mBarrier;
-        private final Context mContext;
+        private final VEContext mContext;
         private AtomicInteger mGroupCount;
 
-        public BatchScanner(Context context, List<MediaItem> mediaItems, CyclicBarrier barrier) {
+        public BatchScanner(VEContext context, List<MediaItem> mediaItems, CyclicBarrier barrier) {
             this.mContext = context;
             this.mMediaItems = mediaItems;
             this.mBarrier = barrier;
@@ -232,13 +229,13 @@ import java.util.concurrent.atomic.AtomicInteger;
             }).fire(new FireVisitor<Group>() {
                 @Override
                 public Boolean visit(final Group group, Object param) {
-                    ConcurrentUtils.submit(new Runnable() {
+                    ConcurrentManager.getDefault().submit(new Runnable() {
                         @Override
                         public void run() {
                             doWidthRects(group, singleRect);
                         }
                     });
-                    ConcurrentUtils.submit(new Runnable() {
+                    ConcurrentManager.getDefault().submit(new Runnable() {
                         @Override
                         public void run() {
                             doWidthTags(group, singleTag);
@@ -279,8 +276,8 @@ import java.util.concurrent.atomic.AtomicInteger;
                         throw new IllegalStateException("you must call #loadImageResource");
                     }
                     ImageResource imageRes = list.get(0);
-                    ConcurrentManager.getDefault().schedule(() -> doWithBacthRects(group, imageRes));
-                    ConcurrentManager.getDefault().schedule(() -> doWithBacthTags(group, imageRes));
+                    ConcurrentManager.getDefault().submit(() -> doWithBacthRects(group, imageRes));
+                    ConcurrentManager.getDefault().submit(() -> doWithBacthTags(group, imageRes));
                     return null;
                 }
             });

@@ -3,10 +3,9 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.utils.FileUtils;
 import com.heaven7.utils.TextReadHelper;
 import com.heaven7.utils.TextUtils;
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 
 import java.io.File;
 import java.util.List;
@@ -24,7 +23,7 @@ public class ImageDataLoader {
      * @param csvPath  the rects file of csv
      * @param imageDir the image dir of batch image. if images are not in same dir or the path in csv use absolute path, this must be null.
      */
-    public static List<ImageFaceRects> loadRects(Context context, String csvPath, String imageDir) {
+    public static List<ImageFaceRects> loadRects(VEContext context, String csvPath, String imageDir) {
         //pic-012.jpg,0.468057632446289 0.755185484886169 0.114837065339088 0.0766602531075478
         TextReadHelper<ImageFaceRects> helper = new TextReadHelper<>(new ImageFaceRectCallback(csvPath));
         List<ImageFaceRects> list = helper.read(context, csvPath);
@@ -40,7 +39,7 @@ public class ImageDataLoader {
         return list;
     }
 
-    public static List<ImageTags> loadTags(Context context, String tagPath, String imageDir) {
+    public static List<ImageTags> loadTags(VEContext context, String tagPath, String imageDir) {
         TextReadHelper<ImageTags> helper = new TextReadHelper<>(new ImageTagCallback(tagPath));
         List<ImageTags> tags = helper.read(context, tagPath);
         if (!TextUtils.isEmpty(imageDir)) {

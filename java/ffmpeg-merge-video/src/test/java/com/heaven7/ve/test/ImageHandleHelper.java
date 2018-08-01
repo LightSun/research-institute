@@ -14,22 +14,47 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 /**
- * @Description:图片处理工具
- * @author:liuyc
- * @time:2016年5月27日 上午10:18:00
+ * 图像合并，贴纸等
  */
 public class ImageHandleHelper {
 
     public static void main(String[] args) {
-           String[] imgs = {
-                   "F:\\test\\imgs\\story0\\dressing\\C0138\\img_00001.png",
-                   "F:\\test\\imgs\\story0\\dressing\\C0138\\img_00007.png",
-           };
-           String ouput1 = "F:\\test\\imgs\\story0\\dressing\\C0138\\test_1.png";
-           String ouput2 = "F:\\test\\imgs\\story0\\dressing\\C0138\\test_2.png";
+        testMerge2();
+    }
 
-           mergeImage(imgs, 1, ouput1);
-           mergeImage(imgs, 2, ouput2);
+    private static void testMerge2() {
+        String[] imgs = {
+                "E:\\tmp\\upload_files\\img_00001.jpg",
+                "E:\\tmp\\upload_files\\img_00002.jpg",
+        };
+        String ouput1 = "E:\\tmp\\upload_files\\test_1.jpg";
+        mergeImage(imgs, 1, ouput1);
+        //second
+        String[] imgs2 = {
+                "E:\\tmp\\upload_files\\img_00012.jpg",
+                "E:\\tmp\\upload_files\\img_00013.jpg",
+        };
+        String ouput2 = "E:\\tmp\\upload_files\\test_2.jpg";
+        mergeImage(imgs2, 1, ouput2);
+
+        imgs = new String[]{
+                "E:\\tmp\\upload_files\\test_1.jpg",
+                "E:\\tmp\\upload_files\\test_2.jpg",
+        };
+        String ouput4 = "E:\\tmp\\upload_files\\test_4.jpg";
+        mergeImage(imgs, 2, ouput4);
+    }
+
+    private static void testMerge1() {
+        String[] imgs = {
+                "F:\\test\\imgs\\story0\\dressing\\C0138\\img_00001.png",
+                "F:\\test\\imgs\\story0\\dressing\\C0138\\img_00007.png",
+        };
+        String ouput1 = "F:\\test\\imgs\\story0\\dressing\\C0138\\test_1.png";
+        String ouput2 = "F:\\test\\imgs\\story0\\dressing\\C0138\\test_2.png";
+
+        mergeImage(imgs, 1, ouput1);
+        mergeImage(imgs, 2, ouput2);
     }
 
     /**
@@ -75,6 +100,7 @@ public class ImageHandleHelper {
                 src[i] = new File(files[i]);
                 images[i] = ImageIO.read(src[i]);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
             int width = images[i].getWidth();

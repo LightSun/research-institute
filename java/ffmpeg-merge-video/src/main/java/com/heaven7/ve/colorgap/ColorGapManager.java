@@ -6,7 +6,7 @@ import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.ArrayUtils;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.ConcurrentUtils;
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.filter.MediaDirFilter;
 import com.heaven7.ve.colorgap.filter.VideoTagFilter;
@@ -27,7 +27,7 @@ public class ColorGapManager {
 
     private static final String TAG = "ColorGapManager";
 
-    private final Context mContext;
+    private final VEContext mContext;
     private final MusicCutter musicCut;
     private final MusicShader musicShader;
     private final PlaidFiller filler;
@@ -35,8 +35,9 @@ public class ColorGapManager {
     private StoryLineShader mStoryShader;
 
     private TemplateScriptProvider mProvider;
+    private IShotRecognizer mShotRecognizer;
 
-    public ColorGapManager(Context context, MediaAnalyser mediaAnalyser, MusicCutter musicCut,
+    public ColorGapManager(VEContext context, MediaAnalyser mediaAnalyser, MusicCutter musicCut,
                            MusicShader musicShader, PlaidFiller filler) {
         this.mContext = context;
         this.mediaAnalyser = mediaAnalyser;
@@ -49,6 +50,9 @@ public class ColorGapManager {
         mediaAnalyser.cancel();
     }
 
+    public void setShotRecognizer(IShotRecognizer mShotRecognizer) {
+        this.mShotRecognizer = mShotRecognizer;
+    }
     /**
      * set the template script provider
      * @param provider the template script provider
@@ -65,10 +69,11 @@ public class ColorGapManager {
      * fill the music plaids by videos, may be parts of video. must called in sub-thread
      * @param musicPath the music paths
      * @param srcTemplate the src template which comes from {@linkplain #createVETemplate(List)},
-     * @param items the media resource item
-     * @return the FillResult which contains video editor nodes and src template.
+     * @param items the media resource item.
+     * @param callback the fill callback
      */
-    public FillResult fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<MediaResourceItem> items) {
+    //return the FillResult which contains video editor nodes and src template.
+    public void fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<MediaResourceItem> items, FillCallback callback) {
         ResourceInitializer.init(mContext);
         //the barrier help we do two tasks: analyse, tint.
         CyclicBarrier barrier = new CyclicBarrier(mediaAnalyser.getAsyncModuleCount() + 1);
@@ -97,25 +102,55 @@ public class ColorGapManager {
             ConcurrentUtils.shutDownNow();
             //cut video
             List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(plaids, mediaItems);
-            //process story to color filter(生成shot key, 过滤)
-            List<GapManager.GapItem> gapItems = null;
-            if(mStoryShader != null) {
-                gapItems = mStoryShader.tintAndFill(plaids, resultTemplate, newItems, filler, new AirShotFilterImpl());
+            //shot recognition
+            if(mShotRecognizer != null && !Predicates.isEmpty(newItems)){
+                List<MediaPartItem> subjectItems = new ArrayList<>();
+                for(MediaPartItem partItem : newItems){
+                    int shotType = mShotRecognizer.getShotType(partItem);
+                    if(shotType == MetaInfo.SHOT_TYPE_NONE){
+                        subjectItems.add(partItem);
+                    }else{
+                        partItem.imageMeta.setShotType(MetaInfo.getShotTypeString(shotType));
+                    }
+                    int shotCategory = mShotRecognizer.recognizeShotCategory(partItem);
+                    partItem.imageMeta.setShotCategory(shotCategory);
+                }
+                //start subject recognize.
+                final VETemplate source_tem = srcTemplate;
+                new SubjectRecognizeHelper(subjectItems){
+                    @Override
+                    protected void onDone() {
+                        //process story to color filter(gen shot key, filter)
+                        doFillPlaids(newItems, plaids, source_tem, resultTemplate, callback);
+                    }
+                }.start();
+            }else {
+                doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
             }
-            if(gapItems == null){
-                //fill plaid
-                gapItems = filler.fillPlaids(plaids, newItems);
-            }
-            return new FillResult(gapItems, srcTemplate , resultTemplate);
         } catch (InterruptedException e) {
             //ignored e.printStackTrace();
+            callback.onFillFinished(null);
         } catch (BrokenBarrierException e) {
             throw new RuntimeException(e);
         }catch (RuntimeException e){
             Logger.w(TAG, "fill", Logger.toString(e));
-            return null;
+            callback.onFillFinished(null);
         }
-        return null;
+    }
+
+    private void doFillPlaids(List<MediaPartItem> newItems, List<CutInfo.PlaidInfo> plaids,
+                              @Nullable VETemplate srcTemplate, VETemplate resultTemplate,
+                              FillCallback callback) {
+        //process story to color filter(gen shot key, filter)
+        List<GapManager.GapItem> gapItems = null;
+        if (mStoryShader != null) {
+            gapItems = mStoryShader.tintAndFill(plaids, resultTemplate, newItems, filler, new AirShotFilterImpl());
+        }
+        if (gapItems == null) {
+            //fill plaid
+            gapItems = filler.fillPlaids(plaids, newItems);
+        }
+        callback.onFillFinished(new FillResult(gapItems, srcTemplate, resultTemplate));
     }
 
     /**
@@ -254,6 +289,16 @@ public class ColorGapManager {
             this.srcTemplate = srcTemplate;
             this.resultTemplate = resultTemplate;
         }
+    }
 
+    /**
+     * the callback
+     */
+    public interface FillCallback{
+        /**
+         * called on fill finished
+         * @param result the fill result, null means failed.
+         */
+        void onFillFinished(FillResult result);
     }
 }

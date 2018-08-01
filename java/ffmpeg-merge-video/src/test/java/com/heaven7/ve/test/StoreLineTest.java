@@ -76,12 +76,19 @@ public class StoreLineTest extends TestCase {
                // cgm.setTemplateScriptProvider(new TemplateProviderImpl_ST2());
                 cgm.setStoryLineShader(new StoryLineShaderImpl());
 
-                ColorGapManager.FillResult result = cgm.fill(null, null, mItems);
-                List<GapManager.GapItem> gapItems = result.nodes;
+                cgm.fill(null, null, mItems, new ColorGapManager.FillCallback() {
+                    @Override
+                    public void onFillFinished(ColorGapManager.FillResult result) {
+                        if(result == null){
+                            Logger.w(TAG, "onFillFinished", "fill failed.");
+                        }else{
+                            List<GapManager.GapItem> gapItems = result.nodes;
 //ffmpeg -safe 0 -f concat -i E:\\study\\github\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story2\\concat.txt -c copy concat_output.mp4 -y
-                FFmpegVideoHelper.buildVideo(result.resultTemplate, gapItems, CUT_OUT_WEDDING_DIR);
-                System.out.println("testStory run done...");
-
+                            FFmpegVideoHelper.buildVideo(result.resultTemplate, gapItems, CUT_OUT_WEDDING_DIR);
+                            System.out.println("testStory run done...");
+                        }
+                    }
+                });
             }
         };
         new Thread(r).start();

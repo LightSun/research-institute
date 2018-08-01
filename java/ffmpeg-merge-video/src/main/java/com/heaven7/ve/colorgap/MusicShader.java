@@ -2,7 +2,7 @@ package com.heaven7.ve.colorgap;
 
 
 import com.heaven7.java.base.anno.Nullable;
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 import com.heaven7.ve.template.VETemplate;
 
 import java.util.List;
@@ -25,6 +25,6 @@ public interface MusicShader {
      * @param tintFlags the tint flags. like {@linkplain #FLAG_ALLOW_RELEASE_HEAD_TAIL}
      * @return  tint  the plaids to template. never null.
      */
-    VETemplate tint(Context context, @Nullable VETemplate template, List<CutInfo.PlaidInfo> musicInfos, int tintFlags);
+    VETemplate tint(VEContext context, @Nullable VETemplate template, List<CutInfo.PlaidInfo> musicInfos, int tintFlags);
 
 }

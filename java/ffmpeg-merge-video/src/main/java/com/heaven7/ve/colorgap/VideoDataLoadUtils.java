@@ -7,7 +7,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.LoadException;
 import com.heaven7.utils.TextReadHelper;
 import com.heaven7.utils.TextUtils;
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,12 +47,12 @@ public class VideoDataLoadUtils {
         void onFaceRectsLoaded(String simpleFileName, String fullPath, List<FrameFaceRects> tags);
     }
 
-    public static void loadTagData(Context context, String filePath, LoadCallback callback)throws LoadException {
+    public static void loadTagData(VEContext context, String filePath, LoadCallback callback)throws LoadException {
         TextReadHelper<FrameTags> reader = new TextReadHelper<FrameTags>(new CsvVideoTagCallback());
         callback.onFrameTagsLoaded(filePath, filePath, reader.read(context, filePath));
     }
 
-    public static void loadRectData(Context context, String filePath, LoadCallback callback) throws LoadException{
+    public static void loadRectData(VEContext context, String filePath, LoadCallback callback) throws LoadException{
         TextReadHelper<FrameFaceRects> reader = new TextReadHelper<FrameFaceRects>(new CsvFaceRectCallback());
         callback.onFaceRectsLoaded(filePath, filePath, reader.read(context, filePath));
     }
@@ -62,7 +62,7 @@ public class VideoDataLoadUtils {
      * @param dir the dir
      * @param callback the load callback
      */
-    public static void loadTagsData(Context context, String dir, LoadCallback callback){
+    public static void loadTagsData(VEContext context, String dir, LoadCallback callback){
 
         //dir 有多个视频源
         File file = new File(dir);
@@ -99,7 +99,7 @@ public class VideoDataLoadUtils {
      * @param dir the dir
      * @param callback the load callback
      */
-    public static void loadRectsData(Context context, String dir, LoadCallback callback){
+    public static void loadRectsData(VEContext context, String dir, LoadCallback callback){
         //dir 有多个视频源
         File file = new File(dir);
         if(!file.exists() || !file.isDirectory()){
@@ -150,7 +150,7 @@ public class VideoDataLoadUtils {
         return Integer.parseInt(str);
     }
 
-    private static List<String> travelFiles(Context context, String dir) {
+    private static List<String> travelFiles(VEContext context, String dir) {
         final String[] list;
         if(sUse_assets) {
             //not contain all files. only have direct file

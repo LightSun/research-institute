@@ -27,5 +27,4 @@ public class JavaImageGenerator implements ImageGenerator {
         }
         return true;
     }
-
 }

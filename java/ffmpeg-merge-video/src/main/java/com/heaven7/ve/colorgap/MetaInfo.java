@@ -4,6 +4,10 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.image.detect.HighLightArea;
+import com.heaven7.java.image.detect.IHighLightData;
+import com.heaven7.java.image.detect.VideoHighLightManager;
+import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
 import com.heaven7.utils.CollectionUtils;
@@ -13,6 +17,7 @@ import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.filter.*;
+import com.heaven7.ve.colorgap.impl.ScoreProviderImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +51,7 @@ public interface MetaInfo {
     int FLAG_CAMERA_MOTION     = 0x0020;
     int FLAG_VIDEO_TAG         = 0x0040;
     int FLAG_SHOT_KEY          = 0x0080;
+    int FLAG_SHOT_CATEGORY     = 0x0100;
 
     //================= location ==================
     int LOCATION_NEAR_GPS = 1;
@@ -130,9 +136,12 @@ public interface MetaInfo {
      */
     int SHOT_TYPE_BIG_CLOSE_UP = 7;
 
-    int CATEGORY_CLOSE_UP    = 10;
+
+    int SHOT_TYPE_NONE  = -1;
+
+    int CATEGORY_CLOSE_UP    = 12;
     int CATEGORY_MIDDLE_VIEW = 11;
-    int CATEGORY_VISION      = 12; //远景
+    int CATEGORY_VISION      = 10; //远景
 
     //========================== time ==========================
     int[] MORNING_HOURS = {7, 8, 9, 10, 11};
@@ -157,6 +166,26 @@ public interface MetaInfo {
                 return SHOT_TYPE_LONG_SHORT;
             case "veryLongShot":
                 return SHOT_TYPE_BIG_LONG_SHORT;
+            default:
+                throw new UnsupportedOperationException("wrong shotType " + shotType);
+        }
+    }
+    static String getShotTypeString(int shotType) {
+        switch (shotType) {
+            case SHOT_TYPE_BIG_CLOSE_UP:
+                return "bigCloseUp";
+            case SHOT_TYPE_CLOSE_UP:
+                return "closeUp";
+            case SHOT_TYPE_MEDIUM_CLOSE_UP:
+                return "mediaCloseUp";
+            case SHOT_TYPE_MEDIUM_SHOT:
+                return "mediumShot";
+            case SHOT_TYPE_MEDIUM_LONG_SHOT:
+                return "mediumLongShot";
+            case SHOT_TYPE_LONG_SHORT:
+                return "longShot";
+            case SHOT_TYPE_BIG_LONG_SHORT:
+                return "veryLongShot";
             default:
                 throw new UnsupportedOperationException("wrong shotType " + shotType);
         }
@@ -256,10 +285,6 @@ public interface MetaInfo {
         }
         //media type
         gc.addGapColorCondition(new MediaTypeFilter.MediaTypeCondition(meta.getMediaType()));
-        //shot type
-        if(!TextUtils.isEmpty(meta.getShotType())){
-            gc.addGapColorCondition(new ShotTypeFilter.ShotTypeCondition(meta.getShotType()));
-        }
         //camera motion
         if(!TextUtils.isEmpty(meta.getCameraMotion())){
             gc.addGapColorCondition(new CameraMotionFilter.CameraMotionCondition(meta.getCameraMotion()));
@@ -268,9 +293,17 @@ public interface MetaInfo {
         if(!Predicates.isEmpty(meta.getTags())){
             gc.addGapColorCondition( new VideoTagFilter.VideoTagCondition(meta.getTags()));
         }
+        //shot type
+        if(!TextUtils.isEmpty(meta.getShotType())){
+            gc.addGapColorCondition(new ShotTypeFilter.ShotTypeCondition(meta.getShotType()));
+        }
         //shot key
         if(!TextUtils.isEmpty(meta.getShotKey())){
             gc.addGapColorCondition(new ShotKeyFilter.ShotKeyCondition(meta.getShotKey()));
+        }
+        //shot category
+        if(meta.getShotCategory() != 0){
+            gc.addGapColorCondition(new ShotCategoryFilter.ShotCategoryCondition(meta.getShotCategory()));
         }
         return gc;
     }
@@ -379,6 +412,8 @@ public interface MetaInfo {
          * frames/second
          */
         private int fps = 30;
+        /** see {@linkplain ShotRecognition#CATEGORY_ENV} and etc. */
+        private int shotCategory;
         /**
          * the shot type
          */
@@ -395,6 +430,8 @@ public interface MetaInfo {
 
         /** the whole frame data of video(from analyse , like AI. ), after read should not change */
         private SparseArray<VideoDataLoadUtils.FrameData> frameDataMap;
+        /** the high light data. key is the time in seconds. */
+        private SparseArray<List<? extends IHighLightData>> highLightMap;
 
         /** 主人脸个数 */
         private int mainFaceCount = -1;
@@ -403,7 +440,7 @@ public interface MetaInfo {
         /** 人脸框信息 */
         private List<FrameFaceRects> rawFaceRects;
 
-
+        //tag indexes
         private List<Integer> nounTags;
         private List<Integer> domainTags;
         private List<Integer> adjTags;
@@ -414,6 +451,43 @@ public interface MetaInfo {
             }
             return frameDataMap;
         }
+        @SuppressWarnings("unchecked")
+        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(int time){
+            if(highLightMap == null){
+                return null;
+            }
+            List<IHighLightData> data = (List<IHighLightData>) highLightMap.get(time);
+            return KeyValuePair.create(time, data);
+        }
+        @SuppressWarnings("unchecked")
+        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(TimeTraveller tt){
+            if(highLightMap == null){
+                return null;
+            }
+            int start = (int)CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
+            int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
+            VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(
+                    new ScoreProviderImpl(), highLightMap);
+            int time = vhl.getHighLightPoint(start, end);
+            List<IHighLightData> data = (List<IHighLightData>) highLightMap.get(time);
+            return KeyValuePair.create(time, data);
+        }
+        @SuppressWarnings("unchecked")
+        public HighLightArea getHightLightArea(TimeTraveller tt){
+            if(highLightMap == null){
+                return null;
+            }
+            int start = (int)CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
+            int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
+            VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(
+                    new ScoreProviderImpl(), highLightMap);
+            return vhl.getHighLightArea(start, end);
+        }
+
+        public void setHighLightMap(SparseArray<List<? extends IHighLightData>> highLightMap) {
+            this.highLightMap = highLightMap;
+        }
+
         public void setFrameDataMap(SparseArray<VideoDataLoadUtils.FrameData> frameDataMap) {
             this.frameDataMap = frameDataMap;
         }
@@ -423,26 +497,32 @@ public interface MetaInfo {
         }
 
         public List<Integer> getNounTags() {
-            return nounTags;
+            return nounTags != null ? nounTags : Collections.emptyList();
         }
         public void setNounTags(List<Integer> nounTags) {
             this.nounTags = nounTags;
         }
 
         public List<Integer> getDomainTags() {
-            return domainTags;
+            return domainTags != null ? domainTags : Collections.emptyList();
         }
         public void setDomainTags(List<Integer> domainTags) {
             this.domainTags = domainTags;
         }
 
         public List<Integer> getAdjTags() {
-            return adjTags;
+            return adjTags != null ? adjTags : Collections.emptyList();
         }
         public void setAdjTags(List<Integer> adjTags) {
             this.adjTags = adjTags;
         }
+        public void setShotCategory(int shotCategory) {
+            this.shotCategory = shotCategory;
+        }
 
+        public int getShotCategory() {
+            return shotCategory;
+        }
         public String getShotKey() {
             return shotKey;
         }
@@ -660,6 +740,9 @@ public interface MetaInfo {
              if(sc instanceof ImageMeta){
                  ImageMeta src = (ImageMeta) sc;
                  setShotType(src.getShotType());
+                 setShotCategory(src.getShotCategory());
+                 setShotKey(src.getShotKey());
+
                  setMainFaceCount(src.getMainFaceCount());
                  setDuration(src.getDuration());
                  setMediaType(src.getMediaType());
@@ -679,9 +762,9 @@ public interface MetaInfo {
                  setRawFaceRects(src.getRawFaceRects());
                  setRawVideoTags(src.getRawVideoTags());
                  setFrameDataMap(src.frameDataMap);
+                 setHighLightMap(src.highLightMap);
              }
         }
-
     }
 
 }

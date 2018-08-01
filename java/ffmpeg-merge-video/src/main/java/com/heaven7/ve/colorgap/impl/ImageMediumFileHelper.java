@@ -1,7 +1,7 @@
 package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.utils.ConcurrentUtils;
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 import com.heaven7.ve.colorgap.MediaItem;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class ImageMediumFileHelper {
         ConcurrentUtils.shutDownNow();
     }
 
-    public void scanAndLoad(Context context, List<MediaItem> items, final CyclicBarrier barrier){
+    public void scanAndLoad(VEContext context, List<MediaItem> items, final CyclicBarrier barrier){
          mImageHelper.scanAndLoad(context, items, singleTag, singleRect, barrier);
     }
 

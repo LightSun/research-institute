@@ -122,15 +122,6 @@ public class FFmpegUtils {
         cmds.add("-y");
         String[] arr = new String[cmds.size()];
         return cmds.toArray(arr);
-
-       /* StringBuilder sb = new StringBuilder();
-        sb.append("ffmpeg -i ")
-                .append(item.item.getFilePath()).append(" ")
-                .append("-vcodec copy -acodec copy -ss ")
-                .append(transferTime(start)).append(" -to ")
-                .append(transferTime(end)).append(" ")
-                .append(outPath).append(" -y");
-        return sb.toString();*/
     }
     //整数s, 小数ms
     /** time in seconds */
@@ -168,6 +159,7 @@ public class FFmpegUtils {
             cmds.add("/c");
             cmds.add("start");
             cmds.add("/wait");
+            cmds.add("/b"); //add this to now show window of cmd
         }
         cmds.add("ffmpeg");
         cmds.add("-i");
@@ -191,7 +183,7 @@ public class FFmpegUtils {
             cmds.add(cmd.getSavePath());
         }else {
             //jpg and jpeg Lossy for image quality
-            cmds.add(cmd.getSavePath() + File.separator + "img_%05d.png");
+            cmds.add(cmd.getSavePath() + File.separator + (cmd .isJpg() ?"img_%05d.jpg" :"img_%05d.png"));
         }
         cmds.add("-y");
 
@@ -222,6 +214,8 @@ public class FFmpegUtils {
         /** can be a jpeg file path or just a dir. MUST */
         private String savePath;
 
+        private boolean jpg;
+
         protected ImageExtractCmd(ImageExtractCmd.Builder builder) {
             this.videoPath = builder.videoPath;
             this.countEverySecond = builder.countEverySecond;
@@ -230,6 +224,7 @@ public class FFmpegUtils {
             this.frameCount = builder.frameCount;
             this.resolution = builder.resolution;
             this.savePath = builder.savePath;
+            this.jpg = builder.jpg;
         }
 
         public void setVideoPath(String videoPath) {
@@ -286,6 +281,10 @@ public class FFmpegUtils {
             return this.savePath;
         }
 
+        public boolean isJpg() {
+            return this.jpg;
+        }
+
         public static class Builder {
             /** -i,  MUST */
             private String videoPath;
@@ -294,13 +293,14 @@ public class FFmpegUtils {
             /** the image save format(-f) */
             private String imageFormat;
             /** the start time (in seconds) to extract(-ss) */
-            private float startTime = 0f;
+            private float startTime;
             /** the extract count.(-vframes) */
             private int frameCount;
             /** like '-s 800*600' */
             private String resolution;
             /** can be a jpeg file path or just a dir. MUST */
             private String savePath;
+            private boolean jpg;
 
             public Builder setVideoPath(String videoPath) {
                 this.videoPath = videoPath;
@@ -334,6 +334,11 @@ public class FFmpegUtils {
 
             public Builder setSavePath(String savePath) {
                 this.savePath = savePath;
+                return this;
+            }
+
+            public Builder setJpg(boolean jpg) {
+                this.jpg = jpg;
                 return this;
             }
 

@@ -1,6 +1,6 @@
 package com.heaven7.utils;
 
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -22,7 +22,7 @@ public final class TextReadHelper<Line>{
         this.mCallback = mCallback;
     }
 
-    public List<Line> read(Context context, String url) throws LoadException {
+    public List<Line> read(VEContext context, String url) throws LoadException {
         List<Line> results = new ArrayList<>();
         BufferedReader reader = null;
         try {
@@ -49,7 +49,7 @@ public final class TextReadHelper<Line>{
 
     public interface Callback<Line>{
 
-        BufferedReader open(Context context, String url) throws IOException;
+        BufferedReader open(VEContext context, String url) throws IOException;
 
         /**
          * parse the line into a object.
@@ -61,7 +61,7 @@ public final class TextReadHelper<Line>{
 
     public static abstract class BaseAssetsCallback<Line> implements Callback<Line>{
         @Override
-        public BufferedReader open(Context context, String url) throws IOException {
+        public BufferedReader open(VEContext context, String url) throws IOException {
             return new BufferedReader(new InputStreamReader(new FileInputStream(url)));
         }
     }

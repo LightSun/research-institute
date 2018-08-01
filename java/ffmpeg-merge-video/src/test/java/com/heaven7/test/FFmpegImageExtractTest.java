@@ -20,6 +20,7 @@ public class FFmpegImageExtractTest extends BaseTest{
 
     @Test
     public void test1(){
+        //extract -> gen highlight info -> key-point ->
         FFmpegUtils.ImageExtractCmd cmd = new FFmpegUtils.ImageExtractCmd.Builder()
                 .setVideoPath("F:\\videos\\jiege_1\\褂子\\VID_20180602_124118.mp4")
                 .setCountEverySecond(1)
@@ -29,7 +30,21 @@ public class FFmpegImageExtractTest extends BaseTest{
                 .build();
         String[] cmds = FFmpegUtils.buildImageExtractCmd(cmd, true);
         new CmdHelper(cmds).execute();
-        waitDone();
+        System.out.println("Done");
+    }
+
+    @Test
+    public void test2(){
+        FFmpegUtils.ImageExtractCmd cmd = new FFmpegUtils.ImageExtractCmd.Builder()
+                .setVideoPath("F:\\videos\\story3\\welcome\\C0012.mp4")
+                .setCountEverySecond(1)
+                //.setFrameCount(3)
+               // .setStartTime(8)
+                .setSavePath("E:\\tmp\\upload_files")
+                .setJpg(true)
+                .build();
+        String[] cmds = FFmpegUtils.buildImageExtractCmd(cmd, true);
+        new CmdHelper(cmds).execute();
         System.out.println("Done");
     }
 }

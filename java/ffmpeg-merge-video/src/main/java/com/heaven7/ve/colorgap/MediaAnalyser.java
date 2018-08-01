@@ -1,7 +1,7 @@
 package com.heaven7.ve.colorgap;
 
 
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 import com.heaven7.ve.MediaResourceItem;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.concurrent.CyclicBarrier;
 
 public interface MediaAnalyser {
 
-    List<MediaItem> analyse(Context context, List<MediaResourceItem> items, CyclicBarrier barrier);
+    List<MediaItem> analyse(VEContext context, List<MediaResourceItem> items, CyclicBarrier barrier);
 
     /**
      * get the async module count .

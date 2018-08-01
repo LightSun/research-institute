@@ -3,7 +3,7 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.TextUtils;
-import com.heaven7.ve.Context;
+import com.heaven7.ve.VEContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -217,7 +217,7 @@ public class Vocabulary {
     }
     //=========================== end wedding ==============================
 
-    public static void loadVocabulary(Context context, String path) {
+    public static void loadVocabulary(VEContext context, String path) {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(ConfigUtil.loadResourcesAsStream(path)));

@@ -8,21 +8,8 @@ import java.util.concurrent.*;
  */
 public class ConcurrentUtils {
 
-    private static ExecutorService sService;
-
     public static void shutDownNow() {
-        if (sService != null) {
-            sService.shutdownNow();
-            sService = null;
-        }
-    }
-
-    public static void submit(Runnable r) {
-        if (sService == null) {
-            sService = new ThreadPoolExecutor(5, 8,
-                    60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-        }
-        sService.submit(r);
+        //empty now
     }
 
     public static void awaitBarrier(CyclicBarrier barrier){

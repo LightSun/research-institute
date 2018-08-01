@@ -22,6 +22,7 @@ public class ImageBlurTest {
     public static void main(String[] args) throws IOException {
         String path = "F:\\test\\imgs_tmp\\test.jpg";
         File srcFile = new File(path);
+
         BufferedImage image = ImageIO.read(srcFile);
         int w = image.getWidth();
         int h = image.getHeight();
@@ -153,8 +154,8 @@ public class ImageBlurTest {
     private static void testGenImage(File srcFile, Matrix2<Integer> mat, int imageType, String suffix) {
         int w = mat.getRowCount();
         int h = mat.getColumnCount();
-        System.out.println(w);
-        System.out.println(h);
+       // System.out.println(w);
+       // System.out.println(h);
         BufferedImage image = new BufferedImage(w, h, imageType);
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {

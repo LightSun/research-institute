@@ -3,8 +3,11 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.image.detect.IHighLightData;
+import com.heaven7.java.image.detect.Location;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
@@ -25,6 +28,10 @@ import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
  * @author heaven7
  */
 public class MediaPartItem implements ItemDelegate , CutItemDelegate{
+
+    public static final int FLAG_REQUIRE_SUBJECT_RECOGNIZE = 0x0001;
+
+    private static final KeyValuePair<Integer, List<IHighLightData>> NONE = KeyValuePair.create(null, null);
 
     private static final Integer TAG_ID_BLACK = 20;
     private static final String TAG = "MediaPartItem";
@@ -48,6 +55,9 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
     /** the cause be deleted from story */
     private String cause = "";
 
+    private KeyValuePair<Integer, List<IHighLightData>> highLight = NONE;
+    private int mFlags;
+
     /**
      * create media part item.
      * @param imageMeta the image meta
@@ -63,6 +73,15 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         //set max duration
         videoPart.setMaxDuration(CommonUtils.timeToFrame(item.getDuration(), TimeUnit.MILLISECONDS));
         setRawTags();
+    }
+    public void addFlags(int flags){
+        this.mFlags |= flags;
+    }
+    public void deleteFlags(int flags){
+        this.mFlags &= ~flags;
+    }
+    public boolean hasFlag(int flag){
+        return (mFlags & flag) == flag;
     }
 
     public boolean isPlaned() {
@@ -163,10 +182,6 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         if(Predicates.isEmpty(framesTags)){
             return 0;
         }
-/*
-        if(item.getFilePath().endsWith("C0073.MP4") || item.getFilePath().endsWith("C0075.MP4")){
-            System.out.println("------------");
-        }*/
 
         float score = 0f;
         for(FrameTags ft : framesTags){
@@ -529,5 +544,26 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
             targetTime = target.getDate();
         }
         return shotTime <= targetTime;
+    }
+
+    public float getBodyArea(int time) {
+        //TODO body area
+        return 0;
+    }
+
+    public List<IHighLightData> getHighLightData(int time) {
+        KeyValuePair<Integer, List<IHighLightData>> pair = imageMeta.getHighLight(time);
+        return pair != null ? pair.getValue(): null;
+    }
+    public KeyValuePair<Integer, List<IHighLightData>> getHighLight(){
+        if(highLight == NONE){
+            highLight = imageMeta.getHighLight(videoPart);
+        }
+        return highLight;
+    }
+
+    public int getKeyPointCount(){
+        //TODO key point count
+        return 0;
     }
 }
