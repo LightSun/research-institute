@@ -42,4 +42,11 @@ public class Rect {
     public void setBottom(int bottom) {
         this.bottom = bottom;
     }
+
+    public int centerX() {
+        return left + (right - left) / 2;
+    }
+    public int centerY() {
+        return top + (bottom - top) / 2;
+    }
 }

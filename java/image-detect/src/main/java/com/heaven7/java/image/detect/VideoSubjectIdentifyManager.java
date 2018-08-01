@@ -9,11 +9,11 @@ import java.util.List;
 public class VideoSubjectIdentifyManager extends AbstractVideoManager<Location> {
 
     public VideoSubjectIdentifyManager(VideoFrameDelegate vfd, String videoSrc) {
-        super(vfd, videoSrc);
+        super(videoSrc);
     }
 
-    public VideoSubjectIdentifyManager(VideoFrameDelegate vfd, String videoSrc, int gap) {
-        super(vfd, videoSrc, gap);
+    public VideoSubjectIdentifyManager(String videoSrc, int gap) {
+        super(videoSrc, gap);
     }
 
     @Override

@@ -19,15 +19,14 @@ import java.util.Map;
 public abstract class AbstractBatchImageManager<T> extends BatchProcessor{
 
     private final List<String> mImages;
-    private final ImageDetector mImageDetector;
+    private final ImageDetector mImageDetector = ImageFactory.getImageInitializer().getImageDetector();
     private final ImageReader mImageReader = ImageFactory.getImageInitializer().getImageReader();
     private Callback<T> mCallback;
 
     private Map<String, T> mDataMap;
 
-    public AbstractBatchImageManager(List<String> mImages, ImageDetector detector) {
+    public AbstractBatchImageManager(List<String> mImages) {
         this.mImages = mImages;
-        this.mImageDetector = detector;
     }
 
     public void detect(Callback<T> callback) {
@@ -94,7 +93,6 @@ public abstract class AbstractBatchImageManager<T> extends BatchProcessor{
             throw new UnsupportedOperationException();
         }
     }
-
 
     public interface Callback<T> {
         void onCallback(Map<String, T> dataMap);

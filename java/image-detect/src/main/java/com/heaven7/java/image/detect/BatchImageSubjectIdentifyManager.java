@@ -7,8 +7,8 @@ import java.util.List;
  */
 public class BatchImageSubjectIdentifyManager extends AbstractBatchImageManager<Location> {
 
-    public BatchImageSubjectIdentifyManager(List<String> mImages, ImageDetector detector) {
-        super(mImages, detector);
+    public BatchImageSubjectIdentifyManager(List<String> mImages) {
+        super(mImages);
     }
 
     @Override

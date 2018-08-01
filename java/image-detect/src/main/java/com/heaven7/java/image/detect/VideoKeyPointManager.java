@@ -7,11 +7,11 @@ import java.util.List;
  */
 public class VideoKeyPointManager extends AbstractVideoManager<List<KeyPointData>>{
 
-    public VideoKeyPointManager(VideoFrameDelegate vfd, String videoSrc) {
-        super(vfd, videoSrc);
+    public VideoKeyPointManager( String videoSrc) {
+        super(videoSrc);
     }
-    public VideoKeyPointManager(VideoFrameDelegate vfd, String videoSrc, int gap) {
-        super(vfd, videoSrc, gap);
+    public VideoKeyPointManager(String videoSrc, int gap) {
+        super( videoSrc, gap);
     }
 
     @Override

@@ -7,8 +7,8 @@ import java.util.List;
  */
 public class BatchImageKeypointManager extends AbstractBatchImageManager<List<KeyPointData>> {
 
-    public BatchImageKeypointManager(List<String> mImages, ImageDetector detector) {
-        super(mImages, detector);
+    public BatchImageKeypointManager(List<String> mImages) {
+        super(mImages);
     }
 
     @Override

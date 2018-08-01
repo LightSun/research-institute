@@ -26,7 +26,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
 
     public static final int DEFAULT_BATCH_SIZE = 4;
 
-    private final VideoFrameDelegate vfd;
+    private final VideoFrameDelegate vfd = ImageFactory.getImageInitializer().getVideoFrameDelegate();
     private final String videoSrc;
     private final int frameGap;
     private final ImageDetector detector;
@@ -39,15 +39,13 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
     private int width;
     private int height;
 
-    public AbstractVideoManager(VideoFrameDelegate vfd, String videoSrc) {
-        this(vfd, videoSrc, 1);
+    public AbstractVideoManager(String videoSrc) {
+        this(videoSrc, 1);
     }
 
-    public AbstractVideoManager(
-            VideoFrameDelegate vfd, String videoSrc, int gap) {
+    public AbstractVideoManager(String videoSrc, int gap) {
         this.detector = ImageFactory.getImageInitializer().getImageDetector();
         this.videoSrc = videoSrc;
-        this.vfd = vfd;
         this.frameGap = gap;
     }
 
@@ -269,6 +267,14 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
          * get the video duration. in seconds
          */
         int getDuration(String videoFile);
+
+        /**
+         * get the frame image path
+         * @param videoFile the video file
+         * @param time the time in seconds
+         * @return the image path
+         */
+        String getFrameImagePath(String videoFile, int time);
     }
 
     public interface Callback<T> {

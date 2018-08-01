@@ -16,12 +16,12 @@ import java.util.List;
  */
 public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightData>> {
 
-    public VideoHighLightManager(VideoFrameDelegate vfd, String videoSrc) {
-        super(vfd, videoSrc);
+    public VideoHighLightManager(String videoSrc) {
+        super(videoSrc);
     }
 
-    public VideoHighLightManager(VideoFrameDelegate vfd, String videoSrc, int gap) {
-        super(vfd, videoSrc, gap);
+    public VideoHighLightManager( String videoSrc, int gap) {
+        super( videoSrc, gap);
     }
 
     @Override
@@ -62,13 +62,18 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
         public final SparseArray<List<? extends IHighLightData>> getDataMap() {
             return dataMap;
         }
-
-        private int getHighLightPoint() {
+        public int getHighLightPoint() {
+            return getHighLightPoint(0, Integer.MAX_VALUE);
+        }
+        public int getHighLightPoint(int stInSeconds, int etInSeconds) {
             int maxScoreTime = -1;
             int size = dataMap.size();
             float score = -1;
             for (int i = 0; i < size; i++) {
                 int time = dataMap.keyAt(i);
+                if(time < stInSeconds || time > etInSeconds){
+                    continue;
+                }
                 //common score + max confidence data.
                 float tmpScore = computeCommonScore(time) + maxConfidenceData(time).getScore();
                 if (tmpScore > score) {
@@ -78,9 +83,11 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
             }
             return maxScoreTime;
         }
-
         public HighLightArea getHighLightArea() {
-            int time = getHighLightPoint();
+            return getHighLightArea(0, Integer.MAX_VALUE);
+        }
+        public HighLightArea getHighLightArea(int stInSeconds, int etInSeconds) {
+            int time = getHighLightPoint(stInSeconds, etInSeconds);
             if (time == -1) {
                 return null;
             }

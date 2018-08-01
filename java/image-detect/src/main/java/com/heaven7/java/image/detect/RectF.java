@@ -42,4 +42,11 @@ public class RectF {
     public void setBottom(float bottom) {
         this.bottom = bottom;
     }
+
+    public float centerX() {
+        return left + (right - left) / 2;
+    }
+    public float centerY() {
+        return top + (bottom - top) / 2;
+    }
 }

@@ -7,8 +7,8 @@ import java.util.List;
  */
 public class BatchImageHighLightManager extends AbstractBatchImageManager<List<IHighLightData>> {
 
-    public BatchImageHighLightManager(List<String> mImages, ImageDetector detector) {
-        super(mImages, detector);
+    public BatchImageHighLightManager(List<String> mImages) {
+        super(mImages);
     }
 
     @Override

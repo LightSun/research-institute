@@ -8,6 +8,10 @@ public class LocationF {
         return new RectF(left, top, left + width, top + height);
     }
 
+    public float getArea(){
+        return width * height;
+    }
+
     @Override
     public String toString() {
         return "LocationF{" +
