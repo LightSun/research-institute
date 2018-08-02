@@ -138,7 +138,8 @@ public class FFmpegVideoHelper {
         String[] outPath = new String[1];
         for (GapManager.GapItem gapItem : gapItems){
             MediaPartItem mpi = (MediaPartItem) gapItem.item;
-            String[] cmds = FFmpegUtils.buildCutCmd(mpi, dir, outPath);
+            String[] cmds = FFmpegUtils.buildCutCmd(mpi.getItem().getFilePath(),
+                    mpi.videoPart.getStartTime(), mpi.videoPart.getEndTime(),dir, outPath);
             new CmdHelper(cmds).execute();
             //sleep for some case . cut video not done.
            /* try {

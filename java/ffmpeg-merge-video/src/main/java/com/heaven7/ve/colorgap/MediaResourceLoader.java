@@ -1,8 +1,8 @@
 package com.heaven7.ve.colorgap;
 
 
+import com.heaven7.utils.Context;
 import com.heaven7.utils.LoadException;
-import com.heaven7.ve.VEContext;
 import com.heaven7.ve.MediaResourceItem;
 
 /**
@@ -19,6 +19,6 @@ public abstract class MediaResourceLoader {
      * @param filePath the file path of scan result
      * @param callback the load callback
      */
-    public abstract void load(VEContext context, MediaResourceItem item, String filePath, VideoDataLoadUtils.LoadCallback callback)
+    public abstract void load(Context context, MediaResourceItem item, String filePath, VideoDataLoadUtils.LoadCallback callback)
                throws LoadException;
 }

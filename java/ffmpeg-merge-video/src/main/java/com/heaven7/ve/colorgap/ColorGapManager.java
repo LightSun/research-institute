@@ -6,7 +6,7 @@ import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.ArrayUtils;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.ConcurrentUtils;
-import com.heaven7.ve.VEContext;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.filter.MediaDirFilter;
 import com.heaven7.ve.colorgap.filter.VideoTagFilter;
@@ -27,7 +27,7 @@ public class ColorGapManager {
 
     private static final String TAG = "ColorGapManager";
 
-    private final VEContext mContext;
+    private final Context mContext;
     private final MusicCutter musicCut;
     private final MusicShader musicShader;
     private final PlaidFiller filler;
@@ -37,7 +37,7 @@ public class ColorGapManager {
     private TemplateScriptProvider mProvider;
     private IShotRecognizer mShotRecognizer;
 
-    public ColorGapManager(VEContext context, MediaAnalyser mediaAnalyser, MusicCutter musicCut,
+    public ColorGapManager(Context context, MediaAnalyser mediaAnalyser, MusicCutter musicCut,
                            MusicShader musicShader, PlaidFiller filler) {
         this.mContext = context;
         this.mediaAnalyser = mediaAnalyser;

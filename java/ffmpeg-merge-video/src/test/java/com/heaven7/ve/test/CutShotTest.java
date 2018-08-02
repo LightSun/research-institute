@@ -1,7 +1,6 @@
 package com.heaven7.ve.test;
 
 import com.heaven7.core.util.Logger;
-import com.heaven7.java.base.util.ArrayUtils;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.StartEndVisitor;
@@ -13,7 +12,6 @@ import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
 import com.heaven7.ve.colorgap.impl.TagBasedShotCutter;
-import com.heaven7.ve.test.util.FFmpegVideoHelper;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -99,7 +97,7 @@ public class CutShotTest extends TestCase {
                     sb.append("score = ").append(item.getDomainTagScore());
                     sb.append("\r\n");
 
-                    String[] cmd = FFmpegUtils.buildCutCmd(item, CUT_DIR);
+                    String[] cmd = buildCutCmd(item, CUT_DIR);
                     Logger.d(TAG, "testCutShot", "cmd  = " + Arrays.toString(cmd));
                     // runCmd(() -> new CmdHelper(cmd).execute(new CmdHelper.LogCallback()));
                     new CmdHelper(cmd).execute(new CmdHelper.LogCallback());
@@ -116,6 +114,10 @@ public class CutShotTest extends TestCase {
         }
     }
 
+    private String[] buildCutCmd(MediaPartItem item, String dir){
+        return FFmpegUtils.buildCutCmd(item.getVideoPath(), item.videoPart.getStartTime(),
+                item.videoPart.getEndTime(), dir);
+    }
 
     private List<MediaResourceItem> createItems() {
         List<MediaResourceItem> items = new ArrayList<>();

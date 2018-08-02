@@ -4,7 +4,7 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.Predicates;
-import com.heaven7.ve.VEContext;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.MusicShader;
 import com.heaven7.ve.template.TransferDelegate;
@@ -26,7 +26,7 @@ public class MusicShaderImpl implements MusicShader {
     private static final String TAG = "MusicShaderImpl";
 
     @Override
-    public VETemplate tint(VEContext context, @Nullable VETemplate template, List<CutInfo.PlaidInfo> plaids, int tintFlags) {
+    public VETemplate tint(Context context, @Nullable VETemplate template, List<CutInfo.PlaidInfo> plaids, int tintFlags) {
 
         /*
          * if no template: we just regard the plaids as one logic-sentence

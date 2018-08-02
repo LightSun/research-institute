@@ -3,15 +3,12 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
-import com.heaven7.java.visitor.PredicateVisitor;
-import com.heaven7.java.visitor.collection.VisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.gap.GapManager;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * the chapter.(a chapter correspond one logic-sentence)

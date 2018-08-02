@@ -63,3 +63,14 @@
       node规则：  环境，局部，产品 其中一个.
 
       染色： 区域(占用格子个数)， 各种条件-color_gap.
+
+
+===================================== 子模型 数据批量生成 ========================================
+filename: duration, [HighlightDataMap]
+
+HighlightData: time, [HighlightData]
+
+
+
+
+

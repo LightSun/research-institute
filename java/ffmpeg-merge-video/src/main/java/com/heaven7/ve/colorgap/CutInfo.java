@@ -1,14 +1,12 @@
 package com.heaven7.ve.colorgap;
 
-import com.heaven7.utils.Arrays2;
 import com.heaven7.ve.*;
 import com.heaven7.ve.colorgap.filter.GroupFilter;
 import com.heaven7.ve.gap.PlaidDelegate;
 import com.heaven7.ve.template.ProportionConfig;
+import com.heaven7.ve.utils.Arrays2;
 
 import java.util.List;
-
-import static com.heaven7.ve.PathTimeTraveller.TYPE_AUDIO;
 
 /**
  * 切点信息

@@ -3,14 +3,12 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.java.visitor.util.Collections2;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 

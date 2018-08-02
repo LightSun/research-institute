@@ -4,7 +4,6 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.image.detect.IHighLightData;
-import com.heaven7.java.image.detect.Location;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
@@ -268,7 +267,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
     /** get end time (in mill-seconds) based on last modify time. */
     public long getEndTime() {
         Throwables.checkNull(imageMeta);
-        return imageMeta.getDate() + (long)CommonUtils.frameToTime(videoPart.getEndTime(), TimeUnit.MILLISECONDS);
+        return imageMeta.getDate() + (long) CommonUtils.frameToTime(videoPart.getEndTime(), TimeUnit.MILLISECONDS);
     }
     /** set tags with main face and shot type */
     private void setRawTags() {

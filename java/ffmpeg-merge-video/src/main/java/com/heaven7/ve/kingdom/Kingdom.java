@@ -1,13 +1,11 @@
 package com.heaven7.ve.kingdom;
 
 import com.heaven7.java.base.util.SparseArray;
-import com.heaven7.java.visitor.IterateVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
-import com.heaven7.java.visitor.collection.IterationInfo;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConfigUtil;
+import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
-import com.heaven7.ve.VEContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -105,7 +103,7 @@ public abstract class Kingdom {
     }
 
     //TODO should call this before any.
-    public static void loadVocabulary(VEContext context, String path) {
+    public static void loadVocabulary(Context context, String path) {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(ConfigUtil.loadResourcesAsStream(path)));

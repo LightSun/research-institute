@@ -3,7 +3,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.ve.VEContext;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.PathTimeTraveller;
 import com.heaven7.ve.colorgap.MediaAnalyser;
@@ -29,7 +29,7 @@ public class MediaAnalyserImpl implements MediaAnalyser {
             | ImageMediumFileHelper.MODE_RECTS);
 
     @Override
-    public List<MediaItem> analyse(VEContext context, List<MediaResourceItem> items, CyclicBarrier barrier) {
+    public List<MediaItem> analyse(Context context, List<MediaResourceItem> items, CyclicBarrier barrier) {
         List<MediaItem> outItems = new ArrayList<>();
         for(MediaResourceItem item : items){
             final MediaItem mediaItem = new MediaItem();
@@ -67,7 +67,7 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         mImageHelper.cancel();
     }
 
-    protected MetaInfo.ImageMeta analyseMeta(VEContext context, MediaResourceItem item) {
+    protected MetaInfo.ImageMeta analyseMeta(Context context, MediaResourceItem item) {
         MetaInfo.ImageMeta meta = new MetaInfo.ImageMeta();
         meta.setPath(item.getFilePath());
         meta.setDate(item.getTime());

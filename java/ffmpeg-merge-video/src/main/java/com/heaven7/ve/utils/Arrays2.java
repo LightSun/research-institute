@@ -1,4 +1,4 @@
-package com.heaven7.utils;
+package com.heaven7.ve.utils;
 
 import com.heaven7.ve.Copyable;
 

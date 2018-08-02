@@ -1,6 +1,6 @@
 package com.heaven7.ve.colorgap;
 
-import com.heaven7.ve.VEContext;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.MediaResourceItem;
 
 /**
@@ -9,6 +9,6 @@ import com.heaven7.ve.MediaResourceItem;
  */
 public abstract class ImageResourceScanner{
 
-    public abstract String scan(VEContext context, MediaResourceItem item, String srcDir, String filenamePrefix);
+    public abstract String scan(Context context, MediaResourceItem item, String srcDir, String filenamePrefix);
 
 }

@@ -8,7 +8,6 @@ import com.heaven7.java.visitor.collection.ListVisitService;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
-import com.heaven7.ve.VEContext;
 import com.heaven7.ve.colorgap.*;
 
 import java.io.File;
@@ -39,12 +38,12 @@ import java.util.concurrent.atomic.AtomicInteger;
         this.tagsScanner = tagsScanner;
     }
 
-    public void scanAndLoad(VEContext context, List<MediaItem> imageItems, boolean singleTag,
+    public void scanAndLoad(Context context, List<MediaItem> imageItems, boolean singleTag,
                             boolean singleRect, final CyclicBarrier barrier) {
         ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, imageItems, singleTag, singleRect, barrier));
     }
 
-    private void scanAndLoad0(VEContext context, List<MediaItem> imageItems, boolean singleTag,
+    private void scanAndLoad0(Context context, List<MediaItem> imageItems, boolean singleTag,
                               boolean singleRect, CyclicBarrier barrier) {
         if (imageItems.isEmpty() || (rectsScanner == null && tagsScanner == null)) {
             ConcurrentUtils.awaitBarrier(barrier);
@@ -207,10 +206,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
         private final List<MediaItem> mMediaItems;
         private final CyclicBarrier mBarrier;
-        private final VEContext mContext;
+        private final Context mContext;
         private AtomicInteger mGroupCount;
 
-        public BatchScanner(VEContext context, List<MediaItem> mediaItems, CyclicBarrier barrier) {
+        public BatchScanner(Context context, List<MediaItem> mediaItems, CyclicBarrier barrier) {
             this.mContext = context;
             this.mMediaItems = mediaItems;
             this.mBarrier = barrier;

@@ -5,11 +5,9 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.Visitors;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
-import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.gap.PlaidDelegate;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

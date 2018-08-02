@@ -477,7 +477,7 @@ public interface MetaInfo {
             if(highLightMap == null){
                 return null;
             }
-            int start = (int)CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
+            int start = (int) CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
             int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
             VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(
                     new ScoreProviderImpl(), highLightMap);

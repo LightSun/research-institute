@@ -1,7 +1,7 @@
 package com.heaven7.ve.colorgap.filter;
 
-import com.heaven7.utils.Arrays2;
 import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.utils.Arrays2;
 
 import java.util.Calendar;
 import java.util.Date;

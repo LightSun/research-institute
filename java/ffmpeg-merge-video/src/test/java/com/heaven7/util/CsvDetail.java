@@ -1,13 +1,8 @@
 package com.heaven7.util;
 
 import com.heaven7.java.base.util.Throwables;
-import com.heaven7.java.visitor.PredicateVisitor;
-import com.heaven7.java.visitor.ResultVisitor;
-import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.colorgap.FrameTags;
-import com.heaven7.ve.colorgap.Tag;
-import com.heaven7.ve.colorgap.Vocabulary;
 
 import java.io.File;
 import java.util.List;

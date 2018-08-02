@@ -6,7 +6,6 @@ import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.StartEndVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
-import com.heaven7.ve.VEContext;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.kingdom.Kingdom;
 
@@ -22,8 +21,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.heaven7.ve.colorgap.Vocabulary.VOCABULARY_FILE_NAME;
-
 /**
  * the resource initializer of cut music / cut video .
  * Created by heaven7 on 2018/4/17 0017.
@@ -36,7 +33,7 @@ public class ResourceInitializer {
     /**
      * init resource
      */
-    public static void init(VEContext context) {
+    public static void init(Context context) {
         MockHelper.init(context);
         //Vocabulary.loadVocabulary(context, "table/" + VOCABULARY_FILE_NAME);
         Kingdom.loadVocabulary(context, "table/" + VOCABULARY_FILE_NAME);
@@ -85,7 +82,7 @@ public class ResourceInitializer {
         private static Map<String, String> sImageTagDirMap = new HashMap<>();
         private static boolean inited;
 
-        public static synchronized void init(VEContext context) {
+        public static synchronized void init(Context context) {
             if (!inited) {
                 inited = true;
                 Properties prop = ConfigUtil.loadResources("table/wedding_map.properties");
@@ -246,7 +243,7 @@ public class ResourceInitializer {
             File tfs_config = new File(dataDir, "tfs_config.txt");
             TextReadHelper<TfsLine> reader = new TextReadHelper<>(new TextReadHelper.Callback<TfsLine>() {
                 @Override
-                public BufferedReader open(VEContext context, String url) throws IOException {
+                public BufferedReader open(Context context, String url) throws IOException {
                     return new BufferedReader(new FileReader(url));
                 }
                 @Override

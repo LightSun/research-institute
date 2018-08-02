@@ -2,12 +2,7 @@ package com.heaven7.test;
 
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
-import com.heaven7.utils.TextUtils;
 import org.junit.Test;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * extract image from video. which use ffmpeg

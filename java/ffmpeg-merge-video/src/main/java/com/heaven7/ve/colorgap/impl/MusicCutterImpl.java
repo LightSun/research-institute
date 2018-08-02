@@ -1,7 +1,7 @@
 package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.ve.VEContext;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.MusicCutter;
 
@@ -19,7 +19,7 @@ public class MusicCutterImpl implements MusicCutter {
     private static final String NAME = "e:/13.mp3";
 
     @Override
-    public CutInfo[] cut(VEContext context, String[] musicPath) {
+    public CutInfo[] cut(Context context, String[] musicPath) {
         CutInfo info = new CutInfo();
         int originDuration = 0;
         int duration = 281 * 1000; //00:04:41

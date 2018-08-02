@@ -3,8 +3,6 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.image.detect.IHighLightData;
-import com.heaven7.java.image.detect.Location;
-import com.heaven7.java.image.detect.Rect;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;

@@ -6,11 +6,7 @@ import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.ConcurrentManager;
-import com.heaven7.utils.ConcurrentUtils;
-import com.heaven7.utils.FileUtils;
-import com.heaven7.utils.LoadException;
-import com.heaven7.ve.VEContext;
+import com.heaven7.utils.*;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.*;
 
@@ -45,7 +41,7 @@ public class MediaAnalyseHelper {
     public void cancel() {
         ConcurrentUtils.shutDownNow();
     }
-    public void scanAndLoad(VEContext context, List<MediaItem> items, final CyclicBarrier outBarrier) {
+    public void scanAndLoad(Context context, List<MediaItem> items, final CyclicBarrier outBarrier) {
         ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, items, outBarrier));
     }
 
@@ -54,7 +50,7 @@ public class MediaAnalyseHelper {
      * @param items the media items
      * @param barrier the barrier
      */
-    private void scanAndLoad0(VEContext context, List<MediaItem> items, final CyclicBarrier barrier) {
+    private void scanAndLoad0(Context context, List<MediaItem> items, final CyclicBarrier barrier) {
         //filter video
         List<MediaItem> videoItems = VisitServices.from(items).visitForQueryList(new PredicateVisitor<MediaItem>() {
             @Override
@@ -83,11 +79,11 @@ public class MediaAnalyseHelper {
         private final CyclicBarrier outBarrier;
         final String dir;
         final List<MediaItem> sameDirItems;
-        final VEContext context;
+        final Context context;
 
         final AtomicInteger mCount;
 
-        /*public*/ BatchProcessor(VEContext context, CyclicBarrier barrier, String dir, List<MediaItem> sameDirItems) {
+        /*public*/ BatchProcessor(Context context, CyclicBarrier barrier, String dir, List<MediaItem> sameDirItems) {
             this.context = context;
             this.outBarrier = barrier;
             this.dir = dir;
@@ -129,7 +125,7 @@ public class MediaAnalyseHelper {
     }
 
     private class ScanTask implements Runnable {
-        final VEContext context;
+        final Context context;
         final String tag;
 
         final MediaItem item;
@@ -139,7 +135,7 @@ public class MediaAnalyseHelper {
 
         final BatchProcessor parent;
 
-        public ScanTask(VEContext context, MediaItem item, String dir,
+        public ScanTask(Context context, MediaItem item, String dir,
                         MediaResourceScanner scanner, MediaResourceLoader loader, BatchProcessor parent, String tag) {
             this.context = context;
             this.item = item;
@@ -167,7 +163,7 @@ public class MediaAnalyseHelper {
 
     private static class LoadTask implements Runnable, VideoDataLoadUtils.LoadCallback {
 
-        final VEContext context;
+        final Context context;
         final String path;
         final MediaResourceItem item;
         final MediaResourceLoader loader;
@@ -175,7 +171,7 @@ public class MediaAnalyseHelper {
         final MetaInfo.ImageMeta out;
         final BatchProcessor parent;
 
-        /*public*/ LoadTask(VEContext context, MediaResourceItem item, String path, MetaInfo.ImageMeta out,
+        /*public*/ LoadTask(Context context, MediaResourceItem item, String path, MetaInfo.ImageMeta out,
                             MediaResourceLoader loader, BatchProcessor parent) {
             this.context = context;
             this.item = item;
