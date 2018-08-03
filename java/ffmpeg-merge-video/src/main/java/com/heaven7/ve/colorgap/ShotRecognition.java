@@ -60,7 +60,6 @@ public class ShotRecognition {
             oldType = MetaInfo.getShotTypeFrom(shotType);
         }
 
-        int time = item.getKeyFrameTime();
         float bodyArea = item.getBodyArea();
         float bodyRate = bodyArea / (item.imageMeta.getWidth() * item.imageMeta.getHeight());
         int body_shotType = getShopTypeByBody(bodyRate);
@@ -71,7 +70,7 @@ public class ShotRecognition {
             if (highLight != null) {
                 data = highLight.getValue();
             } else {
-                data = item.getHighLightData(time);
+                data = item.getHighLightData(item.getKeyFrameTime());
             }
             //module shot type
             int shotType_module = SHOT_TYPE_NONE;
