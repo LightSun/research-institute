@@ -13,4 +13,10 @@ public class Constants {
     public static final String KEY_LIMIT_MIN    = "limit_min";
     public static final String KEY_LIMIT_MAX    = "limit_max";
 
+    public static final String EXTENSION_VIDEO_HIGH_LIGHT     = "vhighlight";
+    public static final String EXTENSION_IMAGE_HIGH_LIGHT     = "ihighlight";
+    public static final String DIR_HIGH_LIGHT   = "highlight";
+
+    public static final String DIR_DATA = "data";
+    public static final String DIR_TEMP = "temp";
 }

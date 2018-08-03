@@ -46,10 +46,7 @@ public class ShotRecognition {
         int faceCount = item.imageMeta.getMainFaceCount();
         int keyPointCount = item.getKeyPointCount();
         if (faceCount > 0) {
-            if (keyPointCount >= 9) {
-                return CATEGORY_ENV;
-            }
-            return CATEGORY_PART;
+            return CATEGORY_ENV;
         } else {
             return keyPointCount >= 9 ? CATEGORY_PART : CATEGORY_PRODUCT;
         }
@@ -63,16 +60,14 @@ public class ShotRecognition {
             oldType = MetaInfo.getShotTypeFrom(shotType);
         }
 
-        long duration = item.imageMeta.getDuration();
-        int middleTime = (int) (duration / 2 / 1000);
-        KeyValuePair<Integer, List<IHighLightData>> highLight = item.getHighLight();
-        int time = highLight != null ? highLight.getKey() : middleTime;
-        float bodyArea = item.getBodyArea(time);
+        int time = item.getKeyFrameTime();
+        float bodyArea = item.getBodyArea();
         float bodyRate = bodyArea / (item.imageMeta.getWidth() * item.imageMeta.getHeight());
         int body_shotType = getShopTypeByBody(bodyRate);
         //trans shot_type and body type is none
         if(oldType == SHOT_TYPE_NONE && body_shotType == SHOT_TYPE_NONE){
             List<IHighLightData> data;
+            KeyValuePair<Integer, List<IHighLightData>> highLight = item.getHighLight();
             if (highLight != null) {
                 data = highLight.getValue();
             } else {
@@ -84,7 +79,6 @@ public class ShotRecognition {
                 shotType_module = getShotTypeOfHighLight(item, data);
             }
             return shotType_module; //may be SHOT_TYPE_NONE
-            //TODO 领域 主体。
         }else{
             return Math.max(oldType, body_shotType);
         }

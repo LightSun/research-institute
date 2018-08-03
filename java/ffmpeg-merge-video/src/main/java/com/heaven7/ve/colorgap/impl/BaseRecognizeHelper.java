@@ -1,38 +1,32 @@
-package com.heaven7.ve.colorgap;
+package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.detect.AbstractBatchImageManager;
-import com.heaven7.java.image.detect.BatchImageSubjectIdentifyManager;
 import com.heaven7.java.image.detect.IHighLightData;
-import com.heaven7.java.image.detect.Location;
 import com.heaven7.java.visitor.*;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.ve.colorgap.MediaPartItem;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * the subject recognize/identify helper
  * @author heaven7
  */
-public abstract class SubjectRecognizeHelper implements AbstractBatchImageManager.Callback<Location> {
+public abstract class BaseRecognizeHelper<T> implements AbstractBatchImageManager.Callback<T>{
 
-    private final BatchImageSubjectIdentifyManager mBisim;
     private final List<Pair> mPairs = new ArrayList<>();
+    private final AbstractBatchImageManager<T> mBIM;
 
-    public SubjectRecognizeHelper(List<MediaPartItem> mItems) {
+    public BaseRecognizeHelper(List<MediaPartItem> mItems) {
         List<String> images = VisitServices.from(mItems).map(new ResultVisitor<MediaPartItem, String>() {
             @Override
             public String visit(MediaPartItem item, Object param) {
                 if(item.getItem().isVideo()){
-                    long duration = item.imageMeta.getDuration();
-                    int middleTime = (int) (duration / 2 / 1000);
-                    KeyValuePair<Integer, List<IHighLightData>> highLight = item.getHighLight();
-                    int time = highLight != null ? highLight.getKey() : middleTime;
                     return ImageFactory.getImageInitializer().getVideoFrameDelegate().getFrameImagePath(
-                            item.item.getFilePath(), time);
+                            item.item.getFilePath(), item.getKeyFrameTime());
                 }
                 return item.getItem().getFilePath();
             }
@@ -45,18 +39,18 @@ public abstract class SubjectRecognizeHelper implements AbstractBatchImageManage
                 return null;
             }
         });
-        this.mBisim = new BatchImageSubjectIdentifyManager(images);
+        mBIM = onCreateBatchImageManager(images);
     }
 
     public void start(){
-        mBisim.detect(this);
+        mBIM.detect(this);
     }
 
     @Override
-    public void onCallback(Map<String, Location> map) {
-        VisitServices.from(map).map2MapValue(new MapResultVisitor<String, Location, MediaPartItem>() {
+    public final void onCallback(Map<String, T> map) {
+        VisitServices.from(map).map2MapValue(new MapResultVisitor<String, T, MediaPartItem>() {
             @Override
-            public MediaPartItem visit(KeyValuePair<String, Location> t, Object param) {
+            public MediaPartItem visit(KeyValuePair<String, T> t, Object param) {
                 return VisitServices.from(mPairs).query(new PredicateVisitor<Pair>() {
                     @Override
                     public Boolean visit(Pair pair, Object param) {
@@ -64,16 +58,28 @@ public abstract class SubjectRecognizeHelper implements AbstractBatchImageManage
                     }
                 }).partItem;
             }
-        }).fire(new MapFireVisitor<MediaPartItem, Location>() {
+        }).fire(new MapFireVisitor<MediaPartItem, T>() {
             @Override
-            public Boolean visit(KeyValuePair<MediaPartItem, Location> pair, Object param) {
-                //TODO get shot type for Subject Recognize
+            public Boolean visit(KeyValuePair<MediaPartItem, T> pair, Object param) {
+                onProcess(pair.getKey(), pair.getValue());
                 return null;
             }
         });
         onDone();
     }
 
+    protected abstract AbstractBatchImageManager<T> onCreateBatchImageManager(List<String> images);
+
+    /**
+     * called when request done and we want to do with the part and value.
+     * @param part the media part
+     * @param value the value
+     */
+    protected abstract void onProcess(MediaPartItem part, T value);
+
+    /**
+     * called on request and set property done done
+     */
     protected abstract void onDone();
 
     private static class Pair{
@@ -85,5 +91,4 @@ public abstract class SubjectRecognizeHelper implements AbstractBatchImageManage
             this.imgPath = imgPath;
         }
     }
-
 }

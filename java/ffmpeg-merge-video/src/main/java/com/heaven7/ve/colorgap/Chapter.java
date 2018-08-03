@@ -7,6 +7,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.gap.GapManager;
+import com.heaven7.ve.kingdom.Kingdom;
 
 import java.util.*;
 
@@ -323,7 +324,7 @@ public class Chapter {
                 int intersectCount = intersectSet.size();
                 //主词，不参加故事分类
                 for(Integer index : intersectSet){
-                    if(Vocabulary.isDomainTag(index)){
+                    if(Kingdom.getDefault().isSubjectTag(index)){
                         intersectCount --;
                     }
                 }

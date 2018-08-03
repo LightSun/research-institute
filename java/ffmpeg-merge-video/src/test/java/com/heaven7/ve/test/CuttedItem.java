@@ -4,8 +4,8 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.colorgap.MediaPartItem;
-import com.heaven7.ve.colorgap.Vocabulary;
 import com.heaven7.ve.gap.GapManager;
+import com.heaven7.ve.kingdom.Kingdom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +59,10 @@ public class CuttedItem {
             return "";
         }
         List<String> tags_str = new ArrayList<>();
-        VisitServices.from(tags.get(0)).transformToCollection(new ResultVisitor<Integer, String>() {
+        VisitServices.from(tags.get(0)).map(new ResultVisitor<Integer, String>() {
             @Override
             public String visit(Integer index, Object param) {
-                return Vocabulary.getTagStr(index);
+                return Kingdom.getTagStr(index);
             }
         }).save(tags_str);
         return tags_str.toString();

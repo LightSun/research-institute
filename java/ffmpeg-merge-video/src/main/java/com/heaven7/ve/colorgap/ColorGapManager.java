@@ -12,6 +12,7 @@ import com.heaven7.ve.colorgap.filter.MediaDirFilter;
 import com.heaven7.ve.colorgap.filter.VideoTagFilter;
 import com.heaven7.ve.colorgap.impl.AirShotFilterImpl;
 import com.heaven7.ve.gap.GapManager;
+import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class ColorGapManager {
 
     private TemplateScriptProvider mProvider;
     private IShotRecognizer mShotRecognizer;
+    private Kingdom mKingdom = Kingdom.getDefault();
 
     public ColorGapManager(Context context, MediaAnalyser mediaAnalyser, MusicCutter musicCut,
                            MusicShader musicShader, PlaidFiller filler) {
@@ -50,6 +52,9 @@ public class ColorGapManager {
         mediaAnalyser.cancel();
     }
 
+    public void setKingdom(Kingdom kingdom) {
+        this.mKingdom = kingdom;
+    }
     public void setShotRecognizer(IShotRecognizer mShotRecognizer) {
         this.mShotRecognizer = mShotRecognizer;
     }
@@ -74,7 +79,7 @@ public class ColorGapManager {
      */
     //return the FillResult which contains video editor nodes and src template.
     public void fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<MediaResourceItem> items, FillCallback callback) {
-        ResourceInitializer.init(mContext);
+       // ResourceInitializer.init(mContext);
         //the barrier help we do two tasks: analyse, tint.
         CyclicBarrier barrier = new CyclicBarrier(mediaAnalyser.getAsyncModuleCount() + 1);
         //analyse
@@ -104,26 +109,13 @@ public class ColorGapManager {
             List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(plaids, mediaItems);
             //shot recognition
             if(mShotRecognizer != null && !Predicates.isEmpty(newItems)){
-                List<MediaPartItem> subjectItems = new ArrayList<>();
-                for(MediaPartItem partItem : newItems){
-                    int shotType = mShotRecognizer.getShotType(partItem);
-                    if(shotType == MetaInfo.SHOT_TYPE_NONE){
-                        subjectItems.add(partItem);
-                    }else{
-                        partItem.imageMeta.setShotType(MetaInfo.getShotTypeString(shotType));
-                    }
-                    int shotCategory = mShotRecognizer.recognizeShotCategory(partItem);
-                    partItem.imageMeta.setShotCategory(shotCategory);
-                }
-                //start subject recognize.
                 final VETemplate source_tem = srcTemplate;
-                new SubjectRecognizeHelper(subjectItems){
+                mShotRecognizer.requestKeyPoint(newItems, new IShotRecognizer.Callback() {
                     @Override
-                    protected void onDone() {
-                        //process story to color filter(gen shot key, filter)
-                        doFillPlaids(newItems, plaids, source_tem, resultTemplate, callback);
+                    public void onRecognizeDone(List<MediaPartItem> parts) {
+                        processShotType(newItems, plaids, source_tem, resultTemplate, callback);
                     }
-                }.start();
+                });
             }else {
                 doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
             }
@@ -135,6 +127,37 @@ public class ColorGapManager {
         }catch (RuntimeException e){
             Logger.w(TAG, "fill", Logger.toString(e));
             callback.onFillFinished(null);
+        }
+    }
+
+    // compute shot-type and judge if need request subject.
+    private void processShotType(List<MediaPartItem> newItems, List<CutInfo.PlaidInfo> plaids,
+                              @Nullable VETemplate srcTemplate, VETemplate resultTemplate,
+                              FillCallback callback) {
+        //do with shot type
+        List<MediaPartItem> subjectItems = new ArrayList<>();
+        for(MediaPartItem partItem : newItems){
+            int shotType = mShotRecognizer.getShotType(partItem);
+            if(shotType == MetaInfo.SHOT_TYPE_NONE){
+                subjectItems.add(partItem);
+            }else{
+                partItem.imageMeta.setShotType(MetaInfo.getShotTypeString(shotType));
+            }
+            int shotCategory = mShotRecognizer.recognizeShotCategory(partItem);
+            partItem.imageMeta.setShotCategory(shotCategory);
+        }
+        //start subject recognize.
+        if(Predicates.isEmpty(subjectItems)){
+            doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
+        }else {
+            final VETemplate source_tem = srcTemplate;
+            mShotRecognizer.requestSubject(subjectItems, new IShotRecognizer.Callback() {
+                @Override
+                public void onRecognizeDone(List<MediaPartItem> parts) {
+                    //process story to color filter(gen shot key, filter)
+                    doFillPlaids(newItems, plaids, source_tem, resultTemplate, callback);
+                }
+            });
         }
     }
 
@@ -158,7 +181,7 @@ public class ColorGapManager {
      * @param items the items from script
      * @return the video editor template. null if the items is empty.
      */
-    public static @Nullable VETemplate createVETemplate(List<RawScriptItem> items){
+    public @Nullable VETemplate createVETemplate(List<RawScriptItem> items){
         if(Predicates.isEmpty(items)){
             return null;
         }
@@ -219,7 +242,7 @@ public class ColorGapManager {
         return nodes;
     }*/
 
-    private static void populateTemplate(VETemplate template, List<RawScriptItem> items) {
+    private void populateTemplate(VETemplate template, List<RawScriptItem> items) {
         for (RawScriptItem item : items) {
             //转场镜头/空镜头的个数. 末尾开始，倒过来均分
             int airShotCount = item.getAirShotCount();
@@ -264,12 +287,12 @@ public class ColorGapManager {
             if (!Predicates.isEmpty(item.getFirstShotTags())) {
                 List<List<Integer>> tags = new ArrayList<>();
                 for (String tag : item.getFirstShotTags()) {
-                    int[] ids = Vocabulary.getTagIdsFromWeddingNounTag(tag);
+                    List<Integer> ids = mKingdom.getTagIdsAsNoun(tag);
                     if (ids == null) {
                         Logger.w("ColorGapManager", "populateTemplate", "getTagIdsFromWeddingNounTag() failed.tag = " + tag);
                         continue;
                     }
-                    tags.add(ArrayUtils.toList(ids));
+                    tags.add(ids);
                 }
                 if (tags.size() > 0) {
                     ls.addColorFilter(new VideoTagFilter(new VideoTagFilter.VideoTagCondition(tags)));

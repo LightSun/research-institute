@@ -12,6 +12,7 @@ import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
 import com.heaven7.ve.colorgap.impl.TagBasedShotCutter;
+import com.heaven7.ve.kingdom.Kingdom;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -84,7 +85,7 @@ public class CutShotTest extends TestCase {
                         VisitServices.from(tags.get(0)).fireWithStartEnd(new StartEndVisitor<Integer>() {
                             @Override
                             public boolean visit(Object param, Integer index, boolean start, boolean end) {
-                                sb.append(Vocabulary.getTagStr(index));
+                                sb.append(Kingdom.getTagStr(index));
                                 if (!end) {
                                     sb.append(", ");
                                 }

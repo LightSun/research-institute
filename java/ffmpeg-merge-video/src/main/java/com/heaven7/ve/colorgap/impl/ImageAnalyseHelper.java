@@ -1,5 +1,7 @@
 package com.heaven7.ve.colorgap.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.*;
@@ -8,9 +10,15 @@ import com.heaven7.java.visitor.collection.ListVisitService;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
+import com.heaven7.ve.Constants;
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.colorgap.impl.montage.ImageDataDirMapperImpl;
+import com.vida.common.IOUtils;
+import com.vida.common.entity.MediaData;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,31 +33,23 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 /*public*/ class ImageAnalyseHelper {
 
-    private static final int DEFAULT_MEMBER_COUNT = 5;
     private static final String TAG = "ImageAnalyseHelper";
-    private final ImageResourceScanner rectsScanner;
-    private final ImageResourceScanner tagsScanner;
+    private final Gson mGson = new GsonBuilder().create();
 
-    private ImageDataDirMapper mDataDirMapper;//TODO data dir mapper.
+    private ImageDataDirMapper mDataDirMapper = new ImageDataDirMapperImpl();
     private List<ImageResource> mImageRess;
 
-    public ImageAnalyseHelper(ImageResourceScanner rectsScanner, ImageResourceScanner tagsScanner) {
-        this.rectsScanner = rectsScanner;
-        this.tagsScanner = tagsScanner;
+
+    public void scanAndLoad(Context context, List<MediaItem> imageItems, final CyclicBarrier barrier) {
+        ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, imageItems, barrier));
     }
 
-    public void scanAndLoad(Context context, List<MediaItem> imageItems, boolean singleTag,
-                            boolean singleRect, final CyclicBarrier barrier) {
-        ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, imageItems, singleTag, singleRect, barrier));
-    }
-
-    private void scanAndLoad0(Context context, List<MediaItem> imageItems, boolean singleTag,
-                              boolean singleRect, CyclicBarrier barrier) {
-        if (imageItems.isEmpty() || (rectsScanner == null && tagsScanner == null)) {
+    private void scanAndLoad0(Context context, List<MediaItem> imageItems, CyclicBarrier barrier) {
+        if (imageItems.isEmpty()) {
             ConcurrentUtils.awaitBarrier(barrier);
         } else {
             //load image
-            new BatchScanner(context, imageItems, barrier).startScan(singleRect, singleTag);
+            new BatchScanner(context, imageItems, barrier).startScanByDir();
         }
     }
 
@@ -71,10 +71,11 @@ import java.util.concurrent.atomic.AtomicInteger;
             }
         }).read(null, batchFileList.getAbsolutePath());
         final TextReadHelper<ConfigLine> reader = new TextReadHelper<>(new ConfigLineCallback());
+        //load face and tag data
         mImageRess = VisitServices.from(lines).map(new ResultVisitor<ImageResBatchLine, ImageResource>() {
             @Override
             public ImageResource visit(ImageResBatchLine line, Object param) {
-                String dataDir = mDataDirMapper.map(line.imageResourceDir);
+                String dataDir = mDataDirMapper.mapDataDir(line.imageResourceDir);
                 ImageResource imageRes = new ImageResource();
                 imageRes.setBatchDir(line.imageResourceDir);
 
@@ -99,6 +100,8 @@ import java.util.concurrent.atomic.AtomicInteger;
                 return imageRes;
             }
         }).getAsList();
+        //load high light data
+
     }
 
     private static class ImageResource{
@@ -125,18 +128,6 @@ import java.util.concurrent.atomic.AtomicInteger;
         public void setTagPath(String tagPath) {
             this.tagPath = tagPath;
         }
-    }
-
-    /**
-     * the image data dir mapper.
-     */
-    public interface ImageDataDirMapper{
-        /**
-         * map the source dir to data dir.
-         * @param imageResDir the image resource dir
-         * @return the image data dir
-         */
-        String map(String imageResDir);
     }
 
     /**
@@ -214,37 +205,6 @@ import java.util.concurrent.atomic.AtomicInteger;
             this.mMediaItems = mediaItems;
             this.mBarrier = barrier;
         }
-
-        public void startScan(boolean singleRect, boolean singleTag) {
-            ListVisitService<List<MediaItem>> groupService = VisitServices.from(mMediaItems)
-                    .groupService(DEFAULT_MEMBER_COUNT);
-            mGroupCount = new AtomicInteger(groupService.size());
-
-            groupService.map(new ResultVisitor<List<MediaItem>, Group>() {
-                @Override
-                public Group visit(List<MediaItem> mediaItems, Object param) {
-                    return new Group(mediaItems);
-                }
-            }).fire(new FireVisitor<Group>() {
-                @Override
-                public Boolean visit(final Group group, Object param) {
-                    ConcurrentManager.getDefault().submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            doWidthRects(group, singleRect);
-                        }
-                    });
-                    ConcurrentManager.getDefault().submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            doWidthTags(group, singleTag);
-                        }
-                    });
-                    return null;
-                }
-            });
-        }
-
         /**
          * 1, 生成时： 分批，生成tag和face.
          * 2. 加载时, 预先加载 tfs_config.txt and face_config.txt, 读取对应的文件路径
@@ -277,6 +237,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                     ImageResource imageRes = list.get(0);
                     ConcurrentManager.getDefault().submit(() -> doWithBacthRects(group, imageRes));
                     ConcurrentManager.getDefault().submit(() -> doWithBacthTags(group, imageRes));
+                    ConcurrentManager.getDefault().submit(() -> doWithHighLights(group, imageRes));
                     return null;
                 }
             });
@@ -303,110 +264,37 @@ import java.util.concurrent.atomic.AtomicInteger;
             doIfAllDone(group);
         }
 
-        private void doWidthRects(Group group, boolean singleRect) {
-            if (rectsScanner != null) {
-                //filename prefix
-                final String prefix = singleRect ? null : group.filenamePrefix;
-
-                List<KeyValuePair<MediaItem, String>> list = VisitServices.from(group.items)
-                        .map2mapAsKey(new ResultVisitor<MediaItem, String>() {
-                    @Override
-                    public String visit(MediaItem item, Object param) {
-                        String dir = FileUtils.getFileDir(item.item.getFilePath(), 2, true);
-                        return rectsScanner.scan(mContext, item.item, dir, prefix);
+        private void doWithHighLights(Group group, ImageResource imageRes) {
+            VisitServices.from(group.items).fire(new FireVisitor<MediaItem>() {
+                @Override
+                public Boolean visit(MediaItem item, Object param) {
+                    String fileName = FileUtils.getFileName(item.item.getFilePath());
+                    String fullDir = FileUtils.getFileDir(item.item.getFilePath(), 1, true);
+                    String dir = FileUtils.getFileDir(item.item.getFilePath(), 1, false);
+                    String dataDir = mDataDirMapper.mapDataDir(fullDir);
+                    //highlight file. .../data/highlight/dir/xxx.ihighlight
+                    String hlFilename = dataDir + File.separator + Constants.DIR_HIGH_LIGHT
+                            + File.separator + dir + File.separator
+                            + fileName + "." + Constants.EXTENSION_IMAGE_HIGH_LIGHT;
+                    File file = new File(hlFilename);
+                    if(!file.exists()){
+                        Logger.w(TAG, "doWithHighLights", "can't find high light file. " + hlFilename);
+                        return true;
                     }
-                }).mapPair().getAsList();
-
-                ListVisitService<KeyValuePair<MediaItem, String>> rectsService = VisitServices.from(list)
-                        .filter(new PredicateVisitor<KeyValuePair<MediaItem, String>>() {
-                            @Override
-                            public Boolean visit(KeyValuePair<MediaItem, String> pair, Object param) {
-                                if (pair.getValue() == null) {
-                                    Logger.d(TAG, "doScan", "scan failed for image: "
-                                            + pair.getKey().item.getFilePath());
-                                }
-                                return pair.getValue() != null;
-                            }
-                        }).asListService();
-                //reduce the rects count
-                group.reduceRects(list.size() - rectsService.size());
-
-                if (singleRect) {
-                    rectsService.fire(new FireVisitor<KeyValuePair<MediaItem, String>>() {
-                        @Override
-                        public Boolean visit(KeyValuePair<MediaItem, String> pair, Object param) {
-                            group.addRects(ImageDataLoader.loadRects(mContext, pair.getValue(), null));
-                            group.decrementRectCount();
-                            return null;
-                        }
-                    });
-                } else {
-                    rectsService.fireBatch(new FireBatchVisitor<KeyValuePair<MediaItem, String>>() {
-                        @Override
-                        public Void visit(Collection<KeyValuePair<MediaItem, String>> coll, Object param) {
-                            KeyValuePair<MediaItem, String> pair = coll.iterator().next();
-                            group.rects = ImageDataLoader.loadRects(mContext, pair.getValue(), null);
-                            return null;
-                        }
-                    });
-                    group.reduceRects(rectsService.size());
-                }
-            } else {
-                group.markDownRects();
-            }
-            doIfAllDone(group);
-        }
-
-        private void doWidthTags(Group group, boolean singleTag) {
-            if (tagsScanner != null) {
-                //filename prefix
-                final String prefix = singleTag ? null : group.filenamePrefix;
-
-                List<KeyValuePair<MediaItem, String>> list = VisitServices.from(group.items)
-                        .map2mapAsKey(new ResultVisitor<MediaItem, String>() {
-                    @Override
-                    public String visit(MediaItem item, Object param) {
-                        String dir = FileUtils.getFileDir(item.item.getFilePath(), 2, true);
-                        return tagsScanner.scan(mContext, item.item, dir, prefix);
+                    FileReader reader = null;
+                    try {
+                        String json = IOUtils.readString(reader = new FileReader(file));
+                        MediaData mediaData = mGson.fromJson(json, MediaData.class);
+                        item.imageMeta.setMediaData(mediaData);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }finally {
+                        IOUtils.closeQuietly(reader);
                     }
-                }).mapPair().getAsList();
-
-                ListVisitService<KeyValuePair<MediaItem, String>> service = VisitServices.from(list)
-                        .filter(new PredicateVisitor<KeyValuePair<MediaItem, String>>() {
-                            @Override
-                            public Boolean visit(KeyValuePair<MediaItem, String> pair, Object param) {
-                                if (pair.getValue() == null) {
-                                    Logger.d(TAG, "doScan", "scan failed for image: " + pair.getKey().item.getFilePath());
-                                }
-                                return !TextUtils.isEmpty(pair.getValue());
-                            }
-                        }).asListService();
-                //reduce the rects count
-                group.reduceTags(list.size() - service.size());
-
-                if (singleTag) {
-                    service.fire(new FireVisitor<KeyValuePair<MediaItem, String>>() {
-                        @Override
-                        public Boolean visit(KeyValuePair<MediaItem, String> pair, Object param) {
-                            group.addTags(ImageDataLoader.loadTags(mContext, pair.getValue(), null));
-                            group.decrementTagCount();
-                            return null;
-                        }
-                    });
-                } else {
-                    service.fireBatch(new FireBatchVisitor<KeyValuePair<MediaItem, String>>() {
-                        @Override
-                        public Void visit(Collection<KeyValuePair<MediaItem, String>> coll, Object param) {
-                            KeyValuePair<MediaItem, String> pair = coll.iterator().next();
-                            group.tags = ImageDataLoader.loadTags(mContext, pair.getValue(), null);
-                            return null;
-                        }
-                    });
-                    group.reduceTags(service.size());
+                    return null;
                 }
-            } else {
-                group.markDownTags();
-            }
+            });
+            group.markDownHighLight();
             doIfAllDone(group);
         }
 
@@ -432,6 +320,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
         final AtomicInteger mRectsCount;
         final AtomicInteger mTagsCount;
+        final AtomicInteger mHighLightCount;
 
         final List<MediaItem> items;
         List<ImageDataLoader.ImageFaceRects> rects = new ArrayList<>();
@@ -445,6 +334,7 @@ import java.util.concurrent.atomic.AtomicInteger;
             this.items = items;
             this.mRectsCount = new AtomicInteger(items.size());
             this.mTagsCount = new AtomicInteger(items.size());
+            this.mHighLightCount = new AtomicInteger(items.size());
             filenamePrefix = ResourceInitializer.getImagesFileNamePrefix(items);
         }
 
@@ -456,6 +346,13 @@ import java.util.concurrent.atomic.AtomicInteger;
             do {
                 val = mTagsCount.get();
             } while (!mTagsCount.compareAndSet(val, val - delta));
+        }
+
+        void markDownHighLight(){
+            int val;
+            do {
+                val = mHighLightCount.get();
+            } while (!mHighLightCount.compareAndSet(val, 0));
         }
 
         void markDownTags() {
@@ -539,7 +436,8 @@ import java.util.concurrent.atomic.AtomicInteger;
         }
 
         public boolean isAllDone() {
-            return mTagsCount.get() == 0 && mRectsCount.get() == 0;
+            return mTagsCount.get() == 0 && mRectsCount.get() == 0
+                     && mHighLightCount.get() == 0;
         }
     }
 

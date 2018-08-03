@@ -157,7 +157,6 @@ public class CountUtils {
     }
 
     public static String getContentFromFrames(List<FrameTags> frames, float minPoss) {
-        //TODO getContentFromFrames
         final StringBuilder sb = new StringBuilder();
         VisitServices.from(frames).sortService(new Comparator<FrameTags>() {
             @Override

@@ -7,6 +7,7 @@ import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.image.detect.VideoHighLightManager;
+import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
@@ -18,6 +19,7 @@ import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.filter.*;
 import com.heaven7.ve.colorgap.impl.ScoreProviderImpl;
+import com.vida.common.entity.MediaData;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -445,6 +447,21 @@ public interface MetaInfo {
         private List<Integer> domainTags;
         private List<Integer> adjTags;
 
+        /** set metadata for high light data. (from load high light) */
+        public void setMediaData(MediaData mediaData) {
+             this.duration = mediaData.getDuration();
+            List<MediaData.HighLightPair> hlMap = mediaData.getHighLightDataMap();
+            if(!Predicates.isEmpty(hlMap)) {
+                highLightMap = new SparseArray<>();
+                VisitServices.from(hlMap).fire(new FireVisitor<MediaData.HighLightPair>() {
+                    @Override
+                    public Boolean visit(MediaData.HighLightPair pair, Object param) {
+                        highLightMap.put(pair.getTime(), pair.getDatas());
+                        return null;
+                    }
+                });
+            }
+        }
         public SparseArray<VideoDataLoadUtils.FrameData> getFrameDataMap() {
             if(frameDataMap == null){
                 frameDataMap = new SparseArray<>();

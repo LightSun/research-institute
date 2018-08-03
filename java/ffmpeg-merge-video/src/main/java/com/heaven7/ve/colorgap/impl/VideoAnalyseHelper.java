@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.base.util.SmartReference;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.MapVisitService;
@@ -9,19 +10,23 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.*;
+import com.vida.common.entity.MediaData;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * this class can only used for video.
- * <p>Use {@linkplain VideoAnalyseHelper} instead.</p>
  * Created by heaven7 on 2018/4/16 0016.
  */
-@Deprecated
-public class MediaAnalyseHelper {
+
+public class VideoAnalyseHelper {
 
     private static final String TAG = "MediaAnalyseHelper";
 
@@ -30,17 +35,33 @@ public class MediaAnalyseHelper {
     private final MediaResourceLoader tagsLoader;
     private final MediaResourceLoader rectsLoader;
 
+    private final MediaResourceScanner highLightScanner;
+    private final MediaDataLoader highLightLoader;
+
+    private List<WeakReference<BatchProcessor>> mWeakBPS = new ArrayList<>();
     private AtomicInteger mGroupCount;
 
-    public MediaAnalyseHelper(MediaResourceScanner rectsScanner, MediaResourceScanner tagsScanner,
-                              MediaResourceLoader rectsLoader, MediaResourceLoader tagsLoader) {
+    public VideoAnalyseHelper(MediaResourceScanner rectsScanner, MediaResourceScanner tagsScanner,MediaResourceScanner highLightScanner,
+                              MediaResourceLoader rectsLoader, MediaResourceLoader tagsLoader, MediaDataLoader highLightLoader) {
         this.rectsScanner = rectsScanner;
         this.tagsScanner = tagsScanner;
         this.tagsLoader = tagsLoader;
         this.rectsLoader = rectsLoader;
+        this.highLightScanner = highLightScanner;
+        this.highLightLoader = highLightLoader;
     }
     public void cancel() {
-        ConcurrentUtils.shutDownNow();
+       // ConcurrentUtils.shutDownNow();
+        if(mWeakBPS.size() > 0){
+            mWeakBPS.clear();
+            List<WeakReference<BatchProcessor>> copy = new ArrayList<>(mWeakBPS);
+            for (WeakReference<BatchProcessor> wrf : copy){
+                BatchProcessor processor = wrf.get();
+                if(processor != null){
+                    processor.cancel();
+                }
+            }
+        }
     }
     public void scanAndLoad(Context context, List<MediaItem> items, final CyclicBarrier outBarrier) {
         ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, items, outBarrier));
@@ -66,39 +87,70 @@ public class MediaAnalyseHelper {
             MapVisitService<String, List<MediaItem>> mapService = VisitServices.from(videoItems)
                     .groupService((item, param) -> {
                         //get the dir of this file
-                       return FileUtils.getFileDir(item.item.getFilePath(), 2, true);
+                       return FileUtils.getFileDir(item.item.getFilePath(), 1, true);
                     });
             mGroupCount = new AtomicInteger(mapService.size());
             mapService.fire((pair, param) -> {
-                new BatchProcessor(context, barrier, pair.getKey(), pair.getValue()).process();
+                BatchProcessor processor = new BatchProcessor(context, barrier, pair.getKey(), pair.getValue());
+                mWeakBPS.add(new WeakReference<>(processor));
+                processor.process();
                 return null;
             });
         }
     }
 
     private class BatchProcessor{
+        private final AtomicBoolean mCancelled = new AtomicBoolean();
         private final CyclicBarrier outBarrier;
         final String dir;
         final List<MediaItem> sameDirItems;
         final Context context;
 
         final AtomicInteger mCount;
+        final List<WeakReference<ManagedRunner>> mCacheTasks = new ArrayList<>();
 
         /*public*/ BatchProcessor(Context context, CyclicBarrier barrier, String dir, List<MediaItem> sameDirItems) {
             this.context = context;
             this.outBarrier = barrier;
             this.dir = dir;
             this.sameDirItems = sameDirItems;
-            //contains. rects and tags
-            this.mCount = new AtomicInteger(sameDirItems.size() * 2);
+            //contains. rects and tags , high-light
+            this.mCount = new AtomicInteger(sameDirItems.size() * 3);
+        }
+
+        public void cancel(){
+            if(mCancelled.compareAndSet(false, true)) {
+                for (WeakReference<ManagedRunner> wrf : mCacheTasks) {
+                    ManagedRunner task = wrf.get();
+                    if (task != null) {
+                        task.setCanceled(true);
+                    }
+                }
+                mCacheTasks.clear();
+            }
         }
 
         public void process() {
             Logger.i(TAG, "process", "start batch process >>> dir = " + dir);
             for (MediaItem item : sameDirItems) {
                 //Logger.d(TAG, "process", "start scan ---> item.path = " + item.item.getFilePath());
-                ConcurrentManager.getDefault().submit(new ScanTask(context, item, dir, rectsScanner, rectsLoader, this, "rects"));
-                ConcurrentManager.getDefault().submit(new ScanTask(context, item, dir, tagsScanner, tagsLoader, this,"tags"));
+                if(mCancelled.get()){
+                    return;
+                }
+                ScanTask rects = new ScanTask(context, item, dir, rectsScanner, rectsLoader, this, "rects");
+                ScanTask tags = new ScanTask(context, item, dir, tagsScanner, tagsLoader, this, "tags");
+                mCacheTasks.add(new WeakReference<>(rects));
+                mCacheTasks.add(new WeakReference<>(tags));
+                ConcurrentManager.getDefault().submit(rects);
+                ConcurrentManager.getDefault().submit(tags);
+
+                if(highLightScanner != null && highLightLoader != null) {
+                    HighLightTask hlTask = new HighLightTask(this, item);
+                    mCacheTasks.add(new WeakReference<>(hlTask));
+                    ConcurrentManager.getDefault().submit(hlTask);
+                }else{
+                    decreaseTask();
+                }
             }
         }
 
@@ -125,7 +177,36 @@ public class MediaAnalyseHelper {
         }
     }
 
-    private class ScanTask implements Runnable {
+    private class HighLightTask extends ManagedRunner implements Runnable{
+
+        final BatchProcessor processor;
+        final MediaItem item;
+
+        public HighLightTask(BatchProcessor processor, MediaItem item) {
+            this.processor = processor;
+            this.item = item;
+        }
+        @Override
+        public void run() {
+            if(isCanceled()){
+                return;
+            }
+            String path = highLightScanner.scan(processor.context, item.item, processor.dir);
+            if(isCanceled()){
+                return;
+            }
+            if(!TextUtils.isEmpty(path)){
+                Object data = highLightLoader.load(processor.context, item.item, path);
+                if(data != null){
+                    assert data instanceof MediaData;
+                    item.imageMeta.setMediaData((MediaData) data);
+                }
+            }
+            processor.decreaseTask();
+        }
+    }
+
+    private class ScanTask extends ManagedRunner implements Runnable {
         final Context context;
         final String tag;
 
@@ -149,8 +230,14 @@ public class MediaAnalyseHelper {
 
         @Override
         public void run() {
+            if(isCanceled()){
+                return;
+            }
             Logger.d(TAG, "run", ">>> start scan "+ tag +": path = " + item.item.getFilePath());
             String path = scanner.scan(context,item.item, dir);
+            if(isCanceled()){
+                return;
+            }
             if(path == null){
                 Logger.w(TAG, "run", tag + " scan failed. dir = " + dir + ",item path = " + item.item.getFilePath());
                 //may some one failed. we notify success. but no data.
@@ -224,6 +311,18 @@ public class MediaAnalyseHelper {
                 frameData.setFaceRectPath(fullPath);
                 frameData.setFaceRects(rects);
             }
+        }
+    }
+
+    private abstract static class ManagedRunner{
+
+        private volatile boolean canceled;
+
+        public boolean isCanceled() {
+            return canceled;
+        }
+        public void setCanceled(boolean canceled) {
+            this.canceled = canceled;
         }
     }
 

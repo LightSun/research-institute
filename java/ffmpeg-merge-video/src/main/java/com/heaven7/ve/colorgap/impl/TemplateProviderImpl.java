@@ -11,7 +11,6 @@ import java.util.List;
  * Created by heaven7 on 2018/5/16 0016.
  */
 
-//TODO just for test.
 public class TemplateProviderImpl implements TemplateScriptProvider {
 
     @Override

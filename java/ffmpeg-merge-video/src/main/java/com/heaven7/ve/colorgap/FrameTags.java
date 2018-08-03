@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.ve.kingdom.Kingdom;
 
 import java.util.*;
 
@@ -36,7 +37,7 @@ public class FrameTags {
 
     // 获取概率大于minPossibility的，最大的（3个）tag的id的集合
     public Set<Integer> getTopTagSet(int maxCount, float minPossibility){
-        List<Tag> topTags = getTopTags(maxCount, minPossibility, Vocabulary.TYPE_WEDDING_ALL);
+        List<Tag> topTags = getTopTags(maxCount, minPossibility, Kingdom.TYPE_ALL);
         HashSet<Integer> set = new HashSet<>();
         VisitServices.from(topTags).map(new ResultVisitor<Tag, Integer>() {
             @Override
@@ -51,7 +52,7 @@ public class FrameTags {
      * get top tags.
      * @param maxCount max count
      * @param minPossibility the min possibility
-     * @param vocabularyType the vocabulary type. see {@linkplain Vocabulary#TYPE_WEDDING_ALL} and etc.
+     * @param vocabularyType the vocabulary type. see {@linkplain Kingdom#TYPE_ALL} and etc.
      * @return the top tags.
      */
     public List<Tag> getTopTags(int maxCount, float minPossibility, int vocabularyType){
@@ -60,18 +61,18 @@ public class FrameTags {
         final List<Tag> filterTags;
 
         switch (vocabularyType){
-            case Vocabulary.TYPE_WEDDING_ADJ:
-            case Vocabulary.TYPE_WEDDING_DOMAIN:
-            case Vocabulary.TYPE_WEDDING_NOUN:
+            case Kingdom.TYPE_NOUN:
+            case Kingdom.TYPE_ADJECTIVE:
+            case Kingdom.TYPE_SCOPE:
                 filterTags = VisitServices.from(this.tags).visitForQueryList(new PredicateVisitor<Tag>() {
                     @Override
                     public Boolean visit(Tag tag, Object param) {
-                        return Vocabulary.isTagInDict(tag.getIndex(), vocabularyType);
+                        return Kingdom.getDefault().isTagExists(vocabularyType, tag.getIndex());
                     }
                 }, null);
                 break;
 
-            case Vocabulary.TYPE_WEDDING_ALL:
+            case Kingdom.TYPE_ALL:
                 filterTags = this.tags;
                 break;
 

@@ -9,6 +9,7 @@ import com.heaven7.ve.PathTimeTraveller;
 import com.heaven7.ve.colorgap.MediaAnalyser;
 import com.heaven7.ve.colorgap.MediaItem;
 import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.colorgap.impl.montage.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,9 @@ import java.util.concurrent.CyclicBarrier;
 
 public class MediaAnalyserImpl implements MediaAnalyser {
 
-    private final MediaAnalyseHelper mVideoHelper = new MediaAnalyseHelper(new MockRectsScanner(), new MockTagsScanner(),
-            new RectsLoader(), new TagsLoader());
-    private final ImageMediumFileHelper mImageHelper = new ImageMediumFileHelper(ImageMediumFileHelper.MODE_SINGLE_TAG
-            | ImageMediumFileHelper.MODE_RECTS);
+    private final VideoAnalyseHelper mVideoHelper = new VideoAnalyseHelper(new MediaFaceScanner(), new MediaTagScanner(),
+            new MediaHighLightScanner(), new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
+    private final ImageMediumFileHelper mImageHelper = new ImageMediumFileHelper();
 
     @Override
     public List<MediaItem> analyse(Context context, List<MediaResourceItem> items, CyclicBarrier barrier) {
@@ -47,11 +47,6 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         //auto handle empty videos
         mVideoHelper.scanAndLoad(context, videoItems, barrier);
         mImageHelper.scanAndLoad(context, images, barrier);
-        //for images need split batch
-
-        //body-key-point
-//TODO
-        //main-part. lazy
 
         return outItems;
     }

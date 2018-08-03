@@ -1,15 +1,18 @@
 package com.heaven7.ve.kingdom;
 
+import com.google.gson.GsonBuilder;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
+import com.vida.common.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.*;
 
 /**
@@ -25,7 +28,7 @@ public abstract class Kingdom {
     private static final SparseArray<String> ID_TAG = new SparseArray<>();
     private static final HashMap<String, Integer> TAG_ID = new HashMap<>();
 
-    //the [noun, adj , scope] map
+    //the [noun, adj , scope] mapDataDir
     private final HashMap<String, List<TagItem>> mNounMap = new HashMap<>();
     private final HashMap<String, List<TagItem>> mAdjMap = new HashMap<>();
     private final HashMap<String, List<TagItem>> mScopeMap = new HashMap<>();
@@ -102,7 +105,19 @@ public abstract class Kingdom {
         return new JsonKingdom(data);
     }
 
-    //TODO should call this before any.
+    public static Kingdom fromKingdomData(String resPath, GsonBuilder builder) {
+        Reader reader = null;
+        try {
+            String json = IOUtils.readString(reader = new InputStreamReader(ConfigUtil.loadResourcesAsStream(resPath)));
+            KingdomData data = builder.create().fromJson(json, KingdomData.class);
+            return new JsonKingdom(data);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            IOUtils.closeQuietly(reader);
+        }
+    }
+
     public static void loadVocabulary(Context context, String path) {
         BufferedReader in = null;
         try {

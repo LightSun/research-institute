@@ -34,9 +34,10 @@ public class ResourceInitializer {
      * init resource
      */
     public static void init(Context context) {
-        MockHelper.init(context);
+       // MockHelper.init(context);
         //Vocabulary.loadVocabulary(context, "table/" + VOCABULARY_FILE_NAME);
-        Kingdom.loadVocabulary(context, "table/" + VOCABULARY_FILE_NAME);
+       //Kingdom.loadVocabulary(context, "table/" + VOCABULARY_FILE_NAME);
+        throw new UnsupportedOperationException();
     }
 
     public static String getFilePathOfRects(MediaResourceItem item, String srcDir) {
@@ -73,7 +74,6 @@ public class ResourceInitializer {
         return MockHelper.getFilePathOfRectsForImageItem(item, srcDir, prefix);
     }
 
-    //todo just for test
     private static class MockHelper {
 
         private static final String IMAGE_MARK = "#@!___image___!@#";

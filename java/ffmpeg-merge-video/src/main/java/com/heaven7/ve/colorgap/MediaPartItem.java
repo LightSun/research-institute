@@ -4,6 +4,9 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.image.detect.IHighLightData;
+import com.heaven7.java.image.detect.KeyPointData;
+import com.heaven7.java.image.detect.LocationF;
+import com.heaven7.java.image.detect.impl.SimpleKeyPointData;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
@@ -14,6 +17,8 @@ import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.gap.ItemDelegate;
+import com.heaven7.ve.kingdom.Kingdom;
+import com.heaven7.ve.kingdom.TagItem;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +38,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
     private static final KeyValuePair<Integer, List<IHighLightData>> NONE = KeyValuePair.create(null, null);
 
     private static final Integer TAG_ID_BLACK = 20;
-    private static final String TAG = "MediaPartItem";
+    //private static final String TAG = "MediaPartItem";
 
     final public MetaInfo.ImageMeta imageMeta;
     final public MediaResourceItem item;
@@ -56,6 +61,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
 
     private KeyValuePair<Integer, List<IHighLightData>> highLight = NONE;
     private int mFlags;
+    private SimpleKeyPointData mKeyPointData;
 
     /**
      * create media part item.
@@ -72,15 +78,6 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         //set max duration
         videoPart.setMaxDuration(CommonUtils.timeToFrame(item.getDuration(), TimeUnit.MILLISECONDS));
         setRawTags();
-    }
-    public void addFlags(int flags){
-        this.mFlags |= flags;
-    }
-    public void deleteFlags(int flags){
-        this.mFlags &= ~flags;
-    }
-    public boolean hasFlag(int flag){
-        return (mFlags & flag) == flag;
     }
 
     public boolean isPlaned() {
@@ -158,6 +155,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         mpi.mCondition = this.mCondition;
         mpi.domainTagScore = this.domainTagScore;
         mpi.storyId = this.storyId;
+        mpi.mKeyPointData = this.mKeyPointData;
         return mpi;
     }
 
@@ -191,7 +189,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
                 tagSet = ft.getTopTagSet(3, 0.5f);
             }
             for (int tagIdx : tagSet){
-                Vocabulary.WeddingTagItem item = Vocabulary.getWeddingTagItem(tagIdx, Vocabulary.TYPE_WEDDING_ALL);
+                TagItem item = Kingdom.getDefault().getTagItem(tagIdx, Kingdom.TYPE_ALL);
                 if(item != null){
                     tagDict.put(item.getDesc(), (float) item.getScore());
                 }
@@ -279,15 +277,15 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         if(!Predicates.isEmpty(framesTags)){
             imageMeta.setRawVideoTags(framesTags);
 
-            List<Integer> tags = calculateTags(framesTags, Vocabulary.TYPE_WEDDING_ALL);
+            List<Integer> tags = calculateTags(framesTags, Kingdom.TYPE_ALL);
 
             List<List<Integer>> tmp_tags = new ArrayList<>();
             tmp_tags.add(tags);
             imageMeta.setTags(tmp_tags);
 
-            imageMeta.setNounTags(calculateTags(framesTags, Vocabulary.TYPE_WEDDING_NOUN));
-            imageMeta.setDomainTags(calculateTags(framesTags, Vocabulary.TYPE_WEDDING_DOMAIN));
-            imageMeta.setAdjTags(calculateTags(framesTags, Vocabulary.TYPE_WEDDING_ADJ));
+            imageMeta.setNounTags(calculateTags(framesTags, Kingdom.TYPE_NOUN));
+            imageMeta.setDomainTags(calculateTags(framesTags, Kingdom.TYPE_SCOPE));
+            imageMeta.setAdjTags(calculateTags(framesTags, Kingdom.TYPE_ADJECTIVE));
         }
 
         //face tags
@@ -339,14 +337,14 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
             }
         }
         //2, video tags. 分三类进行计算（noun, domain, adj），noun计3分，其余计1分，返回最终得分最高的镜头类型
-        if(!Predicates.isEmpty(imageMeta.getTags())){
+       /* if(!Predicates.isEmpty(imageMeta.getTags())){
             Map<String, Float>  shotTypeDict = new HashMap<>();
             List<Integer> shotTypeTags = new ArrayList<>();
             shotTypeTags.addAll(imageMeta.getNounTags());
             shotTypeTags.addAll(imageMeta.getDomainTags());
             shotTypeTags.addAll(imageMeta.getAdjTags());
             for(int tagIdx : shotTypeTags){
-                Vocabulary.WeddingTagItem item = Vocabulary.getWeddingTagItem(tagIdx, Vocabulary.TYPE_WEDDING_ALL);
+                TagItem item = Kingdom.getDefault().getTagItem(tagIdx, Kingdom.TYPE_ALL);
                 if(item == null){
                     continue;
                 }
@@ -384,7 +382,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
                 }
                 imageMeta.setShotType(shotType);
             }
-        }
+        }*/
     }
 
     // 根据rawRects计算主人脸个数
@@ -435,7 +433,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
     // 根据镜头的rawVideoTags统计计算tags. 得到对应的tag-index 数组
     private List<Integer> calculateTags(List<FrameTags> rawVideoTags, int count,
                                         float minPossibility, int vocabularyType) {
-        //map: tag_index - > possibility
+        //mapDataDir: tag_index - > possibility
         //统计 tag 出现的概率(整个镜头中)。 -- 指定tag个数， min 概率
         SparseArray<List<Float>> dict = new SparseArray<>();
         for (FrameTags ft : rawVideoTags){
@@ -545,24 +543,39 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         return shotTime <= targetTime;
     }
 
-    public float getBodyArea(int time) {
-        //TODO body area
-        return 0;
-    }
-
     public List<IHighLightData> getHighLightData(int time) {
         KeyValuePair<Integer, List<IHighLightData>> pair = imageMeta.getHighLight(time);
         return pair != null ? pair.getValue(): null;
     }
+
     public KeyValuePair<Integer, List<IHighLightData>> getHighLight(){
         if(highLight == NONE){
             highLight = imageMeta.getHighLight(videoPart);
         }
         return highLight;
     }
+    public float getBodyArea() {
+        LocationF location = mKeyPointData.getLocation();
+        return location.width * location.height;
+    }
 
     public int getKeyPointCount(){
-        //TODO key point count
-        return 0;
+        return mKeyPointData.getKeyPointCount();
+    }
+
+    /** get the key frame time ( in seconds). if has high light use high light time. */
+    public int getKeyFrameTime() {
+        long duration = imageMeta.getDuration();
+        int middleTime = (int) (duration / 2 / 1000);
+        KeyValuePair<Integer, List<IHighLightData>> highLight = getHighLight();
+        return highLight != null ? highLight.getKey() : middleTime;
+    }
+
+    public void setKeyPointData(KeyPointData kpd) {
+        SimpleKeyPointData skp = new SimpleKeyPointData();
+        skp.setLocation(kpd.getLocation());
+        skp.setKeyPointCount(kpd.getKeyPointCount());
+
+        this.mKeyPointData = skp;
     }
 }

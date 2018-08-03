@@ -36,7 +36,7 @@ public class Vocabulary {
 
     public static final String VOCABULARY_FILE_NAME = "vocabulary.csv";
     /**
-     * 婚礼名词 map
+     * 婚礼名词 mapDataDir
      */
     private static final HashMap<String, WeddingTagItem[]> WEDDING_NOUN_DICT;
     /**

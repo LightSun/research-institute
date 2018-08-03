@@ -1,5 +1,7 @@
 package com.heaven7.ve.colorgap;
 
+import java.util.List;
+
 /**
  * @author heaven7
  */
@@ -19,6 +21,18 @@ public interface IShotRecognizer {
     int CATEGORY_PRODUCT = 3;
 
     /**
+     * request recognize key-point
+     * @param parts the media parts
+     */
+    void requestKeyPoint(List<MediaPartItem> parts, Callback callback);
+
+    /**
+     * request recognize subject
+     * @param parts the media parts
+     */
+    void requestSubject(List<MediaPartItem> parts, Callback callback);
+
+    /**
      * recognize the shot category
      * @param item the media part item
      * @return the shot category. often is {@linkplain #CATEGORY_ENV} and etc. 0 means none.
@@ -31,4 +45,10 @@ public interface IShotRecognizer {
      * @return the shot type
      */
     int getShotType(MediaPartItem item);
+
+
+    interface Callback{
+        /** called on recognize done . may be key-point or subject */
+        void onRecognizeDone(List<MediaPartItem> parts);
+    }
 }

@@ -2,6 +2,7 @@ package com.heaven7.test;
 
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
+import com.vida.common.ImageExtractCmd;
 import org.junit.Test;
 
 /**
@@ -16,7 +17,7 @@ public class FFmpegImageExtractTest extends BaseTest{
     @Test
     public void test1(){
         //extract -> gen highlight info -> key-point ->
-        FFmpegUtils.ImageExtractCmd cmd = new FFmpegUtils.ImageExtractCmd.Builder()
+        ImageExtractCmd cmd = new ImageExtractCmd.Builder()
                 .setVideoPath("F:\\videos\\jiege_1\\褂子\\VID_20180602_124118.mp4")
                 .setCountEverySecond(1)
                 .setFrameCount(3)
@@ -30,7 +31,7 @@ public class FFmpegImageExtractTest extends BaseTest{
 
     @Test
     public void test2(){
-        FFmpegUtils.ImageExtractCmd cmd = new FFmpegUtils.ImageExtractCmd.Builder()
+        ImageExtractCmd cmd = new ImageExtractCmd.Builder()
                 .setVideoPath("F:\\videos\\story3\\welcome\\C0012.mp4")
                 .setCountEverySecond(1)
                 //.setFrameCount(3)
