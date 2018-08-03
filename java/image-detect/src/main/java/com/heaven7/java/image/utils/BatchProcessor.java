@@ -28,6 +28,11 @@ public abstract class BatchProcessor {
         }while (true);
     }
 
+    /** get current count . which often is the tasks */
+    public final int getCount(){
+        return mCount.get();
+    }
+
     /**
      * mark batch task start.
      */

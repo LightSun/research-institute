@@ -90,13 +90,20 @@ public class ImageDetectorTest {
                     }
                 })
                 .build());
-        VideoHighLightManager bihm = new VideoHighLightManager(video);
+       /* VideoHighLightManager bihm = new VideoHighLightManager(video);
         bihm.detectBatch(new AbstractVideoManager.Callback<List<IHighLightData>>() {
             @Override
             public void onCallback(String videoSrc, SparseArray<List<IHighLightData>> dataMap) {
                 System.out.println(videoSrc);
             }
-        });
+        });*/
+       VideoKeyPointManager vkpm = new VideoKeyPointManager(video);
+       vkpm.detectBatch(new AbstractVideoManager.Callback<List<KeyPointData>>() {
+           @Override
+           public void onCallback(String videoSrc, SparseArray<List<KeyPointData>> dataMap) {
+               System.out.println(videoSrc);
+           }
+       });
         try {
             Thread.currentThread().join();
         } catch (InterruptedException e) {

@@ -10,4 +10,10 @@ public interface KeyPointData {
      * @return the key point count
      */
     int getKeyPointCount();
+
+    /**
+     * get the body location
+     * @return the location
+     */
+    LocationF getLocation();
 }

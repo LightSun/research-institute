@@ -2,6 +2,7 @@ package com.heaven7.test.baidu;
 
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.heaven7.core.util.Logger;
 import com.heaven7.test.baidu.entity.VThirdBaiduErrorResponse;
 import okhttp3.Call;
@@ -37,10 +38,14 @@ public abstract class VThirdBaiduCallback<T> implements Callback {
         if (vThirdBaiduErrorResponse.getError_code() != null) {
             onFailed(call, vThirdBaiduErrorResponse.getError_msg());
         } else {
-            T obj = new GsonBuilder()
-                            .create()
-                            .fromJson(json, GsonUtils.getSuperclassTypeParameter(getClass()));
-            onSuccess(call, obj);
+            try {
+                T obj = new GsonBuilder()
+                        .create()
+                        .fromJson(json, GsonUtils.getSuperclassTypeParameter(getClass()));
+                onSuccess(call, obj);
+            }catch (Exception e){
+                onFailed(call, Logger.toString(e));
+            }
         }
     }
 

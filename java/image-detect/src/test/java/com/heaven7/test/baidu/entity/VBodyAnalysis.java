@@ -51,6 +51,10 @@ public class VBodyAnalysis {
         public float getY() {
             return location.top;
         }
+        @Override
+        public LocationF getLocation() {
+            return location;
+        }
     }
 
     //身体部位信息
