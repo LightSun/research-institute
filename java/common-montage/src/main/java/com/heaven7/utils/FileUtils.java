@@ -59,6 +59,22 @@ public class FileUtils {
         }
         return null;
     }
+    public static String getParentDir(String dir, int depth, boolean fullPath){
+        if(depth < 1) throw new IllegalArgumentException("depth must > 0");
+        File file = new File(dir);
+        if(file.exists() && file.isDirectory()){
+            File parent = file;
+            while (depth > 0){
+                depth --;
+                parent = parent.getParentFile();
+                if(parent == null){
+                    return null;
+                }
+            }
+            return fullPath ? parent.getAbsolutePath() :parent.getName();
+        }
+        return null;
+    }
 
     public static String encodeChinesePath(String path){
         return transformPath(path, new FilenameTransformer() {

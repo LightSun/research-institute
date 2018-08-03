@@ -1,5 +1,7 @@
 package com.vida.common;
 
+import com.vida.common.platform.PlatformAICmdGenerator;
+
 import java.util.Properties;
 
 /**
@@ -33,7 +35,7 @@ public abstract class Platform {
         }
 
         try {
-            Class<?> clazz = Class.forName("com.vida.ai.server.montage.platform.PlatformImpl");
+            Class<?> clazz = Class.forName("com.vida.common.platform.PlatformImpl");
             sInstance = (Platform) clazz.newInstance();
         }catch (Exception e){
             e.printStackTrace();
@@ -60,4 +62,6 @@ public abstract class Platform {
     //--------------------------------------
 
     public abstract FFMpegCmdGenerator getFFMpegCmdGenerator(boolean showWindow);
+    public abstract PlatformAICmdGenerator getAiCmdGenerator(boolean showWindow);
+
 }

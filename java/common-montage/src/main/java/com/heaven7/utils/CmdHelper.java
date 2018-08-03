@@ -28,6 +28,10 @@ public class CmdHelper {
         }
         cmd_log = sb.toString();
     }
+
+    public String getCmdActually(){
+        return cmd_log;
+    }
     public void execute(){
         execute(new LogCallback());
     }

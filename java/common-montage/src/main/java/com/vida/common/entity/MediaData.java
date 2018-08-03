@@ -2,6 +2,8 @@ package com.vida.common.entity;
 
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.image.detect.Location;
+import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.util.List;
 
@@ -35,6 +37,18 @@ public class MediaData {
         this.highLightDataMap = highLightDataMap;
     }
 
+    public static List<HighLightData> wrapHighLightData(List<IHighLightData> list){
+        if(list == null){
+            return null;
+        }
+        return VisitServices.from(list).map(new ResultVisitor<IHighLightData, HighLightData>() {
+            @Override
+            public HighLightData visit(IHighLightData data, Object param) {
+                return new HighLightData(data);
+            }
+        }).getAsList();
+    }
+
     public static class HighLightPair{
         private int time;
         private List<HighLightData> datas;
@@ -59,6 +73,15 @@ public class MediaData {
         private String name;
         private float score;
         private Location location;
+
+        public HighLightData() {
+        }
+
+        public HighLightData(IHighLightData  data){
+            this.name = data.getName();
+            this.score = data.getScore();
+            this.location = data.getLocation();
+        }
 
         public void setName(String name) {
             this.name = name;
