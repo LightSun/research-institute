@@ -11,7 +11,7 @@ public interface FFMpegCmdGenerator {
      * @param videoPath the video path
      * @return the cmds
      */
-    String[] buildGetDurationCmd(String videoPath);
+    String[] buildGetDurationCmd(String videoPath);//cmd response is too simple . if use 'cmd /c start /wait' also need '/b'.
 
     /**
      * build the cmd of extract image from video .

@@ -1,5 +1,7 @@
 package com.vida.common.platform;
 
+import com.vida.common.PlatformAICmdGenerator;
+
 import java.util.ArrayList;
 import java.util.List;
 

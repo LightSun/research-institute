@@ -1,7 +1,5 @@
 package com.vida.common;
 
-import com.vida.common.platform.PlatformAICmdGenerator;
-
 import java.util.Properties;
 
 /**

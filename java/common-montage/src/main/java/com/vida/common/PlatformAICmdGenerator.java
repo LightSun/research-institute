@@ -1,4 +1,4 @@
-package com.vida.common.platform;
+package com.vida.common;
 
 import java.util.List;
 
