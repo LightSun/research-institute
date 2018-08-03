@@ -22,7 +22,7 @@ public class JavaImageReader implements ImageReader {
             image = ImageIO.read(srcFile);
             imageType = image.getType();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("srcFile = " + img, e);
         }
         int w = image.getWidth();
         int h = image.getHeight();

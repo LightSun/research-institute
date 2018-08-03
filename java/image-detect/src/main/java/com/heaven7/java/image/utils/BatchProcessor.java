@@ -62,8 +62,8 @@ public abstract class BatchProcessor {
      */
     protected void checkDone(){
         if(mMarkDone.get() && mCount.get() == 0){
-            reset();
             onDone();
+            reset();
         }
     }
 

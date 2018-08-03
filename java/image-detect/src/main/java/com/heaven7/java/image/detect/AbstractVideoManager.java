@@ -252,7 +252,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
          * @param timeInSeconds the time to get the frame . in seconds
          * @return the frame data.
          */
-        byte[] getFrame(String videoFile, long timeInSeconds);
+        byte[] getFrame(String videoFile, int timeInSeconds);
 
         /**
          * get the frame as int array. the stride is width
@@ -261,7 +261,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
          * @param timeInSeconds the time in seconds
          * @return the int array.
          */
-        Matrix2<Integer> getFrameMatrix(String videoFile, long timeInSeconds);
+        Matrix2<Integer> getFrameMatrix(String videoFile, int timeInSeconds);
 
         /**
          * get the video duration. in seconds
