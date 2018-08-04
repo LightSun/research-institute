@@ -25,7 +25,7 @@ public class FilterInfo extends EffectInfo {
        NONE.setType(TYPE_NONE);
    }
 
-    public native int getStrength();
+   /* public native int getStrength();
     public native void setStrength(int strength);
 
     public native int getLightness();
@@ -52,5 +52,5 @@ public class FilterInfo extends EffectInfo {
             setSaturation(fi.getSaturation());
             setContrast(fi.getContrast());
         }
-    }
+    }*/
 }

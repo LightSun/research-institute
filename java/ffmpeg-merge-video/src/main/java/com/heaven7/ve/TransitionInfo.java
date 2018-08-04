@@ -15,11 +15,11 @@ public class TransitionInfo extends EffectInfo {
     public static final int TYPE_DISSOLVE = 2;
     public static final int TYPE_LIGHTNING = 3;
     public static final int TYPE_VAGUE = 4;
-
+/*
     public native int getLeftDuration();
     public native void setLeftDuration(int leftDuration);
     public native int getRightDuration();
-    public native void setRightDuration(int rightDuration);
+    public native void setRightDuration(int rightDuration);*/
 
     /*public int getIconId() {
         switch (getType()) {
@@ -64,7 +64,7 @@ public class TransitionInfo extends EffectInfo {
         return NTYPE_TRANSITION;
     }
 
-    @Override
+  /*  @Override
     public void setFrom(TimeTraveller src) {
         super.setFrom(src);
         if(src instanceof TransitionInfo){
@@ -72,5 +72,5 @@ public class TransitionInfo extends EffectInfo {
             setLeftDuration(ti.getLeftDuration());
             setRightDuration(ti.getRightDuration());
         }
-    }
+    }*/
 }

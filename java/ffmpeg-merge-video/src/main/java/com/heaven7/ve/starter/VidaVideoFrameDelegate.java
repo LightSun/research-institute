@@ -47,7 +47,7 @@ public class VidaVideoFrameDelegate implements AbstractVideoManager.VideoFrameDe
         //videofile =xxx/projectid/resource/xxx.mp4
         //temp = xxx/projectid/temp/xxx/xxx.jpg
         String fileDir = FileUtils.getFileDir(videoFile, 2, true);
-        return fileDir + Constants.DIR_TEMP + File.separator + fileName + File.separator
+        return fileDir + File.separator + Constants.DIR_TEMP + File.separator + fileName + File.separator
                 + "img_" + format(time + 1) + ".jpg";
     }
     private static String format(int time) {

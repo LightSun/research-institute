@@ -11,8 +11,14 @@ public abstract class EffectInfo extends TimeTraveller{
     public static final int CATEGORY_SPEED = 1;
     public static final int CATEGORY_SCALE = 2;
 
-    public native int getType();
-    public native void setType(int type);
+    private int type;
+
+    public int getType(){
+        return this.type;
+    }
+    public void setType(int type){
+        this.type = type;
+    }
 
     @Override
     public void setFrom(TimeTraveller src) {
