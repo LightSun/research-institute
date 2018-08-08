@@ -276,14 +276,43 @@ public class FileUtils {
         return getFileExtension(file.getAbsolutePath());
     }
 
-    public static void copyFile(File src, File dst) {
-        if (!dst.exists()) {
-            dst.delete();
+    public static boolean copyFilesFromDir(File srcDir, File dstDir) {
+        if(!srcDir.exists()){
+            return false;
+        }
+        if(!dstDir.exists()){
+            dstDir.mkdirs();
+        }
+        final String srcPath = srcDir.getAbsolutePath();
+        List<String> files = getFiles(srcDir, "jpg");
+        VisitServices.from(files).fire(new FireVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                int index = s.indexOf(srcPath);
+                String target = dstDir.getAbsolutePath() + s.substring(index + srcPath.length());
+                copyFile(new File(s), new File(target));
+                return null;
+            }
+        });
+        return true;
+    }
+
+    public static boolean copyFile(File src, File dst) {
+        if(!src.exists()){
+            return false;
+        }
+        if(!dst.getParentFile().exists()){
+            dst.getParentFile().mkdirs();
+        }else{
+            if (dst.exists()) {
+                dst.delete();
+            }
         }
         try {
             dst.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
         BufferedInputStream in = null;
         BufferedOutputStream out = null;
@@ -315,6 +344,7 @@ public class FileUtils {
                 }
             }
         }
+        return true;
     }
     public static FileFilter ofDirFileFilter(String dir){
         Throwables.checkNull(dir);

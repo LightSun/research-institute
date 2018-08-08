@@ -104,7 +104,7 @@ public abstract class PyDelegate {
         @Override
         public String getFacePath(String videoFile, String dataDir) {
             String fileName = FileUtils.getFileName(videoFile);
-            return String.format("%s%s%s_predictions.csv", dataDir, File.separator, fileName);
+            return String.format("%s%s%s_rects.csv", dataDir, File.separator, fileName);
         }
 
         @Override

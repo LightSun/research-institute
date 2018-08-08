@@ -22,7 +22,7 @@ public class FFmpegUtils {
      */
     public static String[] buildGetCreateTimeCmd(String videoPath){
         //ffmpeg -safe 0 -f concat -i E:\\study\\github\\ffmpeg-merge-video\\concat.txt -c copy concat_output.mp4 -y
-        List<String> cmds = new ArrayList<>();
+        List<String> cmds = getBaseCmds(false);
         cmds.add("ffprobe");
         cmds.add("-i");
         cmds.add(videoPath);
@@ -38,7 +38,7 @@ public class FFmpegUtils {
      */
     public static String[] buildMergeVideoCmd(String concatPath, String outVideoPath){
         //ffmpeg -safe 0 -f concat -i E:\\study\\github\\ffmpeg-merge-video\\concat.txt -c copy concat_output.mp4 -y
-        List<String> cmds = new ArrayList<>();
+        List<String> cmds = getBaseCmds(false);
         cmds.add("ffmpeg");
         cmds.add("-safe");
         cmds.add("0");
@@ -60,7 +60,7 @@ public class FFmpegUtils {
      * @return the cmds
      */
     public static String[] buildGetDurationCmd(String videoPath){
-        List<String> cmds = new ArrayList<>();
+        List<String> cmds = getBaseCmds(false);
         cmds.add("ffprobe");
         cmds.add("-i");
         cmds.add(videoPath);
@@ -107,7 +107,7 @@ public class FFmpegUtils {
             outPathArr[0] = outPath;
         }
 
-        List<String> cmds = new ArrayList<>();
+        List<String> cmds = getBaseCmds(false);
         cmds.add("ffmpeg");  //不能有空格
         cmds.add("-i");
         cmds.add(videoPath);
@@ -153,15 +153,7 @@ public class FFmpegUtils {
      * @return the cmds
      */
     public static String[] buildImageExtractCmd(ImageExtractCmd cmd, boolean addStartPrefix){
-        List<String> cmds = new ArrayList<>();
-        //"cmd","/c","start"
-        if(addStartPrefix) {
-            cmds.add("cmd");
-            cmds.add("/c");
-            cmds.add("start");
-            cmds.add("/wait");
-            cmds.add("/b"); //add this to now show window of cmd
-        }
+        List<String> cmds = getBaseCmds(addStartPrefix);
         cmds.add("ffmpeg");
         cmds.add("-i");
         cmds.add(cmd.getVideoPath());
@@ -190,6 +182,18 @@ public class FFmpegUtils {
 
         String[] arr = new String[cmds.size()];
         return cmds.toArray(arr);
+    }
+
+    private static List<String> getBaseCmds(boolean showWindow) {
+        List<String> cmds = new ArrayList<>();
+        cmds.add("cmd");
+        cmds.add("/c");
+        cmds.add("start");
+        cmds.add("/wait");
+        if(!showWindow) {
+            cmds.add("/b"); //add this to not show window of cmd
+        }
+        return cmds;
     }
 
 }
