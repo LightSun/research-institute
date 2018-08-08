@@ -15,7 +15,7 @@ public class TestAiUploadFlow {
     private static final String TAG = "TestAiUploadFlow";
 
     public static void main(String[] args) {
-       // testUpload();
+        //testUpload();
        // makeWorks();
          createProject();
     }
@@ -26,11 +26,11 @@ public class TestAiUploadFlow {
     private static void testUpload() {
         String url = "http://110.185.219.124:8004/media/upload";
         String[] medias = {
-                 "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\浅蓝围巾领开衫\\1-10.jpg",
+                // "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\浅蓝围巾领开衫\\1-10.jpg",
                 // "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141100.mp4",
                 // "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141029.mp4",
                // "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140059.mp4",
-               // "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140749.mp4",
+               "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140749.mp4",
                 //"E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_140458.mp4",
         };
         Map<String,String> map = new HashMap<>();
@@ -116,7 +116,7 @@ public class TestAiUploadFlow {
         project.setCategories(cates);
 
         List<Long> ids = new ArrayList<>();
-        ids.add(3L);
+        ids.add(9L);
         project.setPublicMediaIds(ids);
 
        // System.out.println(new Gson().toJson(project));

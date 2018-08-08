@@ -149,13 +149,16 @@ public class GroupFilter extends GapColorFilter {
                 key = FLAG_CAMERA_MOTION;
             }else if( condition instanceof VideoTagFilter.VideoTagCondition){
                 key = FLAG_VIDEO_TAG;
-            } else if( condition instanceof MediaDirFilter.MediaDirCondition) key = FLAG_MEDIA_DIR;
+            } else if( condition instanceof MediaDirFilter.MediaDirCondition)
+                key = FLAG_MEDIA_DIR;
             else if(condition instanceof MediaTypeFilter.MediaTypeCondition){
                 key = FLAG_MEDIA_TYPE;
             }else if(condition instanceof ShotTypeFilter.ShotTypeCondition){
                 key = FLAG_SHOT_TYPE;
             }else if(condition instanceof ShotKeyFilter.ShotKeyCondition){
                 key = FLAG_SHOT_KEY;
+            }else if(condition instanceof ShotCategoryFilter.ShotCategoryCondition){
+                key = FLAG_SHOT_CATEGORY;
             }
             else{
                 throw new IllegalArgumentException("unsupport condition = " + condition.getClass().getName());
