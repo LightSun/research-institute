@@ -6,6 +6,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.PathTimeTraveller;
+import com.heaven7.ve.colorgap.ColorGapParam;
 import com.heaven7.ve.colorgap.MediaAnalyser;
 import com.heaven7.ve.colorgap.MediaItem;
 import com.heaven7.ve.colorgap.MetaInfo;
@@ -60,6 +61,11 @@ public class MediaAnalyserImpl implements MediaAnalyser {
     public void cancel() {
         mVideoHelper.cancel();
         mImageHelper.cancel();
+    }
+
+    @Override
+    public void preLoadData(ColorGapParam param) {
+        mImageHelper.loadResource(param.getResourceDir());
     }
 
     protected MetaInfo.ImageMeta analyseMeta(Context context, MediaResourceItem item) {

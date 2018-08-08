@@ -3,7 +3,6 @@ package com.heaven7.ve.colorgap;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
-import com.heaven7.java.base.util.ArrayUtils;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.Context;
@@ -50,6 +49,13 @@ public class ColorGapManager {
 
     public void cancel(){
         mediaAnalyser.cancel();
+    }
+
+    /**
+     * pre load data. like batch image data which is generate by AI.
+     */
+    public void preLoadData(ColorGapParam param){
+        mediaAnalyser.preLoadData(param);
     }
 
     public void setKingdom(Kingdom kingdom) {

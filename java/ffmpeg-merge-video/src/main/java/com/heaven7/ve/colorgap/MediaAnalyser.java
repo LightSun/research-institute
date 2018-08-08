@@ -23,4 +23,9 @@ public interface MediaAnalyser {
 
     void cancel();
 
+    /**
+     * pre load data.
+     * @param param the extra param
+     */
+    void preLoadData(ColorGapParam param);
 }

@@ -23,4 +23,7 @@ public class ImageMediumFileHelper {
          mImageHelper.scanAndLoad(context, items, barrier);
     }
 
+    public void loadResource(String resourceDir) {
+        mImageHelper.loadImageResource(resourceDir);
+    }
 }
