@@ -9,6 +9,7 @@ import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.gap.PlaidDelegate;
+import com.heaven7.ve.kingdom.Kingdom;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,11 +127,14 @@ public class PlaidFillerImpl implements PlaidFiller {
                     if(videoPart.getMaxDuration() < plaid.getDuration()){
                         throw new IllegalStateException("video relative music part is too short.");
                     }
-                    //videoPart.adjustTimeAsCenter(plaid.getDuration());
-                    //the key frame time often is the high-light time
-                    int keyFrameTime = mpi.getKeyFrameTime();
-                    videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
-                            plaid.getDuration());
+                    if(Kingdom.getDefault().isGeLaiLiYa()){
+                        videoPart.adjustTimeAsCenter(plaid.getDuration());
+                    }else {
+                        //the key frame time often is the high-light time
+                        int keyFrameTime = mpi.getKeyFrameTime();
+                        videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
+                                plaid.getDuration());
+                    }
                 }
             }
         }
