@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.utils.CommonUtils;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * the filler which use gap with 'compute-score' to fill.
@@ -124,7 +126,11 @@ public class PlaidFillerImpl implements PlaidFiller {
                     if(videoPart.getMaxDuration() < plaid.getDuration()){
                         throw new IllegalStateException("video relative music part is too short.");
                     }
-                    videoPart.adjustTimeAsCenter(plaid.getDuration());
+                    //videoPart.adjustTimeAsCenter(plaid.getDuration());
+                    //the key frame time often is the high-light time
+                    int keyFrameTime = mpi.getKeyFrameTime();
+                    videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
+                            plaid.getDuration());
                 }
             }
         }
@@ -142,11 +148,11 @@ public class PlaidFillerImpl implements PlaidFiller {
 
         @Override
         public int indexOfPlaid(PlaidDelegate plaid) {
-            return infoes.indexOf((CutInfo.PlaidInfo)plaid);
+            return infoes.indexOf(plaid);
         }
         @Override
         public int indexOfItem(ItemDelegate item) {
-            return parts.indexOf((MediaPartItem)item);
+            return parts.indexOf(item);
         }
         @Override
         public List<GapManager.GapItem> getFilledItems() {

@@ -49,7 +49,7 @@ public class JavaImageReader implements ImageReader {
         try {
             image = ImageIO.read(srcFile);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("file = " + imgFile, e);
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

@@ -26,7 +26,8 @@ public class MediaHighLightLoader implements MediaDataLoader {
             return sGson.fromJson(json, MediaData.class);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+        }
+        finally {
             IOUtils.closeQuietly(reader);
         }
         return null;

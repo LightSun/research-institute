@@ -124,6 +124,26 @@ public class TimeTraveller extends SimpleCopyDelegate {
         return 0;
     }
 
+    /**
+     * adjust time by target center time.
+     * @param focusTime the focus time in frames
+     * @since 1.0.1 */
+    public void adjustTime(long focusTime, long expectDuration) {
+        final long half = expectDuration / 2;
+        long start = focusTime - half;
+        long end = start + expectDuration;
+        if(start < 0){
+            end += Math.abs(start);
+            start = 0;
+        }else if(end > getMaxDuration()){
+            //end is too large . move start left. end left
+            start -= end - getMaxDuration();
+            end = getMaxDuration();
+        }
+        setStartTime(start);
+        setEndTime(end);
+    }
+
     /** adjust the start and end times by expect duration as center.  */
     public void adjustTimeAsCenter(long expectDuration) {
         long startTime = getStartTime();
@@ -268,4 +288,5 @@ public class TimeTraveller extends SimpleCopyDelegate {
     private long startTime;
     private long endTime;
     private long maxDuration;
+
 }

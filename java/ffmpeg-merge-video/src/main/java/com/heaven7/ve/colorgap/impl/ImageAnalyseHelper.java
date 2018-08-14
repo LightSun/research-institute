@@ -56,45 +56,49 @@ import java.util.concurrent.atomic.AtomicInteger;
     /**
      * load all image resource for batch images.such as rects_path, tag_path.
      * note this must called in sub thread.
+     *
      * @param resourceDir the resource dir of save all medias.
      */
-    public void loadImageResource(String resourceDir){
+    public void loadImageResource(String resourceDir) {
         File batchFileList = new File(resourceDir, "image_batch_list.txt");
-        if(!batchFileList.exists()){
+        if (!batchFileList.exists()) {
             return;
         }
         List<ImageResBatchLine> lines = new TextReadHelper<ImageResBatchLine>(
                 new TextReadHelper.BaseAssetsCallback<ImageResBatchLine>() {
-            @Override
-            public ImageResBatchLine parse(String line) {
-                return new ImageResBatchLine(line);
-            }
-        }).read(null, batchFileList.getAbsolutePath());
+                    @Override
+                    public ImageResBatchLine parse(String line) {
+                        return new ImageResBatchLine(line);
+                    }
+                }).read(null, batchFileList.getAbsolutePath());
         final TextReadHelper<ConfigLine> reader = new TextReadHelper<>(new ConfigLineCallback());
         //load face and tag data
         mImageRess = VisitServices.from(lines).map(new ResultVisitor<ImageResBatchLine, ImageResource>() {
             @Override
             public ImageResource visit(ImageResBatchLine line, Object param) {
                 String dataDir = mDataDirMapper.mapDataDir(line.imageResourceDir);
+                Logger.d(TAG, "loadImageResource", "res dir = " + line.imageResourceDir + " ,dataDir = " + dataDir);
                 ImageResource imageRes = new ImageResource();
                 imageRes.setBatchDir(line.imageResourceDir);
 
                 File face_config = new File(dataDir, "face_config.txt");
                 File tfs_config = new File(dataDir, "tfs_config.txt");
                 //csv, imapath imgpath ...
-                if(face_config.exists()){
+                if (face_config.exists()) {
                     List<ConfigLine> faceLines = reader.read(null, face_config.getAbsolutePath());
-                    if(!Predicates.isEmpty(faceLines)){
+                    if (!Predicates.isEmpty(faceLines)) {
                         String rectsPath = faceLines.get(0).getCsvRectsPath();
                         imageRes.setRectsPath(rectsPath);
+                        Logger.d(TAG, "loadImageResource", "set Rects path done >>> rectsPath = " + rectsPath);
                     }
                 }
                 //tfs_config
-                if(tfs_config.exists()){
-                    List<ConfigLine> faceLines = reader.read(null, face_config.getAbsolutePath());
-                    if(!Predicates.isEmpty(faceLines)){
+                if (tfs_config.exists()) {
+                    List<ConfigLine> faceLines = reader.read(null, tfs_config.getAbsolutePath());
+                    if (!Predicates.isEmpty(faceLines)) {
                         String tagPath = faceLines.get(0).getCsvTagPath();
                         imageRes.setTagPath(tagPath);
+                        Logger.d(TAG, "loadImageResource", "set Tag path done >>> tagPath = " + tagPath);
                     }
                 }
                 return imageRes;
@@ -104,20 +108,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 
     }
 
-    private static class ImageResource{
-         String batchDir;
-         String rectsPath;
-         String tagPath;
+    private static class ImageResource {
+        String batchDir;
+        String rectsPath;
+        String tagPath;
 
         public String getBatchDir() {
             return batchDir;
         }
+
         public void setBatchDir(String batchDir) {
             this.batchDir = batchDir;
         }
+
         public String getRectsPath() {
             return rectsPath;
         }
+
         public void setRectsPath(String rectsPath) {
             this.rectsPath = rectsPath;
         }
@@ -125,6 +132,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         public String getTagPath() {
             return tagPath;
         }
+
         public void setTagPath(String tagPath) {
             this.tagPath = tagPath;
         }
@@ -133,56 +141,58 @@ import java.util.concurrent.atomic.AtomicInteger;
     /**
      * the line of config file
      */
-    private static class ConfigLine{
+    private static class ConfigLine {
         String dataPath;// may be rects or tfrecord path
         List<String> imagePaths;
 
         public ConfigLine(String line) {
             String[] strs = line.split(",");
-            if(!Predicates.isEmpty(strs)){
+            if (!Predicates.isEmpty(strs)) {
                 this.dataPath = strs[0];
-                if(strs.length >= 2){
+                if (strs.length >= 2) {
                     imagePaths = Arrays.asList(strs[1].split(" "));
                 }
             }
         }
 
-        public String getCsvRectsPath(){
+        public String getCsvRectsPath() {
             return dataPath;
         }
-        public String getCsvTagPath(){
-            if(TextUtils.isEmpty(dataPath)){
+
+        public String getCsvTagPath() {
+            if (TextUtils.isEmpty(dataPath)) {
                 return null;
             }
             String dir = FileUtils.getFileDir(dataPath, 1, true);
             String fileName = FileUtils.getFileName(dataPath);
             final String baseFileName;
-            if(fileName.endsWith("_outputs")){
+            if (fileName.endsWith("_outputs")) {
                 baseFileName = fileName.substring(0, fileName.lastIndexOf("outputs"));
-            }else if(fileName.endsWith("_output")){
+            } else if (fileName.endsWith("_output")) {
                 baseFileName = fileName.substring(0, fileName.lastIndexOf("output"));
-            }else{
+            } else {
                 throw new IllegalStateException("wrong file. please check your py script of gen.");
             }
             return dir + File.separator + baseFileName + "predictions.csv";
         }
     }
 
-    private static class ImageResBatchLine{
+    private static class ImageResBatchLine {
         String imageResourceDir;
         int imageCount;
 
         public ImageResBatchLine(String line) {
             String[] strs = line.split(",");
-            if(!Predicates.isEmpty(strs)){
+            if (!Predicates.isEmpty(strs)) {
                 this.imageResourceDir = strs[0];
-                if(strs.length >= 2){
+                if (strs.length >= 2) {
                     imageCount = Integer.valueOf(strs[1]);
                 }
             }
         }
     }
-    private static class ConfigLineCallback extends TextReadHelper.BaseAssetsCallback<ConfigLine>{
+
+    private static class ConfigLineCallback extends TextReadHelper.BaseAssetsCallback<ConfigLine> {
         @Override
         public ConfigLine parse(String line) {
             return new ConfigLine(line);
@@ -200,16 +210,18 @@ import java.util.concurrent.atomic.AtomicInteger;
         private final Context mContext;
         private AtomicInteger mGroupCount;
 
-        public BatchScanner(Context context, List<MediaItem> mediaItems, CyclicBarrier barrier) {
+        BatchScanner(Context context, List<MediaItem> mediaItems, CyclicBarrier barrier) {
             this.mContext = context;
             this.mMediaItems = mediaItems;
             this.mBarrier = barrier;
         }
+
         /**
          * 1, 生成时： 分批，生成tag和face.
          * 2. 加载时, 预先加载 tfs_config.txt and face_config.txt, 读取对应的文件路径
          */
         public void startScanByDir() {
+            Logger.d(TAG, "startScanByDir");
             VisitServices.from(mMediaItems).groupService(new ResultVisitor<MediaItem, String>() {
                 @Override
                 public String visit(MediaItem mediaItem, Object param) {
@@ -222,29 +234,35 @@ import java.util.concurrent.atomic.AtomicInteger;
                     group.dir = t.getKey();
                     return group;
                 }
-            }).fire(new FireVisitor<Group>() {
+            }).save(new SaveVisitor<Group>() {
                 @Override
-                public Boolean visit(Group group, Object param) {
-                    List<ImageResource> list = VisitServices.from(mImageRess).filter(new PredicateVisitor<ImageResource>() {
-                        @Override
-                        public Boolean visit(ImageResource imageResource, Object param) {
-                            return imageResource.batchDir.equals(group.dir);
-                        }
-                    }).getAsList();
-                    if(list.isEmpty()){
-                        throw new IllegalStateException("you must call #loadImageResource");
-                    }
-                    ImageResource imageRes = list.get(0);
-                    ConcurrentManager.getDefault().submit(() -> doWithBacthRects(group, imageRes));
-                    ConcurrentManager.getDefault().submit(() -> doWithBacthTags(group, imageRes));
-                    ConcurrentManager.getDefault().submit(() -> doWithHighLights(group, imageRes));
-                    return null;
+                public void visit(Collection<Group> collection) {
+                    mGroupCount = new AtomicInteger(collection.size());
                 }
-            });
+            })
+                    .fire(new FireVisitor<Group>() {
+                        @Override
+                        public Boolean visit(Group group, Object param) {
+                            List<ImageResource> list = VisitServices.from(mImageRess).filter(new PredicateVisitor<ImageResource>() {
+                                @Override
+                                public Boolean visit(ImageResource imageResource, Object param) {
+                                    return imageResource.batchDir.equals(group.dir);
+                                }
+                            }).getAsList();
+                            if (list.isEmpty()) {
+                                throw new IllegalStateException("you must call #loadImageResource");
+                            }
+                            ImageResource imageRes = list.get(0);
+                            ConcurrentManager.getDefault().submit(() -> doWithBacthRects(group, imageRes));
+                            ConcurrentManager.getDefault().submit(() -> doWithBacthTags(group, imageRes));
+                            ConcurrentManager.getDefault().submit(() -> doWithHighLights(group, imageRes));
+                            return null;
+                        }
+                    });
         }
 
         private void doWithBacthRects(Group group, ImageResource imageRes) {
-            if(TextUtils.isEmpty(imageRes.rectsPath)){
+            if (TextUtils.isEmpty(imageRes.rectsPath)) {
                 Logger.w(TAG, "doWithBacthRects", "no rect file for face data. group dir = " + group.dir);
                 group.markDownRects();
                 return;
@@ -253,8 +271,9 @@ import java.util.concurrent.atomic.AtomicInteger;
             group.markDownRects();
             doIfAllDone(group);
         }
+
         private void doWithBacthTags(Group group, ImageResource imageRes) {
-            if(TextUtils.isEmpty(imageRes.tagPath)){
+            if (TextUtils.isEmpty(imageRes.tagPath)) {
                 Logger.w(TAG, "doWithBacthTags", "no tag file for tag data. group dir = " + group.dir);
                 group.markDownTags();
                 return;
@@ -277,7 +296,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                             + File.separator + dir + File.separator
                             + fileName + "." + Constants.EXTENSION_IMAGE_HIGH_LIGHT;
                     File file = new File(hlFilename);
-                    if(!file.exists()){
+                    if (!file.exists()) {
                         Logger.w(TAG, "doWithHighLights", "can't find high light file. " + hlFilename);
                         return true;
                     }
@@ -288,7 +307,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                         item.imageMeta.setMediaData(mediaData);
                     } catch (IOException e) {
                         e.printStackTrace();
-                    }finally {
+                    } finally {
                         IOUtils.closeQuietly(reader);
                     }
                     return null;
@@ -325,7 +344,9 @@ import java.util.concurrent.atomic.AtomicInteger;
         final List<MediaItem> items;
         List<ImageDataLoader.ImageFaceRects> rects = new ArrayList<>();
         List<ImageDataLoader.ImageTags> tags = new ArrayList<>();
-        /** the die of all media items */
+        /**
+         * the die of all media items
+         */
         String dir;
 
         String filenamePrefix;
@@ -339,7 +360,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         }
 
         void reduceTags(int delta) {
-            if(delta == 0){
+            if (delta == 0) {
                 return;
             }
             int val;
@@ -348,7 +369,7 @@ import java.util.concurrent.atomic.AtomicInteger;
             } while (!mTagsCount.compareAndSet(val, val - delta));
         }
 
-        void markDownHighLight(){
+        void markDownHighLight() {
             int val;
             do {
                 val = mHighLightCount.get();
@@ -363,7 +384,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         }
 
         void reduceRects(int delta) {
-            if(delta == 0){
+            if (delta == 0) {
                 return;
             }
             int val;
@@ -408,11 +429,11 @@ import java.util.concurrent.atomic.AtomicInteger;
                 public ImageData visit(String key, MediaItem item, ImageDataLoader.ImageFaceRects rects, ImageDataLoader.ImageTags tags, Object param) {
                     ImageData data = new ImageData();
                     data.item = item;
-                    if(rects != null) {
+                    if (rects != null) {
                         data.frameData.setFaceRects(rects.getRects());
                         data.frameData.setFaceRectPath(rects.getRectsPath());
                     }
-                    if(tags != null) {
+                    if (tags != null) {
                         data.frameData.setTag(tags.getTags());
                         data.frameData.setTagPath(tags.getTagPath());
                     }
@@ -437,7 +458,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
         public boolean isAllDone() {
             return mTagsCount.get() == 0 && mRectsCount.get() == 0
-                     && mHighLightCount.get() == 0;
+                    && mHighLightCount.get() == 0;
         }
     }
 

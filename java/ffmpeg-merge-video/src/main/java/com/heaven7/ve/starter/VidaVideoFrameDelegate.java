@@ -1,5 +1,6 @@
 package com.heaven7.ve.starter;
 
+import com.heaven7.core.util.Logger;
 import com.heaven7.java.image.ImageReader;
 import com.heaven7.java.image.Matrix2;
 import com.heaven7.java.image.detect.AbstractVideoManager;
@@ -42,6 +43,10 @@ public class VidaVideoFrameDelegate implements AbstractVideoManager.VideoFrameDe
     }
     @Override
     public String getFrameImagePath(String videoFile, int time) {
+        if(time == -1){
+            Logger.w("VidaVideoFrameDelegate", "getFrameImagePath",
+                    "time = -1, videoFile = " + videoFile);
+        }
         //image from 00001. time from 0
         String fileName = FileUtils.getFileName(videoFile);
         //videofile =xxx/projectid/resource/xxx.mp4

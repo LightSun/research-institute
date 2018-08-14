@@ -486,6 +486,9 @@ public interface MetaInfo {
             VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(
                     new ScoreProviderImpl(), highLightMap);
             int time = vhl.getHighLightPoint(start, end);
+            if(time == -1){
+                return null;
+            }
             List<IHighLightData> data = (List<IHighLightData>) highLightMap.get(time);
             return KeyValuePair.create(time, data);
         }

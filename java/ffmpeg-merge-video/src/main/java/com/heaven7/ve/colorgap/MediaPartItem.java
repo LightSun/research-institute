@@ -1,5 +1,6 @@
 package com.heaven7.ve.colorgap;
 
+import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
@@ -555,12 +556,15 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         return highLight;
     }
     public float getBodyArea() {
+        if(mKeyPointData == null){
+            return -1f;
+        }
         LocationF location = mKeyPointData.getLocation();
         return location.width * location.height;
     }
 
     public int getKeyPointCount(){
-        return mKeyPointData.getKeyPointCount();
+        return mKeyPointData != null ? mKeyPointData.getKeyPointCount() : 0;
     }
 
     /** get the key frame time ( in seconds). if has high light use high light time. */

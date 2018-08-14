@@ -184,8 +184,15 @@ public class Project {
     public static class CommodityCategory {
         private Long id;
         private String name;
-        private Integer weight; // 1 -- 5 -- 25
         private Long cid;       // category id
+        private Long fid ;
+
+        public Long getFid() {
+            return fid;
+        }
+        public void setFid(Long fid) {
+            this.fid = fid;
+        }
 
         public Long getCid() {
             return cid;
@@ -201,14 +208,6 @@ public class Project {
 
         public void setName(String name) {
             this.name = name;
-        }
-
-        public int getWeight() {
-            return weight;
-        }
-
-        public void setWeight(int weight) {
-            this.weight = weight;
         }
 
         public Long getId() {

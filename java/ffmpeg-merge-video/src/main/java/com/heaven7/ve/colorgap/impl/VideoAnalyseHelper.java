@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class VideoAnalyseHelper {
 
-    private static final String TAG = "MediaAnalyseHelper";
+    private static final String TAG = "VideoAnalyseHelper";
 
     private final MediaResourceScanner rectsScanner;
     private final MediaResourceScanner tagsScanner;
