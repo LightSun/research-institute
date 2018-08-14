@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 测试ai-server: 制作等接口
  * @author heaven7
  */
 public class TestUploadStoreLine {

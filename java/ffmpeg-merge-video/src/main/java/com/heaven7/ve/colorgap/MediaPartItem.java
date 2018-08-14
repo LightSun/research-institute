@@ -1,6 +1,5 @@
 package com.heaven7.ve.colorgap;
 
-import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
@@ -34,8 +33,6 @@ import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
  */
 public class MediaPartItem implements ItemDelegate , CutItemDelegate{
 
-    public static final int FLAG_REQUIRE_SUBJECT_RECOGNIZE = 0x0001;
-
     private static final KeyValuePair<Integer, List<IHighLightData>> NONE = KeyValuePair.create(null, null);
 
     private static final Integer TAG_ID_BLACK = 20;
@@ -61,7 +58,6 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
     private String cause = "";
 
     private KeyValuePair<Integer, List<IHighLightData>> highLight = NONE;
-    private int mFlags;
     private SimpleKeyPointData mKeyPointData;
 
     /**
@@ -337,53 +333,56 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
                 imageMeta.setShotType(shotType);
             }
         }
-        //2, video tags. 分三类进行计算（noun, domain, adj），noun计3分，其余计1分，返回最终得分最高的镜头类型
-       /* if(!Predicates.isEmpty(imageMeta.getTags())){
-            Map<String, Float>  shotTypeDict = new HashMap<>();
-            List<Integer> shotTypeTags = new ArrayList<>();
-            shotTypeTags.addAll(imageMeta.getNounTags());
-            shotTypeTags.addAll(imageMeta.getDomainTags());
-            shotTypeTags.addAll(imageMeta.getAdjTags());
-            for(int tagIdx : shotTypeTags){
-                TagItem item = Kingdom.getDefault().getTagItem(tagIdx, Kingdom.TYPE_ALL);
-                if(item == null){
-                    continue;
-                }
-                String st1 = item.getShotType1();
-                if(!TextUtils.isEmpty(st1)){
-                    Float val = shotTypeDict.get(st1);
-                    if(val != null){
-                        shotTypeDict.put(st1, val + item.getShotTypeScore());
-                    }else{
-                        shotTypeDict.put(st1, item.getShotTypeScore());
+        //only used for gelailiya
+        if(Kingdom.getDefault().isGeLaiLiYa()) {
+            //2, video tags. 分三类进行计算（noun, domain, adj），noun计3分，其余计1分，返回最终得分最高的镜头类型
+            if (!Predicates.isEmpty(imageMeta.getTags())) {
+                Map<String, Float> shotTypeDict = new HashMap<>();
+                List<Integer> shotTypeTags = new ArrayList<>();
+                shotTypeTags.addAll(imageMeta.getNounTags());
+                shotTypeTags.addAll(imageMeta.getDomainTags());
+                shotTypeTags.addAll(imageMeta.getAdjTags());
+                for (int tagIdx : shotTypeTags) {
+                    TagItem item = Kingdom.getDefault().getTagItem(tagIdx, Kingdom.TYPE_ALL);
+                    if (item == null) {
+                        continue;
                     }
-                }
+                    String st1 = item.getShotType1();
+                    if (!TextUtils.isEmpty(st1)) {
+                        Float val = shotTypeDict.get(st1);
+                        if (val != null) {
+                            shotTypeDict.put(st1, val + item.getShotTypeScore());
+                        } else {
+                            shotTypeDict.put(st1, item.getShotTypeScore());
+                        }
+                    }
 
-                String st2 = item.getShotType2();
-                if(!TextUtils.isEmpty(st2)){
-                    Float val = shotTypeDict.get(st2);
-                    if(val != null){
-                        shotTypeDict.put(st2, val + item.getShotTypeScore());
-                    }else{
-                        shotTypeDict.put(st2, item.getShotTypeScore());
+                    String st2 = item.getShotType2();
+                    if (!TextUtils.isEmpty(st2)) {
+                        Float val = shotTypeDict.get(st2);
+                        if (val != null) {
+                            shotTypeDict.put(st2, val + item.getShotTypeScore());
+                        } else {
+                            shotTypeDict.put(st2, item.getShotTypeScore());
+                        }
                     }
                 }
-            }
-            //dump shotTypeDict
-            //shot type
-            if(shotTypeDict.size() > 0){
-                String shotType = null;
-                float maxVal = -1f;
-                for (Map.Entry<String, Float> en : shotTypeDict.entrySet()){
-                    Float value = en.getValue();
-                    if(value > maxVal){
-                        maxVal = value;
-                        shotType =  en.getKey();
+                //dump shotTypeDict
+                //shot type
+                if (shotTypeDict.size() > 0) {
+                    String shotType = null;
+                    float maxVal = -1f;
+                    for (Map.Entry<String, Float> en : shotTypeDict.entrySet()) {
+                        Float value = en.getValue();
+                        if (value > maxVal) {
+                            maxVal = value;
+                            shotType = en.getKey();
+                        }
                     }
+                    imageMeta.setShotType(shotType);
                 }
-                imageMeta.setShotType(shotType);
             }
-        }*/
+        }
     }
 
     // 根据rawRects计算主人脸个数

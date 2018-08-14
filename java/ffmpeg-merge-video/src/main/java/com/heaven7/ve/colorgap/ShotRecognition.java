@@ -92,7 +92,7 @@ public class ShotRecognition {
         });
         ModuleData moduleData = Kingdom.getDefault().getModuleData(hld.getName());
         if(moduleData == null){
-            Logger.e(TAG , "getShotTypeOfHighLight", "no module data for name = " + hld.getName());
+            Logger.w(TAG , "getShotTypeOfHighLight", "no module data for name = " + hld.getName());
             return SHOT_TYPE_NONE;
         }
         int shotType = MetaInfo.getShotTypeFrom(moduleData.getShotType());

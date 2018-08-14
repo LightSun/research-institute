@@ -113,8 +113,8 @@ public class ColorGapManager {
             ConcurrentUtils.shutDownNow();
             //cut video
             List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(plaids, mediaItems);
-            //shot recognition
-            if(mShotRecognizer != null && !Predicates.isEmpty(newItems)){
+            //shot recognition.for 'GeLayLiYa' ,mShotRecognizer is disabled.
+            if(!mKingdom.isGeLaiLiYa() && mShotRecognizer != null && !Predicates.isEmpty(newItems)){
                 final VETemplate source_tem = srcTemplate;
                 mShotRecognizer.requestKeyPoint(newItems, new IShotRecognizer.Callback() {
                     @Override

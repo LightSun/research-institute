@@ -41,7 +41,9 @@ public abstract class Kingdom {
 
     private static Kingdom sDefault;
 
-    /** override this must call super(). */
+    /**
+     * init tag sets.
+     * override this must call super(). */
     protected void init() {
         for (List<TagItem> list : mNounMap.values()) {
             mNounTagIds.addAll(getIds(list));
@@ -158,6 +160,14 @@ public abstract class Kingdom {
     }
 
     /**
+     * indicate use montage as 'geLaiLiYa' or not. default is false.
+     * @return true if used as 'GeLayLiYa'
+     */
+    public boolean isGeLaiLiYa(){
+        return false;
+    }
+
+    /**
      * is subject or not
      *
      * @param index the tag index
@@ -243,12 +253,12 @@ public abstract class Kingdom {
                 return getTagItem(mScopeMap, index);
 
             case TYPE_ALL:
-                TagItem result = getTagItem(mNounMap, index);
+                TagItem result = getTagItem(index, TYPE_NOUN);
                 if (result == null) {
-                    result = getTagItem(mAdjMap, index);
+                    result = getTagItem(index, TYPE_SCOPE);
                 }
                 if (result == null) {
-                    result = getTagItem(mScopeMap, index);
+                    result = getTagItem(index, TYPE_ADJECTIVE);
                 }
                 return result;
             default:
