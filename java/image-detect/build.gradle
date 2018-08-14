@@ -16,6 +16,8 @@ dependencies {
     testCompile 'com.squareup.okhttp3:okhttp:3.11.0'
 
     testCompile files('libs/common-montage.jar')
+    //testCompile files('libs/scannotation-1.0.2.jar')
+    //testCompile files('libs/core_montage.jar')
 
     compile 'com.heaven7.java.base:Java-base:1.1.0'
     compile 'com.heaven7.java.visitor:Visitor:1.2.71'

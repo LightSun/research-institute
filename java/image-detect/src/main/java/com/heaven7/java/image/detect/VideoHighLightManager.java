@@ -65,6 +65,7 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
         public int getHighLightPoint() {
             return getHighLightPoint(0, Integer.MAX_VALUE);
         }
+        /**  if not found return -1 */
         public int getHighLightPoint(int stInSeconds, int etInSeconds) {
             int maxScoreTime = -1;
             int size = dataMap.size();
