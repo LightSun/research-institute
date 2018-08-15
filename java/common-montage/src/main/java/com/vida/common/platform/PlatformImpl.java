@@ -19,6 +19,6 @@ public class PlatformImpl extends Platform {
         if(getSystemType() != WINDOWS){
             throw new UnsupportedOperationException("Platform not support now.");
         }
-        return new WindowsCmdGenerator(true);
+        return new WindowsCmdGenerator(showWindow);
     }
 }

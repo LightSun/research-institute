@@ -57,6 +57,7 @@ public class FileUtils {
             }
             return fullPath ? parent.getAbsolutePath() :parent.getName();
         }
+        Logger.d("FileUtils", "getFileDir", "file not exist. filepath = " + filepath);
         return null;
     }
     public static String getParentDir(String dir, int depth, boolean fullPath){
@@ -73,6 +74,7 @@ public class FileUtils {
             }
             return fullPath ? parent.getAbsolutePath() :parent.getName();
         }
+        Logger.d("FileUtils", "getParentDir", "dir not exist. dir = " + dir);
         return null;
     }
 

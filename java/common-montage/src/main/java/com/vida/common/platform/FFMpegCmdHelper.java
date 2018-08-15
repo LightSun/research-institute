@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
     private boolean showWindow;
 
-    public FFMpegCmdHelper(boolean showWindow) {
+    FFMpegCmdHelper(boolean showWindow) {
         this.showWindow = showWindow;
     }
     @Override
