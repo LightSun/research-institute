@@ -42,7 +42,7 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
          * @param data the highlight data
          * @return the common score
          */
-        float getCommonScore(IHighLightData data);
+        float getCommonScore(Object context, IHighLightData data);
     }
 
     public static class VideoHighLight {
@@ -53,8 +53,10 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
         private final SparseArray<IHighLightData> maxScoreData = new SparseArray<>();
         private final SparseArray<List<? extends IHighLightData>> dataMap;
         private final ScoreProvider provider;
+        private final Object context;
 
-        public VideoHighLight(ScoreProvider provider, SparseArray<List<? extends IHighLightData>> dataMap) {
+        public VideoHighLight(Object context, ScoreProvider provider, SparseArray<List<? extends IHighLightData>> dataMap) {
+            this.context = context;
             this.provider = provider;
             this.dataMap = dataMap;
         }
@@ -120,7 +122,7 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
             return VisitServices.from(list).map(new ResultVisitor<IHighLightData, Float>() {
                 @Override
                 public Float visit(IHighLightData data, Object param) {
-                    return provider.getCommonScore(data);
+                    return provider.getCommonScore(context, data);
                 }
             }).pile(new PileVisitor<Float>() {
                 @Override
