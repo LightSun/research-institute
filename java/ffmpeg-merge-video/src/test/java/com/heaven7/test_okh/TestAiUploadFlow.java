@@ -16,8 +16,9 @@ public class TestAiUploadFlow {
     private static final String TAG = "TestAiUploadFlow";
 
     public static void main(String[] args) {
-        // testUpload();
-        createProject(TestHelper.getIds());
+         testUpload();
+        //createProject(TestHelper.getIds());
+       // createProject(null, 1L);
         // makeWorks();
        // testGetImage();
     }
@@ -47,7 +48,8 @@ public class TestAiUploadFlow {
      * //cmd /c start /wait /b ffmpeg -i D:\\Users\heyunpeng\AppData\Local\Temp\media_files\e10adc3949ba59abbe56e057f20f883e\1\resource\1533358646780.mp4 -r 1 -ss 00:00:00.00 -s 1920*1080 D:\\Users\heyunpeng\AppData\Local\Temp\media_files\e10adc3949ba59abbe56e057f20f883e\1\temp\1533358646780\img_%05d.jpg -y
      */
     private static void testUpload() {
-        String url = "http://www.xiaoxiekeji.cn:8004/media/upload";
+       // String url = "http://www.xiaoxiekeji.cn:8004/media/upload";
+        String url = "http://www.xiaoxiekeji.cn:8004/media/uploadSimpleFile";
         String[] medias = {
                 "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\浅蓝围巾领开衫\\1-10.jpg",
                 // "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子\\VID_20180507_141100.mp4",
@@ -113,7 +115,7 @@ public class TestAiUploadFlow {
         });
     }
 
-    private static void createProject(List<Long> ids) {
+    private static void createProject(List<Long> ids, Long logoId) {
         //ids: 4
         String url = "http://www.xiaoxiekeji.cn:8002/project/createProject";
         Map<String,String> map = new HashMap<>();
@@ -138,17 +140,20 @@ public class TestAiUploadFlow {
         cates.add(pcc12);
         project.setCategories(cates);
 
-        if(ids == null) {
+        /*if(ids == null) {
             ids = new ArrayList<>();
             ids.add(57L);
             ids.add(58L);
-        }
+        }*/
         project.setPublicMediaIds(ids);
+        if(logoId != null){
+            project.setLogoId(logoId);
+        }
 
        // System.out.println(new Gson().toJson(project));
         FormBody body = new FormBody.Builder()
                 .add("project", new Gson().toJson(project))
-                .add("makeWorks", "true")
+               // .add("makeWorks", "true")
                 .build();
         OkHttpHelper.post(url, map, body, new Callback() {
             @Override

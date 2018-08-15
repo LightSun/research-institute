@@ -5,11 +5,9 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.*;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.colorgap.FrameTags;
-import com.heaven7.ve.colorgap.Tag;
-import com.heaven7.ve.colorgap.VideoDataLoadUtils;
-import com.heaven7.ve.colorgap.Vocabulary;
+import com.heaven7.ve.colorgap.*;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -37,7 +35,7 @@ public class CountUtils {
         return sb;
     }
 
-    public static @Nullable FrameTagInfo convertFrameTagInfo(CsvDetail detail, String[] tags, float minPoss){
+    public static @Nullable FrameTagInfo convertFrameTagInfo(ColorGapContext context, CsvDetail detail, String[] tags, float minPoss){
         final List<Integer> tagIds = VisitServices.from(Arrays.asList(tags)).map(new ResultVisitor<String, Integer>() {
             @Override
             public Integer visit(String s, Object param) {
@@ -48,7 +46,7 @@ public class CountUtils {
         VisitServices.from(detail.getFrames()).queryList(new PredicateVisitor<FrameTags>() {
             @Override
             public Boolean visit(FrameTags frameTags, Object param) {
-                List<Tag> topTags = frameTags.getTopTags(Integer.MAX_VALUE, minPoss, Vocabulary.TYPE_WEDDING_ALL);
+                List<Tag> topTags = frameTags.getTopTags(context, Integer.MAX_VALUE, minPoss, Vocabulary.TYPE_WEDDING_ALL);
                 VisitServices.from(topTags).fireBatch(new FireBatchVisitor<Tag>() {
                     @Override
                     public Void visit(Collection<Tag> collection, Object param) {
@@ -134,7 +132,7 @@ public class CountUtils {
         }).getAsList();
     }
     //startTime. endTime in seconds
-    public static List<Tag> getTags(List<FrameTags> tags, int startTime, int endTime , float minPossibility){
+    public static List<Tag> getTags(ColorGapContext context,List<FrameTags> tags, int startTime, int endTime , float minPossibility){
         final List<Tag> allTags = new ArrayList<>();
         VisitServices.from(tags)
                 .map(new ResultVisitor<FrameTags, List<Tag>>() {
@@ -144,7 +142,7 @@ public class CountUtils {
                         if(frameTags.getFrameIdx() < startTime || frameTags.getFrameIdx() > endTime){
                             return null;
                         }
-                        return frameTags.getTopTags(Integer.MAX_VALUE, minPossibility, Vocabulary.TYPE_WEDDING_ALL);
+                        return frameTags.getTopTags(context, Integer.MAX_VALUE, minPossibility, Vocabulary.TYPE_WEDDING_ALL);
                     }
                 }).fire(new FireVisitor<List<Tag>>() {
             @Override
@@ -156,7 +154,7 @@ public class CountUtils {
         return allTags;
     }
 
-    public static String getContentFromFrames(List<FrameTags> frames, float minPoss) {
+    public static String getContentFromFrames(ColorGapContext context,List<FrameTags> frames, float minPoss) {
         final StringBuilder sb = new StringBuilder();
         VisitServices.from(frames).sortService(new Comparator<FrameTags>() {
             @Override
@@ -168,7 +166,7 @@ public class CountUtils {
             public Boolean visit(FrameTags frameTags, Object param) {
                 //1;(123,str),()...
                 sb.append(frameTags.getFrameIdx()).append(";");
-                List<Tag> tags = frameTags.getTopTags(Integer.MAX_VALUE, minPoss, Vocabulary.TYPE_WEDDING_ALL);
+                List<Tag> tags = frameTags.getTopTags(context, Integer.MAX_VALUE, minPoss, Vocabulary.TYPE_WEDDING_ALL);
                 VisitServices.from(tags).fireWithStartEnd(new StartEndVisitor<Tag>() {
                     @Override
                     public boolean visit(Object param, Tag tag, boolean start, boolean end) {
@@ -188,7 +186,7 @@ public class CountUtils {
         return sb.toString();
     }
 
-    public static String getContentFromDetails(List<CsvDetail> details, float minPoss) {
+    public static String getContentFromDetails(ColorGapContext context,List<CsvDetail> details, float minPoss) {
         final StringBuilder sb = new StringBuilder();
         VisitServices.from(details).fireWithStartEnd(new StartEndVisitor<CsvDetail>() {
             @Override
@@ -198,7 +196,7 @@ public class CountUtils {
                         .append(".")
                         .append(FileUtils.getFileExtension(path))
                         .append("\r\n");
-                sb.append(getContentFromFrames(detail.getFrames(), minPoss)).append("\r\n");
+                sb.append(getContentFromFrames(context, detail.getFrames(), minPoss)).append("\r\n");
                 return false;
             }
         });

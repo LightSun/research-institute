@@ -60,7 +60,7 @@ public class ShotTypeTest {
                 VisitServices.from(outItems).map(new ResultVisitor<MediaItem, MediaPartItem>() {
                     @Override
                     public MediaPartItem visit(MediaItem mediaItem, Object param) {
-                        return mediaItem.asPart();
+                        return mediaItem.asPart(new ContextImpl());
                     }
                 }).fire(new FireVisitor<MediaPartItem>() {
                     @Override

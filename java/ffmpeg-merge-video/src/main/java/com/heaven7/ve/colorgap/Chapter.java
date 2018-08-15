@@ -5,6 +5,7 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
@@ -15,7 +16,7 @@ import java.util.*;
  * the chapter.(a chapter correspond one logic-sentence)
  * Created by heaven7 on 2018/5/12 0012.
  */
-public class Chapter {
+public class Chapter extends BaseContextOwner{
     private static final String TAG = "Chapter";
 
     private final List<CutInfo.PlaidInfo> plaids;
@@ -31,7 +32,8 @@ public class Chapter {
     private List<GapManager.GapItem> filledItems;
     private List<Story> mStories;
 
-    public Chapter(List<CutInfo.PlaidInfo> plaids, List<MediaPartItem> items, int chapterIndex) {
+    public Chapter(Context context, List<CutInfo.PlaidInfo> plaids, List<MediaPartItem> items, int chapterIndex) {
+        super(context);
         this.plaids = plaids;
         this.items = items;
         this.chapterIndex = chapterIndex;
@@ -169,7 +171,7 @@ public class Chapter {
                     shots.get(i).imageMeta.getShotKey())));
         }
         //gap
-        filledItems = filler.fillPlaids(plaids, shots);
+        filledItems = filler.fillPlaids(getContext(), plaids, shots);
 
         //process air-plaids 空镜头只会替换偏差镜头.(按照顺序 - 不能破坏故事的结构)
         if (!Predicates.isEmpty(airPlaids)) {
@@ -310,6 +312,8 @@ public class Chapter {
 
     //将最少2个镜头聚类成故事
     private List<Story> groupStories(List<MediaPartItem> items) {
+        final Kingdom kingdom = getKingdom();
+
         List<MediaPartItem> shotBuffer = new ArrayList<>();
         Set<Integer> currentTagSet = new HashSet<>();
         List<Story> stories = new ArrayList<>();
@@ -324,7 +328,7 @@ public class Chapter {
                 int intersectCount = intersectSet.size();
                 //主词，不参加故事分类
                 for(Integer index : intersectSet){
-                    if(Kingdom.getDefault().isSubjectTag(index)){
+                    if(kingdom.isSubjectTag(index)){
                         intersectCount --;
                     }
                 }

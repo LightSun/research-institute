@@ -1,6 +1,7 @@
 package com.heaven7.ve.colorgap;
 
 
+import com.heaven7.utils.Context;
 import com.heaven7.ve.MediaResourceItem;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface CutItemDelegate {
      */
     MetaInfo.ImageMeta getImageMeta();
 
-    MediaPartItem asPart();
+    MediaPartItem asPart(Context context);
 
     List<FrameTags> getVideoTags();
 

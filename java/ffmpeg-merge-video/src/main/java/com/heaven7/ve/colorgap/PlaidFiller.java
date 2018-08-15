@@ -1,5 +1,6 @@
 package com.heaven7.ve.colorgap;
 
+import com.heaven7.utils.Context;
 import com.heaven7.ve.gap.GapManager;
 
 import java.util.List;
@@ -10,5 +11,5 @@ import java.util.List;
 
 public interface PlaidFiller {
 
-    List<GapManager.GapItem> fillPlaids(List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts);
+    List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts);
 }

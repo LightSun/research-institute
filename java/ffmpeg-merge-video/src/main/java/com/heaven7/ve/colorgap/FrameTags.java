@@ -31,13 +31,13 @@ public class FrameTags {
         VisitServices.from(tags).addIfNotExist(tag);
     }
 
-    public Set<Integer> getTopTagSet(){
-        return getTopTagSet(3, 0.5f);
+    public Set<Integer> getTopTagSet(ColorGapContext context){
+        return getTopTagSet(context, 3, 0.5f);
     }
 
     // 获取概率大于minPossibility的，最大的（3个）tag的id的集合
-    public Set<Integer> getTopTagSet(int maxCount, float minPossibility){
-        List<Tag> topTags = getTopTags(maxCount, minPossibility, Kingdom.TYPE_ALL);
+    public Set<Integer> getTopTagSet(ColorGapContext context,int maxCount, float minPossibility){
+        List<Tag> topTags = getTopTags(context, maxCount, minPossibility, Kingdom.TYPE_ALL);
         HashSet<Integer> set = new HashSet<>();
         VisitServices.from(topTags).map(new ResultVisitor<Tag, Integer>() {
             @Override
@@ -50,12 +50,14 @@ public class FrameTags {
 
     /**
      * get top tags.
+     *
+     * @param context
      * @param maxCount max count
      * @param minPossibility the min possibility
      * @param vocabularyType the vocabulary type. see {@linkplain Kingdom#TYPE_ALL} and etc.
      * @return the top tags.
      */
-    public List<Tag> getTopTags(int maxCount, float minPossibility, int vocabularyType){
+    public List<Tag> getTopTags(ColorGapContext context, int maxCount, float minPossibility, int vocabularyType){
 
         final List<Tag> result = new ArrayList<>();
         final List<Tag> filterTags;
@@ -67,7 +69,7 @@ public class FrameTags {
                 filterTags = VisitServices.from(this.tags).visitForQueryList(new PredicateVisitor<Tag>() {
                     @Override
                     public Boolean visit(Tag tag, Object param) {
-                        return Kingdom.getDefault().isTagExists(vocabularyType, tag.getIndex());
+                        return context.getKingdom().isTagExists(vocabularyType, tag.getIndex());
                     }
                 }, null);
                 break;

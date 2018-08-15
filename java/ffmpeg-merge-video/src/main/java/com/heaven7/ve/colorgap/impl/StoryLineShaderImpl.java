@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
@@ -24,7 +25,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
             = (Comparator<MediaPartItem>) (o1, o2) -> Long.compare(o1.getDate(), o2.getDate());
 
     @Override
-    public List<GapManager.GapItem> tintAndFill(List<CutInfo.PlaidInfo> plaids, VETemplate template, List<MediaPartItem> items,
+    public List<GapManager.GapItem> tintAndFill(Context context, List<CutInfo.PlaidInfo> plaids, VETemplate template, List<MediaPartItem> items,
                                                 PlaidFiller filler, AirShotFilter filter) {
         /*
            0, 把空镜头过滤出来。 最后再填充空镜头， 根据时间或者tag?
@@ -40,7 +41,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
             Logger.d(TAG, "tintAndFill", "get air shots: " + emptyItems);
         }
         items.removeAll(emptyItems);
-        List<Chapter> chapters = groupChapter(template, items);
+        List<Chapter> chapters = groupChapter(context, template, items);
         //normal fill
         for (Chapter chapter : chapters){
             chapter.fill(emptyItems, filler, filter);
@@ -71,14 +72,14 @@ public class StoryLineShaderImpl implements StoryLineShader {
         return result;
     }
 
-    private List<Chapter> groupChapter(VETemplate template, List<MediaPartItem> items) {
+    private List<Chapter> groupChapter(Context context,VETemplate template, List<MediaPartItem> items) {
         List<Chapter> chapters = new ArrayList<>();
         List<VETemplate.LogicSentence> sentences = template.getLogicSentences();
         //only one dir (often for c user.)
         if(sentences.size() == 1){
             //only one
             items.sort(TIME_COMPARATOR);
-            chapters.add(new Chapter(sentences.get(0).getPlaids(), items, 0));
+            chapters.add(new Chapter(context, sentences.get(0).getPlaids(), items, 0));
             return chapters;
         }
 
@@ -97,7 +98,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
             if(filterItems.isEmpty()){
                 throw new IllegalStateException("RawScript error. dir = " + ls.getDir());
             }
-            chapters.add(new Chapter(ls.getPlaids(), filterItems, i));
+            chapters.add(new Chapter(context, ls.getPlaids(), filterItems, i));
         }
         return chapters;
     }

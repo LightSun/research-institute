@@ -477,13 +477,13 @@ public interface MetaInfo {
             return KeyValuePair.create(time, data);
         }
         @SuppressWarnings("unchecked")
-        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(TimeTraveller tt){
+        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(ColorGapContext context, TimeTraveller tt){
             if(highLightMap == null){
                 return null;
             }
             int start = (int)CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
             int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
-            VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(
+            VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(context,
                     new ScoreProviderImpl(), highLightMap);
             int time = vhl.getHighLightPoint(start, end);
             if(time == -1){
@@ -493,13 +493,13 @@ public interface MetaInfo {
             return KeyValuePair.create(time, data);
         }
         @SuppressWarnings("unchecked")
-        public HighLightArea getHightLightArea(TimeTraveller tt){
+        public HighLightArea getHightLightArea(ColorGapContext context, TimeTraveller tt){
             if(highLightMap == null){
                 return null;
             }
             int start = (int) CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
             int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
-            VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(
+            VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(context, 
                     new ScoreProviderImpl(), highLightMap);
             return vhl.getHighLightArea(start, end);
         }

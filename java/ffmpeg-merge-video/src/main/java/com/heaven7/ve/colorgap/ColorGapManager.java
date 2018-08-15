@@ -23,11 +23,10 @@ import java.util.concurrent.CyclicBarrier;
  * Created by heaven7 on 2018/3/15 0015.
  */
 
-public class ColorGapManager {
+public class ColorGapManager extends BaseContextOwner{
 
     private static final String TAG = "ColorGapManager";
 
-    private final Context mContext;
     private final MusicCutter musicCut;
     private final MusicShader musicShader;
     private final PlaidFiller filler;
@@ -36,11 +35,10 @@ public class ColorGapManager {
 
     private TemplateScriptProvider mProvider;
     private IShotRecognizer mShotRecognizer;
-    private Kingdom mKingdom = Kingdom.getDefault();
 
     public ColorGapManager(Context context, MediaAnalyser mediaAnalyser, MusicCutter musicCut,
                            MusicShader musicShader, PlaidFiller filler) {
-        this.mContext = context;
+        super(context);
         this.mediaAnalyser = mediaAnalyser;
         this.musicCut = musicCut;
         this.musicShader = musicShader;
@@ -56,10 +54,6 @@ public class ColorGapManager {
      */
     public void preLoadData(ColorGapParam param){
         mediaAnalyser.preLoadData(param);
-    }
-
-    public void setKingdom(Kingdom kingdom) {
-        this.mKingdom = kingdom;
     }
     public void setShotRecognizer(IShotRecognizer mShotRecognizer) {
         this.mShotRecognizer = mShotRecognizer;
@@ -85,7 +79,8 @@ public class ColorGapManager {
      */
     //return the FillResult which contains video editor nodes and src template.
     public void fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<MediaResourceItem> items, FillCallback callback) {
-       // ResourceInitializer.init(mContext);
+        final ColorGapContext mContext = getContext();
+        // ResourceInitializer.init(mContext);
         //the barrier help we do two tasks: analyse, tint.
         CyclicBarrier barrier = new CyclicBarrier(mediaAnalyser.getAsyncModuleCount() + 1);
         //analyse
@@ -112,9 +107,9 @@ public class ColorGapManager {
             //all done. shut down service.
             ConcurrentUtils.shutDownNow();
             //cut video
-            List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(plaids, mediaItems);
+            List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(mContext, plaids, mediaItems);
             //shot recognition.for 'GeLayLiYa' ,mShotRecognizer is disabled.
-            if(!mKingdom.isGeLaiLiYa() && mShotRecognizer != null && !Predicates.isEmpty(newItems)){
+            if(!getKingdom().isGeLaiLiYa() && mShotRecognizer != null && !Predicates.isEmpty(newItems)){
                 final VETemplate source_tem = srcTemplate;
                 mShotRecognizer.requestKeyPoint(newItems, new IShotRecognizer.Callback() {
                     @Override
@@ -173,11 +168,11 @@ public class ColorGapManager {
         //process story to color filter(gen shot key, filter)
         List<GapManager.GapItem> gapItems = null;
         if (mStoryShader != null) {
-            gapItems = mStoryShader.tintAndFill(plaids, resultTemplate, newItems, filler, new AirShotFilterImpl());
+            gapItems = mStoryShader.tintAndFill(getContext(), plaids, resultTemplate, newItems, filler, new AirShotFilterImpl());
         }
         if (gapItems == null) {
             //fill plaid
-            gapItems = filler.fillPlaids(plaids, newItems);
+            gapItems = filler.fillPlaids(getContext(), plaids, newItems);
         }
         callback.onFillFinished(new FillResult(gapItems, srcTemplate, resultTemplate));
     }
@@ -249,6 +244,7 @@ public class ColorGapManager {
     }*/
 
     private void populateTemplate(VETemplate template, List<RawScriptItem> items) {
+        Kingdom kingdom = getKingdom();
         for (RawScriptItem item : items) {
             //转场镜头/空镜头的个数. 末尾开始，倒过来均分
             int airShotCount = item.getAirShotCount();
@@ -293,7 +289,7 @@ public class ColorGapManager {
             if (!Predicates.isEmpty(item.getFirstShotTags())) {
                 List<List<Integer>> tags = new ArrayList<>();
                 for (String tag : item.getFirstShotTags()) {
-                    List<Integer> ids = mKingdom.getTagIdsAsNoun(tag);
+                    List<Integer> ids = kingdom.getTagIdsAsNoun(tag);
                     if (ids == null) {
                         Logger.w("ColorGapManager", "populateTemplate", "getTagIdsFromWeddingNounTag() failed.tag = " + tag);
                         continue;

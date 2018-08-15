@@ -12,6 +12,7 @@ import com.heaven7.util.FrameTagInfo;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.test.ContextImpl;
 import org.junit.Test;
 
 import java.io.File;
@@ -38,7 +39,7 @@ public class CountTagTest {
         String[] tags = {"Gown"};
         float minPoss = 0.5f;
 
-        Callback2 callback = new Callback2();
+        Callback2 callback = new Callback2(new ContextImpl());
         loadData(dir, callback);
         List<FrameTagInfo> infos = callback.getFrameTagInfos(tags, minPoss);
         StringBuilder sb = buildFrameTagInfos(infos, tags, minPoss);
@@ -55,7 +56,8 @@ public class CountTagTest {
         String[] tags = {"Jeans"};
         float minPoss = 0.5f;
 
-        Callback2 callback = new Callback2();
+        ContextImpl context = new ContextImpl();
+        Callback2 callback = new Callback2(context);
         loadData(dir, callback);
         List<FrameTagInfo> infos = callback.getFrameTagInfos(media, tags, minPoss);
         StringBuilder sb = buildFrameTagInfos(infos, tags, minPoss);
@@ -73,11 +75,12 @@ public class CountTagTest {
         int start = 8;
         int end = 11;
         float minPoss = 0.5f;
+        ContextImpl context = new ContextImpl();
 
-        Callback2 callback = new Callback2();
+        Callback2 callback = new Callback2(context);
         loadData(dir, callback);
         CsvDetail csvDetail = callback.getCsvDetail(mediaPath);
-        List<Tag> tags = getTags(csvDetail.getFrames(),
+        List<Tag> tags = getTags(context, csvDetail.getFrames(),
                 start, end, minPoss);
         //build result
         StringBuilder sb = buildResultText(merge(tags));
@@ -101,10 +104,11 @@ public class CountTagTest {
         int end = 23;
         float minPoss = 0.5f;
 
-        Callback2 callback = new Callback2();
+        ContextImpl context = new ContextImpl();
+        Callback2 callback = new Callback2(context);
         loadData(dir, callback);
         CsvDetail csvDetail = callback.getCsvDetail(mediaPath);
-        List<Tag> tags = getTags(csvDetail.getFrames(),
+        List<Tag> tags = getTags(context, csvDetail.getFrames(),
                 start, end, minPoss);
         //build result
         StringBuilder sb = buildResultText(merge(tags));
@@ -121,7 +125,7 @@ public class CountTagTest {
         String dir = "E:\\BaiduNetdiskDownload\\taobao_service";
         //String dir =  "E:\\BaiduNetdiskDownload\\taobao_service\\照片";
 
-        Callback0 callback = new Callback0();
+        Callback0 callback = new Callback0(new ContextImpl());
         loadData(dir, callback);
         callback.count(dir);
     }
@@ -130,7 +134,8 @@ public class CountTagTest {
     public void generateStrFile() {
         String dir = "E:\\BaiduNetdiskDownload\\taobao_service";
         // String dir = "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子";
-        Callback2 callback = new Callback2();
+        ContextImpl context = new ContextImpl();
+        Callback2 callback = new Callback2(context);
         loadData(dir, callback);
         VisitServices.from(callback.getCsvDetails()).fire(new FireVisitor<CsvDetail>() {
             @Override
@@ -140,7 +145,7 @@ public class CountTagTest {
                 String fileName = FileUtils.getFileName(filePath);
                 File dst = new File(dir + File.separator + "strs" + File.separator + fileName + "_str.txt");
 
-                String content = CountUtils.getContentFromFrames(detail.getFrames(), 0.5f);
+                String content = CountUtils.getContentFromFrames(context, detail.getFrames(), 0.5f);
                 FileUtils.writeTo(dst, content);
                 return null;
             }
@@ -148,11 +153,12 @@ public class CountTagTest {
     }
     @Test //将tag转化为string. 将多个图片的tag文件(同目录) 写到一个文件里。
     public void generateStrFileForImage() {
+        ContextImpl context = new ContextImpl();
         final String dir = "E:\\BaiduNetdiskDownload\\taobao_service";
         final String outDir = "E:\\BaiduNetdiskDownload\\taobao_service\\test";
         final int depth = 3;
         //String dir = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\男装\\翻领撞色套头衫";
-        Callback2 callback = new Callback2();
+        Callback2 callback = new Callback2(context);
         loadData(dir, callback);
         VisitServices.from(callback.getImagesCsvDetails())
                 .groupService(new ResultVisitor<CsvDetail, String>() { //dir
@@ -176,7 +182,7 @@ public class CountTagTest {
                     }
                 }
                 File dst = new File(dir + File.separator + "all_strs.txt");
-                String content = CountUtils.getContentFromDetails(pair.getValue(), 0.5f);
+                String content = CountUtils.getContentFromDetails(context, pair.getValue(), 0.5f);
                 FileUtils.writeTo(dst, content);
                 return null;
             }
@@ -185,9 +191,13 @@ public class CountTagTest {
     }
 
     //for xxx_predication.csv is in 'tags'
-    private static class Callback2 implements VideoDataLoadUtils.LoadCallback {
+    private static class Callback2 extends BaseContextOwner implements VideoDataLoadUtils.LoadCallback {
 
         final List<CsvDetail> datas = new ArrayList<>();
+
+        public Callback2(ColorGapContext mContext) {
+            super(mContext);
+        }
 
         @Override
         public void onFrameTagsLoaded(String simpleFileName, String fullPath, List<FrameTags> tags) {
@@ -228,7 +238,7 @@ public class CountTagTest {
             return VisitServices.from(datas).map(new ResultVisitor<CsvDetail, FrameTagInfo>() {
                 @Override
                 public FrameTagInfo visit(CsvDetail detail, Object param) {
-                    return convertFrameTagInfo(detail, tags, minPoss);
+                    return convertFrameTagInfo(getContext(), detail, tags, minPoss);
                 }
             }).getAsList();
         }
@@ -240,16 +250,20 @@ public class CountTagTest {
                     if (!TextUtils.isEmpty(mediaPath) && !detail.getMediaSrc().getFilePath().equalsIgnoreCase(mediaPath)) {
                         return null;
                     }
-                    return convertFrameTagInfo(detail, tags, minPoss);
+                    return convertFrameTagInfo(getContext(), detail, tags, minPoss);
                 }
             }).getAsList();
         }
     }
 
 
-    private static class Callback0 implements VideoDataLoadUtils.LoadCallback {
+    private static class Callback0 extends BaseContextOwner implements VideoDataLoadUtils.LoadCallback {
 
         final List<FrameTags> list = new ArrayList<>();
+
+        public Callback0(ColorGapContext mContext) {
+            super(mContext);
+        }
 
         @Override
         public void onFrameTagsLoaded(String simpleFileName, String fullPath, List<FrameTags> tags) {
@@ -263,7 +277,7 @@ public class CountTagTest {
 
         //所有tag的信息
         public void count(String dir) {
-            List<Tag> tags = getTags(list, 0, Integer.MAX_VALUE, 0.5f);
+            List<Tag> tags = getTags(getContext(), list, 0, Integer.MAX_VALUE, 0.5f);
             StringBuilder sb = buildResultText(merge(tags));
             //write to file
             File dst = new File(dir, "count_info.txt");

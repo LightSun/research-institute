@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class VideoCutterImpl extends VideoCutter {
 
     @Override
-    public List<MediaPartItem> cut(List<CutInfo.PlaidInfo> plaids, List<MediaItem> items) {
+    public List<MediaPartItem> cut(Context mContext, List<CutInfo.PlaidInfo> plaids, List<MediaItem> items) {
         //if video src.count > music.bag.size
         // -> color
         /*
@@ -110,11 +111,11 @@ public class VideoCutterImpl extends VideoCutter {
             //no parts . may be image
             if(parts == null || parts.size() == 0){
                 long maxDuration = CommonUtils.timeToFrame(item.item.getDuration(), TimeUnit.MILLISECONDS);
-                newItems.add(new MediaPartItem((MetaInfo.ImageMeta) item.imageMeta.copy(), item.item,
+                newItems.add(new MediaPartItem(mContext, (MetaInfo.ImageMeta) item.imageMeta.copy(), item.item,
                         TimeTraveller.of(0, maxDuration, maxDuration)));
             }else {
                 for (TimeTraveller part : parts) {
-                    newItems.add(new MediaPartItem((MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, part));
+                    newItems.add(new MediaPartItem(mContext, (MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, part));
                 }
             }
         }

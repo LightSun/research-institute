@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.TimeTraveller;
 
@@ -52,11 +53,11 @@ public class MediaItem implements CutItemDelegate{
                 + " ,parts = " + videoParts);
     }
 
-    public MediaPartItem asPart() {
+    public MediaPartItem asPart(Context context) {
         TimeTraveller tt = new TimeTraveller();
         tt.setStartTime(0);
         tt.setEndTime(CommonUtils.timeToFrame(item.getDuration(), TimeUnit.MILLISECONDS));
-        return new MediaPartItem((MetaInfo.ImageMeta) imageMeta.copy(), this.item, tt);
+        return new MediaPartItem(context, (MetaInfo.ImageMeta) imageMeta.copy(), this.item, tt);
     }
 
     @Override

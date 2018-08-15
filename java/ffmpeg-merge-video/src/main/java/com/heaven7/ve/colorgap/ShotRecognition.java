@@ -7,6 +7,7 @@ import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.kingdom.ModuleData;
@@ -90,7 +91,7 @@ public class ShotRecognition {
                 return hd1.getLocation().getArea() > hd2.getLocation().getArea() ? hd1 : hd2;
             }
         });
-        ModuleData moduleData = Kingdom.getDefault().getModuleData(hld.getName());
+        ModuleData moduleData = item.getKingdom().getModuleData(hld.getName());
         if(moduleData == null){
             Logger.w(TAG , "getShotTypeOfHighLight", "no module data for name = " + hld.getName());
             return SHOT_TYPE_NONE;

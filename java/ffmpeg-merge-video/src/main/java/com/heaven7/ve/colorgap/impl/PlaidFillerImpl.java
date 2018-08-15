@@ -4,6 +4,7 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class PlaidFillerImpl implements PlaidFiller {
 
     @Override
-    public List<GapManager.GapItem> fillPlaids(List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts) {
+    public List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts) {
         final boolean notEnough = parts.size() < infoes.size();
         if(notEnough){
             Logger.d("PlaidFillerImpl", "fill", "shot is not enough --- expect plaid.count = "
@@ -49,7 +50,7 @@ public class PlaidFillerImpl implements PlaidFiller {
          * 1，过滤出符合条件的 media part item
          * 2, gap
          */
-        GapCallbackImpl gapCallback = new GapCallbackImpl(infoes, parts);
+        GapCallbackImpl gapCallback = new GapCallbackImpl(mContext, infoes, parts);
         //没有匹配条件的填充物
         List<CutInfo.PlaidInfo> notPopulatePlaids = new ArrayList<>();
         for(int i = 0 , size = sortedPlaids.size() ; i < size ; i++){
@@ -97,18 +98,20 @@ public class PlaidFillerImpl implements PlaidFiller {
         return result;
     }
 
-    private static class GapCallbackImpl implements GapManager.GapCallback{
+    private static class GapCallbackImpl extends BaseContextOwner implements GapManager.GapCallback{
 
         final List<GapManager.GapItem> filledItems = new ArrayList<>();
         final List<CutInfo.PlaidInfo> infoes;
         final List<MediaPartItem> parts;
 
-        public GapCallbackImpl(List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts) {
+        public GapCallbackImpl(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts) {
+            super(mContext);
             this.infoes = infoes;
             this.parts = parts;
         }
         /** adjust the video start and end times. after call this the video parts' times may be overlapped. */
         public void adjustTimes() {
+            Kingdom kingdom = getKingdom();
             for(GapManager.GapItem gapItem : filledItems) {
                 CutInfo.PlaidInfo plaid = (CutInfo.PlaidInfo) gapItem.plaid;
                 MediaPartItem mpi = (MediaPartItem) gapItem.item;
@@ -127,7 +130,7 @@ public class PlaidFillerImpl implements PlaidFiller {
                     if(videoPart.getMaxDuration() < plaid.getDuration()){
                         throw new IllegalStateException("video relative music part is too short.");
                     }
-                    if(Kingdom.getDefault().isGeLaiLiYa()){
+                    if(kingdom.isGeLaiLiYa()){
                         videoPart.adjustTimeAsCenter(plaid.getDuration());
                     }else {
                         //the key frame time often is the high-light time

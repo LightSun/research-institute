@@ -7,19 +7,12 @@ import com.heaven7.java.visitor.StartEndVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
 import com.heaven7.ve.MediaResourceItem;
-import com.heaven7.ve.kingdom.Kingdom;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * the resource initializer of cut music / cut video .

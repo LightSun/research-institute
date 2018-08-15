@@ -59,6 +59,14 @@ public class Project {
     private List<CommodityCategory> categories;
 
     private List<Long> publicMediaIds;
+    private Long logoId;
+
+    public Long getLogoId() {
+        return logoId;
+    }
+    public void setLogoId(Long logoId) {
+        this.logoId = logoId;
+    }
 
     public List<Long> getPublicMediaIds() {
         return publicMediaIds;

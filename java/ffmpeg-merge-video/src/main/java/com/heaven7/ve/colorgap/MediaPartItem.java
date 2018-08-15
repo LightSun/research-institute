@@ -13,6 +13,7 @@ import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.TimeTraveller;
@@ -31,7 +32,7 @@ import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
  * the media part item, Equivalent to a video camera-shot
  * @author heaven7
  */
-public class MediaPartItem implements ItemDelegate , CutItemDelegate{
+public class MediaPartItem extends BaseContextOwner implements ItemDelegate , CutItemDelegate{
 
     private static final KeyValuePair<Integer, List<IHighLightData>> NONE = KeyValuePair.create(null, null);
 
@@ -66,7 +67,8 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
      * @param item the media resource item
      * @param videoPart the video part. will auto set max duration.
      */
-    public MediaPartItem(MetaInfo.ImageMeta imageMeta, MediaResourceItem item, TimeTraveller videoPart) {
+    public MediaPartItem(Context context, MetaInfo.ImageMeta imageMeta, MediaResourceItem item, TimeTraveller videoPart) {
+        super(context);
         this.imageMeta = imageMeta;
         this.item = item;
         this.videoPart = videoPart;
@@ -148,7 +150,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
 
     @Override
     public ItemDelegate copy() {
-        MediaPartItem mpi = new MediaPartItem((MetaInfo.ImageMeta) imageMeta.copy(), item, (TimeTraveller) videoPart.copy());
+        MediaPartItem mpi = new MediaPartItem(getContext(), (MetaInfo.ImageMeta) imageMeta.copy(), item, (TimeTraveller) videoPart.copy());
         mpi.mCondition = this.mCondition;
         mpi.domainTagScore = this.domainTagScore;
         mpi.storyId = this.storyId;
@@ -176,17 +178,18 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         if(Predicates.isEmpty(framesTags)){
             return 0;
         }
+        ColorGapContext context = getContext();
 
         float score = 0f;
         for(FrameTags ft : framesTags){
             //先对common tag进行分组， 并且只考虑top tags.(WeddingTagIte.description, score)
             Map<String, Float> tagDict = new HashMap<>();
-            Set<Integer> tagSet = ft.getTopTagSet(3, 0.8f);
+            Set<Integer> tagSet = ft.getTopTagSet(context, 3, 0.8f);
             if(Predicates.isEmpty(tagSet)){
-                tagSet = ft.getTopTagSet(3, 0.5f);
+                tagSet = ft.getTopTagSet(context, 3, 0.5f);
             }
             for (int tagIdx : tagSet){
-                TagItem item = Kingdom.getDefault().getTagItem(tagIdx, Kingdom.TYPE_ALL);
+                TagItem item = getKingdom().getTagItem(tagIdx, Kingdom.TYPE_ALL);
                 if(item != null){
                     tagDict.put(item.getDesc(), (float) item.getScore());
                 }
@@ -303,6 +306,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         if(imageMeta == null){
             return;
         }
+        final Kingdom kingdom = getKingdom();
         //1, face
         if(!Predicates.isEmpty(imageMeta.getRawFaceRects()) && imageMeta.getMainFaceCount() > 0){
             List<FrameFaceRects> faceRects = imageMeta.getRawFaceRects();
@@ -334,7 +338,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
             }
         }
         //only used for gelailiya
-        if(Kingdom.getDefault().isGeLaiLiYa()) {
+        if(kingdom.isGeLaiLiYa()) {
             //2, video tags. 分三类进行计算（noun, domain, adj），noun计3分，其余计1分，返回最终得分最高的镜头类型
             if (!Predicates.isEmpty(imageMeta.getTags())) {
                 Map<String, Float> shotTypeDict = new HashMap<>();
@@ -343,7 +347,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
                 shotTypeTags.addAll(imageMeta.getDomainTags());
                 shotTypeTags.addAll(imageMeta.getAdjTags());
                 for (int tagIdx : shotTypeTags) {
-                    TagItem item = Kingdom.getDefault().getTagItem(tagIdx, Kingdom.TYPE_ALL);
+                    TagItem item = kingdom.getTagItem(tagIdx, Kingdom.TYPE_ALL);
                     if (item == null) {
                         continue;
                     }
@@ -435,9 +439,10 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
                                         float minPossibility, int vocabularyType) {
         //mapDataDir: tag_index - > possibility
         //统计 tag 出现的概率(整个镜头中)。 -- 指定tag个数， min 概率
+        final ColorGapContext context = getContext();
         SparseArray<List<Float>> dict = new SparseArray<>();
         for (FrameTags ft : rawVideoTags){
-            List<Tag> topTags = ft.getTopTags(count, minPossibility, vocabularyType);
+            List<Tag> topTags = ft.getTopTags(context, count, minPossibility, vocabularyType);
             for(Tag tag : topTags){
                 List<Float> value = dict.get(tag.getIndex());
                 if(value == null){
@@ -491,7 +496,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
         return imageMeta;
     }
     @Override
-    public MediaPartItem asPart() {
+    public MediaPartItem asPart(Context context) {
         return (MediaPartItem) copy();
     }
     @Override
@@ -550,7 +555,7 @@ public class MediaPartItem implements ItemDelegate , CutItemDelegate{
 
     public KeyValuePair<Integer, List<IHighLightData>> getHighLight(){
         if(highLight == NONE){
-            highLight = imageMeta.getHighLight(videoPart);
+            highLight = imageMeta.getHighLight(getContext(), videoPart);
         }
         return highLight;
     }

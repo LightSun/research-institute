@@ -1,6 +1,7 @@
 package com.heaven7.ve.colorgap;
 
 
+import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.impl.TagBasedShotCutter;
 import com.heaven7.ve.colorgap.impl.VideoCutterImpl;
 
@@ -12,7 +13,7 @@ import java.util.List;
 
 public abstract class VideoCutter {
 
-   public abstract List<MediaPartItem> cut(List<CutInfo.PlaidInfo> musicInfos, List<MediaItem> items);
+   public abstract List<MediaPartItem> cut(Context mContext, List<CutInfo.PlaidInfo> musicInfos, List<MediaItem> items);
 
    public static VideoCutter of(List<MediaItem> items){
        if(hasRawTags(items)){
