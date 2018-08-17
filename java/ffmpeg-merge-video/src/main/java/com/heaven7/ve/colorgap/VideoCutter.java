@@ -16,14 +16,11 @@ public abstract class VideoCutter {
    public abstract List<MediaPartItem> cut(Context mContext, List<CutInfo.PlaidInfo> musicInfos, List<MediaItem> items);
 
    public static VideoCutter of(List<MediaItem> items){
-      //TODO test for test.
-      /* if(hasRawTags(items)){
+      if(hasRawTags(items)){
           return new TagBasedShotCutter();
        }else{
           return new VideoCutterImpl();
        }
-*/
-      return new TagBasedShotCutter();
    }
 
    private static boolean hasRawTags(List<MediaItem> items) {

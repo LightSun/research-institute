@@ -119,7 +119,4 @@ public class StoryLineShaderImpl implements StoryLineShader {
             }
         }, null);
     }
-
-
-
 }

@@ -31,7 +31,21 @@ public class TestUploadStoreLine {
         // testUpload2();
         //  requestGenShotInfo();
         //  requestMovePublicRes();
-        requestMakeWorks();
+        //requestMakeWorks();
+        requestSaveFile();
+    }
+
+    public static void requestSaveFile(){
+        final String url = "http://www.xiaoxiekeji.cn:8004/media/downloadFileInternal/";
+        Map<String, String> map = new HashMap<>();
+        map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzMxOTcxNzQsImV4cCI6OTIyMzM2NTkwNDA2NjA4MH0.JJaBasuqJc8_u8p7z3LfkbK7Ev5dUARDmupBqRtTZDo");
+        String link = "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3454914715,2716418936&fm=15&gp=0.jpg";
+        OkHttpHelper.post(url, map, new FormBody.Builder()
+                .add("url", link)
+                .add("save_db", "true") //gelailiya 23
+                .add("res_type", "1") // 1 user , 2 public
+                .add("upload_type", "test_downloadFileInternal")
+                .build(), new LogCallback("requestSaveFile"));
     }
 
     public static void requestMakeWorks() {
@@ -53,29 +67,13 @@ public class TestUploadStoreLine {
     private static void requestTest0(String path, String mTag) {
         final String url = "http://www.xiaoxiekeji.cn:8004/media/test/" + path;
         Map<String, String> map = new HashMap<>();
-        map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzMxOTcxNzQsImV4cCI6OTIyMzM2NTkwNDA2NjA4MH0.JJaBasuqJc8_u8p7z3LfkbK7Ev5dUARDmupBqRtTZDo");
+       // map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzMxOTcxNzQsImV4cCI6OTIyMzM2NTkwNDA2NjA4MH0.JJaBasuqJc8_u8p7z3LfkbK7Ev5dUARDmupBqRtTZDo");
+        map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4IiwiaWF0IjoxNTM0NTAyOTI5LCJleHAiOjE1MzUxMDc3Mjl9.P7ebFNdwjozRsAXv26jaeloi0_FRbEbtqD3zXlZ2K00");
         OkHttpHelper.post(url, map, new FormBody.Builder()
                         .add("pub_media_infos", TestHelper.JSON)
-                        .add("project_id", "114") //gelailiya 23
-                        .build(),
-                new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        Logger.w(TAG, mTag, Logger.toString(e));
-                    }
+                        .add("project_id", "111") //gelailiya 23
+                        .build(), new LogCallback(mTag));
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        ResponseBody body = response.body();
-                        if (body == null) {
-                            response.close();
-                            return;
-                        }
-                        String json = body.string();
-                        Logger.i(TAG, mTag, json != null ? json : "Null");
-                        response.close();
-                    }
-                });
     }
 
     private static void testUpload() {
@@ -158,6 +156,5 @@ public class TestUploadStoreLine {
     private static PublicMediaResponse toPublicMediaResponse(String json) {
         return new Gson().fromJson(json, PublicMediaResponse.class);
     }
-
 
 }

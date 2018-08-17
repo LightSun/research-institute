@@ -110,6 +110,7 @@ public class ColorGapManager extends BaseContextOwner{
             ConcurrentUtils.shutDownNow();
             //cut video
             final List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(mContext, plaids, mediaItems);
+            Logger.d(TAG, "fill", "after cut, item.size = " + newItems.size());
             //shot recognition.for 'GeLayLiYa' ,mShotRecognizer is disabled.
             if(!getKingdom().isGeLaiLiYa() && mShotRecognizer != null && !Predicates.isEmpty(newItems)){
                 final VETemplate source_tem = srcTemplate;

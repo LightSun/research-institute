@@ -5,6 +5,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;
+import com.vida.common.ImageExtractCmd;
 import org.junit.Test;
 
 import java.io.File;
@@ -34,7 +35,7 @@ public class VideoImageBlurTest {
         }
         System.out.println(targetDir);
 
-        FFmpegUtils.ImageExtractCmd cmd = new FFmpegUtils.ImageExtractCmd.Builder()
+        ImageExtractCmd cmd = new ImageExtractCmd.Builder()
                 .setVideoPath(videoPath)
                 .setSavePath(targetDir)
                 .build();
@@ -67,7 +68,7 @@ public class VideoImageBlurTest {
         //extract image
         for (String file : mp4) {
             String dir = getTargetDir(file);
-            FFmpegUtils.ImageExtractCmd cmd = new FFmpegUtils.ImageExtractCmd.Builder()
+            ImageExtractCmd cmd = new ImageExtractCmd.Builder()
                     .setVideoPath(file)
                     .setSavePath(dir)
                     .build();
