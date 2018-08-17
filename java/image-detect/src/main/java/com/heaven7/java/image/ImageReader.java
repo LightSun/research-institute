@@ -1,10 +1,14 @@
 package com.heaven7.java.image;
 
+import java.io.InputStream;
+
 public interface ImageReader {
 
      ImageInfo readMatrix(String imgFile);
 
      ImageInfo readBytes(String imgFile, String format);
+
+     ImageInfo readMatrix(InputStream in);
 
      class ImageInfo{
           private Matrix2<Integer> mat;

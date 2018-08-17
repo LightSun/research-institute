@@ -71,4 +71,9 @@ public class MergeImageTest {
     private void write(Matrix2<Integer> mat,String dst){
         IMAGE_WRITER.write(mat, new File(dst), BufferedImage.TYPE_INT_RGB, "jpg");
     }
+    /**
+
+找不到文件“MakePri.exe”e
+
+     */
 }
