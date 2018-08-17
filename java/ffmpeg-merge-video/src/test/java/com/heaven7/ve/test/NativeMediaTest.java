@@ -35,7 +35,8 @@ public class NativeMediaTest {
             "turbojpeg.dll",
 
             "mediasdklib.dll",
-            "Win32Project1.dll",
+            "Win32Project2.dll",
+           // "Win32Project1.dll",
     };
 
     static {

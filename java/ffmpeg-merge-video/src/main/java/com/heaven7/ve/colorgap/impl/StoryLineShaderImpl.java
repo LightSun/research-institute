@@ -34,14 +34,20 @@ public class StoryLineShaderImpl implements StoryLineShader {
          * 3, 章节内部按照故事线来填. (章节优先级？)
          */
         if(DEBUG) {
-            Logger.d(TAG, "tintAndFill", ">>> start story shader...");
+            Logger.d(TAG, "tintAndFill", ">>> start story shader...items.size = " + items.size());
         }
         List<MediaPartItem> emptyItems = getEmptyShots(items);
         if(DEBUG) {
             Logger.d(TAG, "tintAndFill", "get air shots: " + emptyItems);
         }
         items.removeAll(emptyItems);
+        if(DEBUG) {
+            Logger.d(TAG, "tintAndFill", "exclude air shots, left items : " + items.size());
+        }
         List<Chapter> chapters = groupChapter(context, template, items);
+        if(DEBUG) {
+            Logger.d(TAG, "tintAndFill", "chapters: " + chapters.size());
+        }
         //normal fill
         for (Chapter chapter : chapters){
             chapter.fill(emptyItems, filler, filter);
@@ -109,7 +115,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
             @Override
             public Boolean visit(MediaPartItem partItem, Object param) {
                 String dir = FileUtils.getFileDir(partItem.item.getFilePath(), 1,  false);
-                return dir != null && MetaInfo.DIR_EMPTY.equals(dir);
+                return dir != null && MetaInfo.DIR_EMPTY.equals(dir);//empty shot
             }
         }, null);
     }

@@ -4,6 +4,7 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.base.util.Throwables;
 import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.MediaResourceItem;
@@ -39,6 +40,7 @@ public class ColorGapManager extends BaseContextOwner{
     public ColorGapManager(Context context, MediaAnalyser mediaAnalyser, MusicCutter musicCut,
                            MusicShader musicShader, PlaidFiller filler) {
         super(context);
+        Throwables.checkNull(context);
         this.mediaAnalyser = mediaAnalyser;
         this.musicCut = musicCut;
         this.musicShader = musicShader;
@@ -107,7 +109,7 @@ public class ColorGapManager extends BaseContextOwner{
             //all done. shut down service.
             ConcurrentUtils.shutDownNow();
             //cut video
-            List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(mContext, plaids, mediaItems);
+            final List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(mContext, plaids, mediaItems);
             //shot recognition.for 'GeLayLiYa' ,mShotRecognizer is disabled.
             if(!getKingdom().isGeLaiLiYa() && mShotRecognizer != null && !Predicates.isEmpty(newItems)){
                 final VETemplate source_tem = srcTemplate;

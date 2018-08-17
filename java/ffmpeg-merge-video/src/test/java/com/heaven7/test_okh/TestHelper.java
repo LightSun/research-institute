@@ -79,6 +79,34 @@ public class TestHelper {
             ",{\"id\":357,\"savePath\":\"media_files\\\\e10adc3949ba59abbe56e057f20f883e\\\\unknown\\\\resource\\\\1534139989794.mp4\",\"filename\":\"C0013.MP4\"}\n" +
             "]" ;
 
+    static final String JSON_CREATE_PROJECT = "{\n" +
+            "  \"publicMediaIds\": [\n" +
+            "    382,\n" +
+            "    383,\n" +
+            "    384,\n" +
+            "    385\n" +
+            "  ],\n" +
+            "  \"categories\": [\n" +
+            "    {\n" +
+            "      \"cid\": 1,\n" +
+            "      \"name\": \"女装\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"cid\": 101,\n" +
+            "      \"name\": \"甜美\"\n" +
+            "    }\n" +
+            "  ],\n" +
+            "  \"commodity\": {\n" +
+            "    \"series_type\": 0,\n" +
+            "    \"type\": 1\n" +
+            "  },\n" +
+            "  \"name\": \"新创建测试1\",\n" +
+            "  \"logoPath\":\"http://www.xiaoxiekeji.cn:8004/media/resourcesmedia_files\\\\c9f0f895fb98ab9159f51fd0297e236d\\\\simple_files\\\\1534320395795.jpg\",\n" +
+            "  \"rate_type\": 2,\n" +
+            "  \"duration\": 30000,\n" +
+            "  \"logoId\": 8\n" +
+            "}";
+
 
     public static List<Long> getIds(){
         ArrayList<PublicMediaInfo> list = new Gson().fromJson(JSON, new TypeToken<ArrayList<PublicMediaInfo>>() {

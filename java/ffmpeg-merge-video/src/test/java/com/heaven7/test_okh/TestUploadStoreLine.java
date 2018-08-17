@@ -56,7 +56,7 @@ public class TestUploadStoreLine {
         map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzMxOTcxNzQsImV4cCI6OTIyMzM2NTkwNDA2NjA4MH0.JJaBasuqJc8_u8p7z3LfkbK7Ev5dUARDmupBqRtTZDo");
         OkHttpHelper.post(url, map, new FormBody.Builder()
                         .add("pub_media_infos", TestHelper.JSON)
-                        .add("project_id", "23")
+                        .add("project_id", "114") //gelailiya 23
                         .build(),
                 new Callback() {
                     @Override

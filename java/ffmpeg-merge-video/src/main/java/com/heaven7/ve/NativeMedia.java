@@ -26,6 +26,8 @@ public class NativeMedia implements INativeObject, ApiNativeMedia {
 
     public native void stopGenMcVideo();
 
+    protected native void onSetCallback(Callback mCallback);
+
     @Override
     public Callback getCallback() {
         return mCallback;
@@ -33,7 +35,9 @@ public class NativeMedia implements INativeObject, ApiNativeMedia {
     @Override
     public void setCallback(Callback mCallback) {
         this.mCallback = mCallback;
+        onSetCallback(mCallback);
     }
+
     @Override
     public long getNativePointer() {
         return mPtr;

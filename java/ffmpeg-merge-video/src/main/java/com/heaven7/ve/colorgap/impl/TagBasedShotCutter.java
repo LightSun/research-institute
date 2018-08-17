@@ -14,6 +14,7 @@ import com.heaven7.utils.Context;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
 
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -29,8 +30,8 @@ public class TagBasedShotCutter extends VideoCutter {
    // private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
     private static final int MIN_SHOT_BUFFER_LENGTH         = 6 ;           // FrameBuffer中生成Shot的最小Frame数
     private static final int MULTI_FACE_THRESHOLD           = 3 ;           // 多人脸下限为3个人脸
-    private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY = true ;        // 一段segment是否只返回“domain score”最高的Item
-    private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = true ;    // 一段segment是否只返回“face rect score”最高的Item
+    private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY = false ;        // 一段segment是否只返回“domain score”最高的Item
+    private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = false ;    // 一段segment是否只返回“face rect score”最高的Item
     private static final boolean CUT_BY_TAG = false;
     private static final long DURATION_THRESOLD = CommonUtils.timeToFrame(15, TimeUnit.SECONDS); //人脸视频part大于15s 会用tag切割
 
@@ -54,6 +55,9 @@ public class TagBasedShotCutter extends VideoCutter {
                 if(MAX_FACE_RECT_SCORE_SHOT_ONLY && item.item.getDuration() < 180*1000){
                     List<MediaPartItem> faceItems2 = getMaxFaceRectsScoreShot(faceItems, item);
                     resultList.addAll(faceItems2);
+                    if(faceItems2.isEmpty()){
+                        dump(faceItems, item, "cutByFace_MAX_FACE_RECT_SCORE_SHOT_ONLY");
+                    }
                 }else {
                     //cut more face shots.
                     List<MediaPartItem> unUsedShots = getUnUsedShots(context, item, faceItems);
@@ -81,6 +85,9 @@ public class TagBasedShotCutter extends VideoCutter {
                         }
                     });
                     resultList.addAll(faceItems);
+                    if(faceItems.isEmpty()){
+                        dump(faceItems, item, "cut more face shots");
+                    }
                 }
             }else{
                 Logger.d(TAG, "cut", "As common tag. path = " + item.item.getFilePath());
@@ -94,6 +101,9 @@ public class TagBasedShotCutter extends VideoCutter {
                     }
                 }else{
                     resultList.addAll(faceItems);
+                }
+                if(faceItems.isEmpty()){
+                    resultList.add(item.asPart(context));
                 }
             }
         }

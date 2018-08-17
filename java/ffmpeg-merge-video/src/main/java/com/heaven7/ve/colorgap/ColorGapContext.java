@@ -9,4 +9,5 @@ import com.heaven7.ve.kingdom.Kingdom;
 public interface ColorGapContext extends Context {
 
     Kingdom getKingdom();
+    void setKingdom(Kingdom kingdom);
 }
