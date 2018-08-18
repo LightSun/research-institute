@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_FILL_PLAID;
-import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_RECOGNIZE_SHOT;
+import static com.heaven7.ve.collect.ColorGapPerformanceCollector.*;
 
 /**
  * Created by heaven7 on 2018/3/15 0015.
@@ -91,7 +90,7 @@ public class ColorGapManager extends BaseContextOwner{
         //the barrier help we do two tasks: analyse, tint.
         CyclicBarrier barrier = new CyclicBarrier(mediaAnalyser.getAsyncModuleCount() + 1);
         //analyse
-        CollectModule module = getPerformanceCollector().startModule(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA, TAG);
+        CollectModule module = getPerformanceCollector().startModule(MODULE_ANALYSE_MEDIA, TAG);
         List<MediaItem> mediaItems = mediaAnalyser.analyse(mContext, items, barrier);
         module.end(TAG);
         //cut music
@@ -108,7 +107,7 @@ public class ColorGapManager extends BaseContextOwner{
         }
 
         //tint
-        module = getPerformanceCollector().startModule(ColorGapPerformanceCollector.MODULE_MUSIC_SHADER, TAG);
+        module = getPerformanceCollector().startModule(MODULE_MUSIC_SHADER, TAG);
         VETemplate resultTemplate = musicShader.tint(mContext, srcTemplate, plaids, 0);
         module.end(TAG);
         try {
@@ -118,7 +117,7 @@ public class ColorGapManager extends BaseContextOwner{
             //all done. shut down service.
             ConcurrentUtils.shutDownNow();
             //cut video
-            module = getPerformanceCollector().startModule(ColorGapPerformanceCollector.MODULE_CUT_VIDEO, TAG);
+            module = getPerformanceCollector().startModule(MODULE_CUT_VIDEO, TAG);
             final List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(mContext, plaids, mediaItems);
             module.end(TAG);
             Logger.d(TAG, "fill", "after cut, item.size = " + newItems.size());
