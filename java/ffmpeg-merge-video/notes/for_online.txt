@@ -1,0 +1,5 @@
+server 上线前工作：
+ 1， token验证 需要查询db
+ 2, 清理测试用的controllers
+ 3, 迁移资源时，将源文件删除。
+ 4. error request 处理

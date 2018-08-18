@@ -31,8 +31,8 @@ public class TestUploadStoreLine {
         // testUpload2();
         //  requestGenShotInfo();
         //  requestMovePublicRes();
-        //requestMakeWorks();
-        requestSaveFile();
+        requestMakeWorks();
+       // requestSaveFile();
     }
 
     public static void requestSaveFile(){
@@ -65,7 +65,8 @@ public class TestUploadStoreLine {
     }
 
     private static void requestTest0(String path, String mTag) {
-        final String url = "http://www.xiaoxiekeji.cn:8004/media/test/" + path;
+        //final String url = "http://www.xiaoxiekeji.cn:8004/media/test/" + path;
+        final String url = "http://www.xiaoxiekeji.cn:8004/media/" + path;
         Map<String, String> map = new HashMap<>();
        // map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzMxOTcxNzQsImV4cCI6OTIyMzM2NTkwNDA2NjA4MH0.JJaBasuqJc8_u8p7z3LfkbK7Ev5dUARDmupBqRtTZDo");
         map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4IiwiaWF0IjoxNTM0NTAyOTI5LCJleHAiOjE1MzUxMDc3Mjl9.P7ebFNdwjozRsAXv26jaeloi0_FRbEbtqD3zXlZ2K00");

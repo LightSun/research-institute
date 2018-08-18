@@ -8,6 +8,8 @@ import com.heaven7.java.base.util.Throwables;
 import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.collect.CollectModule;
+import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.filter.MediaDirFilter;
 import com.heaven7.ve.colorgap.filter.VideoTagFilter;
 import com.heaven7.ve.colorgap.impl.AirShotFilterImpl;
@@ -19,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+
+import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_FILL_PLAID;
+import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_RECOGNIZE_SHOT;
 
 /**
  * Created by heaven7 on 2018/3/15 0015.
@@ -55,7 +60,7 @@ public class ColorGapManager extends BaseContextOwner{
      * pre load data. like batch image data which is generate by AI.
      */
     public void preLoadData(ColorGapParam param){
-        mediaAnalyser.preLoadData(param);
+        mediaAnalyser.preLoadData(getContext(), param);
     }
     public void setShotRecognizer(IShotRecognizer mShotRecognizer) {
         this.mShotRecognizer = mShotRecognizer;
@@ -86,7 +91,9 @@ public class ColorGapManager extends BaseContextOwner{
         //the barrier help we do two tasks: analyse, tint.
         CyclicBarrier barrier = new CyclicBarrier(mediaAnalyser.getAsyncModuleCount() + 1);
         //analyse
+        CollectModule module = getPerformanceCollector().startModule(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA, TAG);
         List<MediaItem> mediaItems = mediaAnalyser.analyse(mContext, items, barrier);
+        module.end(TAG);
         //cut music
         CutInfo[] infoes = musicCut.cut(mContext, musicPath);
         List<CutInfo.PlaidInfo> plaids = new ArrayList<>();
@@ -101,7 +108,9 @@ public class ColorGapManager extends BaseContextOwner{
         }
 
         //tint
+        module = getPerformanceCollector().startModule(ColorGapPerformanceCollector.MODULE_MUSIC_SHADER, TAG);
         VETemplate resultTemplate = musicShader.tint(mContext, srcTemplate, plaids, 0);
+        module.end(TAG);
         try {
             Logger.d(TAG, "fill", "tint done");
             barrier.await();
@@ -109,14 +118,18 @@ public class ColorGapManager extends BaseContextOwner{
             //all done. shut down service.
             ConcurrentUtils.shutDownNow();
             //cut video
+            module = getPerformanceCollector().startModule(ColorGapPerformanceCollector.MODULE_CUT_VIDEO, TAG);
             final List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(mContext, plaids, mediaItems);
+            module.end(TAG);
             Logger.d(TAG, "fill", "after cut, item.size = " + newItems.size());
             //shot recognition.for 'GeLayLiYa' ,mShotRecognizer is disabled.
             if(!getKingdom().isGeLaiLiYa() && mShotRecognizer != null && !Predicates.isEmpty(newItems)){
                 final VETemplate source_tem = srcTemplate;
+                getPerformanceCollector().startModule(MODULE_RECOGNIZE_SHOT, TAG);
                 mShotRecognizer.requestKeyPoint(newItems, new IShotRecognizer.Callback() {
                     @Override
                     public void onRecognizeDone(List<MediaPartItem> parts) {
+                        getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "KeyPoint", "onRecognizeDone", parts.toString());
                         processShotType(newItems, plaids, source_tem, resultTemplate, callback);
                     }
                 });
@@ -149,9 +162,12 @@ public class ColorGapManager extends BaseContextOwner{
             }
             int shotCategory = mShotRecognizer.recognizeShotCategory(partItem);
             partItem.imageMeta.setShotCategory(shotCategory);
+            getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "setShotCategory", "processShotType",
+                    partItem.toString() + " ,shot_category = " +ShotRecognition.getShotCategoryString(shotCategory));
         }
         //start subject recognize.
         if(Predicates.isEmpty(subjectItems)){
+            getPerformanceCollector().endModule(MODULE_RECOGNIZE_SHOT, "processShotType");
             doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
         }else {
             final VETemplate source_tem = srcTemplate;
@@ -159,6 +175,10 @@ public class ColorGapManager extends BaseContextOwner{
                 @Override
                 public void onRecognizeDone(List<MediaPartItem> parts) {
                     //process story to color filter(gen shot key, filter)
+                    getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "RecognizeSubject", "onRecognizeDone",
+                            parts.toString());
+                    getPerformanceCollector().endModule(MODULE_RECOGNIZE_SHOT, "onRecognizeDone");
+                    getPerformanceCollector().startModule(MODULE_FILL_PLAID, "onRecognizeDone");
                     doFillPlaids(newItems, plaids, source_tem, resultTemplate, callback);
                 }
             });
@@ -177,6 +197,7 @@ public class ColorGapManager extends BaseContextOwner{
             //fill plaid
             gapItems = filler.fillPlaids(getContext(), plaids, newItems);
         }
+        getPerformanceCollector().endModule(MODULE_FILL_PLAID, "doFillPlaids");
         callback.onFillFinished(new FillResult(gapItems, srcTemplate, resultTemplate));
     }
 

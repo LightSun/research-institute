@@ -57,9 +57,10 @@ import java.util.concurrent.atomic.AtomicInteger;
      * load all image resource for batch images.such as rects_path, tag_path.
      * note this must called in sub thread.
      *
+     * @param context
      * @param resourceDir the resource dir of save all medias.
      */
-    public void loadImageResource(String resourceDir) {
+    public void loadImageResource(ColorGapContext context, String resourceDir) {
         File batchFileList = new File(resourceDir, "image_batch_list.txt");
         if (!batchFileList.exists()) {
             return;

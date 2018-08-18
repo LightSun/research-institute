@@ -25,7 +25,8 @@ public interface MediaAnalyser {
 
     /**
      * pre load data.
+     * @param context the context of color-gap
      * @param param the extra param
      */
-    void preLoadData(ColorGapParam param);
+    void preLoadData(ColorGapContext context, ColorGapParam param);
 }

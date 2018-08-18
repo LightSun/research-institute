@@ -1,0 +1,5 @@
+
+
+1, 作为lib 中加载resource文件
+2, request param verify, frame work.
+3,

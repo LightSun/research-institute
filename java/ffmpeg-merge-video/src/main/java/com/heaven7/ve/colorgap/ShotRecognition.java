@@ -38,6 +38,18 @@ public class ShotRecognition {
     private static final float RATE_1_9 = 1f / 9;
     private static final String TAG = "ShotRecognition";
 
+    public static String getShotCategoryString(int shotCategory) {
+        switch (shotCategory){
+            case CATEGORY_ENV:
+                return "CATEGORY_ENV";
+            case CATEGORY_PART:
+                return "CATEGORY_PART";
+            case CATEGORY_PRODUCT:
+                return "CATEGORY_PRODUCT";
+        }
+        return "unknown";
+    }
+
     /***
      * recognize the shot category. such as {@linkplain #CATEGORY_ENV} and etc.
      * @param item the media part item
@@ -122,4 +134,5 @@ public class ShotRecognition {
         }
         return SHOT_TYPE_NONE;
     }
+
 }

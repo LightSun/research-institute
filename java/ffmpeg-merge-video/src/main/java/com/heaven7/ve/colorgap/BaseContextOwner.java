@@ -1,6 +1,7 @@
 package com.heaven7.ve.colorgap;
 
 import com.heaven7.utils.Context;
+import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.kingdom.Kingdom;
 
 /**
@@ -21,5 +22,9 @@ public class BaseContextOwner {
     }
     public Kingdom getKingdom(){
         return mContext.getKingdom();
+    }
+
+    public ColorGapPerformanceCollector getPerformanceCollector(){
+        return mContext.getColorGapPerformanceCollector();
     }
 }
