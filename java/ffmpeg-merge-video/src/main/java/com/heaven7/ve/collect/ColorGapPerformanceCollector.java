@@ -1,8 +1,12 @@
 package com.heaven7.ve.collect;
 
+import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.SparseArray;
 import com.heaven7.java.visitor.util.Throwables;
 import com.vida.common.TimeRecorder;
+
+import java.util.Arrays;
 
 /**
  * the performance collector of color-gap.
@@ -19,19 +23,26 @@ public class ColorGapPerformanceCollector {
 
     private final SparseArray<Collector> mModuleMap = new SparseArray<>();
 
+    public ColorGapPerformanceCollector(){
+        this(PerformanceWriter.LOG_WRITER);
+    }
     public ColorGapPerformanceCollector(PerformanceWriter mWriter) {
-        Collector mPreload = new Collector(MODULE_PRELOAD, mWriter);
-        Collector mAnalyseMedia = new Collector(MODULE_ANALYSE_MEDIA, mWriter);
-        Collector mMusicShader = new Collector(MODULE_MUSIC_SHADER, mWriter);
-        Collector mCutVideo = new Collector(MODULE_CUT_VIDEO, mWriter);
-        Collector mRecogizeShot = new Collector(MODULE_RECOGNIZE_SHOT, mWriter);
-        Collector mFillPlaid = new Collector(MODULE_FILL_PLAID, mWriter);
-        mModuleMap.put(MODULE_PRELOAD.hashCode(), mPreload);
-        mModuleMap.put(MODULE_ANALYSE_MEDIA.hashCode(), mAnalyseMedia);
-        mModuleMap.put(MODULE_MUSIC_SHADER.hashCode(), mMusicShader);
-        mModuleMap.put(MODULE_CUT_VIDEO.hashCode(), mCutVideo);
-        mModuleMap.put(MODULE_RECOGNIZE_SHOT.hashCode(), mRecogizeShot);
-        mModuleMap.put(MODULE_FILL_PLAID.hashCode(), mFillPlaid);
+        //all modules
+        String[] modules = {
+                MODULE_PRELOAD, MODULE_ANALYSE_MEDIA, MODULE_MUSIC_SHADER,
+                MODULE_CUT_VIDEO, MODULE_RECOGNIZE_SHOT, MODULE_FILL_PLAID,
+        };
+        VisitServices.from(Arrays.asList(modules)).fire(new FireVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                putModuleCollector(s, mWriter);
+                return null;
+            }
+        });
+    }
+
+    private void putModuleCollector(String module, PerformanceWriter mWriter){
+        mModuleMap.put(module.hashCode(), new Collector(module, mWriter));
     }
 
     public CollectModule startModule(String module, String label){
