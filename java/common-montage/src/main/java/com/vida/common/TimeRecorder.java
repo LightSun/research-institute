@@ -28,6 +28,9 @@ public class TimeRecorder {
     public void setName(String mName) {
         this.mName = mName;
     }
+    public String getName(){
+        return mName;
+    }
     public void reset() {
         mStartTime = 0;
         mEndTime = 0;
