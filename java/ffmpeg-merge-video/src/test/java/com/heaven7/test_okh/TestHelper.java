@@ -4,9 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import okhttp3.FormBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author heaven7
@@ -107,6 +114,7 @@ public class TestHelper {
             "  \"logoId\": 8\n" +
             "}";
 
+    public static final String TEST_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzMxOTcxNzQsImV4cCI6OTIyMzM2NTkwNDA2NjA4MH0.JJaBasuqJc8_u8p7z3LfkbK7Ev5dUARDmupBqRtTZDo";
 
     public static List<Long> getIds(){
         ArrayList<PublicMediaInfo> list = new Gson().fromJson(JSON, new TypeToken<ArrayList<PublicMediaInfo>>() {
@@ -117,5 +125,46 @@ public class TestHelper {
                 return publicMediaInfo.getId();
             }
         }).getAsList();
+    }
+
+    public static List<Project.MediaInfo> getMediaInfos(){
+        String url = "http://www.xiaoxiekeji.cn:8004/media/test/getPublicMediaInfos";
+        Map<String, String> map = new HashMap<>();
+        map.put("token", TEST_TOKEN);
+        try {
+            final Response res = OkHttpHelper.postSync(url, map, new FormBody.Builder()
+                    .add("count", "2")
+                    .build());
+            final ResponseBody body = res.body();
+            if(body != null){
+                final String json = body.string();
+                res.close();
+                final Type type = new TypeToken<ApiProtocol<ArrayList<Project.MediaInfo>>>() {
+                }.getType();
+                ApiProtocol<ArrayList<Project.MediaInfo>> ap =  new Gson().fromJson(json, type);
+                return ap.getData();
+            }else {
+                res.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static boolean addCategroy(List<Project.CommodityCategory> cates){
+        String url = "http://www.xiaoxiekeji.cn:8002/test/project/addCategory";
+        Map<String, String> map = new HashMap<>();
+        map.put("token", TEST_TOKEN);
+        try {
+            final Response res = OkHttpHelper.postSync(url, map, new FormBody.Builder()
+                    .add("categories", new Gson().toJson(cates))
+                    .build());
+            res.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

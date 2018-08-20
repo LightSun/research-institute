@@ -244,12 +244,12 @@ public class Project{
 
         private String tfrecordPath;
 
-        private long pid;  //project_id
+        private String pid;  //project_id
 
-        public long getPid() {
+        public String getPid() {
             return pid;
         }
-        public void setPid(long pid) {
+        public void setPid(String pid) {
             this.pid = pid;
         }
 
