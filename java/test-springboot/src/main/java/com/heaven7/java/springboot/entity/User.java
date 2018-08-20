@@ -3,6 +3,8 @@ package com.heaven7.java.springboot.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,9 +22,17 @@ public class User {
     private long userId;
     private String username;
     private String userpwd;
+    private ArrayList<String> images;
 
     @JsonIgnore
     private Set<Weibo> weibos;
+
+    public ArrayList<String> getImages() {
+        return images;
+    }
+    public void setImages(ArrayList<String> images) {
+        this.images = images;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
