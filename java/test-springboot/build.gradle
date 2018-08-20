@@ -1,0 +1,90 @@
+allprojects {
+    group 'com.heaven7.java.springboot'
+    version '1.0-SNAPSHOT'
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    }
+}
+buildscript {
+    ext {
+        springIOVersion = '1.0.0.RELEASE'
+        springBootVersion = '1.5.9.RELEASE'
+    }
+    repositories {
+        jcenter()
+        //mavenLocal()
+        mavenCentral()
+        maven { url "http://repo.spring.io/release" }
+        maven { url "http://repo.spring.io/milestone" }
+        maven { url "http://repo.spring.io/snapshot" }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:${springIOVersion}"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+jar {
+    baseName = 'vida'
+    version = '0.0.1'
+    manifest {
+        attributes "Manifest-Version": 1.0,
+                'Main-Class': 'com.vida.server.montage.VidaApplication'
+    }
+}
+
+repositories {
+    jcenter()
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'io.spring.platform:platform-bom:Brussels-SR6'
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Brixton.SR4'
+    }
+}
+
+ext {
+    junitVersion = '4.12'
+}
+
+dependencies {
+    compile 'org.springframework:spring-core'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-autoconfigure'
+    compile 'org.springframework.boot:spring-boot-starter-tomcat'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile "mysql:mysql-connector-java:5.1.39"
+    compile "com.zaxxer:HikariCP:2.7.4"
+
+    compile "com.auth0:java-jwt:3.2.0"
+    compile "io.jsonwebtoken:jjwt:0.7.0"
+
+    compile 'com.heaven7.java.base:Java-base:1.1.0'
+    compile 'com.heaven7.java.visitor:Visitor:1.2.71'
+    compile "com.google.code.gson:gson:2.8.5"
+    compile 'com.squareup.okhttp3:okhttp:3.11.0'
+
+    //internal test depend lib
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile "junit:junit:${junitVersion}"
+}

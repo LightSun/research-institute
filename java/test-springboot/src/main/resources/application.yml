@@ -1,0 +1,41 @@
+jasypt:
+  encryptor:
+    password: vida_web
+    algorithm: PBEWithMD5AndDES
+
+spring:
+  http:
+    multipart: # for file upload and request
+      maxFileSize: 100Mb
+      maxRequestSize: 100Mb
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: pkjjun123.
+    driver-class-name: com.mysql.jdbc.Driver # new is com.mysql.cj.jdbc.Driver
+    # 目前最好的jdbc连接池
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connection-test-query: select 1
+      idle-timeout: 10000
+  jpa:
+    properties:
+       hibernate:
+          hbm2ddl:
+            auto: update
+          dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+# jpa.auto:
+# create：每次加载hibernate都会建一次表，不推荐使用，会丢失表数据。
+# create-drop：每次加载建立表，当SessionFactory关闭则自动删除。
+# update：第一次会自动创建表，之后只更新数据。即使之后表结构改变，也不会删除之前的数据。也是我们最常用的一种属性。
+# valiate：验证数据库中的表进行比较，不创建新表，只插入新值。
+
+server:
+  port: 8002
+  maxHttpHeaderSize: 10240000
+  maxHttpPostSize: 10240000
+  tomcat:
+      maxHttpHeaderSize: 10240000
+      maxHttpPostSize: 10240000
