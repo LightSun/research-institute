@@ -133,6 +133,7 @@ public class ColorGapManager extends BaseContextOwner{
                     }
                 });
             }else {
+                getPerformanceCollector().startModule(MODULE_FILL_PLAID, "processShotType");
                 doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
             }
         } catch (InterruptedException e) {
@@ -167,6 +168,7 @@ public class ColorGapManager extends BaseContextOwner{
         //start subject recognize.
         if(Predicates.isEmpty(subjectItems)){
             getPerformanceCollector().endModule(MODULE_RECOGNIZE_SHOT, "processShotType");
+            getPerformanceCollector().startModule(MODULE_FILL_PLAID, "processShotType");
             doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
         }else {
             final VETemplate source_tem = srcTemplate;

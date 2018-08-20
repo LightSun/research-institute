@@ -14,25 +14,15 @@ import com.heaven7.ve.kingdom.ModuleData;
 
 import java.util.List;
 
+import static com.heaven7.ve.colorgap.IShotRecognizer.CATEGORY_ENV;
+import static com.heaven7.ve.colorgap.IShotRecognizer.CATEGORY_PART;
+import static com.heaven7.ve.colorgap.IShotRecognizer.CATEGORY_PRODUCT;
 import static com.heaven7.ve.colorgap.MetaInfo.*;
 
 /**
  * @author heaven7
  */
 public class ShotRecognition {
-
-    /**
-     * indicate shot is environment
-     */
-    public static final int CATEGORY_ENV = 1;
-    /**
-     * indicate shot is part
-     */
-    public static final int CATEGORY_PART = 2;
-    /**
-     * indicate shot is product
-     */
-    public static final int CATEGORY_PRODUCT = 3;
 
     private static final float RATE_1_3 = 1f / 3;
     private static final float RATE_1_9 = 1f / 9;
@@ -51,7 +41,7 @@ public class ShotRecognition {
     }
 
     /***
-     * recognize the shot category. such as {@linkplain #CATEGORY_ENV} and etc.
+     * recognize the shot category. such as {@linkplain IShotRecognizer#CATEGORY_ENV} and etc.
      * @param item the media part item
      * @return the shot category.
      */
