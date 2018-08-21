@@ -68,11 +68,11 @@ public class TestUploadStoreLine {
         //final String url = "http://www.xiaoxiekeji.cn:8004/media/test/" + path;
         final String url = "http://www.xiaoxiekeji.cn:8004/media/" + path;
         Map<String, String> map = new HashMap<>();
-       // map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzMxOTcxNzQsImV4cCI6OTIyMzM2NTkwNDA2NjA4MH0.JJaBasuqJc8_u8p7z3LfkbK7Ev5dUARDmupBqRtTZDo");
-        map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4IiwiaWF0IjoxNTM0NTAyOTI5LCJleHAiOjE1MzUxMDc3Mjl9.P7ebFNdwjozRsAXv26jaeloi0_FRbEbtqD3zXlZ2K00");
+        map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjM0NTYiLCJpYXQiOjE1MzMxOTcxNzQsImV4cCI6OTIyMzM2NTkwNDA2NjA4MH0.JJaBasuqJc8_u8p7z3LfkbK7Ev5dUARDmupBqRtTZDo");
+       // map.put("token", "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4IiwiaWF0IjoxNTM0NTAyOTI5LCJleHAiOjE1MzUxMDc3Mjl9.P7ebFNdwjozRsAXv26jaeloi0_FRbEbtqD3zXlZ2K00");
         OkHttpHelper.post(url, map, new FormBody.Builder()
                         .add("pub_media_infos", TestHelper.JSON)
-                        .add("project_id", "111") //gelailiya 23
+                        .add("project_id", "5") //gelailiya 23
                         .build(), new LogCallback(mTag));
 
     }

@@ -59,7 +59,9 @@ public class ColorGapManager extends BaseContextOwner{
      * pre load data. like batch image data which is generate by AI.
      */
     public void preLoadData(ColorGapParam param){
+        CollectModule module = getPerformanceCollector().startModule(MODULE_PRELOAD, TAG);
         mediaAnalyser.preLoadData(getContext(), param);
+        module.end(TAG);
     }
     public void setShotRecognizer(IShotRecognizer mShotRecognizer) {
         this.mShotRecognizer = mShotRecognizer;
@@ -133,7 +135,7 @@ public class ColorGapManager extends BaseContextOwner{
                     }
                 });
             }else {
-                getPerformanceCollector().startModule(MODULE_FILL_PLAID, "processShotType");
+                getPerformanceCollector().startModule(MODULE_FILL_PLAID, "fill");
                 doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
             }
         } catch (InterruptedException e) {

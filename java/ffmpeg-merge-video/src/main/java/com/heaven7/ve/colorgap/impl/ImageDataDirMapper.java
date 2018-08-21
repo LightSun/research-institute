@@ -11,4 +11,12 @@ public interface ImageDataDirMapper {
      * @return the image data dir
      */
     String mapDataDir(String imageResDir);
+
+    /**
+     * map the source dir to high-light dir.
+     *
+     * @param imageResDir the image resource dir
+     * @return the image data dir
+     */
+    String mapHighLightDir(String imageResDir);
 }

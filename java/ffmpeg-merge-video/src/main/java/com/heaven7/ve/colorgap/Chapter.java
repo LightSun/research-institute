@@ -6,6 +6,7 @@ import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.Context;
+import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
@@ -312,6 +313,7 @@ public class Chapter extends BaseContextOwner{
 
     //将最少2个镜头聚类成故事
     private List<Story> groupStories(List<MediaPartItem> items) {
+        ColorGapPerformanceCollector collector = getPerformanceCollector();
         final Kingdom kingdom = getKingdom();
 
         List<MediaPartItem> shotBuffer = new ArrayList<>();
@@ -320,6 +322,8 @@ public class Chapter extends BaseContextOwner{
         for (MediaPartItem shot : items) {
             List<List<Integer>> tagss = shot.imageMeta.getTags();
             if (Predicates.isEmpty(tagss)) {
+                collector.addMessage(ColorGapPerformanceCollector.MODULE_FILL_PLAID, TAG,
+                        "groupStories", "shot has no tags. shot = " + shot);
                 continue;
             }
             if (currentTagSet.size() > 0) {
@@ -369,10 +373,10 @@ public class Chapter extends BaseContextOwner{
     }
 
     private void dump(List<Story> stories, String tag) {
-        if(StoryLineShader.DEBUG) {
-            for (Story story : stories) {
-                Logger.d(TAG + "__" + chapterIndex, "dump", tag + " >>> " + story);
-            }
+        ColorGapPerformanceCollector collector = getPerformanceCollector();
+        for (Story story : stories) {
+            //Logger.d(TAG + "__" + chapterIndex, "dump", tag + " >>> " + story);
+            collector.addMessage(ColorGapPerformanceCollector.MODULE_FILL_PLAID, TAG, "dump_"+ chapterIndex, tag + " >>> " + story);
         }
     }
 

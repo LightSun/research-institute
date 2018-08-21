@@ -11,6 +11,7 @@ import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
 import com.heaven7.ve.Constants;
+import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.montage.ImageDataDirMapperImpl;
 import com.vida.common.IOUtils;
@@ -25,6 +26,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA;
 
 /**
  * the image analyse helper help we analyse image rects and tags.
@@ -57,7 +60,7 @@ import java.util.concurrent.atomic.AtomicInteger;
      * load all image resource for batch images.such as rects_path, tag_path.
      * note this must called in sub thread.
      *
-     * @param context
+     * @param context the color gap context
      * @param resourceDir the resource dir of save all medias.
      */
     public void loadImageResource(ColorGapContext context, String resourceDir) {
@@ -217,6 +220,11 @@ import java.util.concurrent.atomic.AtomicInteger;
             this.mBarrier = barrier;
         }
 
+        public ColorGapPerformanceCollector getCollector(){
+            ColorGapContext cgc = (ColorGapContext) mContext;
+            return cgc.getColorGapPerformanceCollector();
+        }
+
         /**
          * 1, 生成时： 分批，生成tag和face.
          * 2. 加载时, 预先加载 tfs_config.txt and face_config.txt, 读取对应的文件路径
@@ -238,6 +246,7 @@ import java.util.concurrent.atomic.AtomicInteger;
             }).save(new SaveVisitor<Group>() {
                 @Override
                 public void visit(Collection<Group> collection) {
+                    getCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "startScanByDir", "group size = " + collection.size());
                     mGroupCount = new AtomicInteger(collection.size());
                 }
             })
@@ -270,6 +279,7 @@ import java.util.concurrent.atomic.AtomicInteger;
             }
             group.rects = ImageDataLoader.loadRects(mContext, imageRes.rectsPath, null);
             group.markDownRects();
+            getCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithBacthRects", "load batch rects done");
             doIfAllDone(group);
         }
 
@@ -280,6 +290,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                 return;
             }
             group.tags = ImageDataLoader.loadTags(mContext, imageRes.tagPath, null);
+            getCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithBacthTags", "load batch tags done");
             group.markDownTags();
             doIfAllDone(group);
         }
@@ -290,11 +301,9 @@ import java.util.concurrent.atomic.AtomicInteger;
                 public Boolean visit(MediaItem item, Object param) {
                     String fileName = FileUtils.getFileName(item.item.getFilePath());
                     String fullDir = FileUtils.getFileDir(item.item.getFilePath(), 1, true);
-                    String dir = FileUtils.getFileDir(item.item.getFilePath(), 1, false);
-                    String dataDir = mDataDirMapper.mapDataDir(fullDir);
+                    String highLightDir = mDataDirMapper.mapHighLightDir(fullDir);
                     //highlight file. .../data/highlight/dir/xxx.ihighlight
-                    String hlFilename = dataDir + File.separator + Constants.DIR_HIGH_LIGHT
-                            + File.separator + dir + File.separator
+                    String hlFilename = highLightDir + File.separator
                             + fileName + "." + Constants.EXTENSION_IMAGE_HIGH_LIGHT;
                     File file = new File(hlFilename);
                     if (!file.exists()) {
@@ -315,6 +324,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                 }
             });
             group.markDownHighLight();
+            getCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithHighLights", "load image high-light done");
             doIfAllDone(group);
         }
 

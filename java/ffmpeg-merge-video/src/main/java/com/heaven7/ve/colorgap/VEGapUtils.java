@@ -32,6 +32,12 @@ public class VEGapUtils {
         }
         throw new IllegalStateException("context must instance of ");
     }
+    public static ColorGapContext asColorGapContext(Object context){
+        if(context instanceof ColorGapContext){
+           return (ColorGapContext) context;
+        }
+        throw new IllegalStateException("context must instance of ");
+    }
 
     public static <Item extends ItemDelegate> Item filterByScore(PlaidDelegate plaid, List<Item> items){
         //check hold until find , if not found , not check hold

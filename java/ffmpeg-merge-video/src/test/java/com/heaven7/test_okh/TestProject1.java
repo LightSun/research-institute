@@ -22,19 +22,29 @@ public class TestProject1 {
 
     //uploaded res: 1534768008279.mp4, 1534768008248.mp4
     public static void main(String[] args) {
-        //testUpload();
-       /* String[] medias = {
-                "media_files\\e10adc3949ba59abbe56e057f20f883e\\unknown\\resource\\1534768008279.mp4",
+       // testUpload();
+       // testCreateProjectWithImage();
+        String[] medias = {
+                "media_files\\e10adc3949ba59abbe56e057f20f883e\\unknown\\resource\\1534840775770.mp4",
+                //"media_files\\e10adc3949ba59abbe56e057f20f883e\\unknown\\resource\\1534815294988.mp4",
         };
-        testProjectByMediaPaths(medias, true);*/
+        testProjectByMediaPaths(medias, false);
 
-        final List<Project.MediaInfo> mediaInfos = TestHelper.getMediaInfos();
+       /* final List<Project.MediaInfo> mediaInfos = TestHelper.getMediaInfos();
         if(Predicates.isEmpty(mediaInfos)){
             Logger.w(TAG, "main", "no mediaInfos");
             return;
         }
-        createProject(mediaInfos);
+        createProject(mediaInfos);*/
       //  updateProject(2L, mediaInfos);
+    }
+
+    private static void testCreateProjectWithImage() {
+        String[] medias = {
+                "media_files\\e10adc3949ba59abbe56e057f20f883e\\unknown\\resource\\1534820716187.jpg",
+                "media_files\\e10adc3949ba59abbe56e057f20f883e\\unknown\\resource\\1534820716171.jpg",
+        };
+        testProjectByMediaPaths(medias, false);
     }
 
     private static void testProjectByMediaPaths(String[] mediaPaths, boolean update) {
@@ -57,8 +67,10 @@ public class TestProject1 {
     private static void testUpload() {
         String url = "http://www.xiaoxiekeji.cn:8004/media/upload";
         String[] medias = {
-                "F:\\videos\\tmp_store\\WeChat_20180816180201.mp4",
+               // "F:\\videos\\tmp_store\\WeChat_20180816180201.mp4",
                 "F:\\videos\\tmp_store\\WeChat_20180816182503.mp4",
+               // "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\黑色阔腿裤\\1-2.jpg",
+               // "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\黑色阔腿裤\\1-4.jpg",
         };
         Map<String, String> map = new HashMap<>();
         map.put("token", TestHelper.TEST_TOKEN);

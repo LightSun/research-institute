@@ -5,6 +5,7 @@ import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
+import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
@@ -79,15 +80,18 @@ public class StoryLineShaderImpl implements StoryLineShader {
     }
 
     private List<Chapter> groupChapter(Context context,VETemplate template, List<MediaPartItem> items) {
+        ColorGapPerformanceCollector collector = VEGapUtils.asColorGapContext(context).getColorGapPerformanceCollector();
         List<Chapter> chapters = new ArrayList<>();
         List<VETemplate.LogicSentence> sentences = template.getLogicSentences();
         //only one dir (often for c user.)
         if(sentences.size() == 1){
             //only one
+            collector.addMessage(ColorGapPerformanceCollector.MODULE_FILL_PLAID, TAG, "groupChapter", "sentences.size() == 1");
             items.sort(TIME_COMPARATOR);
             chapters.add(new Chapter(context, sentences.get(0).getPlaids(), items, 0));
             return chapters;
         }
+        collector.addMessage(ColorGapPerformanceCollector.MODULE_FILL_PLAID, TAG, "groupChapter", "sentences.size() != 1(for RawScript)");
 
         for(int i = 0 , size = sentences.size() ; i < size ; i ++){
             VETemplate.LogicSentence ls = sentences.get(i);

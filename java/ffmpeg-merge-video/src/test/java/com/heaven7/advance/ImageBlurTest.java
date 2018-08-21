@@ -57,8 +57,8 @@ public class ImageBlurTest {
     }
 
     @Test
-    public void testCannyEdgeFilter(){
-       // String path = "F:\\test\\imgs_tmp\\test.jpg";
+    public void testCannyEdgeFilter() {
+        // String path = "F:\\test\\imgs_tmp\\test.jpg";
         String path = "F:\\test\\imgs\\story0\\churchIn\\C0181\\img_00012.png";
         File srcFile = new File(path);
         BufferedImage image;
@@ -79,7 +79,7 @@ public class ImageBlurTest {
     }
 
     @Test
-    public void testPng(){
+    public void testPng() {
         String path = "F:\\test\\imgs\\story0\\churchIn\\C0181\\img_00008.png";
         File srcFile = new File(path);
         JavaImageReader reader = new JavaImageReader();
@@ -154,8 +154,8 @@ public class ImageBlurTest {
     private static void testGenImage(File srcFile, Matrix2<Integer> mat, int imageType, String suffix) {
         int w = mat.getRowCount();
         int h = mat.getColumnCount();
-       // System.out.println(w);
-       // System.out.println(h);
+        // System.out.println(w);
+        // System.out.println(h);
         BufferedImage image = new BufferedImage(w, h, imageType);
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
@@ -181,7 +181,7 @@ public class ImageBlurTest {
         return newFile;
     }
 
-    static class JavaImageReader implements ImageReader{
+    static class JavaImageReader implements ImageReader {
 
         private int imageType;
 
@@ -207,6 +207,7 @@ public class ImageBlurTest {
             }
             return new Matrix2<>(list);
         }
+
         public int getImageType() {
             return imageType;
         }

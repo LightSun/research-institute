@@ -1,0 +1,3 @@
+
+错误： duplicate entry '1' for key 'xxx'
+  一般是设置某列值唯一。插入的数据在数据库中已有。造成的。
