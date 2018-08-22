@@ -8,6 +8,7 @@ import com.heaven7.utils.TextReadHelper;
 import com.heaven7.utils.TextUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 
 /**
@@ -53,6 +54,11 @@ public class ImageDataLoader {
         }
         return tags;
     }
+
+    public static void main(String[] args) {
+        //TODO
+    }
+
     private static class ImageTagCallback extends TextReadHelper.BaseAssetsCallback<ImageTags>{
 
         private final String csvPath;
