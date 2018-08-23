@@ -88,13 +88,18 @@ public abstract class BaseMockAiGeneratorDelegate extends BaseAiGeneratorDelegat
         public void onRun(boolean isVideo) {
             if(isVideo){
                 //create file xxx_output.tfrecord
-                String fileName = FileUtils.getFileName(input);
-                File file = new File(outPut, fileName +"_output.tfrecord");
+                String fileName = FileUtils.getFileName(getInput().get(0));
+                File file = new File(getOutput(), fileName +"_output.tfrecord");
                 FileUtils.createFile(file.getAbsolutePath(), true);
             }else{
                 //create tfs_1534908323496_outputs.tfrecord. and tfs_config.txt
-                mockBatchImage(input, outPut, "tfs_" + System.currentTimeMillis() +"_outputs.tfrecord",
-                        "tfs_config.txt");
+                if(type == TYPE_BATCH_IMAGE_MORE_DIR){
+                    mockBatchImage(getInput(), getOutput(), "tfs_" + System.currentTimeMillis() +"_outputs.tfrecord",
+                            "tfs_config.txt");
+                }else{
+                    mockBatchImage(getInput().get(0), getOutput(), "tfs_" + System.currentTimeMillis() +"_outputs.tfrecord",
+                            "tfs_config.txt");
+                }
             }
         }
     }
@@ -107,11 +112,11 @@ public abstract class BaseMockAiGeneratorDelegate extends BaseAiGeneratorDelegat
         protected void onRun(boolean isVideo) {
             if(isVideo){
                 //create file xxx_output.tfrecord
-                String fileName = FileUtils.getFileName(input);
-                File file = new File(outPut, fileName + "_predictions.csv");
+                String fileName = FileUtils.getFileName(getInput().get(0));
+                File file = new File(getOutput(), fileName + "_predictions.csv");
                 FileUtils.createFile(file.getAbsolutePath(), true);
             }else{
-                File file_config = new File(outPut, "tfs_config.txt");
+                File file_config = new File(getOutput(), "tfs_config.txt");
                 List<TfsConfigLine> list = new TextReadHelper<TfsConfigLine>(new TextReadHelper.Callback<TfsConfigLine>() {
                     @Override
                     public BufferedReader open(Context context, String url) throws IOException {
@@ -139,12 +144,17 @@ public abstract class BaseMockAiGeneratorDelegate extends BaseAiGeneratorDelegat
         protected void onRun(boolean isVideo) {
             if(isVideo){
                 //create file xxx_output.tfrecord
-                String fileName = FileUtils.getFileName(input);
-                File file = new File(outPut, fileName + "_rects.csv");
+                String fileName = FileUtils.getFileName(getInput().get(0));
+                File file = new File(getOutput(), fileName + "_rects.csv");
                 FileUtils.createFile(file.getAbsolutePath(), true);
             }else{
-                mockBatchImage(input, outPut, "face_" + System.currentTimeMillis() +"_rects.csv",
-                        "face_config.txt");
+                if(type == TYPE_BATCH_IMAGE_MORE_DIR){
+                    mockBatchImage(getInput(), getOutput(), "face_" + System.currentTimeMillis() +"_rects.csv",
+                            "face_config.txt");
+                }else{
+                    mockBatchImage(getInput().get(0), getOutput(), "face_" + System.currentTimeMillis() +"_rects.csv",
+                            "face_config.txt");
+                }
             }
         }
     }

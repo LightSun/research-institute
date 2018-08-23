@@ -6,10 +6,10 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;
 import com.vida.common.ai.*;
 import junit.framework.TestCase;
-import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,7 +33,30 @@ public class TestAi extends TestCase{
         mService = Executors.newFixedThreadPool(5);
     }
 
-    public void testImage(){
+    public void testBatchImageInDiffDir(){
+        String[] images = {
+            "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\DSC_2542-1.jpg",
+            "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\DSC_2519.jpg",
+            "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\DSC_2507.jpg",
+        };
+        ArrayList<String> list = new ArrayList<>(Arrays.asList(images));
+        String output = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\data2";
+        TestMockAiGeneratorDelegate delegate = new TestMockAiGeneratorDelegate();
+        MultiFileParamContextImpl multiFiles = new MultiFileParamContextImpl();
+        multiFiles.populateByFiles(list);
+
+        BatchImageAiGenerateContext2 batchImageContext = new BatchImageAiGenerateContext2(delegate, list, output, multiFiles);
+        mService.submit(batchImageContext::genTfRecord);
+        mService.submit(batchImageContext::genFace);
+        try {
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void testBatchImageInOneDir(){
         String input = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫";
         String output = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\data";
         TestMockAiGeneratorDelegate delegate = new TestMockAiGeneratorDelegate();
@@ -92,17 +115,21 @@ public class TestAi extends TestCase{
             FileUtils.getFiles(file, "jpg", images);
             FileUtils.getFiles(file, "jpeg", images);
             FileUtils.getFiles(file, "png", images);
+            populateByFiles(images);
+        }
+
+        public void populateByFiles(List<String> images) {
             List<FileParamContext> list = VisitServices.from(images).map(
                     new ResultVisitor<String, FileParamContext>() {
-                @Override
-                public FileParamContext visit(String filename, Object param) {
-                    String fileName = FileUtils.getFileName(filename);
-                    String extension = FileUtils.getFileExtension(filename);
-                    TestFileParamContext context = new TestFileParamContext();
-                    context.setSavePath(fileName + "." + extension);
-                    return context;
-                }
-            }).getAsList();
+                        @Override
+                        public FileParamContext visit(String filename, Object param) {
+                            String fileName = FileUtils.getFileName(filename);
+                            String extension = FileUtils.getFileExtension(filename);
+                            TestFileParamContext context = new TestFileParamContext();
+                            context.setSavePath(fileName + "." + extension);
+                            return context;
+                        }
+                    }).getAsList();
             this.list.addAll(list);
         }
     }

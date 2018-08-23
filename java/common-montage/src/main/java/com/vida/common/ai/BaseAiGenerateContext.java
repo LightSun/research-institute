@@ -6,6 +6,7 @@ import com.vida.common.TimeRecorder;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * for gen batch image .they must be in one dir.
  * @author heaven7
  */
 public abstract class BaseAiGenerateContext implements AiGenerateContext, AiGenStateNotifier{
@@ -71,7 +72,7 @@ public abstract class BaseAiGenerateContext implements AiGenerateContext, AiGenS
             mAiGenDelegate.onMediaGenDone(this);
         }
     }
-    private void log(TimeRecorder recorder, String keyword) {
+    protected void log(TimeRecorder recorder, String keyword) {
         String[] inOut = getAiGenIO();
         String prefix = String.format("[ Ai-Gen-%s: in = %s, out = %s ]\n", keyword, inOut[0], inOut[1]);
         onWriteAiGenLog(recorder.toString(prefix));
