@@ -184,6 +184,22 @@ public class FileUtils {
         }
     }
 
+    public static void createFile(String path, boolean deleteIfExist){
+        File file = new File(path);
+        if(file.exists()){
+            if(deleteIfExist) {
+                file.delete();
+            }else {
+                return;
+            }
+        }
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void checkDir(String dir, boolean mustExist) {
         File file = new File(dir);
         if ((mustExist && !file.exists()) || file.isFile()) {
