@@ -39,12 +39,19 @@ public abstract class BaseServerAiGeneratorDelegate extends BaseAiGeneratorDeleg
 
     @Override
     protected String[] getGenTfRecordCmd(String[] io) {
-        String input = io[0];
-        String output = io[1];
-        if(isVideo(input)){
-            return mAiCmdGen.generateTfRecordForVideo(input, output);
-        }else{
-            return mAiCmdGen.generateTfRecordForBatchImages(input, output);
+        Runner0 runner = new Runner0(io);
+        switch (runner.type){
+            case Runner0.TYPE_VIDEO:
+                return mAiCmdGen.generateTfRecordForVideo(runner.getInput().get(0), runner.getOutput());
+
+            case BaseGenerateRunner.TYPE_BATCH_IMAGE_MORE_DIR:
+                return mAiCmdGen.generateTfRecordForBatchImages(runner.getInput(), runner.getOutput());
+
+            case BaseGenerateRunner.TYPE_BATCH_IMAGE_ONE_DIR:
+                return mAiCmdGen.generateTfRecordForBatchImages(runner.getInput().get(0), runner.getOutput());
+
+            default:
+                throw new IllegalStateException("wrong type = " + runner.type);
         }
     }
 
@@ -56,13 +63,29 @@ public abstract class BaseServerAiGeneratorDelegate extends BaseAiGeneratorDeleg
 
     @Override
     protected String[] getGenFaceCmd(String[] io) {
-        String input = io[0];
-        String output = io[1];
-        if(isVideo(input)){
-            return mAiCmdGen.generateFaceForVideo(input, output);
-        }else{
-            return mAiCmdGen.generateFaceForBatchImage(input, output);
+        Runner0 runner = new Runner0(io);
+        switch (runner.type){
+            case Runner0.TYPE_VIDEO:
+                return mAiCmdGen.generateFaceForVideo(runner.getInput().get(0), runner.getOutput());
+
+            case BaseGenerateRunner.TYPE_BATCH_IMAGE_MORE_DIR:
+                return mAiCmdGen.generateFaceForBatchImage(runner.getInput(), runner.getOutput());
+
+            case BaseGenerateRunner.TYPE_BATCH_IMAGE_ONE_DIR:
+                return mAiCmdGen.generateFaceForBatchImage(runner.getInput().get(0), runner.getOutput());
+
+            default:
+                throw new IllegalStateException("wrong type = " + runner.type);
         }
     }
 
+    private static class Runner0 extends BaseGenerateRunner{
+        public Runner0(String[] io) {
+            super(io);
+        }
+        @Override
+        protected void onRun(boolean video) {
+
+        }
+    }
 }

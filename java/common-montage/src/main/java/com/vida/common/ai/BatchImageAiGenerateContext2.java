@@ -4,10 +4,10 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.vida.common.TimeRecorder;
 import com.vida.common.entity.BatchImageLine;
 import com.vida.common.platform.PyDelegate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,7 +17,7 @@ import static com.heaven7.utils.TextUtils.getRelativePathForPrefix;
  * the batch image ai generate context. batch images can be in different dir.
  * @author heaven7
  */
-public class BatchImageAiGenerateContext2 extends BaseAiGenerateContext2 {
+public class BatchImageAiGenerateContext2 extends BaseAiGenerateContext {
 
     private final List<String> images;
     private final String outDir;
@@ -43,6 +43,19 @@ public class BatchImageAiGenerateContext2 extends BaseAiGenerateContext2 {
         mAiGenIo = arr;
 
         tfs_config_path = PyDelegate.getDefault().getTfrecordsConfigPath(outDir);
+    }
+
+    @Override
+    protected void log(TimeRecorder recorder, String keyword) {
+        //for batch image .cmd is 'outDir file1 file2 file3'
+        String[] inOut = getAiGenIO();
+        String prefix;
+        if(BaseAiGeneratorDelegate.isVideo(inOut[1])){
+            prefix = String.format("[ Ai-Gen-%s: in = %s, out = %s ]\n", keyword, inOut[0], inOut[1]);
+        }else{
+            prefix = String.format("[ Ai-Gen-%s: out-dir and in-files = %s ]\n", keyword, Arrays.toString(inOut));
+        }
+        onWriteAiGenLog(recorder.toString(prefix));
     }
 
     @Override
