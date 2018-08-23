@@ -50,6 +50,16 @@ public class WindowsCmdGenerator implements PlatformAICmdGenerator {
     }
 
     @Override
+    public String[] generateTfRecordForBatchImages(List<String> images, String outDir) {
+        List<String> cmds = getBaseCmds();
+        cmds.add("python");
+        cmds.add("process_img_batch2.py");
+        cmds.add(outDir);
+        cmds.addAll(images);
+        return toArray(cmds);
+    }
+
+    @Override
     public String[] generateFaceForVideo(String videoFile, String outDir) {
         List<String> cmds = getBaseCmds();
         cmds.add("python");
@@ -72,6 +82,16 @@ public class WindowsCmdGenerator implements PlatformAICmdGenerator {
         cmds.add(extraCmd);
         cmds.add(PREFIX_INPUT + inputDir);
         cmds.add(PREFIX_OUTPUT + outDir);
+        return toArray(cmds);
+    }
+
+    @Override
+    public String[] generateFaceForBatchImage(List<String> images, String outDir) {
+        List<String> cmds = getBaseCmds();
+        cmds.add("python");
+        cmds.add("get_face_image2.py");
+        cmds.add(outDir);
+        cmds.addAll(images);
         return toArray(cmds);
     }
 

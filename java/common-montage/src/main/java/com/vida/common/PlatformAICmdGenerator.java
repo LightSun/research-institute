@@ -15,10 +15,37 @@ public interface PlatformAICmdGenerator {
 
     //process(video_file, out_dir)
     String[] generateTfRecordForVideo(String videoFile, String outDir);
+    /**
+     * generate tfrecord for batch images .which must be in one dir.
+     * @param inputDir the input dir
+     * @param outDir the out dir
+     * @return the cmd array
+     */
     String[] generateTfRecordForBatchImages(String inputDir, String outDir);
 
+    /**
+     * generate tfrecord for batch images .which can in different dirs.
+     * @param images the image paths
+     * @param outDir the out dir
+     * @return the cmd array
+     */
+    String[] generateTfRecordForBatchImages(List<String> images,String outDir);
+
     String[] generateFaceForVideo(String videoFile, String outDir);
+    /**
+     * generate face for batch images .which must be in one dir.
+     * @param inputDir the input dir
+     * @param outDir the out dir
+     * @return the cmd array
+     */
     String[] generateFaceForBatchImage(String inputDir, String outDir);
+    /**
+     * generate face for batch images .which can in different dirs.
+     * @param images the image paths
+     * @param outDir the out dir
+     * @return the cmd array
+     */
+    String[] generateFaceForBatchImage(List<String> images,String outDir);
 
     /**
      * generate tag for video tfrecord file
