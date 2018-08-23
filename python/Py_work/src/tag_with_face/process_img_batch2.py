@@ -143,49 +143,46 @@ def getTimeInMills():
     return int(round(time.time() * 1000))
 
 
-# MAIN support gen for image files in one dir.
+# MAIN support gen for multi image files.
+# py out-dir file1 file2 ...
 if len(sys.argv) < 3:
     printError(" Error! argument is not enough.")
 else:
-    img_file = sys.argv[1].strip()
-    dir = sys.argv[2].strip()  # for single file, this is absolute filename
+    outDir = sys.argv[1].strip()
+    extractor = feature_extractor.YouTube8MFeatureExtractor(FLAGS.model_dir)
+    # tfs_time_outputs.tfrecord
+    tfs_path = 'tfs_%s_outputs.tfrecord' % str(getTimeInMills())
+    tfs_full_path = '%s\%s' % (outDir, tfs_path)
+    # tfs_config.txt
+    tfsConfigWriter = open('%s%stfs_config.txt' % (outDir, '\\'), "at")  # append
 
-    if os.path.isdir(img_file):
-        if not os.path.exists(dir):
-            os.makedirs(dir)
+    tfWriter = tf.python_io.TFRecordWriter(tfs_full_path)
+    first = True
 
-        extractor = feature_extractor.YouTube8MFeatureExtractor(FLAGS.model_dir)
-        # tfs_time_outputs.tfrecord
-        tfs_path = 'tfs_%s_outputs.tfrecord' % str(getTimeInMills())
-        tfs_full_path = '%s\%s' % (dir, tfs_path)
-        # tfs_config.txt
-        tfsConfigWriter = open('%s%stfs_config.txt' % (dir, '\\'), "at")  # append
+    size = len(sys.argv)
+    for i in range(2, size):
+        file_path = sys.argv[i].strip()
 
-        tfWriter = tf.python_io.TFRecordWriter(tfs_full_path)
-        first = True
-        for file in os.listdir(img_file):
-            file_path = os.path.join(img_file, file)
-            if file_path.startswith("."):
-                continue
-            if not os.path.isfile(file_path):
-                continue
-            extension = os.path.splitext(file_path)[1]  # get the extension of file
-            if extension not in IMG_FORMATS:
-                continue
+        # check file
+        if file_path.startswith("."):
+            continue
+        if not os.path.isfile(file_path):
+            continue
+        extension = os.path.splitext(file_path)[1] # get the extension of file
+        if extension not in IMG_FORMATS:
+            continue
 
-            # write tfrecord
-            writeTfrecord(file_path, extractor, tfWriter)
-            # write to congig
-            if first:
-                tfsConfigWriter.write(tfs_full_path)
-                tfsConfigWriter.write(",")
-                tfsConfigWriter.write(file_path)
-                first = False
-            else:
-                tfsConfigWriter.write(" " + file_path)
+        # write tfrecord
+        writeTfrecord(file_path, extractor, tfWriter)
+        # write to config
+        if first:
+            tfsConfigWriter.write(tfs_full_path)
+            tfsConfigWriter.write(",")
+            tfsConfigWriter.write(file_path)
+            first = False
+        else:
+            tfsConfigWriter.write(" " + file_path)
 
-        tfsConfigWriter.write("\n")
-        tfsConfigWriter.close()
-        tfWriter.close()
-    else:
-        process_img(img_file, dir)
+    tfsConfigWriter.write("\n")
+    tfsConfigWriter.close()
+    tfWriter.close()
