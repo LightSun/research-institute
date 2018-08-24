@@ -61,7 +61,7 @@ public class Project{
 
     private List<CommodityCategory> categories;
 
-    private List<MediaInfo> media_infos;
+    private List<MediaInfo> mediaInfos;
 
     public Long getUid() {
         return uid;
@@ -97,6 +97,23 @@ public class Project{
 
     public long getCreate_time() {
         return create_time;
+    }
+
+    public long categoryId;
+    public long categorySecId;
+
+    public long getCategoryId() {
+        return categoryId;
+    }
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public long getCategorySecId() {
+        return categorySecId;
+    }
+    public void setCategorySecId(long categorySecId) {
+        this.categorySecId = categorySecId;
     }
 
     public void setCreate_time(long create_time) {
@@ -177,10 +194,10 @@ public class Project{
 
 
     public List<MediaInfo> getMedia_infos() {
-        return media_infos;
+        return mediaInfos;
     }
     public void setMedia_infos(List<MediaInfo> media_infos) {
-        this.media_infos = media_infos;
+        this.mediaInfos = media_infos;
     }
 
     public ThirdCommodity getCommodity() {
@@ -192,10 +209,10 @@ public class Project{
     }
 
     public void addMediaInfos(List<MediaInfo> infos) {
-        if(media_infos == null){
-            media_infos = new ArrayList<>();
+        if(mediaInfos == null){
+            mediaInfos = new ArrayList<>();
         }
-        media_infos.addAll(infos);
+        mediaInfos.addAll(infos);
     }
 
     public static String getStateString(int state) {
@@ -245,6 +262,15 @@ public class Project{
         private String tfrecordPath;
 
         private String pid;  //project_id
+
+        private String file_md5;
+
+        public String getFile_md5() {
+            return file_md5;
+        }
+        public void setFile_md5(String file_md5) {
+            this.file_md5 = file_md5;
+        }
 
         public String getPid() {
             return pid;

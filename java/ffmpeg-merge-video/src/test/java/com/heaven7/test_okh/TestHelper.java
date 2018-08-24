@@ -167,4 +167,20 @@ public class TestHelper {
             return false;
         }
     }
+
+    public static boolean addCategroy(String domain, List<Project.CommodityCategory> cates){
+        String url = "http://" + domain + ":8002/test/project/addCategory";
+        Map<String, String> map = new HashMap<>();
+        map.put("token", TEST_TOKEN);
+        try {
+            final Response res = OkHttpHelper.postSync(url, map, new FormBody.Builder()
+                    .add("categories", new Gson().toJson(cates))
+                    .build());
+            res.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

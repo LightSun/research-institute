@@ -2,6 +2,7 @@ package com.heaven7.test_okh;
 
 import com.google.gson.Gson;
 import com.heaven7.core.util.Logger;
+import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.starter.JavaImageWriter;
 import okhttp3.*;
 
@@ -83,6 +84,7 @@ public class TestAiUploadFlow {
 
     public static RequestBody getRequestBody(List<String> fileNames) {
         MultipartBody.Builder builder = new MultipartBody.Builder();
+        List<String> md5s = new ArrayList<>();
         for (int i = 0; i < fileNames.size(); i++) {
             File file = new File(fileNames.get(i));
             //mime
@@ -92,8 +94,10 @@ public class TestAiUploadFlow {
                     file.getName(),
                     RequestBody.create(MediaType.parse(fileType), file)
             );
+            md5s.add(FileMd5Helper.getMD5Three(fileNames.get(i)));
         }
         //匿名上传 builder.addFormDataPart("project_id", "1");
+        builder.addFormDataPart("file_md5s", VisitServices.from(md5s).joinToString(","));
         return builder.build();
     }
 
