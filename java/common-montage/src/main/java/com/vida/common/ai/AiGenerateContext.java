@@ -28,6 +28,18 @@ public interface AiGenerateContext {
 
     boolean hasTask(String path);
 
+    /**
+     * set data. which may be used as temp store.
+     * @param data the data
+     */
+    void setData(Object data);
+
+    /**
+     * get the data
+     * @return the data
+     */
+    Object getData();
+
     static String getStateString(int state){
         switch (state){
             case STATE_DEFAULT:

@@ -19,6 +19,7 @@ public abstract class BaseAiGenerateContext implements AiGenerateContext, AiGenS
     private final AtomicInteger tagState = new AtomicInteger();
     private final AtomicInteger faceState = new AtomicInteger();
     private final AiGeneratorDelegate mAiGenDelegate;
+    private Object mData;
 
     public BaseAiGenerateContext(AiGeneratorDelegate delegate) {
         this.mAiGenDelegate = delegate;
@@ -60,6 +61,14 @@ public abstract class BaseAiGenerateContext implements AiGenerateContext, AiGenS
         mAiGenDelegate.genTag(getAiGenIO(),this);
     }
 
+    @Override
+    public void setData(Object data) {
+        this.mData = data;
+    }
+    @Override
+    public Object getData() {
+        return mData;
+    }
     //==============================================================================
 
     private void checkDone() {
