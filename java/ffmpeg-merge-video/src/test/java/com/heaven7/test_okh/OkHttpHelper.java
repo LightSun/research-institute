@@ -36,6 +36,21 @@ public class OkHttpHelper {
         Call call = okHttpClient.newCall(builder.build());
         call.enqueue(callback);
     }
+    public static void post(OkHttpClient client, String url, Map<String, String> headers, RequestBody body, Callback callback){
+        Request.Builder builder = new Request.Builder().url(url)
+                .post(body);
+        if(!headers.isEmpty()) {
+            VisitServices.from(headers).fire(new MapFireVisitor<String, String>() {
+                @Override
+                public Boolean visit(KeyValuePair<String, String> pair, Object param) {
+                    builder.addHeader(pair.getKey(), pair.getValue());
+                    return null;
+                }
+            });
+        }
+        Call call = client.newCall(builder.build());
+        call.enqueue(callback);
+    }
     public static void put(String url, Map<String, String> headers, RequestBody body, Callback callback){
         Request.Builder builder = new Request.Builder().url(url)
                 .put(body);

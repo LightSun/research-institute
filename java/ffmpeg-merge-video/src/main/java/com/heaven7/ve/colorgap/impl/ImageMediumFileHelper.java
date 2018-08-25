@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.ColorGapContext;
+import com.heaven7.ve.colorgap.ColorGapParam;
 import com.heaven7.ve.colorgap.MediaItem;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class ImageMediumFileHelper {
          mImageHelper.scanAndLoad(context, items, barrier);
     }
 
-    public void loadResource(ColorGapContext context, String resourceDir) {
+    public void loadResource(ColorGapContext context, ColorGapParam resourceDir) {
         mImageHelper.loadImageResource(context, resourceDir);
     }
 }

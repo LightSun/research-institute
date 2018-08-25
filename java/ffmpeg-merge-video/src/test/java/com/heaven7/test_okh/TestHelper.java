@@ -4,16 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import okhttp3.FormBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import okhttp3.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.heaven7.test_okh.OkHttpHelper.getMimeType;
 
 /**
  * @author heaven7

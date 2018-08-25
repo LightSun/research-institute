@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap.impl;
 /**
  * the image data dir mapper.
  */
+@Deprecated
 public interface ImageDataDirMapper {
     /**
      * map the source dir to data dir.

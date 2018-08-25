@@ -39,9 +39,7 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
     private static final String TAG = "ImageAnalyseHelper";
     private final Gson mGson = new GsonBuilder().create();
 
-    private ImageDataDirMapper mDataDirMapper = new ImageDataDirMapperImpl();
-    private List<ImageResource> mImageRess;
-
+    private final ImageResource mImageRes = new ImageResource();
 
     public void scanAndLoad(Context context, List<MediaItem> imageItems, final CyclicBarrier barrier) {
         ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, imageItems, barrier));
@@ -59,70 +57,52 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
     /**
      * load all image resource for batch images.such as rects_path, tag_path.
      * note this must called in sub thread.
-     *
-     * @param context the color gap context
-     * @param resourceDir the resource dir of save all medias.
+     *  @param context the color gap context
+     * @param param the resource data dir of batch images.
      */
-    public void loadImageResource(ColorGapContext context, String resourceDir) {
-        File batchFileList = new File(resourceDir, "image_batch_list.txt");
-        if (!batchFileList.exists()) {
-            return;
-        }
-        List<ImageResBatchLine> lines = new TextReadHelper<ImageResBatchLine>(
-                new TextReadHelper.BaseAssetsCallback<ImageResBatchLine>() {
-                    @Override
-                    public ImageResBatchLine parse(String line) {
-                        return new ImageResBatchLine(line);
-                    }
-                }).read(null, batchFileList.getAbsolutePath());
+    public void loadImageResource(ColorGapContext context, ColorGapParam param) {
+        String batchImageDataDir = param.getBatchImageDataDir();
+        Logger.d(TAG, "loadImageResource", " dataDir = " + batchImageDataDir);
+        ImageResource imageRes = this.mImageRes;
+        imageRes.setBatchDataDir(batchImageDataDir);
+        imageRes.setResourceDataDir(param.getResourceDataDir());
+
+        File face_config = new File(batchImageDataDir, "face_config.txt");
+        File tfs_config = new File(batchImageDataDir, "tfs_config.txt");
+        //csv, imapath imgpath ...
         final TextReadHelper<ConfigLine> reader = new TextReadHelper<>(new ConfigLineCallback());
-        //load face and tag data
-        mImageRess = VisitServices.from(lines).map(new ResultVisitor<ImageResBatchLine, ImageResource>() {
-            @Override
-            public ImageResource visit(ImageResBatchLine line, Object param) {
-                String dataDir = mDataDirMapper.mapDataDir(line.imageResourceDir);
-                Logger.d(TAG, "loadImageResource", "res dir = " + line.imageResourceDir + " ,dataDir = " + dataDir);
-                ImageResource imageRes = new ImageResource();
-                imageRes.setBatchDir(line.imageResourceDir);
-
-                File face_config = new File(dataDir, "face_config.txt");
-                File tfs_config = new File(dataDir, "tfs_config.txt");
-                //csv, imapath imgpath ...
-                if (face_config.exists()) {
-                    List<ConfigLine> faceLines = reader.read(null, face_config.getAbsolutePath());
-                    if (!Predicates.isEmpty(faceLines)) {
-                        String rectsPath = faceLines.get(0).getCsvRectsPath();
-                        imageRes.setRectsPath(rectsPath);
-                        Logger.d(TAG, "loadImageResource", "set Rects path done >>> rectsPath = " + rectsPath);
-                    }
-                }
-                //tfs_config
-                if (tfs_config.exists()) {
-                    List<ConfigLine> faceLines = reader.read(null, tfs_config.getAbsolutePath());
-                    if (!Predicates.isEmpty(faceLines)) {
-                        String tagPath = faceLines.get(0).getCsvTagPath();
-                        imageRes.setTagPath(tagPath);
-                        Logger.d(TAG, "loadImageResource", "set Tag path done >>> tagPath = " + tagPath);
-                    }
-                }
-                return imageRes;
+        if (face_config.exists()) {
+            List<ConfigLine> faceLines = reader.read(null, face_config.getAbsolutePath());
+            if (!Predicates.isEmpty(faceLines)) {
+                String rectsPath = faceLines.get(0).getCsvRectsPath();
+                imageRes.setRectsPath(rectsPath);
+                Logger.d(TAG, "loadImageResource", "set Rects path done >>> rectsPath = " + rectsPath);
             }
-        }).getAsList();
+        }
+        //tfs_config
+        if (tfs_config.exists()) {
+            List<ConfigLine> faceLines = reader.read(null, tfs_config.getAbsolutePath());
+            if (!Predicates.isEmpty(faceLines)) {
+                String tagPath = faceLines.get(0).getCsvTagPath();
+                imageRes.setTagPath(tagPath);
+                Logger.d(TAG, "loadImageResource", "set Tag path done >>> tagPath = " + tagPath);
+            }
+        }
         //load high light data
-
     }
 
+
     private static class ImageResource {
-        String batchDir;
+        String resourceDataDir;
+        String batchDataDir;
         String rectsPath;
         String tagPath;
 
-        public String getBatchDir() {
-            return batchDir;
+        public String getBatchDataDir() {
+            return batchDataDir;
         }
-
-        public void setBatchDir(String batchDir) {
-            this.batchDir = batchDir;
+        public void setBatchDataDir(String batchDataDir) {
+            this.batchDataDir = batchDataDir;
         }
 
         public String getRectsPath() {
@@ -139,6 +119,13 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
 
         public void setTagPath(String tagPath) {
             this.tagPath = tagPath;
+        }
+
+        public void setResourceDataDir(String resourceDataDir) {
+            this.resourceDataDir = resourceDataDir;
+        }
+        public String getResourceDataDir() {
+            return resourceDataDir;
         }
     }
 
@@ -212,7 +199,6 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
         private final List<MediaItem> mMediaItems;
         private final CyclicBarrier mBarrier;
         private final Context mContext;
-        private AtomicInteger mGroupCount;
 
         BatchScanner(Context context, List<MediaItem> mediaItems, CyclicBarrier barrier) {
             this.mContext = context;
@@ -231,49 +217,16 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
          */
         public void startScanByDir() {
             Logger.d(TAG, "startScanByDir");
-            VisitServices.from(mMediaItems).groupService(new ResultVisitor<MediaItem, String>() {
-                @Override
-                public String visit(MediaItem mediaItem, Object param) {
-                    return FileUtils.getFileDir(mediaItem.item.getFilePath(), 1, true);
-                }
-            }).map(new MapResultVisitor<String, List<MediaItem>, Group>() {
-                @Override
-                public Group visit(KeyValuePair<String, List<MediaItem>> t, Object param) {
-                    Group group = new Group(t.getValue());
-                    group.dir = t.getKey();
-                    return group;
-                }
-            }).save(new SaveVisitor<Group>() {
-                @Override
-                public void visit(Collection<Group> collection) {
-                    getCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "startScanByDir", "group size = " + collection.size());
-                    mGroupCount = new AtomicInteger(collection.size());
-                }
-            })
-                    .fire(new FireVisitor<Group>() {
-                        @Override
-                        public Boolean visit(Group group, Object param) {
-                            List<ImageResource> list = VisitServices.from(mImageRess).filter(new PredicateVisitor<ImageResource>() {
-                                @Override
-                                public Boolean visit(ImageResource imageResource, Object param) {
-                                    return imageResource.batchDir.equals(group.dir);
-                                }
-                            }).getAsList();
-                            if (list.isEmpty()) {
-                                throw new IllegalStateException("you must call #loadImageResource");
-                            }
-                            ImageResource imageRes = list.get(0);
-                            ConcurrentManager.getDefault().submit(() -> doWithBacthRects(group, imageRes));
-                            ConcurrentManager.getDefault().submit(() -> doWithBacthTags(group, imageRes));
-                            ConcurrentManager.getDefault().submit(() -> doWithHighLights(group, imageRes));
-                            return null;
-                        }
-                    });
+            Group group = new Group(mMediaItems);
+            ImageResource imageRes = ImageAnalyseHelper.this.mImageRes;
+            ConcurrentManager.getDefault().submit(() -> doWithBacthRects(group, imageRes));
+            ConcurrentManager.getDefault().submit(() -> doWithBacthTags(group, imageRes));
+            ConcurrentManager.getDefault().submit(() -> doWithHighLights(group, imageRes));
         }
 
         private void doWithBacthRects(Group group, ImageResource imageRes) {
             if (TextUtils.isEmpty(imageRes.rectsPath)) {
-                Logger.w(TAG, "doWithBacthRects", "no rect file for face data. group dir = " + group.dir);
+                Logger.w(TAG, "doWithBacthRects", "no rect file for face data. data dir = " + mImageRes.getBatchDataDir());
                 group.markDownRects();
                 return;
             }
@@ -285,7 +238,7 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
 
         private void doWithBacthTags(Group group, ImageResource imageRes) {
             if (TextUtils.isEmpty(imageRes.tagPath)) {
-                Logger.w(TAG, "doWithBacthTags", "no tag file for tag data. group dir = " + group.dir);
+                Logger.w(TAG, "doWithBacthTags", "no rect file for tag data. data dir = " + mImageRes.getBatchDataDir());
                 group.markDownTags();
                 return;
             }
@@ -299,15 +252,14 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
             VisitServices.from(group.items).fire(new FireVisitor<MediaItem>() {
                 @Override
                 public Boolean visit(MediaItem item, Object param) {
-                    String fileName = FileUtils.getFileName(item.item.getFilePath());
-                    String fullDir = FileUtils.getFileDir(item.item.getFilePath(), 1, true);
-                    String highLightDir = mDataDirMapper.mapHighLightDir(fullDir);
-                    //highlight file. .../data/highlight/dir/xxx.ihighlight
-                    String hlFilename = highLightDir + File.separator
-                            + fileName + "." + Constants.EXTENSION_IMAGE_HIGH_LIGHT;
-                    File file = new File(hlFilename);
+                    final String fileName = FileUtils.getFileName(item.item.getFilePath());
+                    //...data/highlight/filename.ihighlight.
+                    final String highLightFile = imageRes.getResourceDataDir() + File.separator
+                            + Constants.DIR_HIGH_LIGHT + File.separator + fileName
+                            + "." + Constants.EXTENSION_IMAGE_HIGH_LIGHT;
+                    File file = new File(highLightFile);
                     if (!file.exists()) {
-                        Logger.w(TAG, "doWithHighLights", "can't find high light file. " + hlFilename);
+                        Logger.w(TAG, "doWithHighLights", "can't find high light file. " + highLightFile);
                         return true;
                     }
                     FileReader reader = null;
@@ -338,10 +290,7 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
                         return null;
                     }
                 });
-                if (mGroupCount.decrementAndGet() == 0) {
-                    //all done
-                    ConcurrentUtils.awaitBarrier(mBarrier);
-                }
+                ConcurrentUtils.awaitBarrier(mBarrier);
             }
         }
     }
@@ -355,10 +304,6 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
         final List<MediaItem> items;
         List<ImageDataLoader.ImageFaceRects> rects = new ArrayList<>();
         List<ImageDataLoader.ImageTags> tags = new ArrayList<>();
-        /**
-         * the die of all media items
-         */
-        String dir;
 
         String filenamePrefix;
 

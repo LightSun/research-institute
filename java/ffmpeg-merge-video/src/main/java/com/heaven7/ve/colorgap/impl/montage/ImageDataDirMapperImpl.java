@@ -10,6 +10,7 @@ import java.io.File;
 /**
  * @author heaven7
  */
+@Deprecated
 public class ImageDataDirMapperImpl implements ImageDataDirMapper {
 
     @Override

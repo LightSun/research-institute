@@ -62,7 +62,7 @@ public class MediaAnalyserImpl implements MediaAnalyser {
 
     @Override
     public void preLoadData(ColorGapContext context, ColorGapParam param) {
-        mImageHelper.loadResource(context, param.getResourceDir());
+        mImageHelper.loadResource(context, param);
     }
 
     protected MetaInfo.ImageMeta analyseMeta(Context context, MediaResourceItem item) {

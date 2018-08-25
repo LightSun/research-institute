@@ -89,10 +89,11 @@ public class TestAiUploadFlow {
             File file = new File(fileNames.get(i));
             //mime
             String fileType = getMimeType(file.getName());
+            MediaType type = fileType != null ?MediaType.parse(fileType) : null;
             builder.addFormDataPart(
                     "file",
                     file.getName(),
-                    RequestBody.create(MediaType.parse(fileType), file)
+                    RequestBody.create(type, file)
             );
             md5s.add(FileMd5Helper.getMD5Three(fileNames.get(i)));
         }
