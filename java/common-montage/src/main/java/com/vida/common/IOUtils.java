@@ -1,11 +1,10 @@
 package com.vida.common;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 
 public class IOUtils {
+    private static final int EOF = -1;
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
     public static String readString(Reader r) throws IOException {
         BufferedReader br = r instanceof BufferedReader ? (BufferedReader) r : new BufferedReader(r);
@@ -42,5 +41,17 @@ public class IOUtils {
                 // Ignore.
             }
         }
+    }
+    public static long copyLarge(InputStream input, OutputStream output)
+            throws IOException {
+
+        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        long count = 0;
+        int n = 0;
+        while (EOF != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
     }
 }
