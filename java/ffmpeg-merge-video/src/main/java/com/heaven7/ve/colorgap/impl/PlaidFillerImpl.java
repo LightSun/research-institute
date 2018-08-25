@@ -111,35 +111,7 @@ public class PlaidFillerImpl implements PlaidFiller {
         }
         /** adjust the video start and end times. after call this the video parts' times may be overlapped. */
         public void adjustTimes() {
-            Kingdom kingdom = getKingdom();
-            for(GapManager.GapItem gapItem : filledItems) {
-                CutInfo.PlaidInfo plaid = (CutInfo.PlaidInfo) gapItem.plaid;
-                MediaPartItem mpi = (MediaPartItem) gapItem.item;
-                //for image. set time directly
-                if(mpi.item.isImage()){
-                    mpi.videoPart.setStartTime(0);
-                    mpi.videoPart.setEndTime(plaid.getDuration());
-                    continue;
-                }
-                TimeTraveller videoPart = mpi.videoPart;
-                if(videoPart.getMaxDuration() < plaid.getDuration()){
-                    throw new IllegalStateException("caused by video max duration < part music duration.");
-                }
-                //if duration is the same . no need adjust time.
-                if(videoPart.getDuration() != plaid.getDuration()){
-                    if(videoPart.getMaxDuration() < plaid.getDuration()){
-                        throw new IllegalStateException("video relative music part is too short.");
-                    }
-                    if(kingdom.isGeLaiLiYa()){
-                        videoPart.adjustTimeAsCenter(plaid.getDuration());
-                    }else {
-                        //the key frame time often is the high-light time
-                        int keyFrameTime = mpi.getKeyFrameTime();
-                        videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
-                                plaid.getDuration());
-                    }
-                }
-            }
+            VEGapUtils.adjustTime(getContext(), filledItems);
         }
         /** sort the filled video items as the music plaids' order. */
         public void sortAsPlaids(){

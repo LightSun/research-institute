@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.Context;
@@ -11,6 +12,7 @@ import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
 
+import javax.print.attribute.standard.Media;
 import java.util.*;
 
 /**
@@ -101,6 +103,12 @@ public class Chapter extends BaseContextOwner{
 
         //1, 聚合故事/计算出所有的故事
         List<Story> stories = groupStories(items);
+        if(stories.isEmpty()){
+            //sometimes when no story
+            fillDirectly();
+            return;
+        }
+
         this.mStories = stories;
         dump(stories, "group stoyies");
         // 2. 对每个故事，根据基本规则进行镜头过滤
@@ -193,6 +201,36 @@ public class Chapter extends BaseContextOwner{
         }
 
         dump(stories, "at last");
+    }
+
+    private void fillDirectly() {
+        if(filledItems == null){
+            filledItems = new ArrayList<>();
+        }
+        List<MediaPartItem> newItems = truncateItems(items);
+        VisitServices.from(plaids).fireWithIndex(new FireIndexedVisitor<CutInfo.PlaidInfo>() {
+            @Override
+            public Void visit(Object param, CutInfo.PlaidInfo plaidInfo, int index, int size) {
+                filledItems.add(new GapManager.GapItem(plaids.get(index), newItems.get(index)));
+                return null;
+            }
+        });
+    }
+
+    private List<MediaPartItem> truncateItems(List<MediaPartItem> items) {
+        final int itemSize = items.size();
+        final int plaidSize = plaids.size();
+        if(itemSize > plaidSize){
+            return items.subList(0, plaidSize);
+        }else if(itemSize < plaidSize){
+            int diff = plaidSize - itemSize;
+            List<MediaPartItem> newItems = new ArrayList<>(items);
+            for(int i = 0 ; i < diff ; i ++){
+                newItems.add(items.get(itemSize -1));
+            }
+            return newItems;
+        }
+        return items;
     }
 
     private Story getStory(int storyId) {

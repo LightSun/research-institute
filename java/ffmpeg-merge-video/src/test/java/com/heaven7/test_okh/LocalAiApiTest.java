@@ -23,18 +23,20 @@ import static com.heaven7.test_okh.TestAiUploadFlow.getRequestBody;
 public class LocalAiApiTest {
 
     private static final String TAG = "LocalAiApiTest";
-    public static final String DOMAIN = "127.0.0.1";
+   // public static final String DOMAIN = "127.0.0.1";
+    public static final String DOMAIN = "www.xiaoxiekeji.cn";
 
     public static void main(String[] args) {
        // testUpload();
-       /* String[] md5s = {
-                "6f3714b84d7c0a329005d990df2fb8a2",
+        String[] md5s = {
+                //"6f3714b84d7c0a329005d990df2fb8a2",
                 "a5acf1592ddd04f1c4545149573f44bc",
-        };*/
+        };
        // testMakeWorks(md5s);
-       //  createProjectWithMd5s(md5s);
+
+        createProjectWithMd5s(md5s);
        // updateProject(12L, md5sToMediaInfo(md5s));
-        testTfrecordToTag();
+       // testTfrecordToTag();
     }
     private static void createProjectWithMd5s(String[] md5s){
         List<Project.MediaInfo> list = VisitServices.from(Arrays.asList(md5s)).map(new ResultVisitor<String, Project.MediaInfo>() {

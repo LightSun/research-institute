@@ -5,7 +5,10 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.Visitors;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
+import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
+import com.heaven7.ve.TimeTraveller;
+import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.gap.PlaidDelegate;
 import com.heaven7.ve.kingdom.Kingdom;
@@ -13,6 +16,7 @@ import com.heaven7.ve.kingdom.Kingdom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.heaven7.utils.CommonUtils.isInRange;
 
@@ -25,6 +29,39 @@ public class VEGapUtils {
     // private static final String TAG = "VEGapUtils";
     private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
     private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
+
+
+    public static void adjustTime(ColorGapContext context,List<GapManager.GapItem> filledItems){
+        Kingdom kingdom = context.getKingdom();
+        for(GapManager.GapItem gapItem : filledItems) {
+            CutInfo.PlaidInfo plaid = (CutInfo.PlaidInfo) gapItem.plaid;
+            MediaPartItem mpi = (MediaPartItem) gapItem.item;
+            //for image. set time directly
+            if(mpi.item.isImage()){
+                mpi.videoPart.setStartTime(0);
+                mpi.videoPart.setEndTime(plaid.getDuration());
+                continue;
+            }
+            TimeTraveller videoPart = mpi.videoPart;
+            if(videoPart.getMaxDuration() < plaid.getDuration()){
+                throw new IllegalStateException("caused by video max duration < part music duration.");
+            }
+            //if duration is the same . no need adjust time.
+            if(videoPart.getDuration() != plaid.getDuration()){
+                if(videoPart.getMaxDuration() < plaid.getDuration()){
+                    throw new IllegalStateException("video relative music part is too short.");
+                }
+                if(kingdom.isGeLaiLiYa()){
+                    videoPart.adjustTimeAsCenter(plaid.getDuration());
+                }else {
+                    //the key frame time often is the high-light time
+                    int keyFrameTime = mpi.getKeyFrameTime();
+                    videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
+                            plaid.getDuration());
+                }
+            }
+        }
+    }
 
     public static Kingdom getKingdom(Object context){
         if(context instanceof ColorGapContext){
