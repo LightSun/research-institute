@@ -1,9 +1,9 @@
 package com.heaven7.utils.test;
 
-import com.heaven7.core.util.Logger;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;
+import com.vida.common.Platform;
 import com.vida.common.ai.*;
 import junit.framework.TestCase;
 
@@ -15,12 +15,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
+ * ai generate tests. for video. batch images(same dir or diff dir)
  * @author heaven7
  */
-public class TestAi extends TestCase{
+public class BaseAiTest extends TestCase {
 
-    private ExecutorService mService;
-    private static final String TAG = "TestAi";
+    protected static final String TAG = "BaseAiTest";
+    protected ExecutorService mService;
+    protected AiGeneratorDelegate mAiGenDelegate;
 
     @Override
     protected void tearDown() throws Exception {
@@ -31,21 +33,23 @@ public class TestAi extends TestCase{
     protected void setUp() throws Exception {
         super.setUp();
         mService = Executors.newFixedThreadPool(5);
+       // mAiGenDelegate = new TestMockAiGeneratorDelegate();
+        mAiGenDelegate = new LocalAiGeneratorDelegateImpl(Platform.getDefault().getAiCmdGenerator(true));
     }
 
     public void testBatchImageInDiffDir(){
+        //chinese path have bugs
         String[] images = {
-            "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\DSC_2542-1.jpg",
-            "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\DSC_2519.jpg",
-            "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\DSC_2507.jpg",
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2542-1.jpg",
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2519.jpg",
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2507.jpg",
         };
         ArrayList<String> list = new ArrayList<>(Arrays.asList(images));
-        String output = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\data2";
-        TestMockAiGeneratorDelegate delegate = new TestMockAiGeneratorDelegate();
+        String output = "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\data2";
         MultiFileParamContextImpl multiFiles = new MultiFileParamContextImpl();
         multiFiles.populateByFiles(list);
 
-        BatchImageAiGenerateContext2 batchImageContext = new BatchImageAiGenerateContext2(delegate, list, output, multiFiles);
+        BatchImageAiGenerateContext2 batchImageContext = new BatchImageAiGenerateContext2(mAiGenDelegate, list, output, multiFiles);
         mService.submit(batchImageContext::genTfRecord);
         mService.submit(batchImageContext::genFace);
         try {
@@ -59,11 +63,10 @@ public class TestAi extends TestCase{
     public void testBatchImageInOneDir(){
         String input = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫";
         String output = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\蓝灰色无袖长衫\\data";
-        TestMockAiGeneratorDelegate delegate = new TestMockAiGeneratorDelegate();
         MultiFileParamContextImpl multiFiles = new MultiFileParamContextImpl();
         multiFiles.populateByDir(input);
 
-        BatchImageAiGenerateContext batchImageContext = new BatchImageAiGenerateContext(delegate, input, output, multiFiles);
+        BatchImageAiGenerateContext batchImageContext = new BatchImageAiGenerateContext(mAiGenDelegate, input, output, multiFiles);
         mService.submit(batchImageContext::genTfRecord);
         mService.submit(batchImageContext::genFace);
         try {
@@ -76,10 +79,9 @@ public class TestAi extends TestCase{
     public void testVideo(){
         String videoFile = "F:\\videos\\tmp_store\\1.mp4";
         String dataDir = "F:\\videos\\tmp_store\\data";
-        TestMockAiGeneratorDelegate delegate = new TestMockAiGeneratorDelegate();
         TestFileParamContext context = createVideo("1.mp4");
 
-        VideoAiGenerateContext videoContext = new VideoAiGenerateContext(delegate, context,
+        VideoAiGenerateContext videoContext = new VideoAiGenerateContext(mAiGenDelegate, context,
                 videoFile, dataDir);
 
         mService.submit(videoContext::genTfRecord);
@@ -97,13 +99,7 @@ public class TestAi extends TestCase{
         return context;
     }
 
-    private static class TestMockAiGeneratorDelegate extends BaseMockAiGeneratorDelegate{
-        @Override
-        public void onMediaGenDone(AiGenerateContext context) {
-            Logger.d(TAG, "onMediaGenDone", "" + context.getClass().getName());
-        }
-    }
-    public static class MultiFileParamContextImpl implements MultiFileParamContext{
+    public static class MultiFileParamContextImpl implements MultiFileParamContext {
         final List<FileParamContext> list = new ArrayList<>();
         @Override
         public List<? extends FileParamContext> getAllFileParamContext() {

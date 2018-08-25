@@ -12,6 +12,8 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'com.squareup.okhttp3:okhttp:3.11.0'
+
     compile files('libs/image-detect.jar')
 
     compile 'com.heaven7.java.base:Java-base:1.1.0'

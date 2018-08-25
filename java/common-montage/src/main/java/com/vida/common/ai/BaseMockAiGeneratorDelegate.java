@@ -53,7 +53,7 @@ public abstract class BaseMockAiGeneratorDelegate extends BaseAiGeneratorDelegat
     }
 
     @Override
-    protected void genTag(String[] io, String[] cmds) {
+    protected void genTag(String[] io, String[] cmds, String tfRecordPath) {
         String msg = formatIo(io);
         mockImpl(tagDuration / 2, "genTag",msg, new MockTagRunner(io));
     }

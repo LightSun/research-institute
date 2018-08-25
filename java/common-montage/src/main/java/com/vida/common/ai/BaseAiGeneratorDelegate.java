@@ -44,7 +44,7 @@ public abstract class BaseAiGeneratorDelegate implements AiGeneratorDelegate {
     public final void genTag(String[] io, AiGenStateNotifier notifier) {
         String[] cmds = getGenTagCmd(io, notifier.getTfRecordPath());
         final String cmdString = toCmdString(cmds);
-        genTag(io, cmds);
+        genTag(io, cmds, notifier.getTfRecordPath());
         //post
         notifier.notifyState(AiGenStateNotifier.MARK_TAG, STATE_TAG_TFRECORD_DONE, STATE_TAG_END, cmdString);
     }
@@ -67,7 +67,7 @@ public abstract class BaseAiGeneratorDelegate implements AiGeneratorDelegate {
     }
 
     protected abstract void genTfrecord(String[] io, String[] cmds);
-    protected abstract void genTag(String[] io, String[] cmds);
+    protected abstract void genTag(String[] io, String[] cmds, String tfRecordPath);
     protected abstract void genFace(String[] io, String[] cmds);
 
     protected abstract String[] getGenTfRecordCmd(String[] io);

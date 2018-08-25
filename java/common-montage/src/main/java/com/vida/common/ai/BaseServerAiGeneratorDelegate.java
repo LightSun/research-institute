@@ -17,7 +17,7 @@ public abstract class BaseServerAiGeneratorDelegate extends BaseAiGeneratorDeleg
      * </pre>
      */
     private final CmdHelper.Callback mLogCallback;
-    private final PlatformAICmdGenerator mAiCmdGen;
+    protected final PlatformAICmdGenerator mAiCmdGen;
 
     public BaseServerAiGeneratorDelegate(PlatformAICmdGenerator mAiCmdGen, CmdHelper.Callback cllback) {
         this.mAiCmdGen = mAiCmdGen;
@@ -29,7 +29,7 @@ public abstract class BaseServerAiGeneratorDelegate extends BaseAiGeneratorDeleg
          new CmdHelper(cmds).execute(mLogCallback);
     }
     @Override
-    protected void genTag(String[] io, String[] cmds) {
+    protected void genTag(String[] io, String[] cmds, String tfRecordPath) {
         new CmdHelper(cmds).execute(mLogCallback);
     }
     @Override
@@ -79,7 +79,7 @@ public abstract class BaseServerAiGeneratorDelegate extends BaseAiGeneratorDeleg
         }
     }
 
-    private static class Runner0 extends BaseGenerateRunner{
+    protected static class Runner0 extends BaseGenerateRunner{
         public Runner0(String[] io) {
             super(io);
         }
