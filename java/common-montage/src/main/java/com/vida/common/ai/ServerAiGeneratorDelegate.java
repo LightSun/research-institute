@@ -7,7 +7,7 @@ import com.vida.common.platform.PyDelegate;
 /**
  * @author heaven7
  */
-public abstract class BaseServerAiGeneratorDelegate extends BaseAiGeneratorDelegate {
+public class ServerAiGeneratorDelegate extends BaseAiGeneratorDelegate {
 
     /** the cmd callback. often used to set the env
      * <pre>
@@ -19,7 +19,7 @@ public abstract class BaseServerAiGeneratorDelegate extends BaseAiGeneratorDeleg
     private final CmdHelper.Callback mLogCallback;
     protected final PlatformAICmdGenerator mAiCmdGen;
 
-    public BaseServerAiGeneratorDelegate(PlatformAICmdGenerator mAiCmdGen, CmdHelper.Callback cllback) {
+    public ServerAiGeneratorDelegate(PlatformAICmdGenerator mAiCmdGen, CmdHelper.Callback cllback) {
         this.mAiCmdGen = mAiCmdGen;
         this.mLogCallback = cllback;
     }

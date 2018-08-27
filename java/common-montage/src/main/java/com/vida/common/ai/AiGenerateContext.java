@@ -63,4 +63,15 @@ public interface AiGenerateContext {
                 throw new UnsupportedOperationException("wrong state = " + state);
         }
     }
+
+    /**
+     * on generate listener
+     */
+    interface OnGenerateListener{
+        /**
+         * called on generate done
+         * @param context the context.
+         */
+        void onGenerateDone(AiGenerateContext context);
+    }
 }

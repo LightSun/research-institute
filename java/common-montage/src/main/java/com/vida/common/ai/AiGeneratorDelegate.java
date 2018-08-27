@@ -25,9 +25,4 @@ public interface AiGeneratorDelegate {
      */
     void genTag(String[] io, AiGenStateNotifier notifier);
 
-    /**
-     * called on gen ai info for media done
-     * @param context the ai generate context
-     */
-    void onMediaGenDone(AiGenerateContext context);
 }

@@ -7,12 +7,12 @@ import com.vida.common.platform.PyDelegate;
 /**
  * @author heaven7
  */
-public abstract class LocalAiGeneratorDelegate extends BaseServerAiGeneratorDelegate {
+public class LocalAiGeneratorDelegate extends ServerAiGeneratorDelegate {
 
     private final Callback callback;
 
-    public LocalAiGeneratorDelegate(PlatformAICmdGenerator mAiCmdGen, CmdHelper.Callback cllback, Callback callback) {
-        super(mAiCmdGen, cllback);
+    public LocalAiGeneratorDelegate( PlatformAICmdGenerator mAiCmdGen, CmdHelper.Callback cllback, Callback callback) {
+        super( mAiCmdGen, cllback);
         this.callback = callback;
     }
 

@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
  */
 public class BaseAiTest extends TestCase {
 
-    protected static final String TAG = "BaseAiTest";
+    private final AiGenerateContext.OnGenerateListener mListener = new LogOnGenerateListenerImpl();
     protected ExecutorService mService;
     protected AiGeneratorDelegate mAiGenDelegate;
 
@@ -33,7 +33,7 @@ public class BaseAiTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mService = Executors.newFixedThreadPool(5);
-       // mAiGenDelegate = new TestMockAiGeneratorDelegate();
+      // mAiGenDelegate = new MockAiGeneratorDelegate(new LogOnGenerateListenerImpl());
         mAiGenDelegate = new LocalAiGeneratorDelegateImpl(Platform.getDefault().getAiCmdGenerator(true));
     }
 
@@ -49,7 +49,7 @@ public class BaseAiTest extends TestCase {
         MultiFileParamContextImpl multiFiles = new MultiFileParamContextImpl();
         multiFiles.populateByFiles(list);
 
-        BatchImageAiGenerateContext2 batchImageContext = new BatchImageAiGenerateContext2(mAiGenDelegate, list, output, multiFiles);
+        BatchImageAiGenerateContext2 batchImageContext = new BatchImageAiGenerateContext2(mAiGenDelegate, mListener,list, output, multiFiles);
         mService.submit(batchImageContext::genTfRecord);
         mService.submit(batchImageContext::genFace);
         try {
@@ -66,7 +66,7 @@ public class BaseAiTest extends TestCase {
         MultiFileParamContextImpl multiFiles = new MultiFileParamContextImpl();
         multiFiles.populateByDir(input);
 
-        BatchImageAiGenerateContext batchImageContext = new BatchImageAiGenerateContext(mAiGenDelegate, input, output, multiFiles);
+        BatchImageAiGenerateContext batchImageContext = new BatchImageAiGenerateContext(mAiGenDelegate, mListener, input, output, multiFiles);
         mService.submit(batchImageContext::genTfRecord);
         mService.submit(batchImageContext::genFace);
         try {
@@ -81,7 +81,7 @@ public class BaseAiTest extends TestCase {
         String dataDir = "F:\\videos\\tmp_store\\data";
         TestFileParamContext context = createVideo("1.mp4");
 
-        VideoAiGenerateContext videoContext = new VideoAiGenerateContext(mAiGenDelegate, context,
+        VideoAiGenerateContext videoContext = new VideoAiGenerateContext(mAiGenDelegate, mListener, context,
                 videoFile, dataDir);
 
         mService.submit(videoContext::genTfRecord);

@@ -42,11 +42,11 @@ public class OkHAiCallback implements LocalAiGeneratorDelegate.Callback {
         //get response
         ApiProtocol<String> ap = postSync(client, url, map, getRequestBody(Arrays.asList(tfrecordPath)));
         if(ap == null){
-            Logger.d(TAG, "tfrecordToTag", "failed");
+            Logger.d(TAG, "tfrecordToTag", "failed. tfrecord path = " + tfrecordPath);
             return;
         }
         if(ap.getCode() != 0 || ap.getData() == null){
-            Logger.d(TAG, "tfrecordToTag", ap.getMsg());
+            Logger.d(TAG, "tfrecordToTag", "failed , " + ap.getMsg());
             return;
         }
         byte[] datas = ap.getData().getBytes(StandardCharsets.UTF_8);

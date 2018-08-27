@@ -17,8 +17,8 @@ public class VideoAiGenerateContext extends BaseAiGenerateContext{
     private final String tfreordPath;
     private final AiVideoFileInfo info = new AiVideoFileInfo();
 
-    public VideoAiGenerateContext(AiGeneratorDelegate delegate, FileParamContext fp, String videoFile, String dataDir) {
-        super(delegate);
+    public VideoAiGenerateContext(AiGeneratorDelegate delegate, OnGenerateListener l,FileParamContext fp, String videoFile, String dataDir) {
+        super(delegate, l);
         this.fp = fp;
         this.videoFile = videoFile;
         this.dataDir = dataDir;

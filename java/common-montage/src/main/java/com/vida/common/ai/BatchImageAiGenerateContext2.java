@@ -28,8 +28,8 @@ public class BatchImageAiGenerateContext2 extends BaseAiGenerateContext {
     private final MultiFileParamContext mMultiContext;
     private BatchImageLine batchLine;
 
-    public BatchImageAiGenerateContext2(AiGeneratorDelegate delegate, List<String> images, String outDir, MultiFileParamContext multiContext) {
-        super(delegate);
+    public BatchImageAiGenerateContext2(AiGeneratorDelegate delegate, OnGenerateListener l, List<String> images, String outDir, MultiFileParamContext multiContext) {
+        super(delegate, l);
         this.images = images;
         this.outDir = outDir;
         this.mMultiContext = multiContext;

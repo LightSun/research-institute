@@ -18,17 +18,17 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public abstract class BaseMockAiGeneratorDelegate extends BaseAiGeneratorDelegate{
+public class MockAiGeneratorDelegate extends BaseAiGeneratorDelegate{
 
     private static final String TAG = "BaseMockAiGeneratorDele";
 
     private final long tagDuration;
     private final long faceDuration;
 
-    public BaseMockAiGeneratorDelegate() {
+    public MockAiGeneratorDelegate() {
         this(2000L, 4000L);
     }
-    public BaseMockAiGeneratorDelegate(long tagDuration, long faceDuration) {
+    public MockAiGeneratorDelegate(long tagDuration, long faceDuration) {
         this.tagDuration = tagDuration;
         this.faceDuration = faceDuration;
     }

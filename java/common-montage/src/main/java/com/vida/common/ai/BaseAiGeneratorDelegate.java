@@ -73,4 +73,5 @@ public abstract class BaseAiGeneratorDelegate implements AiGeneratorDelegate {
     protected abstract String[] getGenTfRecordCmd(String[] io);
     protected abstract String[] getGenTagCmd(String[] io, String tfrecordPath);
     protected abstract String[] getGenFaceCmd(String[] io);
+
 }

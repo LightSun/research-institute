@@ -19,10 +19,12 @@ public abstract class BaseAiGenerateContext implements AiGenerateContext, AiGenS
     private final AtomicInteger tagState = new AtomicInteger();
     private final AtomicInteger faceState = new AtomicInteger();
     private final AiGeneratorDelegate mAiGenDelegate;
+    private final OnGenerateListener mListener;
     private Object mData;
 
-    public BaseAiGenerateContext(AiGeneratorDelegate delegate) {
+    public BaseAiGenerateContext(AiGeneratorDelegate delegate, OnGenerateListener l) {
         this.mAiGenDelegate = delegate;
+        this.mListener = l;
     }
 
     @Override
@@ -78,7 +80,7 @@ public abstract class BaseAiGenerateContext implements AiGenerateContext, AiGenS
             //local done.
             onGenerateDone();
             //aiGen.onMediaGenDone(this);
-            mAiGenDelegate.onMediaGenDone(this);
+            mListener.onGenerateDone(this);
         }
     }
     protected void log(TimeRecorder recorder, String keyword) {
