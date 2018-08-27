@@ -17,12 +17,14 @@ public class TestAiUploadFlow {
     private static final String TAG = "TestAiUploadFlow";
 
     public static void main(String[] args) {
-          testUpload();
+         // testUpload();
         //createProject(TestHelper.getIds());
         // createProject(null, 1L);
        // createProject2();
         // makeWorks();
         // testGetImage();
+        String md5 = FileMd5Helper.getMD5Three("D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\1535365031530.mp4");
+        System.out.println(md5);
     }
 
     public static void testGetImage() {

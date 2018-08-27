@@ -37,7 +37,7 @@ public class MusicShaderImpl implements MusicShader {
          */
          if(template != null){
              //template.computePercent();
-             float scale = plaids.size() * 1f / template.getTotalPlaidCount();
+             float scale = plaids.size() * 1f / template.getTotalPlaidCount(); //target-plaid.size / template-plaid.size
              template.setTotalScale(scale);
              /*
               * 1, 计算各个新的逻辑语句 格子个数。使得格子数目相当.
@@ -120,6 +120,7 @@ public class MusicShaderImpl implements MusicShader {
         public List<CountInfo> adjustPlaidCount(int tintFlags){
             final boolean allow_release_head_tail = (tintFlags & FLAG_ALLOW_RELEASE_HEAD_TAIL) == FLAG_ALLOW_RELEASE_HEAD_TAIL;
             final int size = sentences.size();
+            //一个逻辑语句对应一个CountInfo
             final List<CountInfo> list = new ArrayList<>();
             int count = 0;
             for (int i = 0 ; i < size ; i ++){
@@ -163,6 +164,7 @@ public class MusicShaderImpl implements MusicShader {
                             return Integer.compare(o1.getRoundWithOffset(), o2.getRoundWithOffset());
                         }
                     });
+                    //只能释放给相邻的
                      for(CountInfo info : list){
                          if(info.isReleased()){
                              continue;
@@ -202,6 +204,7 @@ public class MusicShaderImpl implements MusicShader {
                 //重新计算个数
                 count = computeCount(list);
             }
+            //adjust plaid count in target sentence.
             if(count < expectCount){
                 int offsetCount = expectCount - count;
                 final int len = list.size();
@@ -372,7 +375,6 @@ public class MusicShaderImpl implements MusicShader {
                     if(target == info){
                         index = usePre ? info.sentenceIndex + 1 : index + 1;
                         target = findCountInfo(list, index);
-                        usePre = false;
                         while(target == info){
                             index ++;
                             target = findCountInfo(list, index);
@@ -612,7 +614,7 @@ public class MusicShaderImpl implements MusicShader {
         private boolean released;
         /** indicate this sentence index is merged to target sentence index */
         private int ownerSentenceIndex = -1;
-        /** the source dir from {@linkplain com.vida.android.common.videoeditor.colorgap.RawScriptItem} */
+        /** the source dir from {@linkplain com.heaven7.ve.colorgap.RawScriptItem} */
         private  String sourceDir;
 
         private int mergedCount;
