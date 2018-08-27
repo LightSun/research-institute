@@ -6,7 +6,6 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import com.vida.common.IOUtils;
 import okhttp3.*;
 
@@ -23,13 +22,13 @@ import static com.heaven7.test_okh.TestAiUploadFlow.getRequestBody;
 public class LocalAiApiTest {
 
     private static final String TAG = "LocalAiApiTest";
-   // public static final String DOMAIN = "127.0.0.1";
-    public static final String DOMAIN = "www.xiaoxiekeji.cn";
+    public static final String DOMAIN = "127.0.0.1";
+   // public static final String DOMAIN = "www.xiaoxiekeji.cn";
 
     public static void main(String[] args) {
        // testUpload();
         String[] md5s = {
-                //"6f3714b84d7c0a329005d990df2fb8a2",
+                "6f3714b84d7c0a329005d990df2fb8a2",
                 "a5acf1592ddd04f1c4545149573f44bc",
         };
        // testMakeWorks(md5s);
@@ -106,8 +105,8 @@ public class LocalAiApiTest {
     public static void testUpload() {
         String url = "http://" + DOMAIN + ":8004/media/upload";
         String[] medias = {
-                //"F:\\videos\\tmp_store\\WeChat_20180816180201.mp4",
-                "F:\\videos\\tmp_store\\WeChat_20180816182503.mp4",
+                "F:\\videos\\tmp_store\\WeChat_20180816180201.mp4",
+               // "F:\\videos\\tmp_store\\WeChat_20180816182503.mp4",
                 // "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\黑色阔腿裤\\1-2.jpg",
                 // "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\黑色阔腿裤\\1-4.jpg",
 
