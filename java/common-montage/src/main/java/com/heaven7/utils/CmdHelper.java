@@ -98,6 +98,28 @@ public class CmdHelper {
 
         }
     }
+    public static class InhertIoCallback implements Callback{
+        @Override
+        public void collect(CmdHelper helper, String line) {
+
+        }
+        @Override
+        public void onFailed(CmdHelper helper, Exception e) {
+            DefaultPrinter.getDefault().warn("InhertIoCallback", "onFailed", e);
+        }
+        @Override
+        public void onStart(CmdHelper helper) {
+
+        }
+        @Override
+        public void onEnd(CmdHelper helper) {
+
+        }
+        @Override
+        public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
+             pb.inheritIO();
+        }
+    }
 
     public static class VideoDurationCallback implements Callback{
 
