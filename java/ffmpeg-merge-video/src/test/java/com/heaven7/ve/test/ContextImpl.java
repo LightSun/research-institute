@@ -8,6 +8,17 @@ import com.heaven7.ve.kingdom.Kingdom;
 public class ContextImpl implements ColorGapContext {
 
     final ColorGapPerformanceCollector collector = new ColorGapPerformanceCollector(PerformanceWriter.LOG_WRITER);
+
+    @Override
+    public void setTestType(int testType) {
+
+    }
+
+    @Override
+    public int getTestType() {
+        return 0;
+    }
+
     @Override
     public Kingdom getKingdom() {
         return Kingdom.getDefault();

@@ -119,6 +119,7 @@ public interface MetaInfo {
      * shot type: long short ( 远景)
      */
     int SHOT_TYPE_LONG_SHORT = 2;
+
     /**  medium long shot. (中远景) */
     int SHOT_TYPE_MEDIUM_LONG_SHOT = 3;
     /**
@@ -136,13 +137,14 @@ public interface MetaInfo {
     /**
      * shot type: big close up ( 大特写)
      */
+    @Deprecated
     int SHOT_TYPE_BIG_CLOSE_UP = 7;
 
 
     int SHOT_TYPE_NONE  = -1;
 
-    int CATEGORY_CLOSE_UP    = 12;
-    int CATEGORY_MIDDLE_VIEW = 11;
+    int CATEGORY_CLOSE_UP    = 12; //特写/近景
+    int CATEGORY_MIDDLE_VIEW = 11; //中景
     int CATEGORY_VISION      = 10; //远景
 
     //========================== time ==========================
@@ -414,7 +416,7 @@ public interface MetaInfo {
          * frames/second
          */
         private int fps = 30;
-        /** see {@linkplain ShotRecognition#CATEGORY_ENV} and etc. */
+        /** see {@linkplain IShotRecognizer#CATEGORY_ENV} and etc. */
         private int shotCategory;
         /**
          * the shot type

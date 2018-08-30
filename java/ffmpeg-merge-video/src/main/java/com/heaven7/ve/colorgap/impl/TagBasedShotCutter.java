@@ -6,6 +6,7 @@ import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
+import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
 import com.heaven7.utils.CollectionUtils;
@@ -26,14 +27,15 @@ import java.util.concurrent.TimeUnit;
 public class TagBasedShotCutter extends VideoCutter {
 
     //move to VEGapUtils.
-   // private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
-   // private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
+    // private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
+    // private static final int MULTI_FACE_THRESHOLD           = 3 ;           // 多人脸下限为3个人脸
+    // private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
+
+    private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY = true ;        // 一段segment是否只返回“domain score”最高的Item
     private static final int MIN_SHOT_BUFFER_LENGTH         = 6 ;           // FrameBuffer中生成Shot的最小Frame数
-    private static final int MULTI_FACE_THRESHOLD           = 3 ;           // 多人脸下限为3个人脸
-    private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY = false ;        // 一段segment是否只返回“domain score”最高的Item
-    private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = false ;    // 一段segment是否只返回“face rect score”最高的Item
+    private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = true ;    // 一段segment是否只返回“face rect score”最高的Item
     private static final boolean CUT_BY_TAG = false;
-    private static final long DURATION_THRESOLD = CommonUtils.timeToFrame(15, TimeUnit.SECONDS); //人脸视频part大于15s 会用tag切割
+    private static final long DURATION_THRESOLD = 10 * 1000; //10 s
 
     private static final String TAG = "TagBasedShotCutter";
 
@@ -52,7 +54,7 @@ public class TagBasedShotCutter extends VideoCutter {
                 //cut by face
                 final List<MediaPartItem> faceItems = cutByFace(context, item);
                 dump(faceItems, item, "cutByFace");
-                if(MAX_FACE_RECT_SCORE_SHOT_ONLY && item.item.getDuration() < 180*1000){
+                if(MAX_FACE_RECT_SCORE_SHOT_ONLY && item.item.getDuration() < DURATION_THRESOLD){
                     List<MediaPartItem> faceItems2 = getMaxFaceRectsScoreShot(faceItems, item);
                     resultList.addAll(faceItems2);
                     if(faceItems2.isEmpty()){
@@ -60,7 +62,7 @@ public class TagBasedShotCutter extends VideoCutter {
                     }
                 }else {
                     //cut more face shots.
-                    List<MediaPartItem> unUsedShots = getUnUsedShots(context, item, faceItems);
+                   /* List<MediaPartItem> unUsedShots = getUnUsedShots(context, item, faceItems);
                     if (!Predicates.isEmpty(unUsedShots)) {
                         VisitServices.from(unUsedShots).fire(new FireVisitor<MediaPartItem>() {
                             @Override
@@ -76,7 +78,7 @@ public class TagBasedShotCutter extends VideoCutter {
                                 return null;
                             }
                         });
-                    }
+                    }*/
                     //AESC
                     VisitServices.from(faceItems).sortService(new Comparator<MediaPartItem>() {
                         @Override
@@ -94,16 +96,13 @@ public class TagBasedShotCutter extends VideoCutter {
                 //cut by common tag
                 List<MediaPartItem> faceItems = cutByCommonTag(context, item, true);
                 dump(faceItems, item, "cutByCommonTag");
-                if(MAX_DOMAIN_SCORE_SHOT_ONLY && item.item.getDuration() < 180*1000){
+                if(MAX_DOMAIN_SCORE_SHOT_ONLY && item.item.getDuration() < DURATION_THRESOLD){
                     MediaPartItem shot = getMaxDomainScoreShot(context, faceItems, item);
                     if(shot != null) {
                         resultList.add(shot);
                     }
                 }else{
                     resultList.addAll(faceItems);
-                }
-                if(faceItems.isEmpty()){
-                    resultList.add(item.asPart(context));
                 }
             }
         }
@@ -227,12 +226,53 @@ public class TagBasedShotCutter extends VideoCutter {
 
     /** 从一个segment中根据tag切出tag稳定的镜头 */
     private static List<MediaPartItem> cutByCommonTag(Context context, CutItemDelegate item, boolean ensureOne) {
-        if(item.getImageMeta() == null){
+        MetaInfo.ImageMeta imageMeta = item.getImageMeta();
+        if(imageMeta == null){
             return Collections.emptyList();
         }
         final List<MediaPartItem> result = new ArrayList<>();
-        CommonTagTraveller traveller = new CommonTagTraveller(context, item, result);
-        traveller.cut();
+        FrameBuffer buffer = new FrameBuffer(context);
+        int idx = 0;
+        while (idx < imageMeta.getRawVideoTags().size()){
+            FrameTags frameTags = imageMeta.getRawVideoTags().get(idx);
+            if(buffer.isEmpty()){
+                buffer.append(frameTags);
+            }else{
+                // 2. 当Buffer不为空，计算两个条件:
+                // a. 当前帧和Buffer的相似度(>= 1/2)； b. pendingFrame是否有值？
+                // 1）0 0：加入pendingFrame
+                // 2）0 1：尝试生成shot; 清空buffer, pendingFrame；从pendingFrame所在frame的idx开始重新积累buffer
+                // 3）1 0：加入buffer
+                // 4）1 1：和pendingFrame，一起加入buffer；清空pending
+                float similarScore = buffer.getSimilarScore(frameTags);
+                boolean similar = FrameBuffer.isSimilar(similarScore);
+                boolean hasPending = buffer.hasPendingFrame();
+                if(similar){
+                    if(hasPending){
+                         buffer.appendPendingFrame();
+                    }
+                    buffer.append(frameTags, false);
+                }else{
+                    if(hasPending){
+                        MediaPartItem shot = createShotByTag(context, buffer.getFrames(), buffer.getTagSet(), item);
+                        if(shot != null){
+                            result.add(shot);
+                        }
+                        buffer.clear();
+                        idx -= 1;
+                        continue;
+                    }else{
+                        buffer.setPengdingFrame(frameTags);
+                    }
+                }
+                idx ++;
+            }
+        }
+        //判断最后buffer中残留的frame能否构成一个镜头
+        MediaPartItem shot = createShotByTag(context, buffer.getFrames(), buffer.getTagSet(), item);
+        if(shot != null){
+            result.add(shot);
+        }
 
         // 确保至少有一个
         if(ensureOne && result.isEmpty()){
@@ -262,13 +302,13 @@ public class TagBasedShotCutter extends VideoCutter {
         List<MediaPartItem> list = new ArrayList<>();
         List<MediaPartItem> oneFaceShots = cutByFaceArea(context, item, 1);
         List<MediaPartItem> twoFaceShots = cutByFaceArea(context, item, 2);
-        List<MediaPartItem> multiFaceShots = cutForMultiFaces(context, item);
-       // List<MediaPartItem> noFaceShots = cutByFaceArea(item, 0);
+        List<MediaPartItem> multiFaceShots = cutByFaceArea(context, item, 3);
+        List<MediaPartItem> noFaceShots = cutByFaceArea(context, item, 0);
 
         list.addAll(oneFaceShots);
         list.addAll(twoFaceShots);
         list.addAll(multiFaceShots);
-       // list.addAll(noFaceShots);
+        list.addAll(noFaceShots);
 
         // 确保至少有一个
         if(list.isEmpty()){
@@ -284,55 +324,6 @@ public class TagBasedShotCutter extends VideoCutter {
         return list;
     }
 
-    /** 从一个segment中获取“多主人脸”( >=3 主人脸 )的镜头 */
-    private static List<MediaPartItem> cutForMultiFaces(Context context,MediaItem item) {
-        if(item.imageMeta == null){
-            return Collections.emptyList();
-        }
-        List<MediaPartItem> result = new ArrayList<>();
-        List<FrameItem> frameBuffer = new ArrayList<>();
-
-        List<FrameFaceRects> rawFaceRects = item.imageMeta.getAllFaceRects();
-        for(int i = 0, size = rawFaceRects.size() ; i < size ; i ++){
-            FrameFaceRects faceRects = rawFaceRects.get(i);
-            //跳出检测
-            if(faceRects.getMainFaceCount() < MULTI_FACE_THRESHOLD){
-                MediaPartItem shot = createShotByMultiFaces(context, frameBuffer, item);
-                if(shot != null){
-                    result.add(shot);
-                }
-                frameBuffer.clear();
-              //  Logger.d(TAG, "cutForMultiFaces", "clear frame buffer");
-            }else{
-                frameBuffer.add(new FrameItem(i, faceRects.getSortedFrameAreas()));
-             //   Logger.d(TAG, "cutForMultiFaces", "append idx = "+ i +" into frame buffer.");
-            }
-        }
-        // 判断最后buffer中残留的frame能否构成一个镜头
-        MediaPartItem shot = createShotByMultiFaces(context, frameBuffer, item);
-        if(shot != null){
-            result.add(shot);
-        }
-        frameBuffer.clear();
-      //  Logger.d(TAG, "cutForMultiFaces", "clear frame buffer -- 2");
-        return result;
-    }
-
-    /** 从frameBuffer中提取镜头：多人脸( >=3 ) */
-    private static MediaPartItem createShotByMultiFaces(Context context,List<FrameItem> frameBuffer, MediaItem item) {
-        if(frameBuffer.size() >= MIN_SHOT_BUFFER_LENGTH){
-            FrameItem bf_item = frameBuffer.get(0);
-            TimeTraveller tt = new TimeTraveller();
-            tt.setStartTime(CommonUtils.timeToFrame(bf_item.id, TimeUnit.SECONDS));
-            tt.setEndTime(CommonUtils.timeToFrame(bf_item.id + frameBuffer.size() - 1, TimeUnit.SECONDS));
-
-            MediaPartItem shot = new MediaPartItem(context,(MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, tt);
-            shot.imageMeta.setMainFaceCount(MULTI_FACE_THRESHOLD);
-            return shot;
-        }
-        return null;
-    }
-
     /**
      * cut by the face area. 主人脸面积
      * @param item the media item
@@ -345,32 +336,58 @@ public class TagBasedShotCutter extends VideoCutter {
             return Collections.emptyList();
         }
         List<MediaPartItem> result = new ArrayList<>();
-        List<FrameItem> frameBuffer = new ArrayList<>();
-        for(FrameFaceRects ffr : allFaceRects){
-            // 跳出条件检测：主人脸个数不对
-            if(ffr.getMainFaceCount() != mainFaceCount){
-                MediaPartItem shot = createShotByFace(context, frameBuffer, mainFaceCount, item);
-                if(shot != null){
-                    result.add(shot);
+        FaceFrameBuffer buffer = new FaceFrameBuffer(context);
+        int idx = 0;
+        while (idx < allFaceRects.size()){
+            FrameFaceRects faceRects = allFaceRects.get(idx);
+            if(buffer.isEmpty()){
+                buffer.append(faceRects);
+            }else {
+                boolean similar = buffer.isSimilar(faceRects.getMainFaceCount());
+                boolean hasPending = buffer.hasPendingFrame();
+                if(similar){
+                    if(hasPending){
+                        buffer.appendPendingFrame();
+                    }
+                    buffer.append(faceRects);
+                }else{
+                    if(hasPending){
+                        List<FrameItem> items = VisitServices.from(buffer.getFrames()).map(new ResultVisitor<FrameFaceRects, FrameItem>() {
+                            @Override
+                            public FrameItem visit(FrameFaceRects frameFaceRects, Object param) {
+                                return frameFaceRects.getFrameItem();
+                            }
+                        }).getAsList();
+                        MediaPartItem shot = createShotByFace(context, items, mainFaceCount, item);
+                        if(shot != null){
+                            result.add(shot);
+                        }
+                        buffer.clear();
+                    }else {
+                        buffer.setPengdingFrame(faceRects);
+                    }
                 }
-                frameBuffer.clear();
-              //  Logger.d(TAG, "cutByFaceArea", "");
-            }else{
-                frameBuffer.add(new FrameItem(ffr.getFrameIdx(), ffr.getSortedFrameAreas()));
             }
+            idx ++;
         }
+
         // 判断最后buffer中残留的frame能否构成一个镜头
-        MediaPartItem shot = createShotByFace(context, frameBuffer, mainFaceCount, item);
+        List<FrameItem> items = VisitServices.from(buffer.getFrames()).map(new ResultVisitor<FrameFaceRects, FrameItem>() {
+            @Override
+            public FrameItem visit(FrameFaceRects frameFaceRects, Object param) {
+                return frameFaceRects.getFrameItem();
+            }
+        }).getAsList();
+        MediaPartItem shot = createShotByFace(context, items, mainFaceCount, item);
         if(shot != null){
             result.add(shot);
         }
-        frameBuffer.clear();
        // Logger.d(TAG, "cutByFaceArea", "");
         return result;
     }
 
     /** 从frameBuffer中提取镜头：通过通用tags  */
-    private static MediaPartItem createShotByFace(Context context,List<FrameItem> frameBuffer, int mainFaceCount, MediaItem item) {
+    private static MediaPartItem createShotByFace(Context context, List<FrameItem> frameBuffer, int mainFaceCount, MediaItem item) {
         if(frameBuffer.size() >= MIN_SHOT_BUFFER_LENGTH){
             // 注意：用ffmpeg切的视频帧，pic-001其实代表第0秒，因此此处要-1
             FrameItem bf_item = frameBuffer.get(0);
@@ -379,6 +396,7 @@ public class TagBasedShotCutter extends VideoCutter {
             tt.setEndTime(CommonUtils.timeToFrame(bf_item.id + frameBuffer.size() - 1, TimeUnit.SECONDS));
 
             MediaPartItem mpi = new MediaPartItem(context,(MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, tt);
+            mpi.getImageMeta().setMainFaceCount(mainFaceCount);
             return mpi;
         }
         return null;
@@ -396,87 +414,6 @@ public class TagBasedShotCutter extends VideoCutter {
             sb.append(String.format(Locale.getDefault(),"( start , end ) = ( %.1f, %.1f ),\n", start, end));
         }
         Logger.i(TAG, "dump", sb.toString());
-    }
-
-    private static class CommonTagTraveller extends BaseContextOwner implements Map.MapTravelCallback<Integer, VideoDataLoadUtils.FrameData>{
-
-        private final CutItemDelegate item;
-        private final List<MediaPartItem> result;
-        List<FrameTags> frameBuffer = new ArrayList<>();
-        Set<Integer> currentTagSet = new HashSet<>();
-
-        public CommonTagTraveller(Context context,CutItemDelegate item, List<MediaPartItem> outItems) {
-            super(context);
-            this.item = item;
-            this.result = outItems;
-        }
-
-        /** cut by frame tags */
-        public void cut() {
-            List<FrameTags> tags = item.getVideoTags();
-            VisitServices.from(tags).fire(new FireVisitor<FrameTags>() {
-                @Override
-                public Boolean visit(FrameTags frameTags, Object param) {
-                    travelFrameTags(frameTags);
-                    return null;
-                }
-            });
-            //item.imageMeta.travelAllFrameDatas(this);
-            processRetainShot();
-        }
-
-        @Override
-        public void onTravel(Integer key, VideoDataLoadUtils.FrameData value) {
-
-            FrameTags ft = value.getTag();
-            if(ft == null){
-                //sparse array bug
-                return;
-            }
-            travelFrameTags(ft);
-        }
-
-        private void travelFrameTags(FrameTags ft) {
-            Set<Integer> frameTagSet = ft.getTopTagSet(getContext());
-            // 跳出条件检测（新tags与currentTagSet的相似度小于1/2）
-            if(currentTagSet.size() > 0){
-                int intersectionCount = CollectionUtils.intersection(currentTagSet, frameTagSet).size();
-                if(intersectionCount == 0 || intersectionCount * 1f / currentTagSet.size() < 0.5f){
-                    MediaPartItem shot = createShotByTag(getContext(), frameBuffer, currentTagSet, item);
-                    if(shot != null){
-                        result.add(shot);
-                    }
-                    frameBuffer.clear();
-                    currentTagSet = new HashSet<>();
-                  //  Logger.d(TAG, "cutByCommonTag", "clear frame buffer");
-                }
-            }
-
-            // 更新buffer检查条件：frameTags非空
-            if(frameTagSet.size() == 0){
-                return;
-            }
-            // 更新buffer和currentTagSet
-            frameBuffer.add(ft);
-            if(currentTagSet.isEmpty()){
-                currentTagSet = frameTagSet;
-            }else{
-                currentTagSet = CollectionUtils.intersection(currentTagSet, ft.getTopTagSet(getContext()));
-            }
-            Logger.d(TAG, "cutByCommonTag", "append idx = "+ ft.getFrameIdx() +
-                    ", tags = "+ frameTagSet +" into buffer, currentTagSet = ("+ currentTagSet +")");
-        }
-
-        /** 处理残留镜头 */
-        private void processRetainShot(){
-            // 判断最后buffer中残留的frame能否构成一个镜头
-            MediaPartItem shot = createShotByTag(getContext(), frameBuffer, currentTagSet, item);
-            if(shot != null){
-                result.add(shot);
-            }
-            frameBuffer.clear();
-           // Logger.d(TAG, "cutByCommonTag", "clear frame buffer -- 2");
-        }
     }
 
 }

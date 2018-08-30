@@ -9,8 +9,18 @@ import com.heaven7.ve.kingdom.Kingdom;
  */
 public class SimpleColorGapContext implements ColorGapContext {
 
+    private int mType = TEST_TYPE_SERVER;
     private Kingdom mKingdom;
     private ColorGapPerformanceCollector mCollector;
+
+    @Override
+    public void setTestType(int testType) {
+        this.mType = testType;
+    }
+    @Override
+    public int getTestType() {
+        return mType;
+    }
 
     @Override
     public Kingdom getKingdom() {
@@ -29,4 +39,5 @@ public class SimpleColorGapContext implements ColorGapContext {
     public ColorGapPerformanceCollector getColorGapPerformanceCollector() {
         return mCollector;
     }
+
 }

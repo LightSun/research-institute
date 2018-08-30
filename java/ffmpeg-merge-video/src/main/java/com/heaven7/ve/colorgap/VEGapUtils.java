@@ -1,12 +1,12 @@
 package com.heaven7.ve.colorgap;
 
 
+import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.Visitors;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.utils.Context;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
@@ -31,7 +31,7 @@ public class VEGapUtils {
     private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
 
 
-    public static void adjustTime(ColorGapContext context,List<GapManager.GapItem> filledItems){
+    public static void adjustTime(ColorGapContext context, List<GapManager.GapItem> filledItems){
         Kingdom kingdom = context.getKingdom();
         for(GapManager.GapItem gapItem : filledItems) {
             CutInfo.PlaidInfo plaid = (CutInfo.PlaidInfo) gapItem.plaid;
@@ -54,10 +54,26 @@ public class VEGapUtils {
                 if(kingdom.isGeLaiLiYa()){
                     videoPart.adjustTimeAsCenter(plaid.getDuration());
                 }else {
-                    //the key frame time often is the high-light time
-                    int keyFrameTime = mpi.getKeyFrameTime();
-                    videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
-                            plaid.getDuration());
+                    HighLightArea area = mpi.getHighLightArea();
+                    if(area != null) {
+                        int plaidDurationInSeconds = (int) CommonUtils.frameToTime(plaid.getDuration(), TimeUnit.SECONDS);
+                        if (area.getDuration() <= plaidDurationInSeconds) {
+                            int over = plaidDurationInSeconds - area.getDuration();
+                            long start = CommonUtils.timeToFrame(area.getStartTime() - over / 2, TimeUnit.SECONDS);
+                            videoPart.setStartTime(start);
+                            videoPart.setEndTime(start + plaid.getDuration());
+                            videoPart.adjustByLimit();
+                        } else{
+                            int keyFrameTime = mpi.getKeyFrameTime();
+                            videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
+                                    plaid.getDuration());
+                        }
+                    }else {
+                        //the key frame time often is the high-light time
+                        int keyFrameTime = mpi.getKeyFrameTime();
+                        videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
+                                plaid.getDuration());
+                    }
                 }
             }
         }

@@ -124,6 +124,30 @@ public class TimeTraveller extends SimpleCopyDelegate {
         return 0;
     }
 
+    public void adjustByLimit(){
+        long endTime = getEndTime();
+        final long maxEndTime = getMaxDuration();
+        if(endTime > maxEndTime){
+            long result = (endTime - maxEndTime);
+            setEndTime(maxEndTime);
+            setStartTime(getStartTime() - result);
+        }else {
+            long startTime = getStartTime();
+            if (startTime < 0) {
+                setEndTime(getEndTime() + Math.abs(startTime));
+                setStartTime(0);
+            }
+        }
+        //check
+        if(getStartTime() < 0 ){
+            throw new IllegalStateException("time error for start time = " + getStartTime());
+        }
+        if(getEndTime() > maxEndTime){
+            throw new IllegalStateException("time error for end time over maxEndTime,  endTime = "
+                    + getEndTime() + " ,maxEndTime =" + maxEndTime);
+        }
+    }
+
     /**
      * adjust time by target center time.
      * @param focusTime the focus time in frames

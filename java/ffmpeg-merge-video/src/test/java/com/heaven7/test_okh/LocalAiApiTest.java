@@ -26,14 +26,14 @@ public class LocalAiApiTest {
    // public static final String DOMAIN = "www.xiaoxiekeji.cn";
 
     public static void main(String[] args) {
-        testUpload();
+       // testUpload();
         String[] md5s = {
-                "6f3714b84d7c0a329005d990df2fb8a2",
+               // "6f3714b84d7c0a329005d990df2fb8a2",
                 "a5acf1592ddd04f1c4545149573f44bc",
         };
        // testMakeWorks(md5s);
 
-       // createProjectWithMd5s(md5s);
+        createProjectWithMd5s(md5s);
        // updateProject(12L, md5sToMediaInfo(md5s));
        // testTfrecordToTag();
     }

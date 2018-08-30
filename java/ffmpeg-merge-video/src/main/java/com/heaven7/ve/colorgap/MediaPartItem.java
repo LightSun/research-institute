@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.image.detect.KeyPointData;
 import com.heaven7.java.image.detect.LocationF;
@@ -50,6 +51,8 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     /** used for story */
     private int storyId = -1;
+    /** the chapter index. */
+    private int chapterIndex;
     /** selected or not in story */
     private boolean selectedInStory;
     /** 偏差镜头标志 */
@@ -110,6 +113,12 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
     public void setStoryId(int storyId) {
         this.storyId = storyId;
     }
+    public void setChapterIndex(int chapterIndex) {
+         this.chapterIndex = chapterIndex;
+    }
+    public int getChapterIndex() {
+        return chapterIndex;
+    }
 
     @Override
     public GapColorFilter.GapColorCondition getColorCondition() {
@@ -155,6 +164,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         mpi.domainTagScore = this.domainTagScore;
         mpi.storyId = this.storyId;
         mpi.mKeyPointData = this.mKeyPointData;
+        mpi.chapterIndex = chapterIndex;
         return mpi;
     }
 
@@ -586,4 +596,10 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
         this.mKeyPointData = skp;
     }
+
+    public HighLightArea getHighLightArea() {
+        return imageMeta.getHightLightArea(getContext(), videoPart);
+    }
+
+
 }

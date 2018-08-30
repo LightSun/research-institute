@@ -11,5 +11,5 @@ import java.util.List;
 
 public interface PlaidFiller {
 
-    List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts);
+    List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts, ColorGapPostProcessor processor);
 }

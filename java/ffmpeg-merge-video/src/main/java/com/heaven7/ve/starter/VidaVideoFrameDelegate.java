@@ -55,7 +55,7 @@ public class VidaVideoFrameDelegate implements AbstractVideoManager.VideoFrameDe
         return fileDir + File.separator + Constants.DIR_TEMP + File.separator + fileName + File.separator
                 + "img_" + format(time + 1) + ".jpg";
     }
-    private static String format(int time) {
+    public static String format(int time) {
         switch (String.valueOf(time).length()) {
             case 1:
                 return "0000" + time;

@@ -3,21 +3,16 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
-import com.heaven7.utils.CommonUtils;
+import com.heaven7.java.visitor.FireIndexedVisitor;
+import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.gap.PlaidDelegate;
-import com.heaven7.ve.kingdom.Kingdom;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 /**
  * the filler which use gap with 'compute-score' to fill.
@@ -27,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class PlaidFillerImpl implements PlaidFiller {
 
     @Override
-    public List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts) {
+    public List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts, ColorGapPostProcessor processor) {
         final boolean notEnough = parts.size() < infoes.size();
         if(notEnough){
             Logger.d("PlaidFillerImpl", "fill", "shot is not enough --- expect plaid.count = "
@@ -75,7 +70,21 @@ public class PlaidFillerImpl implements PlaidFiller {
         }
         //sort as the order of plaids
         gapCallback.sortAsPlaids();
-        //adjust times
+
+        //post processor
+        if(processor != null){
+            List<MediaPartItem> list = VisitServices.from(gapCallback.filledItems).map(
+                    new ResultVisitor<GapManager.GapItem, MediaPartItem>() {
+                        @Override
+                        public MediaPartItem visit(GapManager.GapItem gapItem, Object param) {
+                            return (MediaPartItem) gapItem.item;
+                        }
+                    }).getAsList();
+            List<MediaPartItem> resultList = processor.onPostProcess(mContext, list);
+            gapCallback.changeGapItem(resultList);
+        }
+
+        //adjust times by plaids
         gapCallback.adjustTimes();
         return gapCallback.filledItems;
     }
@@ -157,6 +166,17 @@ public class PlaidFillerImpl implements PlaidFiller {
                 throw new IllegalStateException("can't find best match");
             }
             return bestItem;
+        }
+
+        /** change the item to target item */
+        public void changeGapItem(List<MediaPartItem> resultList) {
+            VisitServices.from(filledItems).fireWithIndex(new FireIndexedVisitor<GapManager.GapItem>() {
+                @Override
+                public Void visit(Object param, GapManager.GapItem gapItem, int index, int size) {
+                    gapItem.item = resultList.get(index);
+                    return null;
+                }
+            });
         }
     }
 }

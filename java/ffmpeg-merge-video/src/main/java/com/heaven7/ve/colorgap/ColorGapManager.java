@@ -198,7 +198,7 @@ public class ColorGapManager extends BaseContextOwner{
         }
         if (gapItems == null) {
             //fill plaid
-            gapItems = filler.fillPlaids(getContext(), plaids, newItems);
+            gapItems = filler.fillPlaids(getContext(), plaids, newItems ,null);
         }
         getPerformanceCollector().endModule(MODULE_FILL_PLAID, "doFillPlaids");
         callback.onFillFinished(new FillResult(gapItems, srcTemplate, resultTemplate));

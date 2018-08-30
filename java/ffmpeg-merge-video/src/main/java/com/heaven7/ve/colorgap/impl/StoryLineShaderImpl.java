@@ -50,8 +50,9 @@ public class StoryLineShaderImpl implements StoryLineShader {
             Logger.d(TAG, "tintAndFill", "chapters: " + chapters.size());
         }
         //normal fill
+        int lastSortRule = ShotSortDelegate.SHOT_SORT_RULE_UNKNOWN;
         for (Chapter chapter : chapters){
-            chapter.fill(emptyItems, filler, filter);
+            lastSortRule = chapter.fill(emptyItems, filler, filter, lastSortRule);
         }
         //process air-shot between chapters
         for(int i = 0, size = chapters.size() ; i < size ; i ++){
@@ -93,6 +94,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
         }
         collector.addMessage(ColorGapPerformanceCollector.MODULE_FILL_PLAID, TAG, "groupChapter", "sentences.size() != 1(for RawScript)");
 
+        //TODO
         for(int i = 0 , size = sentences.size() ; i < size ; i ++){
             VETemplate.LogicSentence ls = sentences.get(i);
             List<MediaPartItem> filterItems = VisitServices.from(items)

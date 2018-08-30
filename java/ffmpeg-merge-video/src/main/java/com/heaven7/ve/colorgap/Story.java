@@ -22,6 +22,7 @@ public class Story {
 
     private final List<MediaPartItem> items;
     private int storyId;
+    private int chapterIndex;
 
     public Story(List<MediaPartItem> items) {
         Throwables.checkEmpty(items);
@@ -31,6 +32,13 @@ public class Story {
     /** indicate the story is empty or not. exclude un-select shot. */
     public boolean isEmpty() {
         return getShots(false).isEmpty();
+    }
+
+    public void setChapterIndex(int chapterIndex) {
+        this.chapterIndex = chapterIndex;
+        for (MediaPartItem item : items) {
+            item.setChapterIndex(chapterIndex);
+        }
     }
 
     public void setStoryId(int storyId) {
@@ -114,7 +122,7 @@ public class Story {
         }
         return out;
     }
-    /** get all shots which is sorted by domain tag score. */
+    /** get all shots which is sorted by domain tag score. (AESC) */
     public List<MediaPartItem> getSortedShots() {
         return getSortedShots(Visitors.truePredicateVisitor());
     }
@@ -148,7 +156,7 @@ public class Story {
 
         //2, 镜头类型相同的镜头 不连续超过3个， 非人脸类型，不得超过2个
         //   先处理镜头，再出路相似的画面。
-        int[] shotTypes = { MetaInfo.SHOT_TYPE_BIG_LONG_SHORT,
+        /*int[] shotTypes = { MetaInfo.SHOT_TYPE_BIG_LONG_SHORT,
                 MetaInfo.SHOT_TYPE_LONG_SHORT,
                 MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT,
                 MetaInfo.SHOT_TYPE_MEDIUM_SHOT,
@@ -176,9 +184,9 @@ public class Story {
                     list.get(i).setSelectedInStory(false, "镜头类型相同不连续超过3个");
                 }
             }
-        }
+        }*/
         //3, 内容相似的画面不超过5个
-        deleteShotsByLimit(Visitors.truePredicateVisitor(), 5, "内容相似的画面不超过5个");
+        //deleteShotsByLimit(Visitors.truePredicateVisitor(), 5, "内容相似的画面不超过5个");
 
         //4, 重复镜头. 得分，类型都相同，则只保留1个
         List<MediaPartItem> partItems = filterAndSortShots(Visitors.truePredicateVisitor(), false);
@@ -249,4 +257,5 @@ public class Story {
                 ", items=" + logItems() +
                 '}';
     }
+
 }

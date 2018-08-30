@@ -76,4 +76,8 @@ public class FrameFaceRects {
     public int getRectsCount() {
         return rects != null ? rects.size() : 0;
     }
+
+    public FrameItem getFrameItem(){
+        return new FrameItem(getFrameIdx(), getSortedFrameAreas());
+    }
 }

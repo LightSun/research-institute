@@ -34,16 +34,19 @@ public class ShotTypeFilter extends GapColorFilter {
         public ShotTypeCondition(String type) {
             super(MetaInfo.getShotTypeFrom(type));
         }
+        public ShotTypeCondition(int shot_type) {
+            super(shot_type);
+        }
         @Override
         protected int getCategory(int type) {
 
             switch (type){
                 case SHOT_TYPE_BIG_CLOSE_UP:
                 case SHOT_TYPE_CLOSE_UP:
+                case SHOT_TYPE_MEDIUM_CLOSE_UP:
                     return CATEGORY_CLOSE_UP;
 
                 case SHOT_TYPE_MEDIUM_SHOT:
-                case SHOT_TYPE_MEDIUM_CLOSE_UP:
                 case SHOT_TYPE_MEDIUM_LONG_SHOT:
                     return CATEGORY_MIDDLE_VIEW;
 

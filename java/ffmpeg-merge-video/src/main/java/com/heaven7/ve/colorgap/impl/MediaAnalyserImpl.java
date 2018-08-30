@@ -22,12 +22,15 @@ import java.util.concurrent.CyclicBarrier;
 
 public class MediaAnalyserImpl implements MediaAnalyser {
 
-    private final VideoAnalyseHelper mVideoHelper = new VideoAnalyseHelper(new MediaFaceScanner(), new MediaTagScanner(),
-            new MediaHighLightScanner(), new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
+    private VideoAnalyseHelper mVideoHelper;
     private final ImageMediumFileHelper mImageHelper = new ImageMediumFileHelper();
 
     @Override
     public List<MediaItem> analyse(Context context, List<MediaResourceItem> items, CyclicBarrier barrier) {
+        if(mVideoHelper == null) {
+            mVideoHelper = createVideoAnalyseHelper(VEGapUtils.asColorGapContext(context).getTestType());
+        }
+
         List<MediaItem> outItems = new ArrayList<>();
         for(MediaResourceItem item : items){
             final MediaItem mediaItem = new MediaItem();
@@ -47,6 +50,21 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         mImageHelper.scanAndLoad(context, images, barrier);
 
         return outItems;
+    }
+
+    private VideoAnalyseHelper createVideoAnalyseHelper(int testType) {
+        switch (testType){
+            case ColorGapContext.TEST_TYPE_LOCAL_SERVER:
+            case ColorGapContext.TEST_TYPE_SERVER:
+                return new VideoAnalyseHelper(new MediaFaceScanner(), new MediaTagScanner(),
+                    new MediaHighLightScanner(), new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
+
+            case ColorGapContext.TEST_TYPE_LOCAL:
+                return  new VideoAnalyseHelper(new LocalMediaFaceScanner(), new LocalTagScanner(),
+                    new LocalHighLightScanner(), new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
+
+        }
+        throw new UnsupportedOperationException("test type = " + ColorGapContext.getTestTypeString(testType));
     }
 
     @Override

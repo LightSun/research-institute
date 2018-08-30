@@ -9,11 +9,14 @@ import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
+import com.heaven7.ve.colorgap.filter.ShotTypeFilter;
+import com.heaven7.ve.colorgap.impl.ChapterColorGapPostProcessor;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
 
-import javax.print.attribute.standard.Media;
 import java.util.*;
+
+import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_FILL_PLAID;
 
 /**
  * the chapter.(a chapter correspond one logic-sentence)
@@ -21,6 +24,8 @@ import java.util.*;
  */
 public class Chapter extends BaseContextOwner{
     private static final String TAG = "Chapter";
+
+    private static final int MIN_SHOT_COUNT_IN_STORY = 1;
 
     private final List<CutInfo.PlaidInfo> plaids;
     private final List<MediaPartItem> items;
@@ -91,13 +96,14 @@ public class Chapter extends BaseContextOwner{
         }
         filledItems.add(gapItem);
     }
-    public void fill(List<MediaPartItem> airShots, PlaidFiller filler, AirShotFilter airFilter) {
+    /** @return  the sort rule that this chapter used. */
+    public int fill(List<MediaPartItem> airShots, PlaidFiller filler, AirShotFilter airFilter, int lastSortRule) {
         if (air) {
             //for air chapter . process after all chapter fill. here just check plaids.size = 1
             if (plaids.size() != 1) {
                 throw new IllegalStateException("for air sentence/chapter can only have one");
             }
-            return;
+            return ShotSortDelegate.SHOT_SORT_RULE_UNKNOWN;
         }
         final int plaidCount = plaids.size();
 
@@ -106,7 +112,7 @@ public class Chapter extends BaseContextOwner{
         if(stories.isEmpty()){
             //sometimes when no story
             fillDirectly();
-            return;
+            return lastSortRule;
         }
 
         this.mStories = stories;
@@ -122,7 +128,11 @@ public class Chapter extends BaseContextOwner{
             List<MediaPartItem> shots = story.getSortedShots();
             //保留最大得分的镜头
             if (shots.size() > 1) {
-                list_to_delete.addAll(shots.subList(0, shots.size() - 1));
+                if(shots.get(shots.size() - 1).getDomainTagScore() > 1f){
+                    list_to_delete.addAll(shots.subList(0, shots.size() - 1));
+                }else{
+                    list_to_delete.addAll(shots);
+                }
             }
         }
         Collections.sort(list_to_delete, (o1, o2) -> Float.compare(o1.getDomainTagScore(), o2.getDomainTagScore()));
@@ -151,7 +161,7 @@ public class Chapter extends BaseContextOwner{
         stories.removeIf(Story::isEmpty);
 
         //5, 处理偏差镜头
-        List<MediaPartItem> biasItems = VisitServices.from(items).visitForQueryList(
+       /* List<MediaPartItem> biasItems = VisitServices.from(items).visitForQueryList(
                 (partItem, param) -> partItem.getStoryId() == -1, null);
 
         //TODO 如果没有偏差镜头， 而且镜头个数不够？ 用空镜头填充？
@@ -166,7 +176,7 @@ public class Chapter extends BaseContextOwner{
                 //TODO 有可能还是不够---, 这个时候 重复插入还是怎么处理？
             }
             dump(stories, "after-process  insert by biasItems");
-        }
+        }*/
         //reset story id.(change by insert or replace or etc.)
         setAllStoryId(stories);
 
@@ -179,8 +189,17 @@ public class Chapter extends BaseContextOwner{
             info.addColorFilter(new ShotKeyFilter(new ShotKeyFilter.ShotKeyCondition(
                     shots.get(i).imageMeta.getShotKey())));
         }
+        //target shot sort rule
+        int sortRule = ShotSortDelegate.getNextSortRule(lastSortRule);
+        getPerformanceCollector().addMessage(MODULE_FILL_PLAID,
+                TAG, "fill", "sort rule is " + ShotSortDelegate.getRuleString(sortRule));
+        //set short type filter
+        setShortTypeFilter(plaidCount, sortRule);
+
         //gap
-        filledItems = filler.fillPlaids(getContext(), plaids, shots);
+        ChapterColorGapPostProcessor postProcessor = new ChapterColorGapPostProcessor(this, sortRule);
+        filledItems = filler.fillPlaids(getContext(), plaids, shots, postProcessor);
+        sortRule = postProcessor.getLastSortRule();
 
         //process air-plaids 空镜头只会替换偏差镜头.(按照顺序 - 不能破坏故事的结构)
         if (!Predicates.isEmpty(airPlaids)) {
@@ -201,6 +220,55 @@ public class Chapter extends BaseContextOwner{
         }
 
         dump(stories, "at last");
+        return sortRule;
+    }
+
+    /** set short type filter */
+    private void setShortTypeFilter(int plaidCount, int sortRule) {
+        //add filter of short types.
+        ShortTypeParam shortTypeParam = ShortTypeParam.fromTotalCount(plaidCount);
+        getPerformanceCollector().addMessage(MODULE_FILL_PLAID,
+                TAG, "setShortTypeFilter", "ShortTypeParam is " + shortTypeParam);
+        switch (sortRule){
+            case ShotSortDelegate.SHOT_SORT_RULE_AESC:
+            {
+                int mediaumStart = shortTypeParam.getNearCount();
+                int longStart = mediaumStart + shortTypeParam.getMediumCount();
+                for (int i = 0; i < plaidCount; i++) {
+                    CutInfo.PlaidInfo info = plaids.get(i);
+                    if (i < mediaumStart) {
+                        //near
+                        info.addColorFilter(new ShotTypeFilter(new ShotTypeFilter.ShotTypeCondition(MetaInfo.SHOT_TYPE_CLOSE_UP)));
+                    } else if (i < longStart) {
+                        //medium
+                        info.addColorFilter(new ShotTypeFilter(new ShotTypeFilter.ShotTypeCondition(MetaInfo.SHOT_TYPE_MEDIUM_SHOT)));
+                    } else { //long shot
+                        info.addColorFilter(new ShotTypeFilter(new ShotTypeFilter.ShotTypeCondition(MetaInfo.SHOT_TYPE_LONG_SHORT)));
+                    }
+                }
+            }break;
+
+            case ShotSortDelegate.SHOT_SORT_RULE_DESC:
+            {   // 0-long-medium-near
+                int mediaumStart = shortTypeParam.getLongCount();
+                int nearStart = mediaumStart + shortTypeParam.getMediumCount();
+                for (int i = 0; i < plaidCount; i++) {
+                    CutInfo.PlaidInfo info = plaids.get(i);
+                    if (i < mediaumStart) {
+                        //long
+                        info.addColorFilter(new ShotTypeFilter(new ShotTypeFilter.ShotTypeCondition(MetaInfo.SHOT_TYPE_LONG_SHORT)));
+                    } else if (i < nearStart) {
+                        //medium
+                        info.addColorFilter(new ShotTypeFilter(new ShotTypeFilter.ShotTypeCondition(MetaInfo.SHOT_TYPE_MEDIUM_SHOT)));
+                    } else { //near
+                        info.addColorFilter(new ShotTypeFilter(new ShotTypeFilter.ShotTypeCondition(MetaInfo.SHOT_TYPE_CLOSE_UP)));
+                    }
+                }
+            }break;
+
+            default:
+                throw new IllegalStateException(" wong shot sort rule = " + ShotSortDelegate.getRuleString(sortRule));
+        }
     }
 
     private void fillDirectly() {
@@ -357,14 +425,24 @@ public class Chapter extends BaseContextOwner{
         List<MediaPartItem> shotBuffer = new ArrayList<>();
         Set<Integer> currentTagSet = new HashSet<>();
         List<Story> stories = new ArrayList<>();
+        /*
+         * 聚合故事条件： 来自同一个视频或者tag相似
+         */
         for (MediaPartItem shot : items) {
             List<List<Integer>> tagss = shot.imageMeta.getTags();
             if (Predicates.isEmpty(tagss)) {
-                collector.addMessage(ColorGapPerformanceCollector.MODULE_FILL_PLAID, TAG,
+                collector.addMessage(MODULE_FILL_PLAID, TAG,
                         "groupStories", "shot has no tags. shot = " + shot);
                 continue;
             }
-            if (currentTagSet.size() > 0) {
+            boolean handled = false;
+            if(!shotBuffer.isEmpty()){
+                MediaPartItem lastItem = shotBuffer.get(shotBuffer.size() - 1);
+                if(lastItem.getItem().getFilePath().equals(shot.getItem().getFilePath())){
+                    handled = true;
+                }
+            }
+            if (!handled && currentTagSet.size() > 0) {
                 //如果tags 和 当前的tag set 相似度小于1/3. 则故事已找到。
                 Set<Integer> intersectSet = CollectionUtils.intersection(currentTagSet, tagss.get(0));
                 int intersectCount = intersectSet.size();
@@ -376,7 +454,7 @@ public class Chapter extends BaseContextOwner{
                 }
                 if (intersectCount == 0
                         || (currentTagSet.size() > 0 && intersectCount * 1f / currentTagSet.size() < 0.3f)) {
-                    if (shotBuffer.size() >= 2) {
+                    if (shotBuffer.size() >= MIN_SHOT_COUNT_IN_STORY) {
                         Story story = new Story(new ArrayList<>(shotBuffer));
                         stories.add(story);
                     }
@@ -395,7 +473,7 @@ public class Chapter extends BaseContextOwner{
         }
 
         //process Fragmentary shots
-        if (shotBuffer.size() >= 2) {
+        if (shotBuffer.size() >= MIN_SHOT_COUNT_IN_STORY) {
             Story story = new Story(new ArrayList<>(shotBuffer));
             stories.add(story);
         }
@@ -404,9 +482,11 @@ public class Chapter extends BaseContextOwner{
         return stories;
     }
 
-    private static void setAllStoryId(List<Story> stories) {
+    private void setAllStoryId(List<Story> stories) {
         for (int i = 0, size = stories.size(); i < size; i++) {
-            stories.get(i).setStoryId(i);
+            Story story = stories.get(i);
+            story.setStoryId(i);
+            story.setChapterIndex(chapterIndex);
         }
     }
 
@@ -414,7 +494,7 @@ public class Chapter extends BaseContextOwner{
         ColorGapPerformanceCollector collector = getPerformanceCollector();
         for (Story story : stories) {
             //Logger.d(TAG + "__" + chapterIndex, "dump", tag + " >>> " + story);
-            collector.addMessage(ColorGapPerformanceCollector.MODULE_FILL_PLAID, TAG, "dump_"+ chapterIndex, tag + " >>> " + story);
+            collector.addMessage(MODULE_FILL_PLAID, TAG, "dump_"+ chapterIndex, tag + " >>> " + story);
         }
     }
 
@@ -434,4 +514,7 @@ public class Chapter extends BaseContextOwner{
         return shots;
     }
 
+    public List<Story> getAllStory() {
+        return mStories;
+    }
 }

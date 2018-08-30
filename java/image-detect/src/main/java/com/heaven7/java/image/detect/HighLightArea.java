@@ -17,4 +17,12 @@ public class HighLightArea {
     public void setEndTime(int endTime) {
         this.endTime = endTime;
     }
+
+    /**
+     * get duration in seconds
+     * @return the duration in seconds
+     */
+    public int getDuration(){
+        return getEndTime() - getStartTime();
+    }
 }

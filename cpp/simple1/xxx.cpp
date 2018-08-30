@@ -6,7 +6,7 @@
 #include "xxx.h"
 #include <iostream>
 
-IO_XXX_DLL void hello(void)
+void hello(void)
 {
     std::cout<<"Hello from dll!"<<std::endl;
     std::cin.get();
