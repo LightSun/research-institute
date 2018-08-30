@@ -24,6 +24,7 @@ public class OkHAiCallback implements LocalAiGeneratorDelegate.Callback {
 
     @Override
     public void tfrecordToTag(String tfrecordPath, String targetTagPath) {
+        Logger.d(TAG, "tfrecordToTag", "start fen tag for tfrecord file. path = " + tfrecordPath);
         if(!new File(tfrecordPath).exists()){
             Logger.w(TAG, "tfrecordToTag", "failed for no tfrecord file. expect path = " + tfrecordPath);
             return;
@@ -104,6 +105,7 @@ public class OkHAiCallback implements LocalAiGeneratorDelegate.Callback {
                     RequestBody.create(null, file)
             );
         }
+        builder.addFormDataPart("show_cmd", "true");
         return builder.build();
     }
 }

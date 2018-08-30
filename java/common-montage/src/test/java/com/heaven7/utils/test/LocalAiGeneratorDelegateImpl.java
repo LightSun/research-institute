@@ -18,6 +18,7 @@ public class LocalAiGeneratorDelegateImpl extends LocalAiGeneratorDelegate {
             @Override
             public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
                 pb.directory(new File(ENV));
+                pb.inheritIO();
             }
         }, new OkHAiCallback());
     }

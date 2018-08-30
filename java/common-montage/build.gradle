@@ -13,6 +13,7 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile 'com.squareup.okhttp3:okhttp:3.11.0'
+    testCompile files('libs/read_file_from_jar.jar')
 
     compile files('libs/image-detect.jar')
 
