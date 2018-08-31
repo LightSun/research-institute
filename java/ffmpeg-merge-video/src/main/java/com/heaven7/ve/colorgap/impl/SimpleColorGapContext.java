@@ -1,7 +1,9 @@
 package com.heaven7.ve.colorgap.impl;
 
+import com.heaven7.ve.anno.SystemResource;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.ColorGapContext;
+import com.heaven7.ve.colorgap.MusicCutter;
 import com.heaven7.ve.kingdom.Kingdom;
 
 /**
@@ -12,6 +14,8 @@ public class SimpleColorGapContext implements ColorGapContext {
     private int mType = TEST_TYPE_SERVER;
     private Kingdom mKingdom;
     private ColorGapPerformanceCollector mCollector;
+    @SystemResource
+    private MusicCutter mMusicCutter;
 
     @Override
     public void setTestType(int testType) {
@@ -38,6 +42,20 @@ public class SimpleColorGapContext implements ColorGapContext {
     @Override
     public ColorGapPerformanceCollector getColorGapPerformanceCollector() {
         return mCollector;
+    }
+
+    @Override
+    public MusicCutter getMusicCutter() {
+        return mMusicCutter;
+    }
+    @Override
+    public void setMusicCutter(MusicCutter provider) {
+        this.mMusicCutter = provider;
+    }
+
+    @Override
+    public void copySystemResource(ColorGapContext dst) {
+        dst.setMusicCutter(getMusicCutter());
     }
 
 }

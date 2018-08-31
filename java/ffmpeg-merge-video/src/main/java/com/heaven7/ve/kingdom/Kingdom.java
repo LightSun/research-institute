@@ -7,6 +7,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
+import com.heaven7.ve.colorgap.MetaInfo;
 import com.vida.common.IOUtils;
 
 import java.io.BufferedReader;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.*;
+
+import static com.heaven7.ve.kingdom.KingdomUtils.*;
 
 /**
  * @author heaven7
@@ -244,13 +247,13 @@ public abstract class Kingdom {
     public TagItem getTagItem(int index, int type) {
         switch (type) {
             case TYPE_NOUN:
-                return getTagItem(mNounMap, index);
+                return KingdomUtils.getTagItem(mNounMap, index);
 
             case TYPE_ADJECTIVE:
-                return getTagItem(mAdjMap, index);
+                return KingdomUtils.getTagItem(mAdjMap, index);
 
             case TYPE_SCOPE:
-                return getTagItem(mScopeMap, index);
+                return KingdomUtils.getTagItem(mScopeMap, index);
 
             case TYPE_ALL:
                 TagItem result = getTagItem(index, TYPE_NOUN);
@@ -265,28 +268,48 @@ public abstract class Kingdom {
                 throw new IllegalArgumentException("wrong type = " + type);
         }
     }
+    //-------------------------- special ===========================
 
-    private static List<Integer> getTagIds(Map<String, List<TagItem>> map, String tag) {
-        List<TagItem> items = map.get(tag);
-        if (items == null) {
-            return null;
+    /**
+     * get the score of shot-type
+     * @param shotType the shot type.
+     * @return the score of shot type.
+     */
+    public float getShotTypeScore(int shotType){
+        switch (shotType){
+            case MetaInfo.SHOT_TYPE_CLOSE_UP:
+            case MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP:
+            case MetaInfo.SHOT_TYPE_LONG_SHORT:
+            case MetaInfo.SHOT_TYPE_BIG_LONG_SHORT:
+                return  1.5f;
+
+            case MetaInfo.SHOT_TYPE_MEDIUM_SHOT:
+            case MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT:
+                return  1f;
+
+            case MetaInfo.SHOT_TYPE_NONE:
+                return 0f;
         }
-        return getIds(items);
+        throw new UnsupportedOperationException("unsupport shot type = " + MetaInfo.getShotTypeString(shotType));
     }
 
-    private static TagItem getTagItem(Map<String, List<TagItem>> map, int index) {
-        for (List<TagItem> list : map.values()) {
-            for (TagItem item : list) {
-                if (item.getIndex() == index) {
-                    return item;
-                }
-            }
+    /**
+     * get main face score
+     * @param mainFaceCount the main face count
+     * @return the main face score
+     */
+    public float getMainFaceScore(int mainFaceCount){
+        if(mainFaceCount == 1){
+            return 0f;
+        }else if(mainFaceCount == 2){
+            return 1f;
+        }else if(mainFaceCount > 2 && mainFaceCount < 5){
+            return 1f;
+        }else{
+            return 1f;
         }
-        return null;
     }
 
-    private static List<Integer> getIds(List<TagItem> list) {
-        return VisitServices.from(list).map((tagItem, param) -> tagItem.getIndex()).getAsList();
-    }
+    //------------------------- private ----------------------------
 
 }

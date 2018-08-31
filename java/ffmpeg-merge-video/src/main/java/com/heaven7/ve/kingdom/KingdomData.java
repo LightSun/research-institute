@@ -1,6 +1,11 @@
 package com.heaven7.ve.kingdom;
 
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
+import com.heaven7.ve.utils.FloatMapGsonAdapter;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -12,6 +17,27 @@ public class KingdomData {
     private List<MapData> maps;
     private List<String> subjects;
     private List<ModuleData> moduleDatas; // the configed module data
+
+    @JsonAdapter(FloatMapGsonAdapter.class)
+    @SerializedName("shot_type_score")
+    private Map<String, Float> shotTypeMap;
+    @JsonAdapter(FloatMapGsonAdapter.class)
+    @SerializedName("main_face_score")
+    private Map<String, Float> mainFaceMap;
+
+    public Map<String, Float> getShotTypeMap() {
+        return shotTypeMap;
+    }
+    public void setShotTypeMap(Map<String, Float> shotTypeMap) {
+        this.shotTypeMap = shotTypeMap;
+    }
+
+    public Map<String, Float> getMainFaceMap() {
+        return mainFaceMap;
+    }
+    public void setMainFaceMap(Map<String, Float> mainFaceMap) {
+        this.mainFaceMap = mainFaceMap;
+    }
 
     public List<ModuleData> getModuleDatas() {
         return moduleDatas;

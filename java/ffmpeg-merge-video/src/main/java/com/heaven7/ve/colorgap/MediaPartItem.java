@@ -188,7 +188,8 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         if(Predicates.isEmpty(framesTags)){
             return 0;
         }
-        ColorGapContext context = getContext();
+        final ColorGapContext context = getContext();
+        final Kingdom kingdom = getKingdom();
 
         float score = 0f;
         for(FrameTags ft : framesTags){
@@ -199,7 +200,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
                 tagSet = ft.getTopTagSet(context, 3, 0.5f);
             }
             for (int tagIdx : tagSet){
-                TagItem item = getKingdom().getTagItem(tagIdx, Kingdom.TYPE_ALL);
+                TagItem item = kingdom.getTagItem(tagIdx, Kingdom.TYPE_ALL);
                 if(item != null){
                     tagDict.put(item.getDesc(), (float) item.getScore());
                 }
@@ -213,31 +214,13 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
         //2. 增加人脸得分
         if(imageMeta != null){
-            int faces = imageMeta.getMainFaceCount();
-            if(faces == 1){
-                score += 1.0f;
-            }else if(faces == 2){
-                score += 2f;
-            }else if(faces > 2){
-                score += 1.5f;
-            }
+            score += kingdom.getMainFaceScore(imageMeta.getMainFaceCount());
         }
         // 3. 增加镜头类型得分
         if(imageMeta != null){
             String shotType = imageMeta.getShotType();
             if (!TextUtils.isEmpty(shotType)) {
-                switch (MetaInfo.getShotTypeFrom(shotType)) {
-                  case MetaInfo.SHOT_TYPE_CLOSE_UP:
-                    score += 2f;
-                    break;
-                  case MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP:
-                    score += 1.5f;
-                    break;
-                  case MetaInfo.SHOT_TYPE_MEDIUM_SHOT:
-                  case MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT:
-                    score += 0.5f;
-                    break;
-                }
+                score += kingdom.getShotTypeScore(MetaInfo.getShotTypeFrom(shotType));
             }
         }
 

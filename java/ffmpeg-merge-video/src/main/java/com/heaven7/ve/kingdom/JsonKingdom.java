@@ -3,6 +3,8 @@ package com.heaven7.ve.kingdom;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.ve.colorgap.helper.MainFaceRecognizer;
+import com.heaven7.ve.colorgap.helper.ShotTypeRecognizer;
 
 import java.util.List;
 
@@ -11,6 +13,9 @@ import java.util.List;
  * @author heaven7
  */
 public class JsonKingdom extends Kingdom{
+
+    private ShotTypeRecognizer mShotTypeReg;
+    private MainFaceRecognizer mMainFaceReg;
 
     public JsonKingdom(KingdomData data) {
         super();
@@ -44,8 +49,31 @@ public class JsonKingdom extends Kingdom{
         if(!Predicates.isEmpty(moduleDatas)){
             addModuleDatas(moduleDatas);
         }
+        //Recognizers
+        if(data.getShotTypeMap() != null){
+            mShotTypeReg = new ShotTypeRecognizer(data.getShotTypeMap());
+        }
+        if(data.getMainFaceMap() != null){
+            mMainFaceReg = new MainFaceRecognizer(data.getMainFaceMap());
+        }
 
         //init
         init();
+    }
+
+    @Override
+    public float getMainFaceScore(int mainFaceCount) {
+        if(mMainFaceReg != null){
+            return mMainFaceReg.getScore(mainFaceCount);
+        }
+        return super.getMainFaceScore(mainFaceCount);
+    }
+
+    @Override
+    public float getShotTypeScore(int shotType) {
+        if(mShotTypeReg != null){
+            mShotTypeReg.getScore(shotType);
+        }
+        return super.getShotTypeScore(shotType);
     }
 }

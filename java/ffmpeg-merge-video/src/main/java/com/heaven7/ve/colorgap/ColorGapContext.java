@@ -1,6 +1,7 @@
 package com.heaven7.ve.colorgap;
 
 import com.heaven7.utils.Context;
+import com.heaven7.ve.anno.SystemResource;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.impl.VideoAnalyseHelper;
 import com.heaven7.ve.colorgap.impl.montage.*;
@@ -32,6 +33,17 @@ public interface ColorGapContext extends Context {
     void setColorGapPerformanceCollector(ColorGapPerformanceCollector collector);
 
     ColorGapPerformanceCollector getColorGapPerformanceCollector();
+
+    /** may be null */
+    MusicCutter getMusicCutter();
+    @SystemResource
+    void setMusicCutter(MusicCutter provider);
+
+    /**
+     * copy the system resource to target color gap context.
+     * @param dst the dst color gap context.
+     */
+    void copySystemResource(ColorGapContext dst);
 
     static String getTestTypeString(int testType) {
         switch (testType){
