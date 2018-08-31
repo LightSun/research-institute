@@ -23,9 +23,10 @@ public class FloatMapGsonAdapter extends MapGsonAdapter<Float> {
         out.value(value.floatValue());
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         String json = "{\"shot_type_score\":[\n" +
                 "{\"mediumShot\":1},\n" +
+
                 "{\"mediumLongShot\":1},\n" +
                 "{\"default\":1.5}\n" +
                 "]}";
@@ -39,6 +40,6 @@ public class FloatMapGsonAdapter extends MapGsonAdapter<Float> {
         @JsonAdapter(FloatMapGsonAdapter.class)
         Map<String, Float> shot_type_score;
 
-    }
+    }*/
 
 }

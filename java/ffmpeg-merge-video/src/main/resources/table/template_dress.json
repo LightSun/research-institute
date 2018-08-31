@@ -1,0 +1,36 @@
+{
+  "type": "color",
+  "items": [
+    {
+      "proportion":0.3,
+      "relationship":"or",
+      "humanTags": [
+        {
+          "shot_category":"enviroment"
+        }
+      ]
+
+    },
+    {
+      "proportion":0.4,
+      "relationship":"or",
+      "humanTags": [
+        {
+          "shot_category":"object"
+        },
+        {
+          "shot_category":"portion"
+        }
+      ]
+    },
+    {
+      "proportion":0.3,
+      "relationship":"or",
+      "humanTags": [
+        {
+          "shot_category":"enviroment"
+        }
+      ]
+    }
+  ]
+}

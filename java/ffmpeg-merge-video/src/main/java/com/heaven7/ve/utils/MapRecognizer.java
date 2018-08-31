@@ -7,12 +7,13 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import java.util.Map;
 
 /**
+ * the map recognizer.
  * @author heaven7
  */
 public abstract class MapRecognizer<V> {
 
     public static final String KEY_DEFAULT  = "default";
-    public static final String SPLIT_SYMBOL= "-";
+    public static final String SPLIT_SYMBOL = "-";
 
     private final Map<String, V> mMap;
 
@@ -68,8 +69,5 @@ public abstract class MapRecognizer<V> {
      */
     protected String getSplitSymbol(){
         return SPLIT_SYMBOL;
-    }
-
-    public static void main(String[] args) {
     }
 }

@@ -71,4 +71,13 @@ public class Tag {
     public int hashCode() {
         return Objects.hash(index);
     }
+
+    @Override
+    public String toString() {
+        return "Tag{" +
+                "index=" + index +
+                ", possibility=" + possibility +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

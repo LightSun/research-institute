@@ -17,7 +17,7 @@ public class LocalHighLightScanner extends MediaResourceScanner {
         // a/b/c.mp4
         // a/b/highlight/c.vhighlight
         String fileName = FileUtils.getFileName(item.getFilePath());
-        String fileDir = FileUtils.getFileDir(srcDir, 1, true);
+        String fileDir = FileUtils.getFileDir(item.getFilePath(), 1, true);
 
         return fileDir + File.separator + Constants.DIR_HIGH_LIGHT + File.separator
                 + fileName + "."

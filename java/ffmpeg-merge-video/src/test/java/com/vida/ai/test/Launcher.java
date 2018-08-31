@@ -2,6 +2,7 @@ package com.vida.ai.test;
 
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
+import com.heaven7.ve.colorgap.impl.SimpleMusicPathProvider;
 import com.heaven7.ve.starter.ImageDetectStarter;
 import com.heaven7.ve.starter.KingdomStarter;
 import com.heaven7.ve.starter.MusicCutStarter;
@@ -15,7 +16,8 @@ public class Launcher {
     public static void launch(Context context) {
         new ImageDetectStarter().init(context, BaiduImageDetector.class.getName());
         new KingdomStarter().init(context, null);
-       //TODO new MusicCutStarter(null).init(context, null);
+        String musicDir = "E:\\tmp\\music_cut";
+        new MusicCutStarter(new SimpleMusicPathProvider(musicDir)).init(context, null);
     }
 
     public static void main(String[] args) {

@@ -230,11 +230,16 @@ public class TagBasedShotCutter extends VideoCutter {
         if(imageMeta == null){
             return Collections.emptyList();
         }
+        List<FrameTags> videoTags = item.getVideoTags();
+        if(Predicates.isEmpty(videoTags)){
+            return Collections.emptyList();
+        }
+
         final List<MediaPartItem> result = new ArrayList<>();
         FrameBuffer buffer = new FrameBuffer(context);
         int idx = 0;
-        while (idx < imageMeta.getRawVideoTags().size()){
-            FrameTags frameTags = imageMeta.getRawVideoTags().get(idx);
+        while (idx < videoTags.size()){
+            FrameTags frameTags = videoTags.get(idx);
             if(buffer.isEmpty()){
                 buffer.append(frameTags);
             }else{
@@ -265,8 +270,8 @@ public class TagBasedShotCutter extends VideoCutter {
                         buffer.setPengdingFrame(frameTags);
                     }
                 }
-                idx ++;
             }
+            idx ++;
         }
         //判断最后buffer中残留的frame能否构成一个镜头
         MediaPartItem shot = createShotByTag(context, buffer.getFrames(), buffer.getTagSet(), item);

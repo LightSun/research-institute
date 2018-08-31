@@ -56,12 +56,12 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         switch (testType){
             case ColorGapContext.TEST_TYPE_LOCAL_SERVER:
             case ColorGapContext.TEST_TYPE_SERVER:
-                return new VideoAnalyseHelper(new MediaFaceScanner(), new MediaTagScanner(),
-                    new MediaHighLightScanner(), new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
+                return new VideoAnalyseHelper(new MediaFaceScanner(), new MediaTagScanner(), new MediaHighLightScanner(),
+                        new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
 
             case ColorGapContext.TEST_TYPE_LOCAL:
-                return  new VideoAnalyseHelper(new LocalMediaFaceScanner(), new LocalTagScanner(),
-                    new LocalHighLightScanner(), new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
+                return  new VideoAnalyseHelper(new LocalMediaFaceScanner(), new LocalTagScanner(), new LocalHighLightScanner(),
+                        new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
 
         }
         throw new UnsupportedOperationException("test type = " + ColorGapContext.getTestTypeString(testType));

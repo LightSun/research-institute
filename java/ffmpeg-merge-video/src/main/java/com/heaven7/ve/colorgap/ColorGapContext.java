@@ -19,7 +19,9 @@ public interface ColorGapContext extends Context {
     /** test type server */
     int TEST_TYPE_SERVER       = 3;
 
-    void setTestType(int testType);
+    @SystemResource
+    void setInitializeParam(InitializeParam ip);
+    InitializeParam getInitializeParam();
 
     /**
      * get test type .default is {@linkplain #TEST_TYPE_SERVER}
@@ -55,5 +57,20 @@ public interface ColorGapContext extends Context {
                 return "TEST_TYPE_LOCAL";
         }
         return null;
+    }
+
+    /**
+     * the init param
+     */
+    class InitializeParam{
+
+        private int testType = ColorGapContext.TEST_TYPE_SERVER;
+
+        public int getTestType() {
+            return testType;
+        }
+        public void setTestType(int testType) {
+            this.testType = testType;
+        }
     }
 }

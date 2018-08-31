@@ -10,7 +10,7 @@ public class MediaResourceItem {
         private int height;
 
         private float ratio; //height / width in album
-        private long duration;
+        private long duration; //in mill seconds
 
         public float getImageRatio() {
             return ratio;
@@ -114,7 +114,7 @@ public class MediaResourceItem {
         public int hashCode() {
             return filePath.hashCode();
         }
-
+        /** in mill seconds */
         public void setDuration(long duration) {
             this.duration = duration;
         }

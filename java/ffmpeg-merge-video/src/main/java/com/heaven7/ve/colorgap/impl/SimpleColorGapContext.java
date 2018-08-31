@@ -11,19 +11,24 @@ import com.heaven7.ve.kingdom.Kingdom;
  */
 public class SimpleColorGapContext implements ColorGapContext {
 
-    private int mType = TEST_TYPE_SERVER;
     private Kingdom mKingdom;
     private ColorGapPerformanceCollector mCollector;
     @SystemResource
     private MusicCutter mMusicCutter;
+    @SystemResource
+    private InitializeParam mInitParam;
 
     @Override
-    public void setTestType(int testType) {
-        this.mType = testType;
+    public void setInitializeParam(InitializeParam ip) {
+        this.mInitParam = ip;
+    }
+    @Override
+    public InitializeParam getInitializeParam() {
+        return mInitParam;
     }
     @Override
     public int getTestType() {
-        return mType;
+        return mInitParam != null ? mInitParam.getTestType() : TEST_TYPE_SERVER;
     }
 
     @Override
@@ -56,6 +61,6 @@ public class SimpleColorGapContext implements ColorGapContext {
     @Override
     public void copySystemResource(ColorGapContext dst) {
         dst.setMusicCutter(getMusicCutter());
+        dst.setInitializeParam(getInitializeParam());
     }
-
 }

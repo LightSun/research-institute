@@ -5,7 +5,7 @@ package com.heaven7.ve.colorgap;
  */
 public class ColorGapParam {
 
-    /** the resource data dir often is data dir of batch image. */
+    /** the resource data dir */
     private String resourceDataDir;
     /** the resource data dir often is data dir of batch image. */
     private String batchImageDataDir;

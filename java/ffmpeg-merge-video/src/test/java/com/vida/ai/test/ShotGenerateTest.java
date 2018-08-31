@@ -4,6 +4,7 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
 import com.heaven7.ve.test.TestUtils;
 
@@ -22,8 +23,10 @@ public class ShotGenerateTest {
     private final ShotInfoGenerator generator = new ShotInfoGenerator(mService);
 
     static {
+        ColorGapContext.InitializeParam ip = new ColorGapContext.InitializeParam();
+        ip.setTestType(ColorGapContext.TEST_TYPE_SERVER);
         SimpleColorGapContext context = new SimpleColorGapContext();
-        context.setTestType(SimpleColorGapContext.TEST_TYPE_LOCAL);
+        context.setInitializeParam(ip);
         Launcher.launch(context);
     }
 

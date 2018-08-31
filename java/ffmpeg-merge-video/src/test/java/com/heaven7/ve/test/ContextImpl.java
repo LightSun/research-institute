@@ -11,8 +11,13 @@ public class ContextImpl implements ColorGapContext {
     final ColorGapPerformanceCollector collector = new ColorGapPerformanceCollector(PerformanceWriter.LOG_WRITER);
 
     @Override
-    public void setTestType(int testType) {
+    public void setInitializeParam(InitializeParam ip) {
 
+    }
+
+    @Override
+    public InitializeParam getInitializeParam() {
+        return null;
     }
 
     @Override

@@ -72,7 +72,7 @@ public class JsonKingdom extends Kingdom{
     @Override
     public float getShotTypeScore(int shotType) {
         if(mShotTypeReg != null){
-            mShotTypeReg.getScore(shotType);
+            return mShotTypeReg.getScore(shotType);
         }
         return super.getShotTypeScore(shotType);
     }

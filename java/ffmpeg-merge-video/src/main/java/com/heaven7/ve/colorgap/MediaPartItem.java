@@ -192,7 +192,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         final Kingdom kingdom = getKingdom();
 
         float score = 0f;
-        for(FrameTags ft : framesTags){
+        /*for(FrameTags ft : framesTags){
             //先对common tag进行分组， 并且只考虑top tags.(WeddingTagIte.description, score)
             Map<String, Float> tagDict = new HashMap<>();
             Set<Integer> tagSet = ft.getTopTagSet(context, 3, 0.8f);
@@ -210,7 +210,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
                 score += val;
             }
         }
-        score = score / framesTags.size();
+        score = score / framesTags.size();*/
 
         //2. 增加人脸得分
         if(imageMeta != null){

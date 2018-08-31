@@ -19,7 +19,7 @@ public class LocalTagScanner extends MediaResourceScanner {
         // a/b/c.mp4
         // a/b/c/c_predictions.csv
         String fileName = FileUtils.getFileName(item.getFilePath());
-        String parentDir = FileUtils.getFileDir(srcDir, 1, true);
+        String parentDir = FileUtils.getFileDir(item.getFilePath(), 1, true);
         return parentDir + File.separator + fileName + File.separator
                 + fileName + "_predictions.csv";
     }
