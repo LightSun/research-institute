@@ -52,7 +52,7 @@ public class GapManager {
                         continue;
                     }
                     float filterScore = plaid.computeScore(item.getColorCondition());
-                    float tagScore = item.getDomainTagScore();
+                    float tagScore = item.getTotalScore();
                    // float matrixScore = computeValueMatrix(plaid, item, callback);
 
                     float tmpValue = filterScore + tagScore;

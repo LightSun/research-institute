@@ -128,14 +128,14 @@ public class Chapter extends BaseContextOwner{
             List<MediaPartItem> shots = story.getSortedShots();
             //保留最大得分的镜头
             if (shots.size() > 1) {
-                if(shots.get(shots.size() - 1).getDomainTagScore() > 1f){
+                if(shots.get(shots.size() - 1).getTotalScore() > 1f){
                     list_to_delete.addAll(shots.subList(0, shots.size() - 1));
                 }else{
                     list_to_delete.addAll(shots);
                 }
             }
         }
-        Collections.sort(list_to_delete, (o1, o2) -> Float.compare(o1.getDomainTagScore(), o2.getDomainTagScore()));
+        Collections.sort(list_to_delete, (o1, o2) -> Float.compare(o1.getTotalScore(), o2.getTotalScore()));
         //4, 音乐格子个数限制
         int shotCount = getTotalShotCount(stories);
         if (shotCount > plaidCount) {
@@ -150,7 +150,7 @@ public class Chapter extends BaseContextOwner{
             //not delete done, delete more
             if(shotCount > plaidCount) {
                 List<MediaPartItem> allShots = getAllShots(stories);
-                Collections.sort(allShots, (o1, o2) -> Float.compare(o1.getDomainTagScore(), o2.getDomainTagScore()));
+                Collections.sort(allShots, (o1, o2) -> Float.compare(o1.getTotalScore(), o2.getTotalScore()));
                 for(int count = shotCount - plaidCount, i = 0 ; i < count; i ++){
                     allShots.remove(0).setSelectedInStory(false, "音乐格子个数限制_delete_more");
                 }
@@ -197,7 +197,7 @@ public class Chapter extends BaseContextOwner{
         setShortTypeFilter(plaidCount, sortRule);
 
         //gap
-        ChapterColorGapPostProcessor postProcessor = new ChapterColorGapPostProcessor(this, sortRule);
+        ChapterColorGapPostProcessor postProcessor = new ChapterColorGapPostProcessor(sortRule);
         filledItems = filler.fillPlaids(getContext(), plaids, shots, postProcessor);
         sortRule = postProcessor.getLastSortRule();
 
@@ -324,7 +324,7 @@ public class Chapter extends BaseContextOwner{
         Collections.sort(biasItems, new Comparator<MediaPartItem>() {
             @Override
             public int compare(MediaPartItem o1, MediaPartItem o2) {
-                return Float.compare(o2.getDomainTagScore(), o1.getDomainTagScore());
+                return Float.compare(o2.getTotalScore(), o1.getTotalScore());
             }
         });
         for (MediaPartItem shot : biasItems) {
@@ -371,7 +371,7 @@ public class Chapter extends BaseContextOwner{
         Collections.sort(biasItems, new Comparator<MediaPartItem>() {
             @Override
             public int compare(MediaPartItem o1, MediaPartItem o2) {
-                return Float.compare(o2.getDomainTagScore(), o1.getDomainTagScore());
+                return Float.compare(o2.getTotalScore(), o1.getTotalScore());
             }
         });
         final int count = Math.min(maxReplaceCount, biasItems.size());

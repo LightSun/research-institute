@@ -1,11 +1,12 @@
 package com.heaven7.ve.colorgap.impl;
 
-import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.colorgap.ColorGapPostProcessor;
+import com.heaven7.ve.colorgap.MediaPartItem;
+import com.heaven7.ve.colorgap.ShotSortDelegate;
 
 import java.util.List;
 
@@ -15,12 +16,10 @@ import java.util.List;
 public class ChapterColorGapPostProcessor implements ColorGapPostProcessor {
 
     private final ShotSortDelegate mSortDelegate =  new ShotSortDelegateImpl();
-    private final Chapter mChapter;
     private final int sortRule;
     private int mLastSortRule;
 
-    public ChapterColorGapPostProcessor(Chapter chapter, int sortRule) {
-        this.mChapter = chapter;
+    public ChapterColorGapPostProcessor(int sortRule) {
         this.sortRule = sortRule;
         this.mLastSortRule = sortRule;
     }
@@ -32,8 +31,7 @@ public class ChapterColorGapPostProcessor implements ColorGapPostProcessor {
     @Override
     public List<MediaPartItem> onPostProcess(Context context, List<MediaPartItem> items) {
         //List<Story> stories = mChapter.getAllStory();
-       //TODO sort
-        /*List<MediaPartItem> result = VisitServices.from(items).groupService(6).map(
+        List<MediaPartItem> result = VisitServices.from(items).groupService(6).map(
                 new ResultVisitor<List<MediaPartItem>, List<MediaPartItem>>() {
             @Override
             public List<MediaPartItem> visit(List<MediaPartItem> list, Object param) {
@@ -47,7 +45,7 @@ public class ChapterColorGapPostProcessor implements ColorGapPostProcessor {
                 list1.addAll(list2);
                 return list1;
             }
-        });*/
+        });
 
         //按照gap填充（镜头类型个数，3:2,1， shot-key）
         //排序。

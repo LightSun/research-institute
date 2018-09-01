@@ -56,8 +56,8 @@ public class FaceFrameBuffer extends BaseContextOwner{
     public boolean isSimilar(int mainFaceCount){
         if(this.mainFaceCount <= 2){
             return this.mainFaceCount == mainFaceCount;
-        }else {
-            return this.mainFaceCount >= mainFaceCount;
+        }else{
+            return mainFaceCount >= this.mainFaceCount;
         }
     }
     public void clear(){

@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.ve.colorgap.IShotRecognizer;
 import com.heaven7.ve.colorgap.MediaPartItem;
+import com.heaven7.ve.colorgap.MetaInfo;
 import com.heaven7.ve.colorgap.ShotRecognition;
 
 import java.util.List;
@@ -39,6 +40,11 @@ public class SimpleShotRecognizer implements IShotRecognizer {
 
     @Override
     public int getShotType(MediaPartItem item) {
-        return ShotRecognition.getShotType(item);
+        int shotType = ShotRecognition.getShotType(item);
+        if(shotType != MetaInfo.SHOT_TYPE_NONE){
+            return shotType;
+        }
+        item.addDetail("default shot-type mediumShot");
+        return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
     }
 }

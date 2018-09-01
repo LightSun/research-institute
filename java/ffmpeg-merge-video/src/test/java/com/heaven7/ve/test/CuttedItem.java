@@ -39,7 +39,7 @@ public class CuttedItem {
 
     public float getTagScore() {
         MediaPartItem mpi = (MediaPartItem)item.item;
-        return mpi.getDomainTagScore();
+        return mpi.getTotalScore();
     }
 
     public Integer getStoryId() {

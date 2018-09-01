@@ -26,7 +26,7 @@ public interface ItemDelegate {
      * get the domain tag score
      * @return the domain tag score
      */
-    float getDomainTagScore();
+    float getTotalScore();
 
     /**
      * copy item

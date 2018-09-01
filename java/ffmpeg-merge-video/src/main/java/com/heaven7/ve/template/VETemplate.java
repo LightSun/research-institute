@@ -7,6 +7,7 @@ import com.heaven7.ve.colorgap.MetaInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * the video editor template
@@ -73,6 +74,15 @@ public class VETemplate {
         /** the extra weight which is compute bu merge */
         private int extraWeight;
         private String dir;
+        /** the shot-category */
+        private int shotCategory;
+
+        public int getShotCategory() {
+            return shotCategory;
+        }
+        public void setShotCategory(int shotCategory) {
+            this.shotCategory = shotCategory;
+        }
 
         public String getDir() {
             return dir;

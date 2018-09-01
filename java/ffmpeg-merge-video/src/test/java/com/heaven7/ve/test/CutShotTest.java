@@ -97,7 +97,7 @@ public class CutShotTest extends TestCase {
                         sb.append(" )");
                     }
                     sb.append("detail = ").append(item.getDetail()).append(" ,");
-                    sb.append("score = ").append(item.getDomainTagScore());
+                    sb.append("score = ").append(item.getTotalScore());
                     sb.append("\r\n");
 
                     String[] cmd = buildCutCmd(item, CUT_DIR);

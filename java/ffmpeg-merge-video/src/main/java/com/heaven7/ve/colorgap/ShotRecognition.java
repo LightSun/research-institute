@@ -40,6 +40,18 @@ public class ShotRecognition {
         return "unknown";
     }
 
+    public static int parseShotCategory(String str){
+        switch (str){
+            case "enviroment":
+                return CATEGORY_ENV;
+            case "object":
+                return CATEGORY_PRODUCT;
+            case "portion":
+                return CATEGORY_PART;
+        }
+        throw new UnsupportedOperationException("wrong shot category = " + str);
+    }
+
     /***
      * recognize the shot category. such as {@linkplain IShotRecognizer#CATEGORY_ENV} and etc.
      * @param item the media part item
@@ -62,31 +74,43 @@ public class ShotRecognition {
         if (!TextUtils.isEmpty(shotType)) {
             oldType = MetaInfo.getShotTypeFrom(shotType);
         }
-
-        float bodyArea = item.getBodyArea();
-        float bodyRate = bodyArea / (item.imageMeta.getWidth() * item.imageMeta.getHeight());
-        int body_shotType = getShopTypeByBody(bodyRate);
-        //trans shot_type and body type is none
-        if(oldType == SHOT_TYPE_NONE && body_shotType == SHOT_TYPE_NONE){
-            List<IHighLightData> data;
-            KeyValuePair<Integer, List<IHighLightData>> highLight = item.getHighLight();
-            if (highLight != null) {
-                data = highLight.getValue();
-            } else {
-                data = item.getHighLightData(item.getKeyFrameTime());
-            }
-            //module shot type
-            int shotType_module = SHOT_TYPE_NONE;
-            if(!Predicates.isEmpty(data)){
-                shotType_module = getShotTypeOfHighLight(item, data);
-            }
-            return shotType_module; //may be SHOT_TYPE_NONE
+        int bodyShotType = getShotTypeByBody(item);
+        //trans shot_type and body shotType is none
+        if(oldType == SHOT_TYPE_NONE && bodyShotType == SHOT_TYPE_NONE){
+            return getShotTypeByHighLight(item);
         }else{
-            return Math.max(oldType, body_shotType);
+            if(oldType == MetaInfo.SHOT_TYPE_NONE){
+                return bodyShotType;
+            }else if(bodyShotType == MetaInfo.SHOT_TYPE_NONE){
+                return oldType;
+            }
+            return Math.max(oldType, bodyShotType);
         }
     }
 
-    private static int getShotTypeOfHighLight(MediaPartItem item, List<IHighLightData> data) {
+    private static int getShotTypeByBody(MediaPartItem item) {
+        float bodyArea = item.getBodyArea();
+        float bodyRate = bodyArea / (item.imageMeta.getWidth() * item.imageMeta.getHeight());
+        return getShopTypeByBody(bodyRate);
+    }
+
+    private static int getShotTypeByHighLight(MediaPartItem item) {
+        List<IHighLightData> data;
+        KeyValuePair<Integer, List<IHighLightData>> highLight = item.getHighLight();
+        if (highLight != null) {
+            data = highLight.getValue();
+        } else {
+            data = item.getHighLightData(item.getKeyFrameTime());
+        }
+        //module shot type
+        int shotType_module = SHOT_TYPE_NONE;
+        if(!Predicates.isEmpty(data)){
+            shotType_module = getShotTypeOfHighLightImpl(item, data);
+        }
+        return shotType_module; //may be SHOT_TYPE_NONE
+    }
+
+    private static int getShotTypeOfHighLightImpl(MediaPartItem item, List<IHighLightData> data) {
         IHighLightData hld = VisitServices.from(data).pile(new PileVisitor<IHighLightData>() {
             @Override
             public IHighLightData visit(Object o, IHighLightData hd1, IHighLightData hd2) {
@@ -115,11 +139,11 @@ public class ShotRecognition {
     private static int getShopTypeByBody(float area) {
         if (CommonUtils.isInRange(area, 0.274f, 0.354f)) {
             return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
-        } else if (CommonUtils.isInRange(area, 0.116f, 0.274f)) {
+        } else if (CommonUtils.isInRange(area, 0.15f, 0.274f)) {
             return MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT;
-        } else if (CommonUtils.isInRange(area, 0.037f, 0.116f)) {
+        } else if (CommonUtils.isInRange(area, 0.0075f, 0.15f)) {
             return MetaInfo.SHOT_TYPE_LONG_SHORT;
-        } else if (CommonUtils.isInRange(area, 0.0f, 0.037f)) {
+        } else if (CommonUtils.isInRange(area, 0.0f, 0.0075f)) {
             return MetaInfo.SHOT_TYPE_BIG_LONG_SHORT;
         }
         return SHOT_TYPE_NONE;

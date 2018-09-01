@@ -4,7 +4,7 @@
     {
       "proportion":0.3,
       "relationship":"or",
-      "humanTags": [
+      "cases": [
         {
           "shot_category":"enviroment"
         }
@@ -14,19 +14,16 @@
     {
       "proportion":0.4,
       "relationship":"or",
-      "humanTags": [
+      "cases": [
         {
-          "shot_category":"object"
-        },
-        {
-          "shot_category":"portion"
+          "shot_category":"object|portion"
         }
       ]
     },
     {
       "proportion":0.3,
       "relationship":"or",
-      "humanTags": [
+      "cases": [
         {
           "shot_category":"enviroment"
         }

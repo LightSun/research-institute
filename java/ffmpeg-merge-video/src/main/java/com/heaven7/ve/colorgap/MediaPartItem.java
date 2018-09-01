@@ -8,6 +8,7 @@ import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.image.detect.KeyPointData;
 import com.heaven7.java.image.detect.LocationF;
 import com.heaven7.java.image.detect.impl.SimpleKeyPointData;
+import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
@@ -20,6 +21,7 @@ import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.kingdom.Kingdom;
+import com.heaven7.ve.kingdom.ModuleData;
 import com.heaven7.ve.kingdom.TagItem;
 
 import java.util.*;
@@ -46,8 +48,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     private GapColorFilter.GapColorCondition mCondition;
     private boolean hold; //是否已经被占用
-    /** 评分系统(“领域Tag得分”) */
-    private float domainTagScore = -1;
+    private Scores mScores = new Scores();
 
     /** used for story */
     private int storyId = -1;
@@ -80,6 +81,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         //set max duration
         videoPart.setMaxDuration(CommonUtils.timeToFrame(item.getDuration(), TimeUnit.MILLISECONDS));
         setRawTags();
+        computeScore();
     }
 
     public boolean isPlaned() {
@@ -138,7 +140,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
                 ", part_time =" + videoPart.toString2() +
                 ", selectedInStory =" + selectedInStory +
                 ", planed =" + planed +
-                ", tagScore =" + getDomainTagScore() +
+                ", scores =" + mScores +
                 ", detail =" + getDetail() +
                 '}';
     }
@@ -161,7 +163,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
     public ItemDelegate copy() {
         MediaPartItem mpi = new MediaPartItem(getContext(), (MetaInfo.ImageMeta) imageMeta.copy(), item, (TimeTraveller) videoPart.copy());
         mpi.mCondition = this.mCondition;
-        mpi.domainTagScore = this.domainTagScore;
+        mpi.mScores = (Scores) this.mScores.copy();
         mpi.storyId = this.storyId;
         mpi.mKeyPointData = this.mKeyPointData;
         mpi.chapterIndex = chapterIndex;
@@ -179,53 +181,38 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
     }
 
     @Override
-    public float getDomainTagScore() {
-        if(domainTagScore >= 0 ){
-            return domainTagScore;
-        }
-        // frame得分（形容词 + 名词）
-        List<FrameTags> framesTags = getFramesTags();
-        if(Predicates.isEmpty(framesTags)){
-            return 0;
-        }
-        final ColorGapContext context = getContext();
+    public float getTotalScore() {
+        return mScores.getTotalScore();
+    }
+
+    public void computeScore(){
         final Kingdom kingdom = getKingdom();
-
-        float score = 0f;
-        /*for(FrameTags ft : framesTags){
-            //先对common tag进行分组， 并且只考虑top tags.(WeddingTagIte.description, score)
-            Map<String, Float> tagDict = new HashMap<>();
-            Set<Integer> tagSet = ft.getTopTagSet(context, 3, 0.8f);
-            if(Predicates.isEmpty(tagSet)){
-                tagSet = ft.getTopTagSet(context, 3, 0.5f);
-            }
-            for (int tagIdx : tagSet){
-                TagItem item = kingdom.getTagItem(tagIdx, Kingdom.TYPE_ALL);
-                if(item != null){
-                    tagDict.put(item.getDesc(), (float) item.getScore());
-                }
-            }
-            //然后对每组进行遍历，不重复计算同一个‘中文领域tag’ 对应的多个tag的值
-            for (Float val : tagDict.values()){
-                score += val;
-            }
-        }
-        score = score / framesTags.size();*/
-
-        //2. 增加人脸得分
+        //1. 增加人脸得分
         if(imageMeta != null){
-            score += kingdom.getMainFaceScore(imageMeta.getMainFaceCount());
+            float score = kingdom.getMainFaceScore(imageMeta.getMainFaceCount());
+            mScores.setPersonNumberScore(score);
         }
-        // 3. 增加镜头类型得分
+        // 2. 增加镜头类型得分
         if(imageMeta != null){
             String shotType = imageMeta.getShotType();
             if (!TextUtils.isEmpty(shotType)) {
-                score += kingdom.getShotTypeScore(MetaInfo.getShotTypeFrom(shotType));
+                float score = kingdom.getShotTypeScore(MetaInfo.getShotTypeFrom(shotType));
+                mScores.setShotTypeScore(score);
             }
         }
-
-        this.domainTagScore = score;
-        return score;
+        //3, high-light score
+        KeyValuePair<Integer, List<IHighLightData>> pair = getHighLight();
+        if(pair != null){
+            Float highLightScore = VisitServices.from(pair.getValue()).pile(null,
+                    new ResultVisitor<IHighLightData, Float>() {
+                        @Override
+                        public Float visit(IHighLightData data, Object param) {
+                            ModuleData md = kingdom.getModuleData(data.getName());
+                            return md != null ? md.getScore() : 0f;
+                        }
+                    }, PileVisitor.FLOAT_ADD);
+            mScores.setHighLightScore(highLightScore);
+        }
     }
 
     public List<FrameTags> getFramesTags(){
@@ -302,7 +289,11 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         final Kingdom kingdom = getKingdom();
         //1, face
         if(!Predicates.isEmpty(imageMeta.getRawFaceRects()) && imageMeta.getMainFaceCount() > 0){
-            List<FrameFaceRects> faceRects = imageMeta.getRawFaceRects();
+            List<FrameFaceRects> faceRects = imageMeta.getFaceRects(videoPart);
+            if(Predicates.isEmpty(faceRects)){
+                addDetail("no face rects.\r\n");
+                return;
+            }
             List<FrameItem> fis = new ArrayList<>();
             for(int i = 0 , size = faceRects.size() ; i < size ; i ++){
                 FrameFaceRects frameFaceRects = faceRects.get(i);
@@ -390,13 +381,20 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         if(Predicates.isEmpty(imageMeta.getRawFaceRects())){
             return;
         }
-        List<FrameFaceRects> ffrs = VisitServices.from(imageMeta.getRawFaceRects())
+        //belong to self shot (face rects)
+        List<FrameFaceRects> faceRects = imageMeta.getFaceRects(videoPart);
+
+        List<FrameFaceRects> ffrs = VisitServices.from(faceRects)
                 .visitForQueryList(new PredicateVisitor<FrameFaceRects>() {
             @Override
             public Boolean visit(FrameFaceRects ffr, Object param) {
                 return ffr.hasRect();
             }
         }, null);
+        //计算主人脸个数（有人脸的帧超过镜头帧1/3才生效）
+        if(ffrs.size() * 3 < faceRects.size()){
+            return;
+        }
         //遍历rawFaceRects，计算主人脸个数
         int total = 0;
         int maxRects = -1;

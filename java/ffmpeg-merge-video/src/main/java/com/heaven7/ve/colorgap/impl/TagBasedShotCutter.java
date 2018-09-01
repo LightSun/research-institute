@@ -4,18 +4,14 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.Predicates;
-import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.java.visitor.util.Map;
-import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
 
-import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -31,9 +27,9 @@ public class TagBasedShotCutter extends VideoCutter {
     // private static final int MULTI_FACE_THRESHOLD           = 3 ;           // 多人脸下限为3个人脸
     // private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
 
-    private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY = true ;        // 一段segment是否只返回“domain score”最高的Item
-    private static final int MIN_SHOT_BUFFER_LENGTH         = 6 ;           // FrameBuffer中生成Shot的最小Frame数
-    private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = true ;    // 一段segment是否只返回“face rect score”最高的Item
+    private static final boolean MAX_DOMAIN_SCORE_SHOT_ONLY     = false ;       // 一段segment是否只返回“domain score”最高的Item
+    private static final int MIN_SHOT_BUFFER_LENGTH             = 6 ;           // FrameBuffer中生成Shot的最小Frame数
+    private static final boolean MAX_FACE_RECT_SCORE_SHOT_ONLY  = false ;       // 一段segment是否只返回“face rect score”最高的Item
     private static final boolean CUT_BY_TAG = false;
     private static final long DURATION_THRESOLD = 10 * 1000; //10 s
 
@@ -199,7 +195,7 @@ public class TagBasedShotCutter extends VideoCutter {
         }, null);
         if(!oneFaces.isEmpty()) {
             VisitServices.from(oneFaces).sortService(
-                    (o1, o2) -> Float.compare(o2.getDomainTagScore(), o1.getDomainTagScore()), true)
+                    (o1, o2) -> Float.compare(o2.getTotalScore(), o1.getTotalScore()), true)
                     .headService(1).save(out);
         }
     }
@@ -212,7 +208,7 @@ public class TagBasedShotCutter extends VideoCutter {
         Collections.sort(faceItems, new Comparator<MediaPartItem>() {
             @Override
             public int compare(MediaPartItem o1, MediaPartItem o2) {
-                return Float.compare(o2.getDomainTagScore(), o1.getDomainTagScore());
+                return Float.compare(o2.getTotalScore(), o1.getTotalScore());
             }
         });
         MediaPartItem result = faceItems.get(0);
@@ -342,35 +338,33 @@ public class TagBasedShotCutter extends VideoCutter {
         }
         List<MediaPartItem> result = new ArrayList<>();
         FaceFrameBuffer buffer = new FaceFrameBuffer(context);
+        buffer.setMainFaceCount(mainFaceCount);
+
         int idx = 0;
         while (idx < allFaceRects.size()){
             FrameFaceRects faceRects = allFaceRects.get(idx);
-            if(buffer.isEmpty()){
+            boolean similar = buffer.isSimilar(faceRects.getMainFaceCount());
+            boolean hasPending = buffer.hasPendingFrame();
+            if(similar){
+                if(hasPending){
+                    buffer.appendPendingFrame();
+                }
                 buffer.append(faceRects);
-            }else {
-                boolean similar = buffer.isSimilar(faceRects.getMainFaceCount());
-                boolean hasPending = buffer.hasPendingFrame();
-                if(similar){
-                    if(hasPending){
-                        buffer.appendPendingFrame();
-                    }
-                    buffer.append(faceRects);
-                }else{
-                    if(hasPending){
-                        List<FrameItem> items = VisitServices.from(buffer.getFrames()).map(new ResultVisitor<FrameFaceRects, FrameItem>() {
-                            @Override
-                            public FrameItem visit(FrameFaceRects frameFaceRects, Object param) {
-                                return frameFaceRects.getFrameItem();
-                            }
-                        }).getAsList();
-                        MediaPartItem shot = createShotByFace(context, items, mainFaceCount, item);
-                        if(shot != null){
-                            result.add(shot);
+            }else{
+                if(hasPending){
+                    List<FrameItem> items = VisitServices.from(buffer.getFrames()).map(new ResultVisitor<FrameFaceRects, FrameItem>() {
+                        @Override
+                        public FrameItem visit(FrameFaceRects frameFaceRects, Object param) {
+                            return frameFaceRects.getFrameItem();
                         }
-                        buffer.clear();
-                    }else {
-                        buffer.setPengdingFrame(faceRects);
+                    }).getAsList();
+                    MediaPartItem shot = createShotByFace(context, items, mainFaceCount, item);
+                    if(shot != null){
+                        result.add(shot);
                     }
+                    buffer.clear();
+                }else {
+                    buffer.setPengdingFrame(faceRects);
                 }
             }
             idx ++;

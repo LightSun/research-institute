@@ -6,7 +6,6 @@ import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.Visitors;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.TextUtils;
 
 import java.util.*;
 
@@ -148,7 +147,7 @@ public class Story {
         VisitServices.from(items).visitForQueryList(new PredicateVisitor<MediaPartItem>() {
             @Override
             public Boolean visit(MediaPartItem partItem, Object param) {
-                boolean selected = partItem.getDomainTagScore() >= 0.5f;
+                boolean selected = partItem.getTotalScore() >= 0.5f;
                 partItem.setSelectedInStory(selected, "分数太低");
                 return selected;
             }
@@ -197,7 +196,7 @@ public class Story {
             while ( j < size){
                 MediaPartItem item1 = partItems.get(i);
                 MediaPartItem item2 = partItems.get(j);
-                if(item1.getDomainTagScore() == item2.getDomainTagScore() &&
+                if(item1.getTotalScore() == item2.getTotalScore() &&
                         strEquals(item1.imageMeta.getShotType(), item2.imageMeta.getShotType())){
                     item1.setSelectedInStory(false, "重复镜头. 得分，类型都相同，则只保留1个");
                 }
@@ -221,7 +220,7 @@ public class Story {
         }).asListService().sortService(new Comparator<MediaPartItem>() {
             @Override
             public int compare(MediaPartItem o1, MediaPartItem o2) {
-                return Float.compare(o1.getDomainTagScore(), o2.getDomainTagScore());
+                return Float.compare(o1.getTotalScore(), o2.getTotalScore());
             }
         }).save(out);
         return out;

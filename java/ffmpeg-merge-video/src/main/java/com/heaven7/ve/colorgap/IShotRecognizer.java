@@ -18,7 +18,7 @@ public interface IShotRecognizer {
     /**
      * indicate shot is product
      */
-    int CATEGORY_PRODUCT = 3;
+    int CATEGORY_PRODUCT = 4;
 
     /**
      * request recognize key-point

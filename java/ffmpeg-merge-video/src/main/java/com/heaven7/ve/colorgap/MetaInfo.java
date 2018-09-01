@@ -749,7 +749,7 @@ public interface MetaInfo {
             float result = tempList.size() * 1f / rawFaceRects.size();
             Logger.d("ImageMeta", "isHumanContent", "human.percent = "
                     + result + " ,path = " + path);
-            return result > 0.6f;
+            return result > 0.55f;
         }
 
         /** 判断这段原始视频是否被标记原始tag（人脸 or 通用） . work before cut */

@@ -161,6 +161,8 @@ public class ColorGapManager extends BaseContextOwner{
                 subjectItems.add(partItem);
             }else{
                 partItem.imageMeta.setShotType(MetaInfo.getShotTypeString(shotType));
+                //recompute score
+                partItem.computeScore();
             }
             int shotCategory = mShotRecognizer.recognizeShotCategory(partItem);
             partItem.imageMeta.setShotCategory(shotCategory);

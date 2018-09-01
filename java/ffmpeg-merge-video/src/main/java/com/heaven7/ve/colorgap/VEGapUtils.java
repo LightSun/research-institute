@@ -110,7 +110,7 @@ public class VEGapUtils {
             }
             // int score = filter.computeScoreWithWeight(mpi.getColorCondition());
             float filterScore = plaid.computeScore(item.getColorCondition());
-            float tagScore = item.getDomainTagScore();
+            float tagScore = item.getTotalScore();
             float score = filterScore + tagScore;
             if(score > maxScore){
                 maxScore = score;
@@ -133,11 +133,11 @@ public class VEGapUtils {
             return "closeUp";
         } else if (isInRange(mainFaceArea,0.06f, 0.12f)) {
             return "mediaCloseUp";
-        } else if (isInRange(mainFaceArea,0.04f, 0.06f)) {
+        } else if (isInRange(mainFaceArea,0.016f, 0.06f)) {
             return "mediumShot";
-        } else if (isInRange(mainFaceArea,0.02f, 0.04f)) {
+        } else if (isInRange(mainFaceArea,0.011f, 0.016f)) {
             return "mediumLongShot";
-        } else if (isInRange(mainFaceArea,0.003f, 0.02f)) {
+        } else if (isInRange(mainFaceArea,0.003f, 0.011f)) {
             return "longShot";
         } else if (isInRange(mainFaceArea,0.001f, 0.003f)) {
             return "veryLongShot";
@@ -152,6 +152,7 @@ public class VEGapUtils {
             return 0f;
         }
         float totalFaceAreas = 0;
+        int maxSize = 0;
         if(mainFaceCount == 1){
             List<Float> areas = new ArrayList<>();
             VisitServices.from(frameBuffer).visitForResultList(
@@ -163,6 +164,7 @@ public class VEGapUtils {
                     }, areas);
                     // (fbi, param) -> fbi.areas.get(0), areas);
             totalFaceAreas = CollectionUtils.sum(areas);
+            maxSize = areas.size();
         }else if(mainFaceCount == 2){
             List<Float> list = VisitServices.from(frameBuffer).map(new ResultVisitor<FrameItem, List<Float>>() {
                 @Override
@@ -179,6 +181,7 @@ public class VEGapUtils {
                 }
             }).visitForQueryList(Visitors.truePredicateVisitor(), null);
             totalFaceAreas = CollectionUtils.sum(list);
+            maxSize = list.size();
         }else{
             //统计前3张脸
             List<Float> list = VisitServices.from(frameBuffer).map(new ResultVisitor<FrameItem, List<Float>>() {
@@ -196,8 +199,9 @@ public class VEGapUtils {
                 }
             }).visitForQueryList(Visitors.truePredicateVisitor(), null);
             totalFaceAreas = CollectionUtils.sum(list);
+            maxSize = list.size();
         }
-        return totalFaceAreas / frameBuffer.size();
+        return totalFaceAreas / maxSize;
     }
 
     /** 主人脸个数， frameAreas 人脸面积数组 */

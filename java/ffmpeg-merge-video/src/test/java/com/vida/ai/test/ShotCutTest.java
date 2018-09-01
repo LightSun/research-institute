@@ -6,7 +6,6 @@ import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.StartEndVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CmdHelper;
-import com.heaven7.utils.Context;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
@@ -16,7 +15,6 @@ import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
 import com.heaven7.ve.colorgap.impl.TagBasedShotCutter;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.starter.KingdomStarter;
-import com.heaven7.ve.test.ContextImpl;
 import com.heaven7.ve.test.TestUtils;
 import org.junit.Test;
 
@@ -101,7 +99,7 @@ public class ShotCutTest extends BaseMontageTest{
                         sb.append(" )");
                     }
                     sb.append("detail = ").append(item.getDetail()).append(" ,");
-                    sb.append("score = ").append(item.getDomainTagScore());
+                    sb.append("score = ").append(item.getTotalScore());
                     sb.append("\r\n");
 
                     String[] cmd = buildCutCmd(item, DIR);
