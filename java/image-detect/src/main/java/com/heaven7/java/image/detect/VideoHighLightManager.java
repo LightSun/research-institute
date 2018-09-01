@@ -114,7 +114,8 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
             return area;
         }
 
-        private float computeCommonScore(int time) {
+        @SuppressWarnings("unchecked")
+        public float computeCommonScore(int time) {
             List<IHighLightData> list = (List<IHighLightData>) dataMap.get(time);
             if (Predicates.isEmpty(list)) {
                 return 0f;
