@@ -1,11 +1,27 @@
 package com.heaven7.utils;
 
+import com.vida.common.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Map;
 import java.util.Properties;
 
 public class ConfigUtil {
+
+    public static String loadResourcesAsString(String path){
+        Reader reader = null;
+        try {
+            reader = new InputStreamReader(loadResourcesAsStream(path));
+            return IOUtils.readString(reader);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }finally {
+            IOUtils.closeQuietly(reader);
+        }
+    }
 
     public static InputStream loadResourcesAsStream(String path){
         return ConfigUtil.class.getClassLoader().getResourceAsStream(path);
