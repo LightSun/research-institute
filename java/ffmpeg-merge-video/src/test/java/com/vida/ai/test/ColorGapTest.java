@@ -63,6 +63,7 @@ public class ColorGapTest {
     private static void init(){
         ColorGapContext.InitializeParam ip = new ColorGapContext.InitializeParam();
         ip.setTestType(SimpleColorGapContext.TEST_TYPE_LOCAL);
+        ip.setTemplateDir("table");
 
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);

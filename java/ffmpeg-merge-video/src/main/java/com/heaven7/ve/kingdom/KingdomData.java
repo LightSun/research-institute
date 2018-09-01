@@ -2,6 +2,7 @@ package com.heaven7.ve.kingdom;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.heaven7.ve.anno.FileResource;
 import com.heaven7.ve.utils.FloatMapGsonAdapter;
 
 import java.util.List;
@@ -24,6 +25,16 @@ public class KingdomData {
     @JsonAdapter(FloatMapGsonAdapter.class)
     @SerializedName("main_face_score")
     private Map<String, Float> mainFaceMap;
+
+    @FileResource
+    private String template;
+
+    public String getTemplate() {
+        return template;
+    }
+    public void setTemplate(String template) {
+        this.template = template;
+    }
 
     public Map<String, Float> getShotTypeMap() {
         return shotTypeMap;

@@ -5,6 +5,7 @@ import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.colorgap.helper.MainFaceRecognizer;
 import com.heaven7.ve.colorgap.helper.ShotTypeRecognizer;
+import com.heaven7.ve.template.TemplateData;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class JsonKingdom extends Kingdom{
 
     private ShotTypeRecognizer mShotTypeReg;
     private MainFaceRecognizer mMainFaceReg;
+    private TemplateData templateData;
 
     public JsonKingdom(KingdomData data) {
         super();
@@ -55,6 +57,10 @@ public class JsonKingdom extends Kingdom{
         }
         if(data.getMainFaceMap() != null){
             mMainFaceReg = new MainFaceRecognizer(data.getMainFaceMap());
+        }
+        //template
+        if(data.getTemplate() != null){
+            getFileResourceManager().setTemplate(data.getTemplate());
         }
 
         //init

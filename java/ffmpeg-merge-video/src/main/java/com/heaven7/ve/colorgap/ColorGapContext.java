@@ -64,6 +64,7 @@ public interface ColorGapContext extends Context {
      */
     class InitializeParam{
 
+        private String templateDir;
         private int testType = ColorGapContext.TEST_TYPE_SERVER;
 
         public int getTestType() {
@@ -71,6 +72,13 @@ public interface ColorGapContext extends Context {
         }
         public void setTestType(int testType) {
             this.testType = testType;
+        }
+
+        public String getTemplateDir() {
+            return templateDir;
+        }
+        public void setTemplateDir(String templateDir) {
+            this.templateDir = templateDir;
         }
     }
 }

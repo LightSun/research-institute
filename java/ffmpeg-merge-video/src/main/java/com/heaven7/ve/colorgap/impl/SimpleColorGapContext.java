@@ -38,6 +38,8 @@ public class SimpleColorGapContext implements ColorGapContext {
     @Override
     public void setKingdom(Kingdom kingdom) {
         this.mKingdom = kingdom;
+        //resolve the associate config file. like template
+        kingdom.resolveFileResourceConfig(this);
     }
 
     @Override

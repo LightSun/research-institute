@@ -31,7 +31,7 @@ public class Cases {
         this.cases = cases;
     }
 
-    public int getShotCategory(){
+    public int getShotCategoryFlags(){
         String str = cases.get(KEY_SHOT_CATEGORY);
         if(str.contains("|")){
             String[] strs = str.split("\\|");

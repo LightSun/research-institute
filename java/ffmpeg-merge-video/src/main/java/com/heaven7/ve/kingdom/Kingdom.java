@@ -7,7 +7,9 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
+import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.template.VETemplate;
 import com.vida.common.IOUtils;
 
 import java.io.BufferedReader;
@@ -43,6 +45,7 @@ public abstract class Kingdom {
     private final Set<Integer> mScopeTagIds = new HashSet<>();
 
     private static Kingdom sDefault;
+    private final FileResourceManager mFileResManager = new FileResourceManager();
 
     /**
      * init tag sets.
@@ -58,7 +61,15 @@ public abstract class Kingdom {
             mScopeTagIds.addAll(getIds(list));
         }
     }
-
+    public void resolveFileResources(ColorGapContext context){
+        mFileResManager.resolve(context);
+    }
+    public FileResourceManager getFileResourceManager(){
+        return mFileResManager;
+    }
+    public VETemplate getVETemplate(){
+        return getFileResourceManager().getVETemplate();
+    }
     public void asDefault(){
         sDefault = this;
     }

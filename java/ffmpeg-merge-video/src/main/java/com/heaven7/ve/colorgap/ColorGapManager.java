@@ -103,7 +103,11 @@ public class ColorGapManager extends BaseContextOwner{
         }
 
         //convert template
-        //final VETemplate template = mSourceTemplate == null ? createVETemplate(templateItems) : mSourceTemplate;
+        if(srcTemplate == null){
+            //from kingdom config
+            srcTemplate = getKingdom().getVETemplate();
+        }
+        //create template
         if(srcTemplate == null && mProvider != null){
             srcTemplate = createVETemplate(mProvider.provideScript());
         }
