@@ -260,6 +260,31 @@ public class FileUtils {
         }
     }
 
+    public static void getFiles(File dir, FileFilter filter, List<String> outFiles) {
+        File[] videoFiles = dir.listFiles(filter);
+        if (!Predicates.isEmpty(videoFiles)) {
+            for (File file : videoFiles) {
+                outFiles.add(file.getAbsolutePath());
+            }
+        }
+        File[] dirs = dir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
+        if (!Predicates.isEmpty(dirs)) {
+            for (File dir1 : dirs) {
+                getFiles(dir1, filter, outFiles);
+            }
+        }
+    }
+    public static List<String> getFiles(File dir, FileFilter filter) {
+        List<String> files = new ArrayList<>();
+        getFiles(dir, filter, files);
+        return files;
+    }
+
 
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {

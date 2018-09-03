@@ -2,6 +2,8 @@ package com.heaven7.utils.test;
 
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.utils.CmdHelper;
+import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;
 import com.vida.common.Platform;
 import com.vida.common.ai.AiGenerateContext;
@@ -29,7 +31,8 @@ public class GenerateDataHelper {
 
     public static void main(String[] args) {
         //renameMp4();
-        new GenerateDataHelper().start();
+       // new GenerateDataHelper().start();
+        new GenerateDataHelper().genForVideo(DIR + File.separator + "LM0A0199.mp4");
     }
 
     private static void renameMp4() {
@@ -76,7 +79,7 @@ public class GenerateDataHelper {
         });
     }
 
-    private void genForVideo(String videoPath){
+    public void genForVideo(String videoPath){
         String fileName = FileUtils.getFileName(videoPath);
         String fileDir = FileUtils.getFileDir(videoPath, 1, true);
         String dataDir = fileDir + File.separator + fileName;
@@ -85,8 +88,44 @@ public class GenerateDataHelper {
         VideoAiGenerateContext videoContext = new VideoAiGenerateContext(mAiGenDelegate, mListener, context,
                 videoPath, dataDir);
 
-        mTagService.submit(videoContext::genTfRecord);
-      //  mFaceService.submit(videoContext::genFace);
+        // mTagService.submit(videoContext::genTfRecord);
+        mFaceService.submit(videoContext::genFace);
     }
 
+    //use temp images
+    public void genFaceVideo(String videoPath){
+        String fileName = FileUtils.getFileName(videoPath);
+        String fileDir = FileUtils.getFileDir(videoPath, 1, true);
+        String imageDir = fileDir + File.separator + "temp" + File.separator + fileName;
+        String outDir = fileDir + File.separator + fileName;
+        File face_rects = new File(outDir, fileName + "_rects.csv");
+        FileUtils.createFile(face_rects.getAbsolutePath(), true);
+
+        String[] cmds = FFmpegUtils.buildGetDurationCmd(videoPath);
+        CmdHelper.VideoDurationCallback dc = new CmdHelper.VideoDurationCallback();
+        new CmdHelper(cmds).execute(dc);
+        long duration = dc.getDuration();//in mill seconds
+
+        int count = (int) (duration / 1000) + 1;
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0 ; i < count ; i ++){
+           String file_sn_name =  "img_" + format(i + 1) + ".jpg";
+           File file = new File(imageDir, file_sn_name);
+
+        }
+    }
+
+    public static String format(int time) {
+        switch (String.valueOf(time).length()) {
+            case 1:
+                return "0000" + time;
+
+            case 2:
+                return "000" + time;
+            case 3:
+                return "00" + time;
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
 }
