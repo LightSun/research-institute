@@ -544,7 +544,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     public List<IHighLightData> getHighLightData(int time) {
         KeyValuePair<Integer, List<IHighLightData>> pair = imageMeta.getHighLight(time);
-        return pair != null ? pair.getValue(): null;
+        return VEGapUtils.filterHighLightData(getKingdom(), pair.getValue());
     }
 
     public KeyValuePair<Integer, List<IHighLightData>> getHighLight(){

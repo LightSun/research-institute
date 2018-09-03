@@ -44,6 +44,15 @@ public class VEGapUtils {
         if(Predicates.isEmpty(value)){
             return null;
         }
+        List<IHighLightData> list = filterHighLightData(kingdom, value);
+        return Predicates.isEmpty(list) ? null : KeyValuePair.create(pair.getKey(), list);
+    }
+
+    public static List<IHighLightData> filterHighLightData(Kingdom kingdom,@Nullable List<IHighLightData> value) {
+        if(value == null){
+            return null;
+        }
+        //filter module data not exist data.
         List<IHighLightData> list = VisitServices.from(value).filter(new PredicateVisitor<IHighLightData>() {
             @Override
             public Boolean visit(IHighLightData data, Object param) {
@@ -67,7 +76,7 @@ public class VEGapUtils {
             }, list2);
             list = list2;
         }
-        return Predicates.isEmpty(list) ? null : KeyValuePair.create(pair.getKey(), list);
+        return list;
     }
 
     public static void adjustTime(ColorGapContext context, List<GapManager.GapItem> filledItems){
