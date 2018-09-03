@@ -1,8 +1,6 @@
-package com.heaven7.ve.colorgap.impl;
-
+package com.heaven7.ve.colorgap.impl.filler;
 
 import com.heaven7.core.util.Logger;
-import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -12,16 +10,21 @@ import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.gap.PlaidDelegate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import static com.heaven7.ve.colorgap.VEGapUtils.filter;
+public class BasePlaidFiller implements PlaidFiller {
 
-/**
- * the filler which use gap with 'compute-score' to fill.
- * Created by heaven7 on 2018/3/17 0017.
- */
-@Deprecated
-public class PlaidFillerImpl implements PlaidFiller {
+    private final StageFiller stageFiller;
+
+    public BasePlaidFiller(StageFiller filler) {
+        this.stageFiller = filler;
+    }
+    public BasePlaidFiller() {
+        this(new NormalStageFiller());
+    }
 
     @Override
     public List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts, ColorGapPostProcessor processor) {
@@ -31,42 +34,12 @@ public class PlaidFillerImpl implements PlaidFiller {
                     + infoes.size() + " but is " + parts.size());
         }
         /*
-         * 1， 匹配出音乐格子对应的 video parts. 然后gap
-         */
-        List<CutInfo.PlaidInfo> sortedPlaids = new ArrayList<>(infoes);
-        //sort by weight. desc
-        Collections.sort(sortedPlaids, new Comparator<CutInfo.PlaidInfo>() {
-            @Override
-            public int compare(CutInfo.PlaidInfo o1, CutInfo.PlaidInfo o2) {
-                float o2_weight = o2.getGapColorFilter() != null ? o2.getGapColorFilter().getWeight() : 0;
-                float o1_weight = o1.getGapColorFilter() != null ? o1.getGapColorFilter().getWeight() : 0;
-                return Float.compare(o2_weight, o1_weight);
-            }
-        });
-        /*
          * 1，过滤出符合条件的 media part item
          * 2, gap
          */
         GapCallbackImpl gapCallback = new GapCallbackImpl(mContext, infoes, parts);
-        //没有匹配条件的填充物
-        List<CutInfo.PlaidInfo> notPopulatePlaids = new ArrayList<>();
-        for(int i = 0 , size = sortedPlaids.size() ; i < size ; i++){
-            CutInfo.PlaidInfo info = sortedPlaids.get(i);
-            List<MediaPartItem> result = filter(info, parts);
-            if(Predicates.isEmpty(result)){
-                notPopulatePlaids.add(info);
-            }else{
-                new GapManager(Arrays.asList(info), result).fill(gapCallback, false, false);
-            }
-        }
-        if(notPopulatePlaids.size() > 0){
-            //base gap
-            new GapManager(notPopulatePlaids, parts).fill(gapCallback, false, false);
-        }
-        //check if not fill done. (that often means shot is not enough)
-        if(gapCallback.filledItems.size() < infoes.size() ){
-            new GapManager(notPopulatePlaids, parts).fill(gapCallback, true, false);
-        }
+        stageFiller.fill(mContext, infoes, parts, gapCallback);
+
         if(gapCallback.filledItems.size() != infoes.size()){
             throw new IllegalStateException("fill failed.");
         }
@@ -91,7 +64,7 @@ public class PlaidFillerImpl implements PlaidFiller {
         return gapCallback.filledItems;
     }
 
-    static class GapCallbackImpl extends BaseContextOwner implements GapManager.GapCallback{
+    public static class GapCallbackImpl extends BaseContextOwner implements GapManager.GapCallback{
 
         final List<GapManager.GapItem> filledItems = new ArrayList<>();
         final List<CutInfo.PlaidInfo> infoes;

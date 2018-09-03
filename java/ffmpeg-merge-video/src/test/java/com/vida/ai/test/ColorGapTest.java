@@ -9,6 +9,7 @@ import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.ColorGapManager;
 import com.heaven7.ve.colorgap.ColorGapParam;
 import com.heaven7.ve.colorgap.impl.*;
+import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.starter.KingdomStarter;
 import com.heaven7.ve.test.TestUtils;
 
@@ -28,7 +29,7 @@ public class ColorGapTest {
 
     public static void main(String[] args) {
         String music = "E:\\tmp\\music_cut\\M7.mp3";
-        String outDir = "F:\\videos\\ClothingWhite\\works";
+        String outDir = "F:\\videos\\temp_works\\ClothingWhite";
         List<String> files = FileUtils.getFiles(new File("F:\\videos\\ClothingWhite"), "mp4");
         List<MediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, MediaResourceItem>() {
             @Override
@@ -50,7 +51,7 @@ public class ColorGapTest {
         context.setColorGapPerformanceCollector(new ColorGapPerformanceCollector());
         //gap
         ColorGapManager cgm = new ColorGapManager(context, new MediaAnalyserImpl(),
-               context.getMusicCutter(), new MusicShaderImpl(), new PlaidFillerImpl());
+               context.getMusicCutter(), new MusicShaderImpl(), new BasePlaidFiller());
         cgm.setStoryLineShader(new StoryLineShaderImpl());
         cgm.setShotRecognizer(new SimpleShotRecognizer());
         //for batch image .need this.
@@ -64,6 +65,8 @@ public class ColorGapTest {
         ColorGapContext.InitializeParam ip = new ColorGapContext.InitializeParam();
         ip.setTestType(SimpleColorGapContext.TEST_TYPE_LOCAL);
         ip.setTemplateDir("table");
+        ip.setDebug(true);
+        ip.setDebugOutDir("F:\\videos\\temp_works\\ClothingWhite");
 
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);

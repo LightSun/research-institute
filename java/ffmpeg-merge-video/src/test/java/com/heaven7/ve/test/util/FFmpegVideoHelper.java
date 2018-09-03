@@ -57,7 +57,7 @@ public class FFmpegVideoHelper {
             List<VETemplate.LogicSentence> sentences = plaidScatter.getLogicSentences();
             for(int i = 0 ; i < sentences.size() ; i ++ ){
                 VETemplate.LogicSentence ls = sentences.get(i);
-                chapterItems.add(cutItems.subList(lastIndex, ls.getPlaidCount()));
+                chapterItems.add(cutItems.subList(lastIndex, lastIndex + ls.getPlaidCount()));
                 lastIndex += ls.getPlaidCount();
             }
             //每个story

@@ -7,7 +7,6 @@ import com.heaven7.ve.colorgap.MetaInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * the video editor template
@@ -15,7 +14,23 @@ import java.util.Map;
  */
 public class VETemplate {
 
+   /* public static final int CHAPTER_FILL_TYPE_DEFAULT    = 1;
+    public static final int CHAPTER_FILL_TYPE_SOTRY_LINE = 2;*/
+    public static final String FILL_TYPE_STORY_LINE = "story_line";
+    /** fill the chapter by filter then use other shots */
+    public static final String FILL_TYPE_FILTER_THEN_OTHERS = "filter_then_others";
+    /** fill the chapter by all-shots(include other chapters' shots) by max score */
+    public static final String FILL_TYPE_ALL_SHOTS_MAX_SCORE = "all_shots_max_score";
+
     private List<LogicSentence> logicSentences;
+    private String chapterFillType;
+
+    public String getChapterFillType() {
+        return chapterFillType;
+    }
+    public void setChapterFillType(String chapterFillType) {
+        this.chapterFillType = chapterFillType;
+    }
 
     public List<LogicSentence> getLogicSentences() {
         return logicSentences;
@@ -74,14 +89,13 @@ public class VETemplate {
         /** the extra weight which is compute bu merge */
         private int extraWeight;
         private String dir;
-        /** the shot-category */
-        private int shotCategory;
+        private int shotCategoryFlags;
 
-        public int getShotCategory() {
-            return shotCategory;
+        public int getShotCategoryFlags() {
+            return shotCategoryFlags;
         }
-        public void setShotCategory(int shotCategory) {
-            this.shotCategory = shotCategory;
+        public void setShotCategoryFlags(int shotCategoryFlags) {
+            this.shotCategoryFlags = shotCategoryFlags;
         }
 
         public String getDir() {

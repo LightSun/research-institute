@@ -16,12 +16,11 @@ import java.util.List;
 public class ChapterColorGapPostProcessor implements ColorGapPostProcessor {
 
     private final ShotSortDelegate mSortDelegate =  new ShotSortDelegateImpl();
-    private final int sortRule;
-    private int mLastSortRule;
+    private int sortRule;
+    private int mLastSortRule = ShotSortDelegate.SHOT_SORT_RULE_UNKNOWN;
 
     public ChapterColorGapPostProcessor(int sortRule) {
         this.sortRule = sortRule;
-        this.mLastSortRule = sortRule;
     }
 
     public int getLastSortRule(){
@@ -35,8 +34,10 @@ public class ChapterColorGapPostProcessor implements ColorGapPostProcessor {
                 new ResultVisitor<List<MediaPartItem>, List<MediaPartItem>>() {
             @Override
             public List<MediaPartItem> visit(List<MediaPartItem> list, Object param) {
-                List<MediaPartItem> result = mSortDelegate.sortShots(context, getLastSortRule(), list);
-                mLastSortRule = ShotSortDelegate.getNextSortRule(mLastSortRule);
+                int rule = sortRule;
+                List<MediaPartItem> result = mSortDelegate.sortShots(context, rule, list);
+                sortRule = ShotSortDelegate.getNextSortRule(rule);
+                mLastSortRule = rule;
                 return result;
             }
         }).pile(new PileVisitor<List<MediaPartItem>>() {
@@ -46,9 +47,8 @@ public class ChapterColorGapPostProcessor implements ColorGapPostProcessor {
                 return list1;
             }
         });
-
         //按照gap填充（镜头类型个数，3:2,1， shot-key）
         //排序。
-        return items;
+        return result;
     }
 }

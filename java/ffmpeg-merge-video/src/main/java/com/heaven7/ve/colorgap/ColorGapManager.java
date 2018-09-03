@@ -5,8 +5,11 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.visitor.FireIndexedVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.Context;
+import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.collect.CollectModule;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
@@ -17,6 +20,7 @@ import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
@@ -173,6 +177,21 @@ public class ColorGapManager extends BaseContextOwner{
             getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "setShotCategory", "processShotType",
                     partItem.toString() + " ,shot_category = " +ShotRecognition.getShotCategoryString(shotCategory));
         }
+        //write debug info for local debug.
+        if(getContext().getInitializeParam().getTestType() == ColorGapContext.TEST_TYPE_LOCAL
+                && getContext().getInitializeParam().isDebug()){
+            StringBuilder sb = new StringBuilder();
+            VisitServices.from(newItems).fireWithIndex(new FireIndexedVisitor<MediaPartItem>() {
+                @Override
+                public Void visit(Object param, MediaPartItem item, int index, int size) {
+                    sb.append(item.toString()).append("\r\n\n");
+                    return null;
+                }
+            });
+            FileUtils.writeTo(new File(getContext().getInitializeParam().getDebugOutDir(),
+                    "media_part_detail.txt"), sb.toString());
+        }
+
         //start subject recognize.
         if(Predicates.isEmpty(subjectItems)){
             getPerformanceCollector().endModule(MODULE_RECOGNIZE_SHOT, "processShotType");

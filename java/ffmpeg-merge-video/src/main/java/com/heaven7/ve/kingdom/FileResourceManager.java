@@ -52,17 +52,17 @@ public class FileResourceManager {
         if(Predicates.isEmpty(items)){
             return null;
         }
-        List<VETemplate.LogicSentence> list = VisitServices.from(items).map(new ResultVisitor<TemplateData.Item, VETemplate.LogicSentence>() {
+        List<VETemplate.LogicSentence> list = VisitServices.from(items).map(
+                new ResultVisitor<TemplateData.Item, VETemplate.LogicSentence>() {
             @Override
             public VETemplate.LogicSentence visit(TemplateData.Item item, Object param) {
                 VETemplate.LogicSentence ls = new VETemplate.LogicSentence();
                 Cases cases = new Cases(item.getCases(), item.getRelationship().equals("or"));
                 int shotCategory = cases.getShotCategoryFlags();
-                ls.setShotCategory(shotCategory);
+                ls.setShotCategoryFlags(shotCategory);
                 int count = (int) (item.getProportion() * 100);
                 for (int i = count - 1; i >= 0; i--) {
                     CutInfo.PlaidInfo info = new CutInfo.PlaidInfo();
-                    //TODO shot category may be multi. so 匹配计算需要改变
                     info.addColorFilter(new ShotCategoryFilter(new ShotCategoryFilter.ShotCategoryCondition(shotCategory)));
                     ls.addPlaidInfo(info);
                 }
@@ -71,6 +71,7 @@ public class FileResourceManager {
         }).getAsList();
         VETemplate template = new VETemplate();
         template.setLogicSentences(list);
+        template.setChapterFillType(templateData.getChapterFillType());
         mTemplate = template;
         return template;
     }

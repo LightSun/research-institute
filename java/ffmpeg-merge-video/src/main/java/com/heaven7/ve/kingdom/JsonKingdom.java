@@ -68,7 +68,7 @@ public class JsonKingdom extends Kingdom{
     }
 
     @Override
-    public float getMainFaceScore(int mainFaceCount) {
+    public float getMainFaceScoreImpl(int mainFaceCount) {
         if(mMainFaceReg != null){
             return mMainFaceReg.getScore(mainFaceCount);
         }

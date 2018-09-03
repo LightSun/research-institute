@@ -39,7 +39,7 @@ public class SimpleColorGapContext implements ColorGapContext {
     public void setKingdom(Kingdom kingdom) {
         this.mKingdom = kingdom;
         //resolve the associate config file. like template
-        kingdom.resolveFileResourceConfig(this);
+        kingdom.resolveFileResources(this);
     }
 
     @Override

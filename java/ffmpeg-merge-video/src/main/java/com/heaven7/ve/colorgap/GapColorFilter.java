@@ -95,6 +95,10 @@ public abstract class GapColorFilter {
             this.type = this.category = 0;
         }
 
+        public int getType() {
+            return type;
+        }
+
         protected int getCategory(int type){
             return 0;
         }

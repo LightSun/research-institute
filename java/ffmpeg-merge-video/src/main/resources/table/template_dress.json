@@ -1,5 +1,6 @@
 {
   "type": "color",
+  "chapter_fill_type":"filter_then_others",
   "items": [
     {
       "proportion":0.3,

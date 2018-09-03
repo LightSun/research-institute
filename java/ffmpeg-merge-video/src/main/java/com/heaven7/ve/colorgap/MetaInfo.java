@@ -44,6 +44,7 @@ public interface MetaInfo {
     float WEIGHT_TIME          = 3;
     float WEIGHT_VIDEO_TAG     = 1.5f;
     float WEIGHT_SHOT_KEY      = 5f;
+    float WEIGHT_SHOT_CATEGORY = 3f;
 
     int FLAG_TIME       = 0x0001;
     int FLAG_LOCATION   = 0x0002;
@@ -247,6 +248,10 @@ public interface MetaInfo {
 
             case FLAG_SHOT_KEY:
                 return WEIGHT_SHOT_KEY;
+
+            case FLAG_SHOT_CATEGORY:
+                return WEIGHT_SHOT_CATEGORY;
+
             case 0:
                 return 1;
         }

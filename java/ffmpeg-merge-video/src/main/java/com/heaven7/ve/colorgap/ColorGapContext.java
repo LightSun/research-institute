@@ -3,8 +3,6 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.anno.SystemResource;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
-import com.heaven7.ve.colorgap.impl.VideoAnalyseHelper;
-import com.heaven7.ve.colorgap.impl.montage.*;
 import com.heaven7.ve.kingdom.Kingdom;
 
 /**
@@ -66,6 +64,22 @@ public interface ColorGapContext extends Context {
 
         private String templateDir;
         private int testType = ColorGapContext.TEST_TYPE_SERVER;
+        private boolean debug;
+        private String debugOutDir;
+
+        public String getDebugOutDir() {
+            return debugOutDir;
+        }
+        public void setDebugOutDir(String debugOutDir) {
+            this.debugOutDir = debugOutDir;
+        }
+
+        public boolean isDebug() {
+            return debug;
+        }
+        public void setDebug(boolean debug) {
+            this.debug = debug;
+        }
 
         public int getTestType() {
             return testType;

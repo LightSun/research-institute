@@ -28,7 +28,7 @@ public class GapManager {
      * @param callback the callback
      * @param reuseItem true to reuse item.(may be reuse multi times)
      */
-    public void fill(GapCallback callback, boolean reuseItem){
+    public void fill(GapCallback callback, boolean reuseItem, boolean ignoreFillFailed){
         List<GapItem> filledItems = callback.getFilledItems();
         Throwables.checkNull(filledItems);
         for(PlaidDelegate plaid : plaids){
@@ -63,12 +63,17 @@ public class GapManager {
                     }
                 }
                 //no item match. or item.duration is incorrect
-                if(maxValueItem == null || (maxValueItem.isVideo() && maxValueItem.getMaxDuration() < plaid.getDuration())){
-                    if(reuseItem){
-                        throw new IllegalStateException("can't find the max value item for plaid.");
-                    }else {
-                        Logger.w("GapManager", "fill", "can't find the max value item for plaid.");
-                        break;
+                boolean failed = maxValueItem == null || (maxValueItem.isVideo() && maxValueItem.getMaxDuration() < plaid.getDuration());
+                if(failed){
+                    if (ignoreFillFailed){
+                        continue;
+                    }else{
+                        if(reuseItem){
+                            throw new IllegalStateException("can't find the max value item for plaid.");
+                        }else {
+                            Logger.w("GapManager", "fill", "can't find the max value item for plaid.");
+                            break;
+                        }
                     }
                 }
                 //for item .if it is used before. we copy a new item

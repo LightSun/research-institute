@@ -54,12 +54,12 @@ public class Cases {
         });
     }
 
-    public static void main(String[] args) {
-       /* String json = ConfigUtil.loadResourcesAsString("table/template_dress.json");
+   /* public static void main(String[] args) {
+        String json = ConfigUtil.loadResourcesAsString("table/template_dress.json");
         TemplateData data = new Gson().fromJson(json, TemplateData.class);
-        System.out.println(data);*/
+        System.out.println(data);
 
-       /* String dir = "E:\\tmp\\face_data";
+        String dir = "E:\\tmp\\face_data";
         List<String> files = FileUtils.getFiles(new File(dir), new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -73,6 +73,6 @@ public class Cases {
                 return null;
             }
         });
-        System.out.println(files);*/
-    }
+        System.out.println(files);
+    }*/
 }

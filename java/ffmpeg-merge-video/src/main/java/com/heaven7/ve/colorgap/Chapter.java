@@ -4,6 +4,8 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.FireIndexedVisitor;
+import com.heaven7.java.visitor.PredicateVisitor;
+import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.Context;
@@ -11,8 +13,12 @@ import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.colorgap.filter.ShotTypeFilter;
 import com.heaven7.ve.colorgap.impl.ChapterColorGapPostProcessor;
+import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
+import com.heaven7.ve.colorgap.impl.filler.MatchStageFiller;
+import com.heaven7.ve.colorgap.impl.filler.StageFiller;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
+import com.sun.media.jfxmedia.Media;
 
 import java.util.*;
 
@@ -37,7 +43,7 @@ public class Chapter extends BaseContextOwner{
     private List<CutInfo.PlaidInfo> airPlaids;
     private boolean air;
 
-    private List<GapManager.GapItem> filledItems;
+    private List<GapManager.GapItem> filledItems = new ArrayList<>();
     private List<Story> mStories;
 
     public Chapter(Context context, List<CutInfo.PlaidInfo> plaids, List<MediaPartItem> items, int chapterIndex) {
@@ -52,6 +58,7 @@ public class Chapter extends BaseContextOwner{
             }
         }
     }
+
     /** in mills */
     public long getFilledEndTime(){
         GapManager.GapItem lastItem = filledItems.get(filledItems.size() - 1);
@@ -96,8 +103,25 @@ public class Chapter extends BaseContextOwner{
         }
         filledItems.add(gapItem);
     }
-    /** @return  the sort rule that this chapter used. */
-    public int fill(List<MediaPartItem> airShots, PlaidFiller filler, AirShotFilter airFilter, int lastSortRule) {
+    /** fill the plaids by normal */
+    public int fill(PlaidFiller filler, int lastSortRule){
+        final int plaidCount = plaids.size();
+        //target shot sort rule
+        int sortRule = ShotSortDelegate.getNextSortRule(lastSortRule);
+        getPerformanceCollector().addMessage(MODULE_FILL_PLAID,
+                TAG, "fill", "sort rule is " + ShotSortDelegate.getRuleString(sortRule));
+        //set short type filter
+        setShortTypeFilter(plaidCount, sortRule);
+
+        ChapterColorGapPostProcessor postProcessor = new ChapterColorGapPostProcessor(sortRule);
+        filledItems = filler.fillPlaids(getContext(), plaids, items, postProcessor);
+        return postProcessor.getLastSortRule();
+    }
+
+    /**
+     * fill the items based on 'story-line'
+     * @return  the sort rule that this chapter used. */
+    public int fillStoryLine(List<MediaPartItem> airShots, PlaidFiller filler, AirShotFilter airFilter, int lastSortRule) {
         if (air) {
             //for air chapter . process after all chapter fill. here just check plaids.size = 1
             if (plaids.size() != 1) {
@@ -189,20 +213,16 @@ public class Chapter extends BaseContextOwner{
             info.addColorFilter(new ShotKeyFilter(new ShotKeyFilter.ShotKeyCondition(
                     shots.get(i).imageMeta.getShotKey())));
         }
-        //target shot sort rule
-        int sortRule = ShotSortDelegate.getNextSortRule(lastSortRule);
-        getPerformanceCollector().addMessage(MODULE_FILL_PLAID,
-                TAG, "fill", "sort rule is " + ShotSortDelegate.getRuleString(sortRule));
         //set short type filter
-        setShortTypeFilter(plaidCount, sortRule);
+        //setShortTypeFilter(plaidCount, sortRule);
 
         //gap
-        ChapterColorGapPostProcessor postProcessor = new ChapterColorGapPostProcessor(sortRule);
-        filledItems = filler.fillPlaids(getContext(), plaids, shots, postProcessor);
-        sortRule = postProcessor.getLastSortRule();
+       // ChapterColorGapPostProcessor postProcessor = new ChapterColorGapPostProcessor(sortRule);
+        filledItems = filler.fillPlaids(getContext(), plaids, shots, null);
+       // sortRule = postProcessor.getLastSortRule();
 
         //process air-plaids 空镜头只会替换偏差镜头.(按照顺序 - 不能破坏故事的结构)
-        if (!Predicates.isEmpty(airPlaids)) {
+      /*  if (!Predicates.isEmpty(airPlaids)) {
             List<GapManager.GapItem> filledBiasShots = getBiasGapItems(filledItems);
             for(int i = 0 , count = Math.min(airPlaids.size(), filledBiasShots.size()) ;
                     i < count ; i ++){
@@ -217,10 +237,10 @@ public class Chapter extends BaseContextOwner{
                     //airPlaids.get(i).setAir(false);
                 }
             }
-        }
+        }*/
 
         dump(stories, "at last");
-        return sortRule;
+        return lastSortRule;
     }
 
     /** set short type filter */
@@ -516,5 +536,88 @@ public class Chapter extends BaseContextOwner{
 
     public List<Story> getAllStory() {
         return mStories;
+    }
+
+    //----------------------------------------------------------
+
+    public List<CutInfo.PlaidInfo> getLeftPlaids() {
+        List<CutInfo.PlaidInfo> filledPlaids = getFilledPlaids();
+        return VisitServices.from(this.plaids).filter(new PredicateVisitor<CutInfo.PlaidInfo>() {
+            @Override
+            public Boolean visit(CutInfo.PlaidInfo info, Object param) {
+                return !filledPlaids.contains(info);
+            }
+        }).getAsList();
+    }
+    public void fillMatches(StageFiller filler) {
+        BasePlaidFiller.GapCallbackImpl impl = new BasePlaidFiller.GapCallbackImpl(getContext(), plaids, items);
+        filler.fill(getContext(), plaids, items, impl);
+        List<GapManager.GapItem> filledItems = impl.getFilledItems();
+        this.filledItems.addAll(filledItems);
+    }
+
+    public void sortByPlaid(){
+        VisitServices.from(filledItems).sortService(new Comparator<GapManager.GapItem>() {
+            @Override
+            public int compare(GapManager.GapItem o1, GapManager.GapItem o2) {
+                int index1 = plaids.indexOf(o1.plaid);
+                int index2 = plaids.indexOf(o2.plaid);
+                return Integer.compare(index1, index2);
+            }
+        });
+    }
+
+    public void adjustTime(){
+        VEGapUtils.adjustTime(getContext(), filledItems);
+    }
+
+    public int sortRules(int lastShotTypeRule){
+        if(plaids.size() != filledItems.size()){
+            throw new IllegalStateException("fill failed. plaid.size = " + plaids.size() + " ,filledItem.size = " + filledItems.size());
+        }
+        List<MediaPartItem> list = getFilledMediaPartItems();
+        //sort by shot type.
+        int rule = ShotSortDelegate.getNextSortRule(lastShotTypeRule);
+        ChapterColorGapPostProcessor processor = new ChapterColorGapPostProcessor(rule);
+        List<MediaPartItem> resultItems = processor.onPostProcess(getContext(), list);
+        //handle after sort.
+        VisitServices.from(filledItems).fireWithIndex(new FireIndexedVisitor<GapManager.GapItem>() {
+            @Override
+            public Void visit(Object param, GapManager.GapItem gapItem, int index, int size) {
+                gapItem.item = resultItems.get(index);
+                return null;
+            }
+        });
+        return processor.getLastSortRule();
+    }
+
+    public void receiveGapItems(List<GapManager.GapItem> gapItems) {
+        List<GapManager.GapItem> list = VisitServices.from(gapItems).filter(
+                new PredicateVisitor<GapManager.GapItem>() {
+            @Override
+            public Boolean visit(GapManager.GapItem gapItem, Object param) {
+                return plaids.contains(gapItem.plaid);
+            }
+        }).getAsList();
+        this.filledItems.addAll(list);
+    }
+
+    public List<MediaPartItem> getFilledMediaPartItems() {
+        return VisitServices.from(filledItems).map(
+                new ResultVisitor<GapManager.GapItem, MediaPartItem>() {
+                    @Override
+                    public MediaPartItem visit(GapManager.GapItem gapItem, Object param) {
+                        return (MediaPartItem) gapItem.item;
+                    }
+                }).getAsList();
+    }
+    public List<CutInfo.PlaidInfo> getFilledPlaids() {
+        return VisitServices.from(filledItems).map(
+                new ResultVisitor<GapManager.GapItem, CutInfo.PlaidInfo>() {
+                    @Override
+                    public CutInfo.PlaidInfo visit(GapManager.GapItem gapItem, Object param) {
+                        return (CutInfo.PlaidInfo) gapItem.plaid;
+                    }
+                }).getAsList();
     }
 }

@@ -1,6 +1,7 @@
 package com.heaven7.ve.template;
 
 import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
 import com.heaven7.ve.utils.StringMapGsonAdapter;
 
 import java.util.List;
@@ -13,6 +14,15 @@ public class TemplateData {
 
     private String type;
     private List<Item> items;
+    @SerializedName("chapter_fill_type")
+    private String chapterFillType;
+
+    public String getChapterFillType() {
+        return chapterFillType;
+    }
+    public void setChapterFillType(String chapterFillType) {
+        this.chapterFillType = chapterFillType;
+    }
 
     public String getType() {
         return type;

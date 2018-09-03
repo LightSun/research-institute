@@ -1,9 +1,14 @@
 package com.heaven7.ve.colorgap;
 
 
+import com.heaven7.java.base.anno.Nullable;
+import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.image.detect.HighLightArea;
+import com.heaven7.java.image.detect.IHighLightData;
+import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.Visitors;
+import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
@@ -30,6 +35,40 @@ public class VEGapUtils {
     private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
     private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
 
+    public static KeyValuePair<Integer, List<IHighLightData>> filterHighLight(Kingdom kingdom,
+                                                                             @Nullable KeyValuePair<Integer, List<IHighLightData>> pair){
+        if(pair == null){
+            return null;
+        }
+        List<IHighLightData> value = pair.getValue();
+        if(Predicates.isEmpty(value)){
+            return null;
+        }
+        List<IHighLightData> list = VisitServices.from(value).filter(new PredicateVisitor<IHighLightData>() {
+            @Override
+            public Boolean visit(IHighLightData data, Object param) {
+                return kingdom.getModuleData(data.getName()) != null;
+            }
+        }).getAsList();
+        //clear repeat
+        if(!Predicates.isEmpty(list)){
+            List<IHighLightData> list2 = new ArrayList<>();
+            VisitServices.from(list).filter(null, new PredicateVisitor<IHighLightData>() {
+                @Override
+                public Boolean visit(IHighLightData data, Object param) {
+                    List<String> names = VisitServices.from(list2).map(new ResultVisitor<IHighLightData, String>() {
+                        @Override
+                        public String visit(IHighLightData data, Object param) {
+                            return data.getName();
+                        }
+                    }).getAsList();
+                    return names.contains(data.getName());
+                }
+            }, list2);
+            list = list2;
+        }
+        return Predicates.isEmpty(list) ? null : KeyValuePair.create(pair.getKey(), list);
+    }
 
     public static void adjustTime(ColorGapContext context, List<GapManager.GapItem> filledItems){
         Kingdom kingdom = context.getKingdom();
@@ -119,6 +158,23 @@ public class VEGapUtils {
         }
         return bestItem;
     }
+    public static List<MediaPartItem> filter(CutInfo.PlaidInfo info, List<MediaPartItem> parts) {
+        GapColorFilter filter = info.getGapColorFilter();
+        if(filter == null){
+            return Collections.emptyList();
+        }
+        List<MediaPartItem> result = new ArrayList<>();
+        for(MediaPartItem item : parts){
+            //not hold and should pass
+            if(item.isHold()){
+                continue;
+            }
+            if(filter.shouldPass(item.getColorCondition())){
+                result.add(item);
+            }
+        }
+        return result;
+    }
 
     /** 根据“主人脸”面积获取镜头类型 */
     public static String getShotType(float mainFaceArea){
@@ -146,62 +202,38 @@ public class VEGapUtils {
         }
     }
 
+    private static List<Float> getTotalArea(List<FrameItem> frameBuffer, int mainFaceCount){
+        assert mainFaceCount >= 1;
+        //filter by main face count.
+        return VisitServices.from(frameBuffer).filter(new PredicateVisitor<FrameItem>() {
+            @Override
+            public Boolean visit(FrameItem frameItem, Object param) {
+                return frameItem.areas.size() >= mainFaceCount;
+            }
+        }).map(new ResultVisitor<FrameItem, Float>() {
+            @Override
+            public Float visit(FrameItem frameItem, Object param) {
+                List<Float> areas = frameItem.areas;
+                if(mainFaceCount == 1){
+                    return areas.get(0);
+                }else if(mainFaceCount == 2){
+                    return areas.get(0) + areas.get(1);
+                }else {
+                    return areas.get(0) + areas.get(1) + areas.get(2);
+                }
+            }
+        }).getAsList();
+    }
+
     /** 获取“平均主人脸面积”，用于判断镜头类型 */
     public static float getAverMainFaceArea(List<FrameItem> frameBuffer, int mainFaceCount) {
         if(mainFaceCount == 0){
             return 0f;
         }
-        float totalFaceAreas = 0;
-        int maxSize = 0;
-        if(mainFaceCount == 1){
-            List<Float> areas = new ArrayList<>();
-            VisitServices.from(frameBuffer).visitForResultList(
-                    new ResultVisitor<FrameItem, Float>() {
-                        @Override
-                        public Float visit(FrameItem fbi, Object param) {
-                            return !fbi.areas.isEmpty() ? fbi.areas.get(0) : 0f;
-                        }
-                    }, areas);
-                    // (fbi, param) -> fbi.areas.get(0), areas);
-            totalFaceAreas = CollectionUtils.sum(areas);
-            maxSize = areas.size();
-        }else if(mainFaceCount == 2){
-            List<Float> list = VisitServices.from(frameBuffer).map(new ResultVisitor<FrameItem, List<Float>>() {
-                @Override
-                public List<Float> visit(FrameItem fbi, Object param) {
-                    return fbi.areas;
-                }
-            }).map(new ResultVisitor<List<Float>, Float>() {
-                @Override
-                public Float visit(List<Float> floats, Object param) {
-                    if(floats.size() < 2){
-                        return null;
-                    }
-                    return (floats.get(0) + floats.get(1));
-                }
-            }).visitForQueryList(Visitors.truePredicateVisitor(), null);
-            totalFaceAreas = CollectionUtils.sum(list);
-            maxSize = list.size();
-        }else{
-            //统计前3张脸
-            List<Float> list = VisitServices.from(frameBuffer).map(new ResultVisitor<FrameItem, List<Float>>() {
-                @Override
-                public List<Float> visit(FrameItem fbi, Object param) {
-                    return fbi.areas;
-                }
-            }).map(new ResultVisitor<List<Float>, Float>() {
-                @Override
-                public Float visit(List<Float> floats, Object param) {
-                    if(floats.size() < 3){
-                        return null;
-                    }
-                    return floats.get(0) + floats.get(1) + floats.get(2);
-                }
-            }).visitForQueryList(Visitors.truePredicateVisitor(), null);
-            totalFaceAreas = CollectionUtils.sum(list);
-            maxSize = list.size();
-        }
-        return totalFaceAreas / maxSize;
+        List<Float> areas = getTotalArea(frameBuffer, mainFaceCount);
+        float totalFaceAreas = CollectionUtils.sum(areas);
+        int size = areas.size();
+        return totalFaceAreas / size;
     }
 
     /** 主人脸个数， frameAreas 人脸面积数组 */

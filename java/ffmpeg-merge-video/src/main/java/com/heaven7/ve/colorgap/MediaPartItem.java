@@ -48,6 +48,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     private GapColorFilter.GapColorCondition mCondition;
     private boolean hold; //是否已经被占用
+    private final MediaPartDetailInfo mDetailInfo;
     private Scores mScores = new Scores();
 
     /** used for story */
@@ -82,6 +83,8 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         videoPart.setMaxDuration(CommonUtils.timeToFrame(item.getDuration(), TimeUnit.MILLISECONDS));
         setRawTags();
         computeScore();
+
+        this.mDetailInfo = new MediaPartDetailInfo(this);
     }
 
     public boolean isPlaned() {
@@ -97,7 +100,6 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
             this.cause += cause + "\r\n";
         }
     }
-
     public void addDetail(String desc){
         this.cause += desc + "\r\n";
     }
@@ -140,8 +142,9 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
                 ", part_time =" + videoPart.toString2() +
                 ", selectedInStory =" + selectedInStory +
                 ", planed =" + planed +
-                ", scores =" + mScores +
-                ", detail =" + getDetail() +
+                ", cause_detail =" + getDetail() +
+                ", scores = \n" + mScores +
+                ", part_detail = \n" + mDetailInfo.toString() +
                 '}';
     }
 
@@ -289,7 +292,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         final Kingdom kingdom = getKingdom();
         //1, face
         if(!Predicates.isEmpty(imageMeta.getRawFaceRects()) && imageMeta.getMainFaceCount() > 0){
-            List<FrameFaceRects> faceRects = imageMeta.getFaceRects(videoPart);
+            List<FrameFaceRects> faceRects = imageMeta.getRawFaceRects();
             if(Predicates.isEmpty(faceRects)){
                 addDetail("no face rects.\r\n");
                 return;
@@ -546,7 +549,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     public KeyValuePair<Integer, List<IHighLightData>> getHighLight(){
         if(highLight == NONE){
-            highLight = imageMeta.getHighLight(getContext(), videoPart);
+            highLight = VEGapUtils.filterHighLight(getKingdom(), imageMeta.getHighLight(getContext(), videoPart));
         }
         return highLight;
     }
@@ -555,7 +558,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
             return -1f;
         }
         LocationF location = mKeyPointData.getLocation();
-        return location.width * location.height;
+        return location.getArea();
     }
 
     public int getKeyPointCount(){

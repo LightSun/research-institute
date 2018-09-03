@@ -18,7 +18,7 @@ dependencies {
     compile files('libs/image-detect.jar')
     compile files('libs/common-montage.jar')
 
-    compile 'com.heaven7.java.base:Java-base:1.1.0'
+    compile 'com.heaven7.java.base:Java-base:1.1.21' //upgraded
     compile 'com.heaven7.java.visitor:Visitor:1.2.71'
     compile 'com.google.code.gson:gson:2.8.2'
 

@@ -309,7 +309,14 @@ public abstract class Kingdom {
      * @param mainFaceCount the main face count
      * @return the main face score
      */
-    public float getMainFaceScore(int mainFaceCount){
+    public final float getMainFaceScore(int mainFaceCount){
+        if(mainFaceCount <= 0){
+            return 0f;
+        }
+        return getMainFaceScoreImpl(mainFaceCount);
+    }
+
+    protected float getMainFaceScoreImpl(int mainFaceCount) {
         if(mainFaceCount == 1){
             return 0f;
         }else if(mainFaceCount == 2){

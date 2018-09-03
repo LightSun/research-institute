@@ -7,6 +7,7 @@ import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.ColorGapManager;
 import com.heaven7.ve.colorgap.impl.*;
+import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.test.util.FFmpegVideoHelper;
 import junit.framework.TestCase;
@@ -71,7 +72,7 @@ public class StoreLineTest extends TestCase {
                                 new MediaAnalyserImpl(),
                                 new MusicCutterImpl2(45   ),
                                 new MusicShaderImpl(),
-                                new PlaidFillerImpl());
+                                new BasePlaidFiller());
                 // 先不设置模版。表示只按照一个章节来测试
                // cgm.setTemplateScriptProvider(new TemplateProviderImpl_ST2());
                 cgm.setStoryLineShader(new StoryLineShaderImpl());

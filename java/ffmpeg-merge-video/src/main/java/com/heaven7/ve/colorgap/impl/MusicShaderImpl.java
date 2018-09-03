@@ -36,6 +36,7 @@ public class MusicShaderImpl implements MusicShader {
          * 根据模版tint or 根据 镜头类型，人脸识别信息，目录 等去tint.
          */
          if(template != null){
+             resultTem.setChapterFillType(template.getChapterFillType());
              //template.computePercent();
              float scale = plaids.size() * 1f / template.getTotalPlaidCount(); //target-plaid.size / template-plaid.size
              template.setTotalScale(scale);
@@ -63,6 +64,7 @@ public class MusicShaderImpl implements MusicShader {
                  //tint plaid/transfer by weight of sentence
                  VETemplate.LogicSentence from = findMaxWeightSentence(sentences, info);
                  delegate.transferAll(from, ls);
+                 ls.setShotCategoryFlags(from.getShotCategoryFlags());
              }
          }else{
              //one logic-sentence
