@@ -5,7 +5,8 @@ import face_recognition
 # file = "E:\\test\\lfw\\lfw\\Abdul_Majeed_Shobokshi\\Abdul_Majeed_Shobokshi_0001.jpg"
 # file = "E:\\test\\lfw\\lfw\\Abdel_Nasser_Assidi\\Abdel_Nasser_Assidi_0001.jpg"
 # file = "E:\\test\\lfw\\lfw\\Abdel_Aziz_Al-Hakim\\Abdel_Aziz_Al-Hakim_0001.jpg"
-file = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\黑色满襟衫\\1-11.jpg"
+# file = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\黑色满襟衫\\1-11.jpg"
+file = "F:\\videos\\ClothingWhite\\temp\\LM0A0199\\img_00001.jpg"
 image = face_recognition.load_image_file(file)
 
 print("shape: ", image.shape)

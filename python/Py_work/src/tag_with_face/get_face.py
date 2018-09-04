@@ -14,13 +14,17 @@ def getFace(videofile, tagfile, model='hog'):
     fileWriter = open(tagfile, "wt")
     vh = cv_video_helper.VideoHelper()
 
-    for num_retrieved, rgb in vh.frame_iterator(videofile, every_ms=1000):
+    for num_retrieved, frame in vh.frame_iterator(videofile, every_ms=1000):
         print("num_retrieved: ", num_retrieved)
+
+        # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+        rgb = frame[:, :, ::-1]
+
         face_locations = face_recognition.face_locations(rgb, model=model)
-        height = rgb.shape[0]
-        width = rgb.shape[1]
+        height = frame.shape[0]
+        width = frame.shape[1]
         fileWriter.write(str(num_retrieved))
-        if (face_locations):
+        if face_locations:
             fileWriter.write(",")
             first = True
             for face_location in face_locations:

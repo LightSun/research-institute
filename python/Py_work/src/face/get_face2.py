@@ -48,7 +48,7 @@ def printError(msg):
     print(msg, file=sys.stderr)
 
 
-#################################################
+################### temp_images_dir, outDir, image_count  ##############################
 if len(sys.argv) < 3:
     printError("argument is not enough Error!")
 else:

@@ -17,7 +17,7 @@ dependencies {
 
     compile files('libs/image-detect.jar')
 
-    compile 'com.heaven7.java.base:Java-base:1.1.2'
+    compile 'com.heaven7.java.base:Java-base:1.1.21'
     compile 'com.heaven7.java.visitor:Visitor:1.2.71'
 
     compile 'com.google.code.gson:gson:2.8.2'
