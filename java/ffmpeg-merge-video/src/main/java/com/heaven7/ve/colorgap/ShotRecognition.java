@@ -28,6 +28,8 @@ public class ShotRecognition {
     private static final float RATE_1_9 = 1f / 9;
     private static final String TAG = "ShotRecognition";
 
+    public static final int THRESOLD_KEY_POINT_COUNT = 9;
+
     public static String getShotCategoryString(int shotCategory) {
         switch (shotCategory){
             case CATEGORY_ENV:
@@ -63,7 +65,7 @@ public class ShotRecognition {
         if (faceCount > 0) {
             return CATEGORY_ENV;
         } else {
-            return keyPointCount >= 9 ? CATEGORY_PART : CATEGORY_PRODUCT;
+            return keyPointCount >= THRESOLD_KEY_POINT_COUNT ? CATEGORY_PART : CATEGORY_PRODUCT;
         }
     }
 
@@ -89,6 +91,10 @@ public class ShotRecognition {
     }
 
     private static int getShotTypeByBody(MediaPartItem item) {
+        //shot-type of body must > 9
+        if(item.getKeyPointCount() < THRESOLD_KEY_POINT_COUNT){
+            return MetaInfo.SHOT_TYPE_NONE;
+        }
         float bodyArea = item.getBodyArea();
         float bodyRate = bodyArea / (item.imageMeta.getWidth() * item.imageMeta.getHeight());
         return getShopTypeByBody(bodyRate);

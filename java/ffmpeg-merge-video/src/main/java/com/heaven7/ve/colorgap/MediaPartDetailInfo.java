@@ -6,7 +6,6 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.kingdom.Kingdom;
-import com.heaven7.ve.kingdom.TagItem;
 
 import java.util.List;
 
@@ -35,11 +34,18 @@ public class MediaPartDetailInfo {
         if (meta.getWidth() == 0 || meta.getHeight() == 0) {
             throw new IllegalStateException("must set width and height. for part = " + item);
         }
+        if(item.getKeyPointCount() < ShotRecognition.THRESOLD_KEY_POINT_COUNT){
+            return -1;
+        }
         float bodyArea = item.getBodyArea();
         if (bodyArea == -1) {
             return -1;
         }
         return bodyArea / (meta.getWidth() * meta.getHeight());
+    }
+
+    public int getKeyFrameTime(){
+        return item.getKeyFrameTime();
     }
 
     public String getShotType() {
@@ -102,6 +108,7 @@ public class MediaPartDetailInfo {
                     ", topTags = " + getTopTagsString() +
                     ", shotCategory = " + getShotCategoryString() +
                     ", highLight = " + getHighLightString() +
+                    ", keyFrameTime = " + getKeyFrameTime() +
                     '}';
         }catch (Exception e){
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.heaven7.ve.test;
 
+import com.heaven7.core.util.Logger;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.FFmpegUtils;
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestUtils {
 
+    private static final String TAG = "TestUtils";
 
     public static MediaResourceItem createImageItem(String path) {
         MediaResourceItem item = new MediaResourceItem();
@@ -39,7 +41,7 @@ public class TestUtils {
         CmdHelper.VideoDurationCallback dc = new CmdHelper.VideoDurationCallback();
         new CmdHelper(cmds).execute(dc);
         long duration = dc.getDuration();
-        //System.out.println(duration);
+        Logger.d(TAG, "createVideoItem", "duration = " + duration + " ,path = " + path);
 
         MediaResourceItem item = new MediaResourceItem();
         item.setFilePath(path);

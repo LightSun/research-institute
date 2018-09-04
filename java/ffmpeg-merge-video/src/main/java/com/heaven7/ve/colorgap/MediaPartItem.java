@@ -570,10 +570,13 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     /** get the key frame time ( in seconds). if has high light use high light time. */
     public int getKeyFrameTime() {
-        long duration = imageMeta.getDuration();
-        int middleTime = (int) (duration / 2 / 1000);
         KeyValuePair<Integer, List<IHighLightData>> highLight = getHighLight();
-        return highLight != null ? highLight.getKey() : middleTime;
+        if(highLight != null){
+            return highLight.getKey();
+        }
+        long start = videoPart.getStartTime();
+        long halfDuration = (videoPart.getDuration() / 2);
+        return (int) CommonUtils.frameToTime(start + halfDuration, TimeUnit.SECONDS);
     }
 
     public void setKeyPointData(KeyPointData kpd) {

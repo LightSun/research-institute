@@ -466,7 +466,6 @@ public interface MetaInfo {
         //-------------------------- start High-Light ----------------------------
         /** set metadata for high light data. (from load high light) */
         public void setMediaData(MediaData mediaData) {
-             this.duration = mediaData.getDuration();
             List<MediaData.HighLightPair> hlMap = mediaData.getHighLightDataMap();
             if(!Predicates.isEmpty(hlMap)) {
                 highLightMap = new SparseArray<>();

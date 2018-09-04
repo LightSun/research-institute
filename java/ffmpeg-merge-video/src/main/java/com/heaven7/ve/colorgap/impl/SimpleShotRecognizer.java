@@ -2,7 +2,6 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.ve.colorgap.IShotRecognizer;
 import com.heaven7.ve.colorgap.MediaPartItem;
-import com.heaven7.ve.colorgap.MetaInfo;
 import com.heaven7.ve.colorgap.ShotRecognition;
 
 import java.util.List;
