@@ -107,54 +107,5 @@ public class KingdomData {
         }
     }
 
-    /** the person proportion. which used to judge shot type when no person.
-     * relative to a standard person.
-     * */
-    public static class PersonProportion{
-        private String desc;
-        private int index;//tag index
-        private float proportion;
-
-        public String getDesc() {
-            return desc;
-        }
-
-        public void setDesc(String desc) {
-            this.desc = desc;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-        public void setIndex(int index) {
-            this.index = index;
-        }
-
-        public float getProportion() {
-            return proportion;
-        }
-        public void setProportion(float proportion) {
-            this.proportion = proportion;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            PersonProportion that = (PersonProportion) o;
-            return index == that.index;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return Objects.hash(index);
-        }
-    }
-
-    public static void main(String[] args) {
-        
-    }
-
 }
     

@@ -12,7 +12,6 @@ import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.collect.CollectModule;
-import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.filter.MediaDirFilter;
 import com.heaven7.ve.colorgap.filter.VideoTagFilter;
 import com.heaven7.ve.colorgap.impl.AirShotFilterImpl;

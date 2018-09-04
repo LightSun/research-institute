@@ -12,14 +12,6 @@ public class MediaResourceItem {
         private float ratio; //height / width in album
         private long duration; //in mill seconds
 
-        public float getImageRatio() {
-            return ratio;
-        }
-
-        public void setImageRatio(float ratio) {
-            this.ratio = ratio;
-        }
-
         public boolean isImage() {
             return mime.startsWith("image");
         }
@@ -49,14 +41,6 @@ public class MediaResourceItem {
 
         public void setMime(String mime) {
             this.mime = mime;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
         }
 
         /** in mills */
