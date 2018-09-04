@@ -8,6 +8,7 @@ import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.Visitors;
+import com.heaven7.java.visitor.WeightVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
@@ -20,6 +21,7 @@ import com.heaven7.ve.kingdom.Kingdom;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +36,16 @@ public class VEGapUtils {
     // private static final String TAG = "VEGapUtils";
     private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
     private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
+
+    public static void setDefaultShotType(List<MediaPartItem> parts){
+        for (MediaPartItem item : parts){
+            if(MetaInfo.getShotTypeFrom(item.getImageMeta().getShotType()) == MetaInfo.SHOT_TYPE_NONE){
+                item.addDetail("default shot-type mediumShot\n");
+                item.getImageMeta().setShotType(MetaInfo.getShotTypeString(MetaInfo.SHOT_TYPE_MEDIUM_SHOT));
+                item.computeScore();
+            }
+        }
+    }
 
     public static KeyValuePair<Integer, List<IHighLightData>> filterHighLight(Kingdom kingdom,
                                                                              @Nullable KeyValuePair<Integer, List<IHighLightData>> pair){
@@ -61,20 +73,17 @@ public class VEGapUtils {
         }).getAsList();
         //clear repeat
         if(!Predicates.isEmpty(list)){
-            List<IHighLightData> list2 = new ArrayList<>();
-            VisitServices.from(list).filter(null, new PredicateVisitor<IHighLightData>() {
+            list = VisitServices.from(list).removeRepeat(null, new Comparator<IHighLightData>() {
                 @Override
-                public Boolean visit(IHighLightData data, Object param) {
-                    List<String> names = VisitServices.from(list2).map(new ResultVisitor<IHighLightData, String>() {
-                        @Override
-                        public String visit(IHighLightData data, Object param) {
-                            return data.getName();
-                        }
-                    }).getAsList();
-                    return names.contains(data.getName());
+                public int compare(IHighLightData o1, IHighLightData o2) {
+                    return o1.getName().equals(o2.getName()) ? 0 : 1;
                 }
-            }, list2);
-            list = list2;
+            }, new WeightVisitor<IHighLightData>() {
+                @Override
+                public Integer visit(IHighLightData data, Object param) {
+                    return Float.floatToIntBits(data.getScore());
+                }
+            }).getAsList();
         }
         return list;
     }
@@ -278,5 +287,24 @@ public class VEGapUtils {
             }
         }
         return mainFaces;
+    }
+
+    public static int getShotTypeBySubjectRate(float val) {
+        if(isInRange(val,0.85f, 1.000001f)){
+            return MetaInfo.SHOT_TYPE_BIG_LONG_SHORT;
+        }else if(isInRange(val,0.75f, 0.85f)){
+            return MetaInfo.SHOT_TYPE_CLOSE_UP;
+        }else if(isInRange(val,0.6f, 0.75f)){
+            return MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP;
+        }else if(isInRange(val,0.45f, 0.6f)){
+            return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
+        }else if(isInRange(val,0.35f, 0.45f)){
+            return MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT;
+        }else if(isInRange(val,0.25f, 0.35f)){
+            return MetaInfo.SHOT_TYPE_LONG_SHORT;
+        }else if(isInRange(val,0.0f, 0.25f)){
+            return MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP;
+        }
+        return MetaInfo.SHOT_TYPE_NONE;
     }
 }

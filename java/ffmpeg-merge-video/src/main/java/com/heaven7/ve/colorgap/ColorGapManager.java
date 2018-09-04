@@ -161,7 +161,7 @@ public class ColorGapManager extends BaseContextOwner{
     private void processShotType(List<MediaPartItem> newItems, List<CutInfo.PlaidInfo> plaids,
                               @Nullable VETemplate srcTemplate, VETemplate resultTemplate,
                               FillCallback callback) {
-        //do with shot type
+        //do with shot type (need subject items)
         List<MediaPartItem> subjectItems = new ArrayList<>();
         for(MediaPartItem partItem : newItems){
             int shotType = mShotRecognizer.getShotType(partItem);
@@ -177,20 +177,6 @@ public class ColorGapManager extends BaseContextOwner{
             getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "setShotCategory", "processShotType",
                     partItem.toString() + " ,shot_category = " +ShotRecognition.getShotCategoryString(shotCategory));
         }
-        //write debug info for local debug.
-        if(getContext().getInitializeParam().getTestType() == ColorGapContext.TEST_TYPE_LOCAL
-                && getContext().getInitializeParam().isDebug()){
-            StringBuilder sb = new StringBuilder();
-            VisitServices.from(newItems).fireWithIndex(new FireIndexedVisitor<MediaPartItem>() {
-                @Override
-                public Void visit(Object param, MediaPartItem item, int index, int size) {
-                    sb.append(item.toString()).append("\r\n\n");
-                    return null;
-                }
-            });
-            FileUtils.writeTo(new File(getContext().getInitializeParam().getDebugOutDir(),
-                    "media_part_detail.txt"), sb.toString());
-        }
 
         //start subject recognize.
         if(Predicates.isEmpty(subjectItems)){
@@ -202,6 +188,8 @@ public class ColorGapManager extends BaseContextOwner{
             mShotRecognizer.requestSubject(subjectItems, new IShotRecognizer.Callback() {
                 @Override
                 public void onRecognizeDone(List<MediaPartItem> parts) {
+                    //at last. if no shot-type. default is medium-shot
+                    VEGapUtils.setDefaultShotType(parts);
                     //process story to color filter(gen shot key, filter)
                     getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "RecognizeSubject", "onRecognizeDone",
                             parts.toString());
@@ -216,6 +204,21 @@ public class ColorGapManager extends BaseContextOwner{
     private void doFillPlaids(List<MediaPartItem> newItems, List<CutInfo.PlaidInfo> plaids,
                               @Nullable VETemplate srcTemplate, VETemplate resultTemplate,
                               FillCallback callback) {
+        //all is ensure, write debug info for local debug.
+        if(getContext().getInitializeParam().getTestType() == ColorGapContext.TEST_TYPE_LOCAL
+                && getContext().getInitializeParam().isDebug()){
+            StringBuilder sb = new StringBuilder();
+            VisitServices.from(newItems).fireWithIndex(new FireIndexedVisitor<MediaPartItem>() {
+                @Override
+                public Void visit(Object param, MediaPartItem item, int index, int size) {
+                    sb.append(item.toString()).append("\r\n\n");
+                    return null;
+                }
+            });
+            FileUtils.writeTo(new File(getContext().getInitializeParam().getDebugOutDir(),
+                    "media_part_detail.txt"), sb.toString());
+        }
+
         //process story to color filter(gen shot key, filter)
         List<GapManager.GapItem> gapItems = null;
         if (mStoryShader != null) {

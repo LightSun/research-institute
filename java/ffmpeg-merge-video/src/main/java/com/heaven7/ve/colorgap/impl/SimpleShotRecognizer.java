@@ -40,11 +40,6 @@ public class SimpleShotRecognizer implements IShotRecognizer {
 
     @Override
     public int getShotType(MediaPartItem item) {
-        int shotType = ShotRecognition.getShotType(item);
-        if(shotType != MetaInfo.SHOT_TYPE_NONE){
-            return shotType;
-        }
-        item.addDetail("default shot-type mediumShot");
-        return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
+        return ShotRecognition.getShotType(item);
     }
 }

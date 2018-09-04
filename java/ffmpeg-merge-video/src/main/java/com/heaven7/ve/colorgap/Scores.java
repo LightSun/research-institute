@@ -41,8 +41,8 @@ public class Scores extends SimpleCopyDelegate{
     @Override
     public String toString() {
         return "Scores {" +
-                "shotTypeScore=" + shotTypeScore +
-                ", personNumberScore=" + personNumberScore +
+                " personNumberScore=" + personNumberScore +
+                ", shotTypeScore=" + shotTypeScore +
                 ", highLightScore=" + highLightScore +
                 '}';
     }

@@ -19,6 +19,7 @@ import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.filter.*;
 import com.heaven7.ve.colorgap.impl.ScoreProviderImpl;
+import com.heaven7.ve.utils.HighLightHelper;
 import com.vida.common.entity.MediaData;
 
 import java.util.ArrayList;
@@ -156,6 +157,9 @@ public interface MetaInfo {
     int TIME_SAME_PERIOD_IN_DAY   = 2; //timeSamePeriodInDay
 
     static int getShotTypeFrom(String shotType) {
+        if(TextUtils.isEmpty(shotType)){
+            return SHOT_TYPE_NONE;
+        }
         switch (shotType) {
             case "bigCloseUp":
                 return SHOT_TYPE_BIG_CLOSE_UP;
@@ -191,6 +195,9 @@ public interface MetaInfo {
                 return "longShot";
             case SHOT_TYPE_BIG_LONG_SHORT:
                 return "veryLongShot";
+
+            case SHOT_TYPE_NONE:
+                return "none";
             default:
                 throw new UnsupportedOperationException("wrong shotType " + shotType);
         }
@@ -441,6 +448,7 @@ public interface MetaInfo {
         private SparseArray<VideoDataLoadUtils.FrameData> frameDataMap;
         /** the high light data. key is the time in seconds. */
         private SparseArray<List<? extends IHighLightData>> highLightMap;
+        private HighLightHelper mHighLightHelper;
 
         /** 主人脸个数 */
         private int mainFaceCount = -1;
@@ -454,6 +462,8 @@ public interface MetaInfo {
         private List<Integer> domainTags;
         private List<Integer> adjTags;
 
+
+        //-------------------------- start High-Light ----------------------------
         /** set metadata for high light data. (from load high light) */
         public void setMediaData(MediaData mediaData) {
              this.duration = mediaData.getDuration();
@@ -468,53 +478,37 @@ public interface MetaInfo {
                     }
                 });
             }
+            mHighLightHelper = new HighLightHelper(highLightMap);
         }
+        @SuppressWarnings("unchecked")
+        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(int time){
+           return mHighLightHelper.getHighLight(time);
+        }
+        @SuppressWarnings("unchecked")
+        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(ColorGapContext context, TimeTraveller tt){
+            return mHighLightHelper.getHighLight(context, tt);
+        }
+
+        public List<KeyValuePair<Integer, List<IHighLightData>>> getHighLights(ColorGapContext context, TimeTraveller tt){
+            return mHighLightHelper.getHighLights(context, tt);
+        }
+        @SuppressWarnings("unchecked")
+        public HighLightArea getHighLightArea(ColorGapContext context, TimeTraveller tt){
+            return mHighLightHelper.getHighLightArea(context, tt);
+        }
+
+        public void setHighLightMap(SparseArray<List<? extends IHighLightData>> highLightMap) {
+            this.highLightMap = highLightMap;
+            this.mHighLightHelper = new HighLightHelper(highLightMap);
+        }
+
+        //-------------------------- end High-Light ----------------------------
         public SparseArray<VideoDataLoadUtils.FrameData> getFrameDataMap() {
             if(frameDataMap == null){
                 frameDataMap = new SparseArray<>();
             }
             return frameDataMap;
         }
-        @SuppressWarnings("unchecked")
-        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(int time){
-            if(highLightMap == null){
-                return null;
-            }
-            List<IHighLightData> data = (List<IHighLightData>) highLightMap.get(time);
-            return KeyValuePair.create(time, data);
-        }
-        @SuppressWarnings("unchecked")
-        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(ColorGapContext context, TimeTraveller tt){
-            if(highLightMap == null){
-                return null;
-            }
-            int start = (int)CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
-            int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
-            VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(context,
-                    new ScoreProviderImpl(), highLightMap);
-            int time = vhl.getHighLightPoint(start, end);
-            if(time == -1){
-                return null;
-            }
-            List<IHighLightData> data = (List<IHighLightData>) highLightMap.get(time);
-            return KeyValuePair.create(time, data);
-        }
-        @SuppressWarnings("unchecked")
-        public HighLightArea getHightLightArea(ColorGapContext context, TimeTraveller tt){
-            if(highLightMap == null){
-                return null;
-            }
-            int start = (int) CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
-            int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
-            VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(context, 
-                    new ScoreProviderImpl(), highLightMap);
-            return vhl.getHighLightArea(start, end);
-        }
-
-        public void setHighLightMap(SparseArray<List<? extends IHighLightData>> highLightMap) {
-            this.highLightMap = highLightMap;
-        }
-
         public void setFrameDataMap(SparseArray<VideoDataLoadUtils.FrameData> frameDataMap) {
             this.frameDataMap = frameDataMap;
         }

@@ -5,6 +5,7 @@ import com.heaven7.java.image.detect.BatchImageSubjectIdentifyManager;
 import com.heaven7.java.image.detect.Location;
 import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.colorgap.VEGapUtils;
 
 import java.util.List;
 
@@ -19,10 +20,6 @@ public abstract class SubjectRecognizeHelper extends BaseRecognizeHelper<Locatio
 
     public SubjectRecognizeHelper(List<MediaPartItem> mItems) {
        super(mItems);
-       //at last default to medium shot.
-       for(MediaPartItem item : mItems){
-           item.imageMeta.setShotType(getShotTypeString(MetaInfo.SHOT_TYPE_MEDIUM_SHOT));
-       }
     }
 
     @Override
@@ -33,17 +30,14 @@ public abstract class SubjectRecognizeHelper extends BaseRecognizeHelper<Locatio
     @Override
     protected void onProcess(MediaPartItem part, Location value) {
         int area = value.getArea();
-        int shotType;
-        //fixed to 1920*1080
-        float val = area * 1f / 1920 / 1080;
-        if(val > 2f / 3){
-            shotType = MetaInfo.SHOT_TYPE_CLOSE_UP;
-        }else if( val > 1f /3){
-            shotType = MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
-        }else {
-            shotType = MetaInfo.SHOT_TYPE_LONG_SHORT;
+        MetaInfo.ImageMeta imageMeta = part.imageMeta;
+        if(imageMeta.getWidth() == 0 || imageMeta.getHeight() == 0){
+            throw new IllegalStateException("width and height can't be 0. path = " + part.getItem().getFilePath());
         }
-        part.imageMeta.setShotType(getShotTypeString(shotType));
+        float val = area * 1f / (imageMeta.getWidth() * imageMeta.getHeight());
+        int shotType = VEGapUtils.getShotTypeBySubjectRate(val);
+        imageMeta.setShotType(getShotTypeString(shotType));
+        part.addDetail("SubjectRecognize(value = "+ val +")");
     }
 
 }

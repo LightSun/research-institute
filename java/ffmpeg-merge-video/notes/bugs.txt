@@ -1,2 +1,2 @@
 
-1, pending task 查询到。接着high-light 刚调用完。
+TransferDelegate__WARN__ >>> called transfer(): adjust index failed

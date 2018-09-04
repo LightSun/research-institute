@@ -42,7 +42,7 @@ public interface IShotRecognizer {
     /**
      * get shot type for media part item
      * @param item the media part item
-     * @return the shot type
+     * @return the shot type. or {@linkplain MetaInfo#SHOT_TYPE_NONE} if not found.
      */
     int getShotType(MediaPartItem item);
 
