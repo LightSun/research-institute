@@ -4,6 +4,10 @@ package com.vida.ai.third.baidu;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.heaven7.java.base.util.threadpool.Executors2;
+import com.heaven7.java.visitor.MapFireVisitor;
+import com.heaven7.java.visitor.collection.KeyValuePair;
+import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;
 import com.vida.ai.third.baidu.entity.VBodyAnalysis;
 import com.vida.ai.third.baidu.entity.VDetectionVidaSKI;
@@ -19,26 +23,26 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
-public class VThirdBaiduService {
+public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
 
     private static VThirdBaiduAccessToken accessToken;
+    private ExecutorService mService = Executors2.newFixedThreadPool(5);
 
     public static void main(String[] args) {
 
         //https://oauth.jd.com/oauth/token?grant_type=authorization_code&client_id=&redirect_uri=http://192.168.3.142&code=GET_CODE&state=1&client_secret=
         String image = "E:\\tmp\\upload_files\\test_4.jpg";
 
-        new VThirdBaiduService() {
-        }.postDetectionVidaSKI(image, new VThirdBaiduCallback<VDetectionVidaSKI>() {
+        VThirdBaiduService service = new VThirdBaiduService();
+        service.postDetectionVidaSKI(image, new VThirdBaiduCallback<VDetectionVidaSKI>(service) {
             @Override
             protected void onSuccess(Call call, VDetectionVidaSKI obj) {
                 System.out.println(obj.toString());
             }
         });
     }
-
-
     /**
      * 获取百度token
      * @param ak
@@ -85,7 +89,7 @@ public class VThirdBaiduService {
         Map<String, String> header = new HashMap<>();
         header.put("Content-Type", "application/x-www-form-urlencoded");
 
-        OkHttpHelper.post(requestUrl, header, RequestBodys.toFormUrlEncodeBody(param), callback);
+        post(requestUrl, header, RequestBodys.toFormUrlEncodeBody(param), callback);
     }
 
     public void postObjectDetect(String image, VThirdBaiduCallback<VObjectDetect> callback) {
@@ -121,7 +125,7 @@ public class VThirdBaiduService {
         Map<String, String> header = new HashMap<>();
         header.put("Content-Type", "application/x-www-form-urlencoded");
 
-        OkHttpHelper.post(requestUrl, header, RequestBodys.toFormUrlEncodeBody(param), callback);
+        post(requestUrl, header, RequestBodys.toFormUrlEncodeBody(param), callback);
     }
 
     public void postBodyAnalysis(String image, VThirdBaiduCallback<VBodyAnalysis> callback) {
@@ -161,7 +165,7 @@ public class VThirdBaiduService {
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
 
-        OkHttpHelper.post(requestUrl, header, requestBody, callback);
+        post(requestUrl, header, requestBody, callback);
     }
 
     public void postDetectionVidaSKI(String image, VThirdBaiduCallback<VDetectionVidaSKI> callback) {
@@ -199,5 +203,41 @@ public class VThirdBaiduService {
      */
     private void updateToken() {
         postAuth("6dD8acznGrtKRIwkVOeCeaKZ", "vNQIpqoFPHIU8G1WjeSO9EOOgUs1dzNj");
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if(mService != null){
+            mService.shutdownNow();
+            mService = null;
+        }
+        super.finalize();
+    }
+
+    /** for limit request count of bai-du-http */
+    private void post(String url, Map<String, String> headers, RequestBody body, Callback callback){
+        Request.Builder builder = new Request.Builder().url(url)
+                .post(body);
+        if(!headers.isEmpty()) {
+            VisitServices.from(headers).fire(new MapFireVisitor<String, String>() {
+                @Override
+                public Boolean visit(KeyValuePair<String, String> pair, Object param) {
+                    builder.addHeader(pair.getKey(), pair.getValue());
+                    return null;
+                }
+            });
+        }
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .dispatcher(new Dispatcher(mService))
+                .build();
+        Call call = okHttpClient.newCall(builder.build());
+        call.enqueue(callback);
+    }
+
+    public void postRequest(Request request, Callback callback) {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .dispatcher(new Dispatcher(mService))
+                .build();
+        okHttpClient.newCall(request).enqueue(callback);
     }
 }

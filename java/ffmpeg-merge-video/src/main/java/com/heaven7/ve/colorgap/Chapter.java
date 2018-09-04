@@ -103,15 +103,17 @@ public class Chapter extends BaseContextOwner{
         }
         filledItems.add(gapItem);
     }
+    public int getPlaidCount(){
+        return plaids.size();
+    }
     /** fill the plaids by normal */
     public int fill(PlaidFiller filler, int lastSortRule){
-        final int plaidCount = plaids.size();
         //target shot sort rule
         int sortRule = ShotSortDelegate.getNextSortRule(lastSortRule);
         getPerformanceCollector().addMessage(MODULE_FILL_PLAID,
                 TAG, "fill", "sort rule is " + ShotSortDelegate.getRuleString(sortRule));
         //set short type filter
-        setShortTypeFilter(plaidCount, sortRule);
+        setShortTypeFilter(sortRule);
 
         ChapterColorGapPostProcessor postProcessor = new ChapterColorGapPostProcessor(sortRule);
         filledItems = filler.fillPlaids(getContext(), plaids, items, postProcessor);
@@ -244,7 +246,8 @@ public class Chapter extends BaseContextOwner{
     }
 
     /** set short type filter */
-    private void setShortTypeFilter(int plaidCount, int sortRule) {
+    public void setShortTypeFilter(int sortRule) {
+        final int plaidCount = getPlaidCount();
         //add filter of short types.
         ShortTypeParam shortTypeParam = ShortTypeParam.fromTotalCount(plaidCount);
         getPerformanceCollector().addMessage(MODULE_FILL_PLAID,
@@ -588,6 +591,10 @@ public class Chapter extends BaseContextOwner{
                 return null;
             }
         });
+        getPerformanceCollector().addMessage(MODULE_FILL_PLAID, TAG, "sortRules", "input lastShotRule("
+                        + ShotSortDelegate.getRuleString(lastShotTypeRule)
+                        + ") ,output lastSortRule("
+                        + ShotSortDelegate.getRuleString(processor.getLastSortRule())  +") ");
         return processor.getLastSortRule();
     }
 

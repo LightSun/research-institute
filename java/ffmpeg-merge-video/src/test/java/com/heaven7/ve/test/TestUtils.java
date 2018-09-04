@@ -41,7 +41,7 @@ public class TestUtils {
         CmdHelper.VideoDurationCallback dc = new CmdHelper.VideoDurationCallback();
         new CmdHelper(cmds).execute(dc);
         long duration = dc.getDuration();
-        Logger.d(TAG, "createVideoItem", "duration = " + duration + " ,path = " + path);
+       // Logger.d(TAG, "createVideoItem", "duration = " + duration + " ,path = " + path);
 
         MediaResourceItem item = new MediaResourceItem();
         item.setFilePath(path);

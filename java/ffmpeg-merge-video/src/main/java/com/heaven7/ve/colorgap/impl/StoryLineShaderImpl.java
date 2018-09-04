@@ -8,10 +8,7 @@ import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
-import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
-import com.heaven7.ve.colorgap.impl.filler.MatchStageFiller;
-import com.heaven7.ve.colorgap.impl.filler.MaxScoreStageFiller;
-import com.heaven7.ve.colorgap.impl.filler.ResuseItemStageFiller;
+import com.heaven7.ve.colorgap.impl.filler.*;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
 import com.heaven7.ve.utils.Flags;
@@ -101,9 +98,31 @@ public class StoryLineShaderImpl implements StoryLineShader {
                 break;
 
             case VETemplate.FILL_TYPE_ALL_SHOTS_MAX_SCORE:
+                /*
+                  1,  chapter: 镜头类型,比例染色。
+                  2， 整体color-gap
+                  3,  chapter: 局部排序
+                 */
                 chapters = groupChapterAllShots(context, template, items);
+                //1, shot-type filter
+                int startRule = lastSortRule;
                 for (Chapter chapter : chapters){
-                    lastSortRule = chapter.fill(filler, lastSortRule);
+                    startRule = ShotSortDelegate.getNextSortRule(startRule);
+                    Logger.d(TAG, "tintAndFill", "all_shots_max_score >>> shot-type filter. rule = "
+                            + ShotSortDelegate.getRuleString(startRule));
+                    chapter.setShortTypeFilter(startRule);
+                }
+                //2 . gap
+                BasePlaidFiller bp_filler = new BasePlaidFiller(new NormalStageFiller(), false);
+                List<GapManager.GapItem> gapItems = bp_filler.fillPlaids(context, plaids, items, null);
+                //3, sort by shot-type
+                for (Chapter chapter : chapters){
+                    //add the last gap items.
+                    chapter.receiveGapItems(gapItems);
+                    //chapter.sortByPlaid();
+                    lastSortRule = chapter.sortRules(lastSortRule);
+                    //adjust time
+                    chapter.adjustTime();
                 }
                 break;
 

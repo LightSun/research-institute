@@ -1,5 +1,6 @@
 package com.heaven7.ve.colorgap.impl;
 
+import com.heaven7.core.util.Logger;
 import com.heaven7.ve.colorgap.IShotRecognizer;
 import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.colorgap.ShotRecognition;
@@ -10,6 +11,8 @@ import java.util.List;
  * @author heaven7
  */
 public class SimpleShotRecognizer implements IShotRecognizer {
+
+    private static final String TAG = "SimpleShotRecognizer";
 
     @Override
     public void requestKeyPoint(List<MediaPartItem> parts, Callback callback) {
@@ -23,6 +26,7 @@ public class SimpleShotRecognizer implements IShotRecognizer {
 
     @Override
     public void requestSubject(List<MediaPartItem> parts, Callback callback) {
+       // Logger.d(TAG, "requestSubject", "size = " + parts.size());
         new SubjectRecognizeHelper(parts){
             @Override
             protected void onDone() {

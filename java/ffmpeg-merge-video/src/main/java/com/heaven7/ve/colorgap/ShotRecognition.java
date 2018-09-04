@@ -129,15 +129,13 @@ public class ShotRecognition {
             return SHOT_TYPE_NONE;
         }
         int shotType = MetaInfo.getShotTypeFrom(moduleData.getShotType());
-
-        float heightRatio = hld.getLocation().height * 1f / item.imageMeta.getHeight();
-        if(heightRatio <= RATE_1_9){
-            shotType -= 4 ;
-        }else if(heightRatio <= RATE_1_3){
-            shotType -= 2;
-        }
-        if(shotType < SHOT_TYPE_BIG_LONG_SHORT){
-            shotType = SHOT_TYPE_BIG_LONG_SHORT;
+        float areaRate = hld.getLocation().getArea() * 1f / (item.imageMeta.getWidth() * item.imageMeta.getHeight());
+        if(CommonUtils.isInRange(areaRate, 0.5f, 1f)){
+            //empty
+        }else if(CommonUtils.isInRange(areaRate, 0.25f, 0.5f)){
+            shotType += 1;
+        }else if(CommonUtils.isInRange(areaRate, 0f, 0.25f)){
+            shotType += 2;
         }
         return shotType;
     }

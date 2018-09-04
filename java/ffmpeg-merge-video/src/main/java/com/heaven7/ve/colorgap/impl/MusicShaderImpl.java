@@ -66,6 +66,7 @@ public class MusicShaderImpl implements MusicShader {
                  delegate.transferAll(from, ls);
                  ls.setShotCategoryFlags(from.getShotCategoryFlags());
              }
+             assert resultTem.getTotalPlaidCount() == plaids.size();
          }else{
              //one logic-sentence
              VETemplate.LogicSentence ls = new VETemplate.LogicSentence();

@@ -22,13 +22,13 @@ public class BaiduImageDetector implements ImageDetector {
 
     @Override
     public void detectHighLight(byte[] imageData, OnDetectCallback<List<IHighLightData>> callback) {
-        mService.postDetectionVidaSKI(imageData, new VThirdBaiduCallback<VDetectionVidaSKI>() {
+        mService.postDetectionVidaSKI(imageData, new VThirdBaiduCallback<VDetectionVidaSKI>(mService) {
             @Override
             protected void onSuccess(Call call, VDetectionVidaSKI obj) {
                 callback.onSuccess(convert1(obj.getResults()));
             }
             @Override
-            protected void onFailed(Call call, String msg) {
+            protected void onFailed(Call call, int failedType,String msg) {
                 callback.onFailed(0, msg);
             }
         });
@@ -36,7 +36,7 @@ public class BaiduImageDetector implements ImageDetector {
 
     @Override
     public void detectKeyPoints(byte[] imageData, OnDetectCallback<List<KeyPointData>> callback) {
-        mService.postBodyAnalysis(imageData, new VThirdBaiduCallback<VBodyAnalysis>() {
+        mService.postBodyAnalysis(imageData, new VThirdBaiduCallback<VBodyAnalysis>(mService) {
             @Override
             protected void onSuccess(Call call, VBodyAnalysis obj) {
                 callback.onSuccess(convert1(obj.getPersonInfos()));
@@ -50,7 +50,7 @@ public class BaiduImageDetector implements ImageDetector {
 
     @Override
     public void detectSubjectIdentification(byte[] imageData, OnDetectCallback<Location> callback) {
-        mService.postObjectDetect(imageData, new VThirdBaiduCallback<VObjectDetect>() {
+        mService.postObjectDetect(imageData, new VThirdBaiduCallback<VObjectDetect>(mService) {
             @Override
             protected void onSuccess(Call call, VObjectDetect obj) {
                 callback.onSuccess(obj.getResult());
@@ -64,7 +64,7 @@ public class BaiduImageDetector implements ImageDetector {
 
     @Override
     public void detectHighLightBatch(BatchInfo info, byte[] imageData, OnDetectCallback<List<IHighLightData>> callback) {
-        mService.postDetectionVidaSKI(imageData, new VThirdBaiduCallback<VDetectionVidaSKI>() {
+        mService.postDetectionVidaSKI(imageData, new VThirdBaiduCallback<VDetectionVidaSKI>(mService) {
             @Override
             protected void onSuccess(Call call, VDetectionVidaSKI obj) {
                 List<VDetectionVidaSKI.Results> results = obj.getResults();
@@ -85,7 +85,7 @@ public class BaiduImageDetector implements ImageDetector {
 
     @Override
     public void detectKeyPointsBatch(BatchInfo info, byte[] imageData, OnDetectCallback<List<KeyPointData>> callback) {
-        mService.postBodyAnalysis(imageData, new VThirdBaiduCallback<VBodyAnalysis>() {
+        mService.postBodyAnalysis(imageData, new VThirdBaiduCallback<VBodyAnalysis>(mService) {
             @Override
             protected void onSuccess(Call call, VBodyAnalysis obj) {
                 List<VBodyAnalysis.PersonInfo> personInfos = obj.getPersonInfos();

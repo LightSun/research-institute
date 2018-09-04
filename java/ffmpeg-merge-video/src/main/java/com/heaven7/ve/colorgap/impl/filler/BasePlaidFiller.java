@@ -18,12 +18,14 @@ import java.util.List;
 public class BasePlaidFiller implements PlaidFiller {
 
     private final StageFiller stageFiller;
+    private final boolean shouldAdjustTime;
 
-    public BasePlaidFiller(StageFiller filler) {
+    public BasePlaidFiller(StageFiller filler, boolean shouldAdjustTime) {
         this.stageFiller = filler;
+        this.shouldAdjustTime = shouldAdjustTime;
     }
     public BasePlaidFiller() {
-        this(new NormalStageFiller());
+        this(new NormalStageFiller(), true);
     }
 
     @Override
@@ -60,7 +62,9 @@ public class BasePlaidFiller implements PlaidFiller {
         }
 
         //adjust times by plaids
-        gapCallback.adjustTimes();
+        if(shouldAdjustTime) {
+            gapCallback.adjustTimes();
+        }
         return gapCallback.filledItems;
     }
 

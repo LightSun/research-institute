@@ -41,7 +41,6 @@ public class ShotTypeFilter extends GapColorFilter {
         protected int getCategory(int type) {
 
             switch (type){
-                case SHOT_TYPE_BIG_CLOSE_UP:
                 case SHOT_TYPE_CLOSE_UP:
                 case SHOT_TYPE_MEDIUM_CLOSE_UP:
                     return CATEGORY_CLOSE_UP;

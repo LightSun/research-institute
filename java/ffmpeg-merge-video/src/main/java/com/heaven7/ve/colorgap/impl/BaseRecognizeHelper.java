@@ -2,7 +2,6 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.detect.AbstractBatchImageManager;
-import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.visitor.*;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;

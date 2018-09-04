@@ -37,13 +37,14 @@ public class VEGapUtils {
     private static final float MAIN_FACE_AREA_RATE          = 2.0f ;        // 主人脸相对次要人脸的面积倍率
     private static final float AVERAGE_AREA_DIFF_RATE       = 0.5f  ;       // 多人脸场景中，次要人脸相对平均人脸面积的倍率
 
+    /** set default shot type with recompute score. */
     public static void setDefaultShotType(List<MediaPartItem> parts){
         for (MediaPartItem item : parts){
             if(MetaInfo.getShotTypeFrom(item.getImageMeta().getShotType()) == MetaInfo.SHOT_TYPE_NONE){
                 item.addDetail("default shot-type mediumShot\n");
                 item.getImageMeta().setShotType(MetaInfo.getShotTypeString(MetaInfo.SHOT_TYPE_MEDIUM_SHOT));
-                item.computeScore();
             }
+            item.computeScore();
         }
     }
 

@@ -318,7 +318,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
                 }
             }
             float averMainFaceArea = getAverMainFaceArea(fis, imageMeta.getMainFaceCount());
-            System.out.println("averMainFaceArea = " + averMainFaceArea);
+            //System.out.println("averMainFaceArea = " + averMainFaceArea);
             String shotType = getShotType(averMainFaceArea);
             if(shotType != null){
                 imageMeta.setShotType(shotType);

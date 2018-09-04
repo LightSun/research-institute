@@ -116,32 +116,27 @@ public interface MetaInfo {
     /**
      * shot type: big - long- short  ( 大远景)
      */
-    int SHOT_TYPE_BIG_LONG_SHORT = 1;
+    int SHOT_TYPE_BIG_LONG_SHORT = 5;
     /**
      * shot type: long short ( 远景)
      */
-    int SHOT_TYPE_LONG_SHORT = 2;
+    int SHOT_TYPE_LONG_SHORT = 4;
 
     /**  medium long shot. (中远景) */
     int SHOT_TYPE_MEDIUM_LONG_SHOT = 3;
     /**
      * shot type: medium shot(中景)
      */
-    int SHOT_TYPE_MEDIUM_SHOT = 4;
-    /**
-     * shot type: close up -head ( 特写-头)
-     */
-    int SHOT_TYPE_CLOSE_UP = 5;
+    int SHOT_TYPE_MEDIUM_SHOT = 2;
     /**
      * shot type: close up - chest ( 特写-胸)
      */
-    int SHOT_TYPE_MEDIUM_CLOSE_UP = 6;
-    /**
-     * shot type: big close up ( 大特写)
-     */
-    @Deprecated
-    int SHOT_TYPE_BIG_CLOSE_UP = 7;
+    int SHOT_TYPE_MEDIUM_CLOSE_UP = 1;
 
+    /**
+     * shot type: close up -head ( 特写-头)
+     */
+    int SHOT_TYPE_CLOSE_UP = 0;
 
     int SHOT_TYPE_NONE  = -1;
 
@@ -161,8 +156,6 @@ public interface MetaInfo {
             return SHOT_TYPE_NONE;
         }
         switch (shotType) {
-            case "bigCloseUp":
-                return SHOT_TYPE_BIG_CLOSE_UP;
             case "closeUp":
                 return SHOT_TYPE_CLOSE_UP;
             case "mediaCloseUp":
@@ -181,8 +174,6 @@ public interface MetaInfo {
     }
     static String getShotTypeString(int shotType) {
         switch (shotType) {
-            case SHOT_TYPE_BIG_CLOSE_UP:
-                return "bigCloseUp";
             case SHOT_TYPE_CLOSE_UP:
                 return "closeUp";
             case SHOT_TYPE_MEDIUM_CLOSE_UP:
