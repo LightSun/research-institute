@@ -17,6 +17,7 @@ import java.util.List;
 
 public class BasePlaidFiller implements PlaidFiller {
 
+    private static final String TAG = "BasePlaidFiller";
     private final StageFiller stageFiller;
     private final boolean shouldAdjustTime;
 
@@ -32,7 +33,7 @@ public class BasePlaidFiller implements PlaidFiller {
     public List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts, ColorGapPostProcessor processor) {
         final boolean notEnough = parts.size() < infoes.size();
         if(notEnough){
-            Logger.d("PlaidFillerImpl", "fill", "shot is not enough --- expect plaid.count = "
+            Logger.d(TAG, "fill", "shot is not enough --- expect plaid.count = "
                     + infoes.size() + " but is " + parts.size());
         }
         /*

@@ -117,7 +117,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
                 List<GapManager.GapItem> gapItems = bp_filler.fillPlaids(context, plaids, items, null);
                 //3, sort by shot-type
                 for (Chapter chapter : chapters){
-                    //add the last gap items.
+                    //receive gap items.
                     chapter.receiveGapItems(gapItems);
                     //chapter.sortByPlaid();
                     lastSortRule = chapter.sortRules(lastSortRule);

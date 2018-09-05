@@ -35,6 +35,13 @@ public abstract class StageFiller {
         return buildLeftFillInfo(newPlaids, items, callback);
     }
 
+    /**
+     * fill the plaid by target media part items which named 'Shot'.
+     * @param context the context
+     * @param newPlaids the new plaids which is sorted by weight
+     * @param items the shot items
+     * @param callback the gap callback
+     */
     protected abstract void fillImpl(Context context, List<CutInfo.PlaidInfo> newPlaids, List<MediaPartItem> items, GapManager.GapCallback callback);
 
     /**

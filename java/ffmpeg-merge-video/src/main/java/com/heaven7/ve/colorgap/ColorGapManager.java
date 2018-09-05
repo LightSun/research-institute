@@ -256,7 +256,6 @@ public class ColorGapManager extends BaseContextOwner{
             VideoEditorNode ve_node = new VideoEditorNode();
             CutInfo.PlaidInfo info = (CutInfo.PlaidInfo) gapItem.plaid;
             MediaPartItem mpi = (MediaPartItem) gapItem.item;
-            // Logger.d("PlaidFillerImpl", "fillPlaids", "plaid index = " + infoes.indexOf(info));
             //audio
             AudioTrack at = new AudioTrack();
             at.setPath(info.getPath());

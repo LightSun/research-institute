@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class FFmpegVideoHelper {
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    //private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     //plaidScatter 格子分布
     public static void buildVideo(VETemplate plaidScatter, List<GapManager.GapItem> gapItems, String dir){
@@ -48,7 +48,12 @@ public class FFmpegVideoHelper {
         //build merge cmd and execute cmd
         String outVidePath = dir + File.separator + "merged.mp4";
         String[] cmds = FFmpegUtils.buildMergeVideoCmd(file.getAbsolutePath(), outVidePath);
-        new CmdHelper(cmds).execute(new CmdHelper.LogCallback());
+        new CmdHelper(cmds).execute(new CmdHelper.LogCallback(){
+            @Override
+            public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
+                pb.inheritIO();
+            }
+        });
     }
 
     private static void buildDetail(VETemplate plaidScatter, List<CuttedItem> cutItems, String dir) {

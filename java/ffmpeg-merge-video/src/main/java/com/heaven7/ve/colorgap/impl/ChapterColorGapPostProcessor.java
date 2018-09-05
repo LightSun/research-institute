@@ -6,6 +6,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.ColorGapPostProcessor;
 import com.heaven7.ve.colorgap.MediaPartItem;
+import com.heaven7.ve.colorgap.ShortTypeParam;
 import com.heaven7.ve.colorgap.ShotSortDelegate;
 
 import java.util.List;
@@ -30,8 +31,8 @@ public class ChapterColorGapPostProcessor implements ColorGapPostProcessor {
     @Override
     public List<MediaPartItem> onPostProcess(Context context, List<MediaPartItem> items) {
         //List<Story> stories = mChapter.getAllStory();
-        List<MediaPartItem> result = VisitServices.from(items).groupService(6).map(
-                new ResultVisitor<List<MediaPartItem>, List<MediaPartItem>>() {
+        List<MediaPartItem> result = VisitServices.from(items).groupService(ShortTypeParam.SORT_SHOT_COUNT)
+                .map(new ResultVisitor<List<MediaPartItem>, List<MediaPartItem>>() {
             @Override
             public List<MediaPartItem> visit(List<MediaPartItem> list, Object param) {
                 int rule = sortRule;

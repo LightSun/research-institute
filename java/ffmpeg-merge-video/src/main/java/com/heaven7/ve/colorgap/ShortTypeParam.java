@@ -6,6 +6,8 @@ package com.heaven7.ve.colorgap;
  */
 public class ShortTypeParam {
 
+    public static final int SORT_SHOT_COUNT = 6;
+
     private int mediumCount;
     private int nearCount  ;
     private int longCount  ;
@@ -31,12 +33,13 @@ public class ShortTypeParam {
         int nearCount   = 0;
         int longCount   = 0;
         int more = 0;
-        if(totalCount > 6){ //medium =3, near = 2, Long = 1
-            more = totalCount % 6;
-            mediumCount = totalCount / 6 * 3;
-            nearCount = totalCount / 6 * 2;
-            longCount = totalCount / 6; //totalCount / 6 * 1
-        }else if(totalCount == 6){
+        if(totalCount > SORT_SHOT_COUNT){ //medium =3, near = 2, Long = 1
+            more = totalCount % SORT_SHOT_COUNT;
+            int times = totalCount / SORT_SHOT_COUNT;
+            mediumCount = times * 3;
+            nearCount = times * 2;
+            longCount = times; //totalCount / 6 * 1
+        }else if(totalCount == SORT_SHOT_COUNT){
             mediumCount =  3;
             nearCount = 2;
             longCount =  1;

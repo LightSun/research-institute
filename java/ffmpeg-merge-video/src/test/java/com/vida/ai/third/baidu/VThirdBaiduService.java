@@ -156,10 +156,24 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
             e.printStackTrace();
         }
     }
+    @Override
+    public void postRequest(Request request, Callback callback) {
+        //for strict
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .dispatcher(new Dispatcher(getExecutorService(request.url().toString())))
+                .build();
+        okHttpClient.newCall(request).enqueue(callback);
+    }
+
+    @Override
     protected void finalize() throws Throwable {
         if(mService != null){
             mService.shutdownNow();
             mService = null;
+        }
+        if(mStrictService != null){
+            mStrictService.shutdownNow();
+            mStrictService = null;
         }
         super.finalize();
     }
@@ -193,14 +207,6 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
     private ExecutorService getExecutorService(String url) {
         //for strict
         return url.startsWith(URL_SUBJECT) ? mStrictService : mService;
-    }
-
-    public void postRequest(Request request, Callback callback) {
-        //for strict
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .dispatcher(new Dispatcher(getExecutorService(request.url().toString())))
-                .build();
-        okHttpClient.newCall(request).enqueue(callback);
     }
 
     private String getRealUrl(String baseUrl) {
