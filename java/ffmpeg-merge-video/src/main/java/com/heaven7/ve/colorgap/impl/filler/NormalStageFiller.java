@@ -15,7 +15,7 @@ public class NormalStageFiller extends StageFiller {
 
     private final StageFiller matchFiller = new MatchStageFiller();
     private final StageFiller maxFiller = new MaxScoreStageFiller();
-    private final StageFiller reuseFiller = new ResuseItemStageFiller();
+    private final StageFiller reuseFiller = new ReuseItemStageFiller();
 
     @Override
     protected void fillImpl(Context context, List<CutInfo.PlaidInfo> newPlaids, List<MediaPartItem> items, GapManager.GapCallback callback) {

@@ -1,5 +1,6 @@
 package com.heaven7.ve.test.util;
 
+import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
@@ -28,6 +29,15 @@ public class FFmpegVideoHelper {
 
     //plaidScatter 格子分布
     public static void buildVideo(VETemplate plaidScatter, List<GapManager.GapItem> gapItems, String dir){
+        //delete any video from dir
+        VisitServices.from(FileUtils.getFiles(new File(dir), "mp4"))
+                .fire(new FireVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                return new File(s).delete();
+            }
+        });
+
         //cut video by cmd
         List<CuttedItem> cutItems = cutVideoActually(gapItems, dir);
         //build concat.txt
@@ -93,8 +103,10 @@ public class FFmpegVideoHelper {
 
             for (CuttedItem item : cutItems){
                 //file 'F:\\videos\\wedding\\empty\\empty_C0015.mp4'
-                fw.write("file '"+ item.getSavePath() + "'  tagScore = "+ item.getTagScore() + " ,bias = " + item.isBiasShot()
-                        + " ,time = "  + SDF.format(item.getLastModifyTime()) + "\r\n");
+                /*fw.write("file '"+ item.getSavePath() + "'  tagScore = "+ item.getTagScore() + " ,bias = " + item.isBiasShot()
+                        + " ,time = "  + SDF.format(item.getLastModifyTime()) + "\r\n");*/
+                fw.write(item.toString() + "\r\n");
+                fw.write("\r\n");
             }
         } catch (IOException e) {
             e.printStackTrace();

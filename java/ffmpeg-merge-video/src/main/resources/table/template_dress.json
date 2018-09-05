@@ -1,6 +1,7 @@
 {
   "type": "color",
   "chapter_fill_type":"all_shots_max_score",
+  "release_sentence":"false",
   "items": [
     {
       "proportion":0.3,

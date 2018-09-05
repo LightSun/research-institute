@@ -12,7 +12,7 @@ import com.heaven7.util.FrameTagInfo;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.colorgap.*;
-import com.heaven7.ve.test.ContextImpl;
+import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
 import org.junit.Test;
 
 import java.io.File;
@@ -39,7 +39,7 @@ public class CountTagTest {
         String[] tags = {"Gown"};
         float minPoss = 0.5f;
 
-        Callback2 callback = new Callback2(new ContextImpl());
+        Callback2 callback = new Callback2(new SimpleColorGapContext());
         loadData(dir, callback);
         List<FrameTagInfo> infos = callback.getFrameTagInfos(tags, minPoss);
         StringBuilder sb = buildFrameTagInfos(infos, tags, minPoss);
@@ -56,7 +56,7 @@ public class CountTagTest {
         String[] tags = {"Jeans"};
         float minPoss = 0.5f;
 
-        ContextImpl context = new ContextImpl();
+        SimpleColorGapContext context = new SimpleColorGapContext();
         Callback2 callback = new Callback2(context);
         loadData(dir, callback);
         List<FrameTagInfo> infos = callback.getFrameTagInfos(media, tags, minPoss);
@@ -75,7 +75,7 @@ public class CountTagTest {
         int start = 8;
         int end = 11;
         float minPoss = 0.5f;
-        ContextImpl context = new ContextImpl();
+        SimpleColorGapContext context = new SimpleColorGapContext();
 
         Callback2 callback = new Callback2(context);
         loadData(dir, callback);
@@ -104,7 +104,7 @@ public class CountTagTest {
         int end = 23;
         float minPoss = 0.5f;
 
-        ContextImpl context = new ContextImpl();
+        SimpleColorGapContext context = new SimpleColorGapContext();
         Callback2 callback = new Callback2(context);
         loadData(dir, callback);
         CsvDetail csvDetail = callback.getCsvDetail(mediaPath);
@@ -125,7 +125,7 @@ public class CountTagTest {
         String dir = "E:\\BaiduNetdiskDownload\\taobao_service";
         //String dir =  "E:\\BaiduNetdiskDownload\\taobao_service\\照片";
 
-        Callback0 callback = new Callback0(new ContextImpl());
+        Callback0 callback = new Callback0(new SimpleColorGapContext());
         loadData(dir, callback);
         callback.count(dir);
     }
@@ -134,7 +134,7 @@ public class CountTagTest {
     public void generateStrFile() {
         String dir = "E:\\BaiduNetdiskDownload\\taobao_service";
         // String dir = "E:\\BaiduNetdiskDownload\\taobao_service\\东森（服装）\\女装南泉外拍第二次视频2\\扎染褙子";
-        ContextImpl context = new ContextImpl();
+        SimpleColorGapContext context = new SimpleColorGapContext();
         Callback2 callback = new Callback2(context);
         loadData(dir, callback);
         VisitServices.from(callback.getCsvDetails()).fire(new FireVisitor<CsvDetail>() {
@@ -153,7 +153,7 @@ public class CountTagTest {
     }
     @Test //将tag转化为string. 将多个图片的tag文件(同目录) 写到一个文件里。
     public void generateStrFileForImage() {
-        ContextImpl context = new ContextImpl();
+        SimpleColorGapContext context = new SimpleColorGapContext();
         final String dir = "E:\\BaiduNetdiskDownload\\taobao_service";
         final String outDir = "E:\\BaiduNetdiskDownload\\taobao_service\\test";
         final int depth = 3;

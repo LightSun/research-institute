@@ -99,11 +99,14 @@ public class ColorGapManager extends BaseContextOwner{
         List<MediaItem> mediaItems = mediaAnalyser.analyse(mContext, items, barrier);
         module.end(TAG);
         //cut music
+        CollectModule musicModule = getPerformanceCollector().startModule(MODULE_CUT_MUSIC, TAG);
         CutInfo[] infoes = musicCut.cut(mContext, musicPath);
         List<CutInfo.PlaidInfo> plaids = new ArrayList<>();
         for (CutInfo info : infoes) {
             plaids.addAll(info.getPlaidInfos());
         }
+        musicModule.addMessage(TAG, "fill", "plaid.size = " + plaids.size());
+        musicModule.end(TAG);
 
         //convert template
         if(srcTemplate == null){

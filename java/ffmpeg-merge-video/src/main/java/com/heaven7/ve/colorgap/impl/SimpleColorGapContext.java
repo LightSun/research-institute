@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.ve.anno.SystemResource;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.ColorGapContext;
+import com.heaven7.ve.colorgap.MontageParam;
 import com.heaven7.ve.colorgap.MusicCutter;
 import com.heaven7.ve.kingdom.Kingdom;
 
@@ -13,6 +14,8 @@ public class SimpleColorGapContext implements ColorGapContext {
 
     private Kingdom mKingdom;
     private ColorGapPerformanceCollector mCollector;
+    private MontageParam mMontageParam;
+
     @SystemResource
     private MusicCutter mMusicCutter;
     @SystemResource
@@ -26,6 +29,16 @@ public class SimpleColorGapContext implements ColorGapContext {
     public InitializeParam getInitializeParam() {
         return mInitParam;
     }
+
+    @Override
+    public void setMontageParameter(MontageParam param) {
+        this.mMontageParam = param;
+    }
+    @Override
+    public MontageParam getMontageParameter() {
+        return mMontageParam;
+    }
+
     @Override
     public int getTestType() {
         return mInitParam != null ? mInitParam.getTestType() : TEST_TYPE_SERVER;

@@ -12,6 +12,7 @@ import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
+import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
 import com.heaven7.ve.colorgap.impl.TagBasedShotCutter;
 import com.heaven7.ve.kingdom.Kingdom;
 import junit.framework.TestCase;
@@ -40,7 +41,7 @@ public class CutShotTest extends TestCase {
     }
 
     List<MediaPartItem> cutItems(List<MediaResourceItem> items, CyclicBarrier barrier) {
-        Context context = new ContextImpl();
+        Context context = new SimpleColorGapContext();
         Throwables.checkEmpty(items);
         ResourceInitializer.init(null);
         List<MediaItem> mediaItems = mediaAnalyser.analyse(null, items, barrier);

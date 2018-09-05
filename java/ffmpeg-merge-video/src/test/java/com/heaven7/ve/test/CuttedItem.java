@@ -72,4 +72,9 @@ public class CuttedItem {
         MediaPartItem mpi = (MediaPartItem)item.item;
         return mpi.isPlaned();
     }
+
+    public String toString(){
+        MediaPartItem mpi = (MediaPartItem)item.item;
+        return mpi.toString();
+    }
 }

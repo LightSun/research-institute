@@ -20,7 +20,7 @@ dependencies {
    // compile files('libs/java-os.jar')
 
     compile 'com.heaven7.java.base:Java-base:1.1.21' //upgraded
-    compile 'com.heaven7.java.visitor:Visitor:1.2.9' //upgraded
+    compile 'com.heaven7.java.visitor:Visitor:1.2.9.1' //upgraded
     compile 'com.google.code.gson:gson:2.8.2'
 
    // compile 'org.bytedeco:javacv-platform:1.4.2'

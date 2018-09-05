@@ -17,6 +17,9 @@ public interface MusicShader {
     /** the tint flag of 'allow release head and tail.' */
     int FLAG_ALLOW_RELEASE_HEAD_TAIL = 0x0001;
 
+    /** protect_sentence. so sentence should not be release.  */
+    int FLAG_PROTECT_SENTENCE        = 0x0002;
+
     /**
      * tint by {@linkplain GapColorFilter}.
      * @param context the resource context

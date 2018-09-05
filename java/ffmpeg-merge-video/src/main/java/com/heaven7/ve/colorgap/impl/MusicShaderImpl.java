@@ -40,6 +40,9 @@ public class MusicShaderImpl implements MusicShader {
              //template.computePercent();
              float scale = plaids.size() * 1f / template.getTotalPlaidCount(); //target-plaid.size / template-plaid.size
              template.setTotalScale(scale);
+             if(!template.isReleaseSentence()){
+                 tintFlags |= FLAG_PROTECT_SENTENCE;
+             }
              /*
               * 1, 计算各个新的逻辑语句 格子个数。使得格子数目相当.
               * 2, 着色
@@ -122,6 +125,7 @@ public class MusicShaderImpl implements MusicShader {
 
         public List<CountInfo> adjustPlaidCount(int tintFlags){
             final boolean allow_release_head_tail = (tintFlags & FLAG_ALLOW_RELEASE_HEAD_TAIL) == FLAG_ALLOW_RELEASE_HEAD_TAIL;
+            final boolean protect_sentence = (tintFlags & FLAG_PROTECT_SENTENCE) == FLAG_PROTECT_SENTENCE;
             final int size = sentences.size();
             //一个逻辑语句对应一个CountInfo
             final List<CountInfo> list = new ArrayList<>();
@@ -168,6 +172,7 @@ public class MusicShaderImpl implements MusicShader {
                         }
                     });
                     //只能释放给相邻的
+                    out:
                      for(CountInfo info : list){
                          if(info.isReleased()){
                              continue;
@@ -188,10 +193,16 @@ public class MusicShaderImpl implements MusicShader {
                              targetIndex ++;
                          }
                          CountInfo target = findCountInfo(list, targetIndex);
+                         if(target == null){
+                             break;
+                         }
                          //may be self
                          while (target == info){
                              targetIndex ++;
                              target = findCountInfo(list, targetIndex);
+                             if(target == null) {
+                                 break out;
+                             }
                          }
                          merge0(target, info);
                          mPreReleasedCount ++;
@@ -297,8 +308,10 @@ public class MusicShaderImpl implements MusicShader {
                     + expectCount + ", " + list.toString());
             Logger.d(TAG, "adjust", "dump adjust info: " + list);
             if(shouldReleaseNextTime) {
-                //normal release
-                releaseIfNeed(size, list, 0, canReleaseHeadOrTail);
+                //normal release if not protect sentence.
+                if(!protect_sentence) {
+                    releaseIfNeed(size, list, 0, canReleaseHeadOrTail);
+                }
                 //release air at last, need sort by sentence index order
                 Collections.sort(list, (o1, o2) -> Integer.compare(o1.sentenceIndex, o2.sentenceIndex));
                 releaseAirSentence(size, list, canReleaseHeadOrTail);
@@ -334,6 +347,7 @@ public class MusicShaderImpl implements MusicShader {
             }
             final int temp_size = tempList.size();
 
+            out:
             for(int i = 0, len = list.size() ; i < len ; i++ ) {
                 CountInfo info = list.get(i);
                 //不能合并/不支持合并了 ---
@@ -374,13 +388,22 @@ public class MusicShaderImpl implements MusicShader {
                         usePre = false;
                     }
                     CountInfo target = findCountInfo(list, index);
+                    if(target == null){
+                        break;
+                    }
                     //exclude self
                     if(target == info){
                         index = usePre ? info.sentenceIndex + 1 : index + 1;
                         target = findCountInfo(list, index);
+                        if(target == null){
+                            break;
+                        }
                         while(target == info){
                             index ++;
                             target = findCountInfo(list, index);
+                            if(target == null){
+                                break out;
+                            }
                         }
                     }
                     //头尾重要，则不能释放到头尾上
@@ -389,6 +412,9 @@ public class MusicShaderImpl implements MusicShader {
                             index += 2;
                             try {
                                 target = findCountInfo(list, index);
+                                if(target == null){
+                                    break;
+                                }
                             } catch (IllegalStateException e) {
                                 throw new RuntimeException("VE-Template error, air-shot can't released.");
                             }
@@ -478,6 +504,7 @@ public class MusicShaderImpl implements MusicShader {
             //expectReleaseCount == 0 means normal释放模式， 否则 为释放次数模式。
             final boolean modeIsCount = expectReleaseCount > 0;
             boolean noNeedRelease = true;
+            out:
             for(int i = 0, len = list.size() ; i < len ; i++ ) {
                 CountInfo info = list.get(i);
                 //maybe头尾不释放
@@ -513,14 +540,26 @@ public class MusicShaderImpl implements MusicShader {
                         usePre = false;
                     }
                     CountInfo target = findCountInfo(list, index);
+                    if(target == null){
+                        noNeedRelease = true;
+                        break;
+                    }
                     //exclude self
                     if(target == info){
                         index = usePre ? info.sentenceIndex + 1 : index + 1;
                         target = findCountInfo(list, index);
+                        if(target == null){
+                            noNeedRelease = true;
+                            break;
+                        }
                         usePre = false;
                         while(target == info){
                             index ++;
                             target = findCountInfo(list, index);
+                            if(target == null){
+                                noNeedRelease = true;
+                                break out;
+                            }
                         }
                     }
                     //头尾重要，则不能释放到头尾上
@@ -529,6 +568,10 @@ public class MusicShaderImpl implements MusicShader {
                             index += 2;
                             try {
                                 target = findCountInfo(list, index);
+                                if(target == null){
+                                    noNeedRelease = true;
+                                    break;
+                                }
                             } catch (IllegalStateException e) {
                                 throw new RuntimeException("VE-Template error, release failed. index = " + index);
                             }
@@ -553,6 +596,10 @@ public class MusicShaderImpl implements MusicShader {
                                 break;
                             }
                             target = findCountInfo(list, index);
+                            if(target == null){
+                                noNeedRelease = true;
+                                break out;
+                            }
                         }
                     }
                     //不相邻, 不合并
@@ -573,6 +620,7 @@ public class MusicShaderImpl implements MusicShader {
             }
             return noNeedRelease;
         }
+        /** return null. if can't find */
         CountInfo findCountInfo(List<CountInfo> list, int sentenceIndex)throws IllegalStateException{
             if(sentenceIndex < 0) throw new IllegalArgumentException();
             for(CountInfo info : list){
@@ -583,7 +631,9 @@ public class MusicShaderImpl implements MusicShader {
                     return info;
                 }
             }
-            throw new IllegalStateException("expect sentence index = " + sentenceIndex);
+            Logger.d(TAG, "findCountInfo", "can't find for sentenceIndex = " + sentenceIndex);
+            //throw new IllegalStateException("expect sentence index = " + sentenceIndex);
+            return null;
         }
     }
 
@@ -704,6 +754,7 @@ public class MusicShaderImpl implements MusicShader {
         /** the wheel of release */
         public boolean shouldReleasePlaid() {
            // Logger.d(TAG, "shouldReleasePlaid", "merge percent = 1 / " + (mergedCount + 3 ));
+            //TODO release sentence have bugs . when raw sentence 30,40,30 -> 11(total)
             return getRound() + offset < rawCount * 1f / (mergedCount + 3);
         }
         /** indicate the count info is adjacent with current or not. */

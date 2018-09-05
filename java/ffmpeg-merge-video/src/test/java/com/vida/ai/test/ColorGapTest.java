@@ -8,6 +8,7 @@ import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.ColorGapManager;
 import com.heaven7.ve.colorgap.ColorGapParam;
+import com.heaven7.ve.colorgap.MontageParam;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.starter.KingdomStarter;
@@ -45,10 +46,13 @@ public class ColorGapTest {
     }
 
     public void start(String musicPath, List<MediaResourceItem> items, String outDir){
+        MontageParam param = new MontageParam();
+        param.setDuration(30);
         SimpleColorGapContext context = new SimpleColorGapContext();
         sInitContext.copySystemResource(context);
         context.setKingdom(KingdomStarter.getKingdom(KingdomStarter.TYPE_DRESS));
         context.setColorGapPerformanceCollector(new ColorGapPerformanceCollector());
+        context.setMontageParameter(param);
         //gap
         ColorGapManager cgm = new ColorGapManager(context, new MediaAnalyserImpl(),
                context.getMusicCutter(), new MusicShaderImpl(), new BasePlaidFiller());

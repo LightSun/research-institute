@@ -24,6 +24,14 @@ public class VETemplate {
 
     private List<LogicSentence> logicSentences;
     private String chapterFillType;
+    private boolean releaseSentence;
+
+    public boolean isReleaseSentence() {
+        return releaseSentence;
+    }
+    public void setReleaseSentence(boolean releaseSentence) {
+        this.releaseSentence = releaseSentence;
+    }
 
     public String getChapterFillType() {
         return chapterFillType;

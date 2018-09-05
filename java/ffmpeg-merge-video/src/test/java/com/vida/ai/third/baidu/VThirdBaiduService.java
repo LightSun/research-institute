@@ -27,8 +27,15 @@ import java.util.concurrent.ExecutorService;
 
 public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
 
+    private static final String API_KEY     = "6dD8acznGrtKRIwkVOeCeaKZ";
+    private static final String SECURE_KEY  = "vNQIpqoFPHIU8G1WjeSO9EOOgUs1dzNj";
+    private static final String URL_SUBJECT = "https://aip.baidubce.com/rest/2.0/image-classify/v1/object_detect";
+    private static final int QPS_LIMIT = 5;
+
     private static VThirdBaiduAccessToken accessToken;
-    private ExecutorService mService = Executors2.newFixedThreadPool(5);
+    private ExecutorService mService = Executors2.newFixedThreadPool(QPS_LIMIT - 1);
+    private ExecutorService mStrictService = Executors2.newFixedThreadPool(QPS_LIMIT / 2);
+
 
     public static void main(String[] args) {
 
@@ -44,41 +51,11 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
         });
     }
     /**
-     * 获取百度token
-     * @param ak
-     * @param sk
-     */
-    public void postAuth(String ak, String sk) {
-        // 获取token地址
-        String authHost = "https://aip.baidubce.com/oauth/2.0/token?";
-        String getAccessTokenUrl = authHost
-                // 1. grant_type为固定参数
-                + "grant_type=client_credentials"
-                // 2. 官网获取的 API Key
-                + "&client_id=" + ak
-                // 3. 官网获取的 Secret Key
-                + "&client_secret=" + sk;
-
-        Map<String, String> param = new HashMap<>();
-        try {
-            Response response = OkHttpHelper.postSync(getAccessTokenUrl, RequestBodys.toFormUrlEncodeBody(param));
-            ResponseBody body = response.body();
-            String responseBodyString = body.string();
-            Gson gson = new GsonBuilder().create();
-            accessToken = gson.fromJson(responseBodyString, VThirdBaiduAccessToken.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * 图片主体检测
-     * @param imageBytes
-     * @param callback
      */
     public void postObjectDetect(byte[] imageBytes, VThirdBaiduCallback<VObjectDetect> callback) {
-        String url = "https://aip.baidubce.com/rest/2.0/image-classify/v1/object_detect";
-        String requestUrl = urlAddToken(url);
+       // String url = "https://aip.baidubce.com/rest/2.0/image-classify/v1/object_detect";
+        String requestUrl = getRealUrl(URL_SUBJECT);
 
         String imageString = Base64.getEncoder().encodeToString(imageBytes);
 
@@ -110,12 +87,10 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
 
     /**
      * 人体检测接口
-     * @param imageBytes
-     * @param callback
      */
     public void postBodyAnalysis(byte[] imageBytes, VThirdBaiduCallback<VBodyAnalysis> callback) {
         String url = "https://aip.baidubce.com/rest/2.0/image-classify/v1/body_analysis";
-        String requestUrl = urlAddToken(url);
+        String requestUrl = getRealUrl(url);
 
         String imageString = Base64.getEncoder().encodeToString(imageBytes);
 
@@ -145,14 +120,12 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
     }
 
     /**
-     * 子模型接口，获取滑雪高光
-     * @param imageBytes
-     * @param callback
+     * 子模型接口，获取高光
      */
     public void postDetectionVidaSKI(byte[] imageBytes, VThirdBaiduCallback<VDetectionVidaSKI> callback) {
-        //String url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/detection/Vida_SKI";
+        //String url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/detection/Vida_SKI"; //滑雪
         String url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/detection/clothing"; //服装
-        String requestUrl = urlAddToken(url);
+        String requestUrl = getRealUrl(url);
 
         String imageString = Base64.getEncoder().encodeToString(imageBytes);
 
@@ -165,7 +138,7 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
 
-        post(requestUrl, header, requestBody, callback);
+        post(requestUrl, header, requestBody ,callback);
     }
 
     public void postDetectionVidaSKI(String image, VThirdBaiduCallback<VDetectionVidaSKI> callback) {
@@ -183,35 +156,60 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
             e.printStackTrace();
         }
     }
-
-    /**
-     * url请求加上token
-     * @param baseUrl
-     * @return
-     */
-    private String urlAddToken(String baseUrl) {
-        if (accessToken == null) {
-            postAuth("6dD8acznGrtKRIwkVOeCeaKZ", "vNQIpqoFPHIU8G1WjeSO9EOOgUs1dzNj");
-        }
-        String requestUrl = baseUrl
-                + "?access_token=" + accessToken.getAccess_token();
-        return requestUrl;
-    }
-
-    /**
-     * 更新token
-     */
-    private void updateToken() {
-        postAuth("6dD8acznGrtKRIwkVOeCeaKZ", "vNQIpqoFPHIU8G1WjeSO9EOOgUs1dzNj");
-    }
-
-    @Override
     protected void finalize() throws Throwable {
         if(mService != null){
             mService.shutdownNow();
             mService = null;
         }
         super.finalize();
+    }
+
+    //------------------------------ private -------------------------------
+
+    private void getAuth(String ak, String sk) {
+        // 获取token地址
+        String authHost = "https://aip.baidubce.com/oauth/2.0/token?";
+        String getAccessTokenUrl = authHost
+                // 1. grant_type为固定参数
+                + "grant_type=client_credentials"
+                // 2. 官网获取的 API Key
+                + "&client_id=" + ak
+                // 3. 官网获取的 Secret Key
+                + "&client_secret=" + sk;
+
+        Map<String, String> param = new HashMap<>();
+        try {
+            Response response = OkHttpHelper.postSync(getAccessTokenUrl, RequestBodys.toFormUrlEncodeBody(param));
+            ResponseBody body = response.body();
+            String responseBodyString = body.string();
+            Gson gson = new GsonBuilder().create();
+            accessToken = gson.fromJson(responseBodyString, VThirdBaiduAccessToken.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //for some api ,qps limit. so need strict service.
+    private ExecutorService getExecutorService(String url) {
+        //for strict
+        return url.startsWith(URL_SUBJECT) ? mStrictService : mService;
+    }
+
+    public void postRequest(Request request, Callback callback) {
+        //for strict
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .dispatcher(new Dispatcher(getExecutorService(request.url().toString())))
+                .build();
+        okHttpClient.newCall(request).enqueue(callback);
+    }
+
+    private String getRealUrl(String baseUrl) {
+        if (accessToken == null) {
+            getAuth(API_KEY, SECURE_KEY);
+        }
+        String requestUrl = baseUrl
+                + "?access_token=" + accessToken.getAccess_token();
+        return requestUrl;
     }
 
     /** for limit request count of bai-du-http */
@@ -228,16 +226,9 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
             });
         }
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .dispatcher(new Dispatcher(mService))
+                .dispatcher(new Dispatcher(getExecutorService(url)))
                 .build();
         Call call = okHttpClient.newCall(builder.build());
         call.enqueue(callback);
-    }
-
-    public void postRequest(Request request, Callback callback) {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .dispatcher(new Dispatcher(mService))
-                .build();
-        okHttpClient.newCall(request).enqueue(callback);
     }
 }

@@ -77,7 +77,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
                 //3, has left plaids , reuse item gap
                 if(leftPlaids.size() > 0){
                     BasePlaidFiller.GapCallbackImpl gapCallback = new BasePlaidFiller.GapCallbackImpl(context, leftPlaids, items);
-                    ResuseItemStageFiller reuse = new ResuseItemStageFiller();
+                    ReuseItemStageFiller reuse = new ReuseItemStageFiller();
                     reuse.fill(context, leftPlaids, items, gapCallback);
                     List<GapManager.GapItem> gapItems = gapCallback.getFilledItems();
                     //sore by chapter

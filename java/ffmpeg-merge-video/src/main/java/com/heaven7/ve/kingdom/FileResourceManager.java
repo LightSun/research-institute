@@ -72,6 +72,7 @@ public class FileResourceManager {
         VETemplate template = new VETemplate();
         template.setLogicSentences(list);
         template.setChapterFillType(templateData.getChapterFillType());
+        template.setReleaseSentence(templateData.isReleaseSentence());
         mTemplate = template;
         return template;
     }

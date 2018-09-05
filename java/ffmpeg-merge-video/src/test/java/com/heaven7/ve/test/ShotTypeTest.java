@@ -11,6 +11,7 @@ import com.heaven7.ve.colorgap.MediaItem;
 import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.colorgap.ResourceInitializer;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
+import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
 import org.junit.Test;
 
 import java.io.File;
@@ -60,7 +61,7 @@ public class ShotTypeTest {
                 VisitServices.from(outItems).map(new ResultVisitor<MediaItem, MediaPartItem>() {
                     @Override
                     public MediaPartItem visit(MediaItem mediaItem, Object param) {
-                        return mediaItem.asPart(new ContextImpl());
+                        return mediaItem.asPart(new SimpleColorGapContext());
                     }
                 }).fire(new FireVisitor<MediaPartItem>() {
                     @Override

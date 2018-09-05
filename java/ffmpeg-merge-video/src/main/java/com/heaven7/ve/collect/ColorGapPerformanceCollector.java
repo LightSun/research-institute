@@ -20,6 +20,7 @@ public class ColorGapPerformanceCollector {
     public static final String MODULE_CUT_VIDEO     = "CutVideo";
     public static final String MODULE_RECOGNIZE_SHOT= "RecognizeShot";
     public static final String MODULE_FILL_PLAID    = "FillPlaid";
+    public static final String MODULE_CUT_MUSIC     = "CutMusic";
 
     private final SparseArray<Collector> mModuleMap = new SparseArray<>();
 
@@ -31,6 +32,7 @@ public class ColorGapPerformanceCollector {
         String[] modules = {
                 MODULE_PRELOAD, MODULE_ANALYSE_MEDIA, MODULE_MUSIC_SHADER,
                 MODULE_CUT_VIDEO, MODULE_RECOGNIZE_SHOT, MODULE_FILL_PLAID,
+                MODULE_CUT_MUSIC,
         };
         VisitServices.from(Arrays.asList(modules)).fire(new FireVisitor<String>() {
             @Override

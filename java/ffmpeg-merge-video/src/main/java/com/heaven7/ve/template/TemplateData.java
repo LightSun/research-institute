@@ -16,6 +16,15 @@ public class TemplateData {
     private List<Item> items;
     @SerializedName("chapter_fill_type")
     private String chapterFillType;
+    @SerializedName("release_sentence")
+    private boolean releaseSentence;
+
+    public boolean isReleaseSentence() {
+        return releaseSentence;
+    }
+    public void setReleaseSentence(boolean releaseSentence) {
+        this.releaseSentence = releaseSentence;
+    }
 
     public String getChapterFillType() {
         return chapterFillType;

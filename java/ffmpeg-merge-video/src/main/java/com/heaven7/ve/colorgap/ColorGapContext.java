@@ -21,6 +21,9 @@ public interface ColorGapContext extends Context {
     void setInitializeParam(InitializeParam ip);
     InitializeParam getInitializeParam();
 
+    void setMontageParameter(MontageParam param);
+    MontageParam getMontageParameter();
+
     /**
      * get test type .default is {@linkplain #TEST_TYPE_SERVER}
      * @return the test type

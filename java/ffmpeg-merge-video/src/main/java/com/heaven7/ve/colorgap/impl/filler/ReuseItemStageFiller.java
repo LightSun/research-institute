@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public class ResuseItemStageFiller extends MatchStageFiller{
+public class ReuseItemStageFiller extends MatchStageFiller{
 
     @Override
     public void fillImpl(Context context, List<CutInfo.PlaidInfo> plaids, List<MediaPartItem> items, GapManager.GapCallback callback) {
