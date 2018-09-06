@@ -1,5 +1,6 @@
 package com.heaven7.utils;
 
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -8,6 +9,24 @@ import java.util.concurrent.TimeUnit;
 public class CommonUtils {
 
     private static final int FPS_VIDEO = 30;
+    private static final char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+
+    /**
+     * indicate the path is relative path or absolute path.
+     * @param path the path to judge
+     * @return true if is relative path
+     */
+    public static boolean isRelativePath(String path){
+        if(path.startsWith("/")){
+            return false;
+        }
+        for (char ch : ALPHABET){
+            if(path.startsWith(ch + ":")){
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static String urlEncode(String  str){
         try {
@@ -64,7 +83,6 @@ public class CommonUtils {
                 throw new UnsupportedOperationException("+" + unit);
         }
     }
-
 
     public static boolean isInRange(float val, float start, float end) {
         return val >= start && val < end;
