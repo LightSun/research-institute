@@ -111,7 +111,7 @@ public class ColorGapManager extends BaseContextOwner{
         //convert template
         if(srcTemplate == null){
             //from kingdom config
-            srcTemplate = getKingdom().getVETemplate();
+            srcTemplate = getContext().getTemplate();
         }
         //create template
         if(srcTemplate == null && mProvider != null){
@@ -150,12 +150,12 @@ public class ColorGapManager extends BaseContextOwner{
             }
         } catch (InterruptedException e) {
             //ignored e.printStackTrace();
-            callback.onFillFinished(null);
+            callback.onFillFinished(getContext(),null);
         } catch (BrokenBarrierException e) {
             throw new RuntimeException(e);
         }catch (RuntimeException e){
             Logger.w(TAG, "fill", Logger.toString(e));
-            callback.onFillFinished(null);
+            callback.onFillFinished(getContext(), null);
         }
     }
 
@@ -231,7 +231,7 @@ public class ColorGapManager extends BaseContextOwner{
             gapItems = filler.fillPlaids(getContext(), plaids, newItems ,null);
         }
         getPerformanceCollector().endModule(MODULE_FILL_PLAID, "doFillPlaids");
-        callback.onFillFinished(new FillResult(gapItems, srcTemplate, resultTemplate));
+        callback.onFillFinished(getContext(), new FillResult(gapItems, srcTemplate, resultTemplate));
     }
 
     /**
@@ -380,6 +380,6 @@ public class ColorGapManager extends BaseContextOwner{
          * called on fill finished
          * @param result the fill result, null means failed.
          */
-        void onFillFinished(FillResult result);
+        void onFillFinished(ColorGapContext context, FillResult result);
     }
 }

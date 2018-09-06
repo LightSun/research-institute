@@ -26,16 +26,6 @@ public class KingdomData {
     @SerializedName("main_face_score")
     private Map<String, Float> mainFaceMap;
 
-    @FileResource
-    private String template;
-
-    public String getTemplate() {
-        return template;
-    }
-    public void setTemplate(String template) {
-        this.template = template;
-    }
-
     public Map<String, Float> getShotTypeMap() {
         return shotTypeMap;
     }

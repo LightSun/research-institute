@@ -6,6 +6,8 @@ package com.heaven7.ve.colorgap;
  */
 public class MontageParam {
 
+    private String effectFileName;
+    private String templateFileName;
     /** duration in seconds */
     private int duration;
 
@@ -22,4 +24,17 @@ public class MontageParam {
         this.duration = duration;
     }
 
+    public String getEffectFileName() {
+        return effectFileName;
+    }
+    public void setEffectFileName(String effectFileName) {
+        this.effectFileName = effectFileName;
+    }
+
+    public String getTemplateFileName() {
+        return templateFileName;
+    }
+    public void setTemplateFileName(String templateFileName) {
+        this.templateFileName = templateFileName;
+    }
 }

@@ -1,0 +1,65 @@
+{
+  "texture": {
+    "indexes": [
+      {
+        "index": 0,
+        "type": "L2",
+        "value": "L2_0.mp4"
+      },
+      {
+        "index": -1,
+        "type": "L2",
+        "value": "L2_1.mp4"
+      }
+    ],
+    "chapter": [],
+    "level": [
+      {
+        "level": 0,
+        "type": "L2",
+        "value": "L2_1.mp4"
+      }
+    ]
+  },
+  "transition": {
+    "index": [],
+    "chapter": [
+      {
+        "index": -1,
+        "applyAll": true,
+        "percentage": 0.5,
+        "values": [
+          "leftMove",
+          "rightMove"
+        ]
+      }
+    ],
+    "level": [
+      {
+        "level": 0,
+        "percentage": 0.5,
+        "values": [
+          "leftRoller",
+          "rightRoller"
+        ]
+      },
+      {
+        "level": 3,
+        "percentage": 1,
+        "values": [
+          "blackFade"
+        ]
+      }
+    ]
+  },
+  "filter": {
+    "index": [],
+    "chapter": [],
+    "level": []
+  },
+  "special_effect": {
+    "index": [],
+    "chapter": [],
+    "level": []
+  }
+}

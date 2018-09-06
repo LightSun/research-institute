@@ -64,6 +64,10 @@ public class TransitionInfo extends EffectInfo {
         return NTYPE_TRANSITION;
     }
 
+    public void setTypeFrom(String val) {
+        //TODO setTypeFrom transition.
+    }
+
   /*  @Override
     public void setFrom(TimeTraveller src) {
         super.setFrom(src);

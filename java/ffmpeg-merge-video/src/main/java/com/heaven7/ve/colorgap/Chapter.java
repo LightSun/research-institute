@@ -18,6 +18,7 @@ import com.heaven7.ve.colorgap.impl.filler.MatchStageFiller;
 import com.heaven7.ve.colorgap.impl.filler.StageFiller;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
+import com.heaven7.ve.template.EffectData;
 import com.sun.media.jfxmedia.Media;
 
 import java.util.*;
@@ -627,4 +628,5 @@ public class Chapter extends BaseContextOwner{
                     }
                 }).getAsList();
     }
+
 }

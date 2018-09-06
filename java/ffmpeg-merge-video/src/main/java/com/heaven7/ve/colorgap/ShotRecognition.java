@@ -101,13 +101,11 @@ public class ShotRecognition {
     }
 
     private static int getShotTypeByHighLight(MediaPartItem item) {
-        List<IHighLightData> data;
         KeyValuePair<Integer, List<IHighLightData>> highLight = item.getHighLight();
-        if (highLight != null) {
-            data = highLight.getValue();
-        } else {
-            data = item.getHighLightData(item.getKeyFrameTime());
+        if (highLight == null || Predicates.isEmpty(highLight.getValue())) {
+            return SHOT_TYPE_NONE;
         }
+        List<IHighLightData> data = highLight.getValue();
         //module shot type
         int shotType_module = SHOT_TYPE_NONE;
         if(!Predicates.isEmpty(data)){

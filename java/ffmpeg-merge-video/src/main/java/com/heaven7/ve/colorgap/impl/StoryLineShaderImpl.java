@@ -10,6 +10,7 @@ import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.filler.*;
 import com.heaven7.ve.gap.GapManager;
+import com.heaven7.ve.template.EffectData;
 import com.heaven7.ve.template.VETemplate;
 import com.heaven7.ve.utils.Flags;
 
@@ -138,6 +139,8 @@ public class StoryLineShaderImpl implements StoryLineShader {
         for(Chapter chapter : chapters){
             result.addAll(chapter.getFilledItems());
         }
+        //mark effects
+        new EffectMarkerImpl().markEffects(VEGapUtils.asColorGapContext(context), chapters, result);
         return result;
     }
 

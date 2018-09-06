@@ -18,6 +18,10 @@ public class SpecialEffect extends EffectInfo{
         return NTYPE_SPECIAL_EFFECT;
     }
 
+    public void setTypeFrom(String val) {
+        //TODO set special effect from
+    }
+
    /* @Override
     public void setFrom(TimeTraveller src) {
         super.setFrom(src);

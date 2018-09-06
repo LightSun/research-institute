@@ -46,8 +46,12 @@ public class ColorGapTest {
     }
 
     public void start(String musicPath, List<MediaResourceItem> items, String outDir){
+        //montage param
         MontageParam param = new MontageParam();
         param.setDuration(30);
+        param.setEffectFileName("effect_dress");
+        param.setTemplateFileName("template_dress");
+
         SimpleColorGapContext context = new SimpleColorGapContext();
         sInitContext.copySystemResource(context);
         context.setKingdom(KingdomStarter.getKingdom(KingdomStarter.TYPE_DRESS));
@@ -69,8 +73,10 @@ public class ColorGapTest {
         ColorGapContext.InitializeParam ip = new ColorGapContext.InitializeParam();
         ip.setTestType(SimpleColorGapContext.TEST_TYPE_LOCAL);
         ip.setTemplateDir("table");
+        ip.setEffectDir("table");
         ip.setDebug(true);
         ip.setDebugOutDir("F:\\videos\\temp_works\\ClothingWhite");
+        ip.setEffectResourceDir("E:\\tmp\\服装demo_数据_ios\\texture");
 
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);

@@ -25,6 +25,10 @@ public class FilterInfo extends EffectInfo {
        NONE.setType(TYPE_NONE);
    }
 
+    public void setTypeFrom(String val) {
+ //TODO parse filter type.
+    }
+
    /* public native int getStrength();
     public native void setStrength(int strength);
 

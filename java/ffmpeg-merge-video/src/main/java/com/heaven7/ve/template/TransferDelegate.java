@@ -174,7 +174,7 @@ public class TransferDelegate {
         int getWeight(CutInfo.PlaidInfo info);
 
         /**
-         * apply the skill from one to another.
+         * applyEffects the skill from one to another.
          *
          * @param from the from plaid info
          * @param to   the to plaid info

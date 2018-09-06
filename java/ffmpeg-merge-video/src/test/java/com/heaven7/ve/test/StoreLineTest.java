@@ -5,6 +5,7 @@ import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.ColorGapManager;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
@@ -79,7 +80,7 @@ public class StoreLineTest extends TestCase {
 
                 cgm.fill(null, null, mItems, new ColorGapManager.FillCallback() {
                     @Override
-                    public void onFillFinished(ColorGapManager.FillResult result) {
+                    public void onFillFinished(ColorGapContext context, ColorGapManager.FillResult result) {
                         if(result == null){
                             Logger.w(TAG, "onFillFinished", "fill failed.");
                         }else{

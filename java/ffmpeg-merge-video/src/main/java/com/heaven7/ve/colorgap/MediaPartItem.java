@@ -48,8 +48,10 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     private GapColorFilter.GapColorCondition mCondition;
     private boolean hold; //是否已经被占用
+
     private final MediaPartDetailInfo mDetailInfo;
     private Scores mScores = new Scores();
+    private MarkFlags mMarkFlags = new MarkFlags();
 
     /** used for story */
     private int storyId = -1;
@@ -87,6 +89,9 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         this.mDetailInfo = new MediaPartDetailInfo(this);
     }
 
+    public MarkFlags getMarkFlags(){
+        return mMarkFlags;
+    }
     public boolean isPlaned() {
         return planed;
     }
@@ -556,6 +561,22 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         }
         return highLight;
     }
+
+    public ModuleData getHighLightModuleData(){
+        KeyValuePair<Integer, List<IHighLightData>> highLight = getHighLight();
+        if(highLight == null || Predicates.isEmpty(highLight.getValue())){
+            return null;
+        }
+        IHighLightData hld = VisitServices.from(highLight.getValue())
+                .pile(new PileVisitor<IHighLightData>() {
+            @Override
+            public IHighLightData visit(Object o, IHighLightData hd1, IHighLightData hd2) {
+                return hd1.getLocation().getArea() > hd2.getLocation().getArea() ? hd1 : hd2;
+            }
+        });
+        return getKingdom().getModuleData(hld.getName());
+    }
+
     public float getBodyArea() {
         if(mKeyPointData == null){
             return -1f;

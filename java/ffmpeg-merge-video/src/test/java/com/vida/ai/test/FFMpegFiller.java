@@ -1,6 +1,7 @@
 package com.vida.ai.test;
 
 import com.heaven7.core.util.Logger;
+import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.ColorGapManager;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.test.util.FFmpegVideoHelper;
@@ -20,7 +21,7 @@ public class FFMpegFiller implements ColorGapManager.FillCallback {
     }
 
     @Override
-    public void onFillFinished(ColorGapManager.FillResult result) {
+    public void onFillFinished(ColorGapContext context, ColorGapManager.FillResult result) {
         if(result == null){
             Logger.w(TAG, "onFillFinished", "fill failed.");
         }else{

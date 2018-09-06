@@ -58,11 +58,6 @@ public class JsonKingdom extends Kingdom{
         if(data.getMainFaceMap() != null){
             mMainFaceReg = new MainFaceRecognizer(data.getMainFaceMap());
         }
-        //template
-        if(data.getTemplate() != null){
-            getFileResourceManager().setTemplate(data.getTemplate());
-        }
-
         //init
         init();
     }

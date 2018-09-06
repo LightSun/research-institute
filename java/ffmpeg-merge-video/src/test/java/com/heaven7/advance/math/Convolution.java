@@ -10,7 +10,7 @@ import static com.heaven7.advance.Matrix2Utils.INT_0_PROVIDER;
 
 /**
  * 卷积
- * n 是输入矩阵，f是卷积核, padding p(四周都有),  步长s
+ * n 是输入矩阵，f是卷积核, padding p(四周都有),  步长s (stride)
  * 保持原图像矩阵的大小。满足 (n+2p-f+1) = n ,即 p=(f−1)/2.
  *  输出 (n + 2p -f)/s + 1
  * @author heaven7

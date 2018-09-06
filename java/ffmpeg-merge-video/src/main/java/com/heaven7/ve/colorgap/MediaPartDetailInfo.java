@@ -6,6 +6,7 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.kingdom.Kingdom;
+import com.heaven7.ve.kingdom.ModuleData;
 
 import java.util.List;
 
@@ -97,6 +98,13 @@ public class MediaPartDetailInfo {
             }
         }).asListService().joinToString(": ");
     }
+    public Integer getLevel() {
+        ModuleData data = item.getHighLightModuleData();
+        if(data == null){
+            return null;
+        }
+        return data.getLevel();
+    }
 
     @Override
     public String toString() {
@@ -108,6 +116,7 @@ public class MediaPartDetailInfo {
                     ", topTags = " + getTopTagsString() +
                     ", shotCategory = " + getShotCategoryString() +
                     ", highLight = " + getHighLightString() +
+                    ", level = " + getLevel() +
                     ", keyFrameTime = " + getKeyFrameTime() +
                     '}';
         }catch (Exception e){
@@ -115,4 +124,5 @@ public class MediaPartDetailInfo {
             return null;
         }
     }
+
 }

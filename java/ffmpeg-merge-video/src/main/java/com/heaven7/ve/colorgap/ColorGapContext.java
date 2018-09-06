@@ -3,7 +3,9 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.anno.SystemResource;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
+import com.heaven7.ve.kingdom.FileResourceManager;
 import com.heaven7.ve.kingdom.Kingdom;
+import com.heaven7.ve.template.VETemplate;
 
 /**
  * @author heaven7
@@ -23,6 +25,9 @@ public interface ColorGapContext extends Context {
 
     void setMontageParameter(MontageParam param);
     MontageParam getMontageParameter();
+
+    FileResourceManager getFileResourceManager();
+    VETemplate getTemplate();
 
     /**
      * get test type .default is {@linkplain #TEST_TYPE_SERVER}
@@ -65,10 +70,23 @@ public interface ColorGapContext extends Context {
      */
     class InitializeParam{
 
-        private String templateDir;
         private int testType = ColorGapContext.TEST_TYPE_SERVER;
+        /** the template file dir of json-data */
+        private String templateDir;
+        /** the effect file dir of json-data */
+        private String effectDir;
+        /** the effect file dir of resource */
+        private String effectResourceDir;
         private boolean debug;
+        /** the debug output dir */
         private String debugOutDir;
+
+        public String getEffectResourceDir() {
+            return effectResourceDir;
+        }
+        public void setEffectResourceDir(String effectResourceDir) {
+            this.effectResourceDir = effectResourceDir;
+        }
 
         public String getDebugOutDir() {
             return debugOutDir;
@@ -96,6 +114,13 @@ public interface ColorGapContext extends Context {
         }
         public void setTemplateDir(String templateDir) {
             this.templateDir = templateDir;
+        }
+
+        public String getEffectDir() {
+            return effectDir;
+        }
+        public void setEffectDir(String effectDir) {
+            this.effectDir = effectDir;
         }
     }
 }
