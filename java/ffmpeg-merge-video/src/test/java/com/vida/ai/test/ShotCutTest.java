@@ -8,7 +8,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
@@ -50,12 +50,12 @@ public class ShotCutTest extends BaseMontageTest{
     public void testCut1(){
         String dir = "F:\\videos\\ClothingWhite";
         String videoName = "LM0A0239.mp4";
-        MediaResourceItem item = TestUtils.createVideoItem(dir + File.separator + videoName);
-        ArrayList<MediaResourceItem> list = new ArrayList<>(Arrays.asList(item));
+        BaseMediaResourceItem item = TestUtils.createVideoItem(dir + File.separator + videoName);
+        ArrayList<BaseMediaResourceItem> list = new ArrayList<>(Arrays.asList(item));
         testCutShot(list);
     }
 
-    private List<MediaPartItem> cutItems(List<MediaResourceItem> items, CyclicBarrier barrier) {
+    private List<MediaPartItem> cutItems(List<BaseMediaResourceItem> items, CyclicBarrier barrier) {
         Throwables.checkEmpty(items);
         List<MediaItem> mediaItems = mediaAnalyser.analyse(mContext, items, barrier);
         try {
@@ -71,7 +71,7 @@ public class ShotCutTest extends BaseMontageTest{
                 item.videoPart.getEndTime(), dir);
     }
 
-    private void testCutShot(List<MediaResourceItem> items) {
+    private void testCutShot(List<BaseMediaResourceItem> items) {
         new Thread(new Runnable() {
             @Override
             public void run() {

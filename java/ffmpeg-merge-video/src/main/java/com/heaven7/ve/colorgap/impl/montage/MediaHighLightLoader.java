@@ -2,7 +2,7 @@ package com.heaven7.ve.colorgap.impl.montage;
 
 import com.google.gson.Gson;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.colorgap.MediaDataLoader;
 import com.vida.common.IOUtils;
 import com.vida.common.entity.MediaData;
@@ -19,7 +19,7 @@ public class MediaHighLightLoader implements MediaDataLoader {
     private static final Gson sGson = new Gson();
 
     @Override
-    public Object load(Context context, MediaResourceItem item, String dataPath) {
+    public Object load(Context context, BaseMediaResourceItem item, String dataPath) {
         Reader reader = null;
         try {
             String json = IOUtils.readString(reader = new FileReader(dataPath));

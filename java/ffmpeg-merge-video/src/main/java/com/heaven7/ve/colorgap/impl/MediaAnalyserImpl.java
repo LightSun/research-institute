@@ -4,7 +4,7 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.PathTimeTraveller;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.montage.*;
@@ -26,13 +26,13 @@ public class MediaAnalyserImpl implements MediaAnalyser {
     private final ImageMediumFileHelper mImageHelper = new ImageMediumFileHelper();
 
     @Override
-    public List<MediaItem> analyse(Context context, List<MediaResourceItem> items, CyclicBarrier barrier) {
+    public List<MediaItem> analyse(Context context, List<BaseMediaResourceItem> items, CyclicBarrier barrier) {
         if(mVideoHelper == null) {
             mVideoHelper = createVideoAnalyseHelper(VEGapUtils.asColorGapContext(context).getTestType());
         }
 
         List<MediaItem> outItems = new ArrayList<>();
-        for(MediaResourceItem item : items){
+        for(BaseMediaResourceItem item : items){
             final MediaItem mediaItem = new MediaItem();
             mediaItem.item = item;
             mediaItem.imageMeta = analyseMeta(context, item);
@@ -83,7 +83,7 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         mImageHelper.loadResource(context, param);
     }
 
-    protected MetaInfo.ImageMeta analyseMeta(Context context, MediaResourceItem item) {
+    protected MetaInfo.ImageMeta analyseMeta(Context context, BaseMediaResourceItem item) {
         MetaInfo.ImageMeta meta = new MetaInfo.ImageMeta();
         meta.setPath(item.getFilePath());
         meta.setDate(item.getTime());
@@ -100,7 +100,7 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         return meta;
     }
 
-    private String getFileName(MediaResourceItem item) {
+    private String getFileName(BaseMediaResourceItem item) {
         String path = item.getFilePath();
         int index = path.indexOf("/");
         return path.substring(index + 1);

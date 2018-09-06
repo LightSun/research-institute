@@ -6,18 +6,15 @@ package com.heaven7.ve;
  */
 public abstract class EffectInfo extends TimeTraveller{
 
-   // protected int type; //类型。由c/c++底层提供
-    public static final int CATEGORY_NONE = 0;
-    public static final int CATEGORY_SPEED = 1;
-    public static final int CATEGORY_SCALE = 2;
-
-    private int type;
-
+    @Override
+    protected TimeTravelEntityDelegate createImpl() {
+        return new EffectInfoImpl();
+    }
     public int getType(){
-        return this.type;
+        return getDelegateAs(EffectEntityDelegate.class).getType();
     }
     public void setType(int type){
-        this.type = type;
+        getDelegateAs(EffectEntityDelegate.class).setType(type);
     }
 
     @Override
@@ -34,11 +31,22 @@ public abstract class EffectInfo extends TimeTraveller{
         if (o == null || getClass() != o.getClass()) return false;
 
         EffectInfo that = (EffectInfo) o;
-
         return getType() == that.getType();
     }
     @Override
     public int hashCode() {
         return getType();
+    }
+
+    protected static class EffectInfoImpl extends TimeTravelDelegateImpl implements EffectEntityDelegate{
+        private int type;
+        @Override
+        public int getType() {
+            return type;
+        }
+        @Override
+        public void setType(int type) {
+            this.type = type;
+        }
     }
 }

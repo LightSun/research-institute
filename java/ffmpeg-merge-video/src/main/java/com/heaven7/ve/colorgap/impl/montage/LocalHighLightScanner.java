@@ -2,8 +2,8 @@ package com.heaven7.ve.colorgap.impl.montage;
 
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.Constants;
-import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.colorgap.MediaResourceScanner;
 
 import java.io.File;
@@ -13,7 +13,7 @@ import java.io.File;
  */
 public class LocalHighLightScanner extends MediaResourceScanner {
     @Override
-    public String scan(Context context, MediaResourceItem item, String srcDir) {
+    public String scan(Context context, BaseMediaResourceItem item, String srcDir) {
         // a/b/c.mp4
         // a/b/highlight/c.vhighlight
         String fileName = FileUtils.getFileName(item.getFilePath());

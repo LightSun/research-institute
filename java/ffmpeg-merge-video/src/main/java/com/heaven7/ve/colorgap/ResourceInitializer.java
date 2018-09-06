@@ -6,7 +6,7 @@ import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.StartEndVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,11 +33,11 @@ public class ResourceInitializer {
         throw new UnsupportedOperationException();
     }
 
-    public static String getFilePathOfRects(MediaResourceItem item, String srcDir) {
+    public static String getFilePathOfRects(BaseMediaResourceItem item, String srcDir) {
         return MockHelper.getFilePathOfRects(item, srcDir);
     }
 
-    public static String getFilePathOfTags(MediaResourceItem item, String srcDir) {
+    public static String getFilePathOfTags(BaseMediaResourceItem item, String srcDir) {
         return MockHelper.getFilePathOfTags(item, srcDir);
     }
 
@@ -59,11 +59,11 @@ public class ResourceInitializer {
         return sb.toString().hashCode() + "";
     }
 
-    public static String getFilePathOTagsForImageItem(MediaResourceItem item, String srcDir, @Nullable String prefix) {
+    public static String getFilePathOTagsForImageItem(BaseMediaResourceItem item, String srcDir, @Nullable String prefix) {
         return MockHelper.getFilePathOTagsForImageItem(item, srcDir, prefix);
     }
 
-    public static String getFilePathOfRectsForImageItem(MediaResourceItem item, String srcDir, @Nullable String prefix) {
+    public static String getFilePathOfRectsForImageItem(BaseMediaResourceItem item, String srcDir, @Nullable String prefix) {
         return MockHelper.getFilePathOfRectsForImageItem(item, srcDir, prefix);
     }
 
@@ -112,7 +112,7 @@ public class ResourceInitializer {
                 }
             }
         }
-        public static String getFilePathOTagsForImageInBatch(MediaResourceItem item, String srcDir) {
+        public static String getFilePathOTagsForImageInBatch(BaseMediaResourceItem item, String srcDir) {
 
             final String filePath = item.getFilePath();
             String preDir1 = FileUtils.getFileDir(filePath, 1, false);
@@ -130,7 +130,7 @@ public class ResourceInitializer {
             return null;
         }
 
-        public static String getFilePathOTagsForImageItem(MediaResourceItem item, String srcDir, @Nullable String prefix) {
+        public static String getFilePathOTagsForImageItem(BaseMediaResourceItem item, String srcDir, @Nullable String prefix) {
 
             final String filePath = item.getFilePath();
             String preDir1 = FileUtils.getFileDir(filePath, 1, false);
@@ -154,7 +154,7 @@ public class ResourceInitializer {
             return new File(targetDir).exists() ? targetDir : null;
         }
 
-        public static String getFilePathOfRectsForImageItem(MediaResourceItem item, String srcDir, @Nullable String prefix) {
+        public static String getFilePathOfRectsForImageItem(BaseMediaResourceItem item, String srcDir, @Nullable String prefix) {
             final String filePath = item.getFilePath();
             String preDir1 = FileUtils.getFileDir(filePath, 1, false);
             String preDir2 = FileUtils.getFileDir(filePath, 2, false);
@@ -179,7 +179,7 @@ public class ResourceInitializer {
         }
 
         //srcDir 视频文件目录。 不包含'rects'
-        public static String getFilePathOfRects(MediaResourceItem item, String srcDir) {
+        public static String getFilePathOfRects(BaseMediaResourceItem item, String srcDir) {
             String filePath = item.getFilePath();
             int index = filePath.lastIndexOf("/");
             if (index == -1) {
@@ -203,7 +203,7 @@ public class ResourceInitializer {
         }
 
         // get file path of video item
-        public static String getFilePathOfTags(MediaResourceItem item, String srcDir) {
+        public static String getFilePathOfTags(BaseMediaResourceItem item, String srcDir) {
             String filePath = item.getFilePath();
             int index = filePath.lastIndexOf("/");
             if (index == -1) {

@@ -3,7 +3,7 @@ package com.vida.ai.test;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.*;
@@ -29,10 +29,10 @@ public class ColorGapTest {
         String music = "E:\\tmp\\music_cut\\M7.mp3";
         String outDir = "F:\\videos\\temp_works\\ClothingWhite";
         List<String> files = FileUtils.getFiles(new File("F:\\videos\\ClothingWhite"), "mp4");
-        List<MediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, MediaResourceItem>() {
+        List<BaseMediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, BaseMediaResourceItem>() {
             @Override
-            public MediaResourceItem visit(String s, Object param) {
-                MediaResourceItem item = TestUtils.createVideoItem(s);
+            public BaseMediaResourceItem visit(String s, Object param) {
+                BaseMediaResourceItem item = TestUtils.createVideoItem(s);
                 item.setWidth(1280);
                 item.setHeight(720);
                 return item;
@@ -42,7 +42,7 @@ public class ColorGapTest {
         cgt.start(music,  list, outDir);
     }
 
-    public void start(String musicPath, List<MediaResourceItem> items, String outDir){
+    public void start(String musicPath, List<BaseMediaResourceItem> items, String outDir){
         //montage param
         MontageParam param = new MontageParam();
         param.setDuration(30);

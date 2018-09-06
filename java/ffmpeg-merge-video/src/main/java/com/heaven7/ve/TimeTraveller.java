@@ -1,6 +1,7 @@
 package com.heaven7.ve;
 
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.ve.anno.NeedOverride;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,22 +11,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class TimeTraveller extends SimpleCopyDelegate {
 
-    public static final int NTYPE_DEFAULT        = 1;
-    public static final int NTYPE_PATH           = 2;
-    public static final int NTYPE_SPECIAL_EFFECT = 3;
-    public static final int NTYPE_FILTER      = 4;
-    public static final int NTYPE_TRANSITION  = 5;
-
-    public static final int NTYPE_AUDIO_TRACK = 6;
-    public static final int NTYPE_VIDEO_TRACK = 7;
-    public static final int NTYPE_IMAGE_INFO  = 9;
-
-    private static final String TAG = "TimeTraveller";
+    protected final TimeTravelEntityDelegate mDelegate;
     private final long ptr;
     private boolean mDestroied;
 
     public TimeTraveller() {
-        this.ptr = nCreate(getNativeType());
+        mDelegate = createImpl();
+        this.ptr = mDelegate.nCreate(getNativeType());
     }
 
     public static TimeTraveller of(long start, long end, long maxDuration){
@@ -36,10 +28,19 @@ public class TimeTraveller extends SimpleCopyDelegate {
         return tt;
     }
 
-    protected int getNativeType(){
-        return NTYPE_DEFAULT;
+    @SuppressWarnings("unchecked")
+    protected final <T extends TimeTravelEntityDelegate> T getDelegateAs(Class<T> clazz){
+        return (T) mDelegate;
     }
 
+    @NeedOverride("onAndroid")
+    protected TimeTravelEntityDelegate createImpl(){
+        return new TimeTravelDelegateImpl();
+    }
+    @NeedOverride("onAndroid")
+    protected int getNativeType(){
+        return 0;
+    }
 
     /** duration in frames */
     public long getDuration(){
@@ -228,38 +229,38 @@ public class TimeTraveller extends SimpleCopyDelegate {
     /** in frames */
     public long getStartTime(){
        // Logger.d(TAG, "getStartTime", "in");
-        long result = getStartTime0();
+        long result = mDelegate.getStartTime0();
        // Logger.d(TAG, "getStartTime", "out");
         return result;
     }
     public void setStartTime(long startTime){
        // Logger.d(TAG, "setStartTime", "in");
-        setStartTime0(startTime);
+        mDelegate.setStartTime0(startTime);
         // Logger.d(TAG, "setStartTime", "out");
     }
 
     /** in frames */
     public long getEndTime(){
        // Logger.d(TAG, "getEndTime", "in");
-        long result = getEndTime0();
+        long result = mDelegate.getEndTime0();
        // Logger.d(TAG, "getEndTime", "out");
         return result;
     }
     public void setEndTime(long endTime){
        // Logger.d(TAG, "setEndTime", "in");
-        setEndTime0(endTime);
+        mDelegate.setEndTime0(endTime);
        // Logger.d(TAG, "setEndTime", "out");
     }
 
     /** set max duration in frames*/
     public void setMaxDuration(long maxDuration){
        // Logger.d(TAG, "setMaxDuration", "in");
-        setMaxDuration0(maxDuration);
+        mDelegate.setMaxDuration0(maxDuration);
        // Logger.d(TAG, "setMaxDuration", "out");
     }
     public long getMaxDuration(){
        // Logger.d(TAG, "getMaxDuration", "in");
-        long result = getMaxDuration0();
+        long result = mDelegate.getMaxDuration0();
        // Logger.d(TAG, "getMaxDuration", "out");
         return result;
     }
@@ -267,7 +268,7 @@ public class TimeTraveller extends SimpleCopyDelegate {
     public void destroyNative(){
         if(!mDestroied && ptr != 0 ){
            // Logger.d(TAG, "destroy", "start release pointer = " + getNativePointer());
-            nRelease(ptr);
+            mDelegate.nRelease(ptr);
             mDestroied = true;
         }
     }
@@ -278,39 +279,41 @@ public class TimeTraveller extends SimpleCopyDelegate {
         super.finalize();
     }
 
-    private long nCreate(int nativeType){
-        return 0;
-    }
-    private void nRelease(long ptr){
+    protected static class TimeTravelDelegateImpl implements TimeTravelEntityDelegate {
 
+        private long startTime;
+        private long endTime;
+        private long maxDuration;
+        @Override
+        public long nCreate(int nativeType) {
+            return 0;
+        }
+        @Override
+        public void nRelease(long ptr) {
+        }
+        @Override
+        public long getStartTime0() {
+            return startTime;
+        }
+        @Override
+        public void setStartTime0(long startTime) {
+            this.startTime = startTime;
+        }
+        @Override
+        public long getEndTime0() {
+            return endTime;
+        }
+        @Override
+        public void setEndTime0(long endTime) {
+            this.endTime = endTime;
+        }
+        @Override
+        public void setMaxDuration0(long maxDuration) {
+            this.maxDuration = maxDuration;
+        }
+        @Override
+        public long getMaxDuration0() {
+            return maxDuration;
+        }
     }
-
-    /** in frames */
-    private long getStartTime0(){
-        return startTime;
-    }
-    private void setStartTime0(long startTime){
-        this.startTime = startTime;
-    }
-
-    /** in frames */
-    private long getEndTime0(){
-        return endTime;
-    }
-    private void setEndTime0(long endTime){
-        this.endTime = endTime;
-    }
-
-    /** set max duration in frames*/
-    private void setMaxDuration0(long maxDuration){
-        this.maxDuration = maxDuration;
-    }
-    private long getMaxDuration0(){
-        return maxDuration;
-    }
-
-    private long startTime;
-    private long endTime;
-    private long maxDuration;
-
 }

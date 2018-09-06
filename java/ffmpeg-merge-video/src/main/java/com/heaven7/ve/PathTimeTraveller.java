@@ -10,8 +10,10 @@ public class PathTimeTraveller extends TimeTraveller {
     public static final byte TYPE_IMAGE = 2;
     public static final byte TYPE_AUDIO = 3;
 
-    private String path;
-    private int type;
+    @Override
+    protected TimeTravelEntityDelegate createImpl() {
+        return new PathTimeTravelDelegateImpl();
+    }
 
     public void setFrom(TimeTraveller src){
         super.setFrom(src);
@@ -21,22 +23,17 @@ public class PathTimeTraveller extends TimeTraveller {
         }
     }
 
-    @Override
-    protected int getNativeType() {
-        return NTYPE_PATH;
-    }
-
     public String getPath(){
-        return path;
+        return getDelegateAs(PathTimeTravelDelegate.class).getPath();
     }
     public void setPath(String path){
-        this.path = path;
+        getDelegateAs(PathTimeTravelDelegate.class).setPath(path);
     }
-    public int getType(){
-        return type;
+    public int getType() {
+        return getDelegateAs(PathTimeTravelDelegate.class).getType();
     }
-    public void setType(int type){
-        this.type = type;
+    public void setType(int type) {
+        getDelegateAs(PathTimeTravelDelegate.class).setType(type);
     }
 
     @Override
@@ -45,5 +42,27 @@ public class PathTimeTraveller extends TimeTraveller {
                 "path='" + getPath() + '\'' +
                 ", type=" + getType() +
                 "} " + super.toString();
+    }
+
+    protected static class PathTimeTravelDelegateImpl extends TimeTravelDelegateImpl implements PathTimeTravelDelegate{
+        private String path;
+        private int type;
+        @Override
+        public String getPath() {
+            return path;
+        }
+        @Override
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        @Override
+        public int getType() {
+            return type;
+        }
+        @Override
+        public void setType(int type) {
+            this.type = type;
+        }
     }
 }

@@ -7,26 +7,8 @@ package com.heaven7.ve;
 
 public class SpecialEffect extends EffectInfo{
 
-   /* public native void setCategory(int category);
-    public native int getCategory();
-    public native void setMultiple(float multiple);
-
-    public native float getMultiple();*/
-
-    @Override
-    protected int getNativeType() {
-        return NTYPE_SPECIAL_EFFECT;
-    }
-
     public void setTypeFrom(String val) {
         //TODO set special effect from
     }
 
-   /* @Override
-    public void setFrom(TimeTraveller src) {
-        super.setFrom(src);
-        if(src instanceof SpecialEffect){
-            setMultiple(((SpecialEffect) src).getMultiple());
-        }
-    }*/
 }

@@ -10,7 +10,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.collect.CollectModule;
 import com.heaven7.ve.colorgap.filter.MediaDirFilter;
 import com.heaven7.ve.colorgap.filter.VideoTagFilter;
@@ -89,7 +89,7 @@ public class ColorGapManager extends BaseContextOwner{
      * @param callback the fill callback
      */
     //return the FillResult which contains video editor nodes and src template.
-    public void fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<MediaResourceItem> items, FillCallback callback) {
+    public void fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<BaseMediaResourceItem> items, FillCallback callback) {
         final ColorGapContext mContext = getContext();
         // ResourceInitializer.init(mContext);
         //the barrier help we do two tasks: analyse, tint.

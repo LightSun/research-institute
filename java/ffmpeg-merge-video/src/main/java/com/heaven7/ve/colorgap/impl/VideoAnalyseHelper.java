@@ -2,13 +2,12 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
-import com.heaven7.java.base.util.SmartReference;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.colorgap.*;
 import com.vida.common.entity.MediaData;
 
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -253,13 +251,13 @@ public class VideoAnalyseHelper {
 
         final Context context;
         final String path;
-        final MediaResourceItem item;
+        final BaseMediaResourceItem item;
         final MediaResourceLoader loader;
 
         final MetaInfo.ImageMeta out;
         final BatchProcessor parent;
 
-        /*public*/ LoadTask(Context context, MediaResourceItem item, String path, MetaInfo.ImageMeta out,
+        /*public*/ LoadTask(Context context, BaseMediaResourceItem item, String path, MetaInfo.ImageMeta out,
                             MediaResourceLoader loader, BatchProcessor parent) {
             this.context = context;
             this.item = item;

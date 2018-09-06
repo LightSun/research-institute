@@ -1,7 +1,7 @@
 package com.heaven7.ve.test;
 
 import com.heaven7.java.base.util.DefaultPrinter;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.colorgap.ResourceInitializer;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ public class ResourceInitTest {
     public void test1(){
         String videoPath = "F:\\videos\\wedding\\character\\character_01.mp4";
         String dir = "F:\\videos\\wedding";
-        MediaResourceItem item = new MediaResourceItem();
+        BaseMediaResourceItem item = new BaseMediaResourceItem();
         item.setFilePath(videoPath);
         ResourceInitializer.init(null);
         String path = ResourceInitializer.getFilePathOfTags(item, dir);

@@ -3,7 +3,7 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.core.util.Logger;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.TimeTraveller;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class MediaItem implements CutItemDelegate{
     public static final int FLAG_INVALID  = 0x0002;
 
     public MetaInfo.ImageMeta imageMeta;
-    public MediaResourceItem item; //path, duration, date
+    public BaseMediaResourceItem item; //path, duration, date
     private List<TimeTraveller> videoParts;  //切割后的parts.
     private int flags;
 
@@ -69,7 +69,7 @@ public class MediaItem implements CutItemDelegate{
         return imageMeta.getAllVideoTags();
     }
     @Override
-    public MediaResourceItem getItem() {
+    public BaseMediaResourceItem getItem() {
         return item;
     }
 }

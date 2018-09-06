@@ -2,7 +2,7 @@ package com.heaven7.ve.colorgap;
 
 
 import com.heaven7.utils.Context;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 
 /**
  * the media resource scanner
@@ -19,6 +19,6 @@ public abstract class MediaResourceScanner {
      * @param srcDir  the source dir
      * @return the full path of scan result file. eg: rects, tags.
      */
-    public abstract String scan(Context context, MediaResourceItem item, String srcDir);
+    public abstract String scan(Context context, BaseMediaResourceItem item, String srcDir);
 
 }

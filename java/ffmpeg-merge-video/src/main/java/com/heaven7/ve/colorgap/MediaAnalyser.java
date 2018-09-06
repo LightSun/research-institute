@@ -2,7 +2,7 @@ package com.heaven7.ve.colorgap;
 
 
 import com.heaven7.utils.Context;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
@@ -13,7 +13,7 @@ import java.util.concurrent.CyclicBarrier;
 
 public interface MediaAnalyser {
 
-    List<MediaItem> analyse(Context context, List<MediaResourceItem> items, CyclicBarrier barrier);
+    List<MediaItem> analyse(Context context, List<BaseMediaResourceItem> items, CyclicBarrier barrier);
 
     /**
      * get the async module count .

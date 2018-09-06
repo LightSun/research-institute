@@ -1,23 +1,20 @@
 package com.heaven7.ve.test;
 
-import com.heaven7.core.util.Logger;
 import com.heaven7.utils.CmdHelper;
-import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.FFmpegUtils;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.TimeUnit;
 
 public class TestUtils {
 
     private static final String TAG = "TestUtils";
 
-    public static MediaResourceItem createImageItem(String path) {
-        MediaResourceItem item = new MediaResourceItem();
+    public static BaseMediaResourceItem createImageItem(String path) {
+        BaseMediaResourceItem item = new BaseMediaResourceItem();
         item.setFilePath(path);
 
         item.setTime(new File(path).lastModified());
@@ -25,9 +22,9 @@ public class TestUtils {
         item.setMime("image/jpg");
         return item;
     }
-    public static MediaResourceItem createVideoItem(String path, long durationInMills){
+    public static BaseMediaResourceItem createVideoItem(String path, long durationInMills){
        // String path ="F:\\videos\\test_cut\\test_shot_cut\\GP5A0859.mp4";
-        MediaResourceItem item = new MediaResourceItem();
+        BaseMediaResourceItem item = new BaseMediaResourceItem();
         item.setFilePath(path);
 
         item.setTime(new File(path).lastModified());
@@ -35,7 +32,7 @@ public class TestUtils {
         item.setMime("video/mp4");
         return item;
     }
-    public static MediaResourceItem createVideoItem(String path){
+    public static BaseMediaResourceItem createVideoItem(String path){
         // String path ="F:\\videos\\test_cut\\test_shot_cut\\GP5A0859.mp4";
         String[] cmds = FFmpegUtils.buildGetDurationCmd(path);
         CmdHelper.VideoDurationCallback dc = new CmdHelper.VideoDurationCallback();
@@ -43,7 +40,7 @@ public class TestUtils {
         long duration = dc.getDuration();
        // Logger.d(TAG, "createVideoItem", "duration = " + duration + " ,path = " + path);
 
-        MediaResourceItem item = new MediaResourceItem();
+        BaseMediaResourceItem item = new BaseMediaResourceItem();
         item.setFilePath(path);
         item.setDuration(duration);
         item.setTime(new File(path).lastModified());

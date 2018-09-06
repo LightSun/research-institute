@@ -49,8 +49,12 @@ public class EffectMarkerImpl implements EffectsMarker {
             @Override
             public void visit(Object param, int count, int step, List<MediaPartItem> parts) {
                 MediaPartItem leftItem = parts.get(0);
-                MediaPartItem rightItem = parts.get(1);
-                leftItem.applyEffects(rightItem.videoPart);
+                if(parts.size() >= 2 ) {
+                    MediaPartItem rightItem = parts.get(1);
+                    leftItem.applyEffects(rightItem.videoPart);
+                }else{
+                    leftItem.applyEffects(null);
+                }
             }
         });
     }

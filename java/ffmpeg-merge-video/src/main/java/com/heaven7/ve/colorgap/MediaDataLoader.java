@@ -1,7 +1,7 @@
 package com.heaven7.ve.colorgap;
 
 import com.heaven7.utils.Context;
-import com.heaven7.ve.MediaResourceItem;
+import com.heaven7.ve.BaseMediaResourceItem;
 
 /**
  * @author heaven7
@@ -15,5 +15,5 @@ public interface MediaDataLoader {
      * @param dataPath the data path.  like high-light data path
      * @return the whole data
      */
-    Object load(Context context, MediaResourceItem item, String dataPath);
+    Object load(Context context, BaseMediaResourceItem item, String dataPath);
 }
