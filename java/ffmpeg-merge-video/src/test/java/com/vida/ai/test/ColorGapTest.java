@@ -5,10 +5,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.MediaResourceItem;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
-import com.heaven7.ve.colorgap.ColorGapContext;
-import com.heaven7.ve.colorgap.ColorGapManager;
-import com.heaven7.ve.colorgap.ColorGapParam;
-import com.heaven7.ve.colorgap.MontageParam;
+import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.starter.KingdomStarter;
@@ -77,7 +74,12 @@ public class ColorGapTest {
         ip.setDebug(true);
         ip.setDebugOutDir("F:\\videos\\temp_works\\ClothingWhite");
         ip.setEffectResourceDir("E:\\tmp\\服装demo_数据_ios\\texture");
-
+        ip.setTransitionDelegate(new TransitionDelegate() {
+            @Override
+            public long getDuration(int transitionType) {
+                return 30;
+            }
+        });
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);
     }

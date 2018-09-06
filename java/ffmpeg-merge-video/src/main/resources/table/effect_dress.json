@@ -1,6 +1,6 @@
 {
   "texture": {
-    "indexes": [
+    "index": [
       {
         "index": 0,
         "type": "L2",
@@ -17,7 +17,7 @@
       {
         "level": 0,
         "type": "L2",
-        "value": "L2_1.mp4"
+        "value": "L2_2.mp4"
       }
     ]
   },
@@ -26,7 +26,6 @@
     "chapter": [
       {
         "index": -1,
-        "applyAll": true,
         "percentage": 0.5,
         "values": [
           "leftMove",

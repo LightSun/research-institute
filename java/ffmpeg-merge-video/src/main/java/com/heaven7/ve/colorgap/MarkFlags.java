@@ -78,7 +78,14 @@ public class MarkFlags {
         }
         return mEffectMap.get(type);
     }
-    public void applyEffects() {
+
+    /**
+     * apply effects by
+     * @param context the context
+     * @param tt the time traveller.
+     * @param nextTt the next time traveller.
+     */
+    public void applyEffects(ColorGapContext context, TimeTraveller tt, TimeTraveller nextTt) {
         if(mEffectMap == null){
             return;
         }
@@ -88,7 +95,7 @@ public class MarkFlags {
             public Boolean visit(Integer type, Object param) {
                 List<EffectItemDelegate> delegates = mEffectMap.get(type);
                 if(!Predicates.isEmpty(delegates)){
-                    helper.transform(delegates, type);
+                    helper.transform(context, delegates, type , tt, nextTt);
                 }
                 return null;
             }
@@ -128,6 +135,14 @@ public class MarkFlags {
         public EffectItemDelegate(EffectData.Item item, int flag) {
             this.item = item;
             this.flag = flag;
+        }
+
+        @Override
+        public String toString() {
+            return "EffectItemDelegate{" +
+                    "item=" + item +
+                    ", flag=" + getFlagString(flag) +
+                    '}';
         }
     }
 }

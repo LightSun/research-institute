@@ -80,6 +80,14 @@ public interface ColorGapContext extends Context {
         private boolean debug;
         /** the debug output dir */
         private String debugOutDir;
+        private TransitionDelegate transitionDelegate;
+
+        public TransitionDelegate getTransitionDelegate() {
+            return transitionDelegate;
+        }
+        public void setTransitionDelegate(TransitionDelegate transitionDelegate) {
+            this.transitionDelegate = transitionDelegate;
+        }
 
         public String getEffectResourceDir() {
             return effectResourceDir;

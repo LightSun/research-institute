@@ -520,6 +520,10 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         return  tempList.size() * 1f / rects.size();
     }
 
+    public void applyEffects(TimeTraveller nextShot){
+        getMarkFlags().applyEffects(getContext(), videoPart, nextShot);
+    }
+
     /** indicate current media part can put after target or not. */
     public boolean canPutAfter(MediaPartItem target) {
         long shotTime;

@@ -1,10 +1,7 @@
 package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.java.base.util.Predicates;
-import com.heaven7.java.visitor.FireVisitor;
-import com.heaven7.java.visitor.PredicateVisitor;
-import com.heaven7.java.visitor.ResultVisitor;
-import com.heaven7.java.visitor.StartEndVisitor;
+import com.heaven7.java.visitor.*;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.gap.GapManager;
@@ -48,11 +45,12 @@ public class EffectMarkerImpl implements EffectsMarker {
             public MediaPartItem visit(GapManager.GapItem gapItem, Object param) {
                 return (MediaPartItem) gapItem.item;
             }
-        }).fire(new FireVisitor<MediaPartItem>() {
+        }).asListService().fireMulti(2, 1, null, new FireMultiVisitor<MediaPartItem>() {
             @Override
-            public Boolean visit(MediaPartItem item, Object param) {
-                item.getMarkFlags().applyEffects();
-                return null;
+            public void visit(Object param, int count, int step, List<MediaPartItem> parts) {
+                MediaPartItem leftItem = parts.get(0);
+                MediaPartItem rightItem = parts.get(1);
+                leftItem.applyEffects(rightItem.videoPart);
             }
         });
     }
