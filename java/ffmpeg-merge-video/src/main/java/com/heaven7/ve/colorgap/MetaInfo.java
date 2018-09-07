@@ -6,6 +6,7 @@ import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.image.detect.IHighLightData;
+import com.heaven7.java.image.detect.Location;
 import com.heaven7.java.image.detect.VideoHighLightManager;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
@@ -455,6 +456,8 @@ public interface MetaInfo {
         private List<Integer> domainTags;
         private List<Integer> adjTags;
 
+        private Location subjectLocation;
+
         //-------------------------- start High-Light ----------------------------
         /** set metadata for high light data. (from load high light) */
         public void setMediaData(MediaData mediaData) {
@@ -644,6 +647,13 @@ public interface MetaInfo {
         }
         public int getPersonCount() {
             return Math.max(mBodyCount, mainFaceCount);
+        }
+
+        public Location getSubjectLocation() {
+            return subjectLocation;
+        }
+        public void setSubjectLocation(Location subjectLocation) {
+            this.subjectLocation = subjectLocation;
         }
 
         //============================================================

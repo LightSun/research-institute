@@ -83,11 +83,11 @@ public class ColorGapTest {
                 return 30;
             }
         });
+       /*
         ip.setFlags(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE);
-
         String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
         ShotsData data = new Gson().fromJson(shots, ShotsData.class);
-        ip.setShotAssigner(data);
+        ip.setShotAssigner(data);*/
 
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);

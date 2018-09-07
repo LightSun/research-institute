@@ -30,6 +30,7 @@ public abstract class SubjectRecognizeHelper extends BaseRecognizeHelper<Locatio
     @Override
     protected void onProcess(MediaPartItem part, Location value) {
         int area = value.getArea();
+        part.imageMeta.setSubjectLocation(value);
         MetaInfo.ImageMeta imageMeta = part.imageMeta;
         if(imageMeta.getWidth() == 0 || imageMeta.getHeight() == 0){
             throw new IllegalStateException("width and height can't be 0. path = " + part.getItem().getFilePath());

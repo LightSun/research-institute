@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap;
 
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.image.detect.IHighLightData;
+import com.heaven7.java.image.detect.Location;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -23,6 +24,9 @@ public class MediaPartDetailInfo {
         this.item = item;
     }
 
+    public Location getSubjectLocation() {
+        return item.imageMeta.getSubjectLocation();
+    }
     public int getMainFaceCount() {
         return item.imageMeta.getMainFaceCount();
     }

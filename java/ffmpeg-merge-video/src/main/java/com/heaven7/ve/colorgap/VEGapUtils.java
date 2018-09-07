@@ -319,20 +319,18 @@ public class VEGapUtils {
     }
 
     public static int getShotTypeBySubjectRate(float val) {
-        if(isInRange(val,0.85f, 1.000001f)){
-            return MetaInfo.SHOT_TYPE_BIG_LONG_SHORT;
-        }else if(isInRange(val,0.75f, 0.85f)){
+       if(isInRange(val,0.75f, 1.0001f)){
             return MetaInfo.SHOT_TYPE_CLOSE_UP;
-        }else if(isInRange(val,0.6f, 0.75f)){
+        }else if(isInRange(val,0.52f, 0.75f)){
             return MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP;
-        }else if(isInRange(val,0.45f, 0.6f)){
+        }else if(isInRange(val,0.45f, 0.52f)){
             return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
         }else if(isInRange(val,0.35f, 0.45f)){
             return MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT;
         }else if(isInRange(val,0.25f, 0.35f)){
             return MetaInfo.SHOT_TYPE_LONG_SHORT;
         }else if(isInRange(val,0.0f, 0.25f)){
-            return MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP;
+            return MetaInfo.SHOT_TYPE_BIG_LONG_SHORT;
         }
         return MetaInfo.SHOT_TYPE_NONE;
     }
