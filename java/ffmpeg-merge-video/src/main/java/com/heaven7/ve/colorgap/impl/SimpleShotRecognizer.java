@@ -1,9 +1,7 @@
 package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.core.util.Logger;
-import com.heaven7.ve.colorgap.IShotRecognizer;
-import com.heaven7.ve.colorgap.MediaPartItem;
-import com.heaven7.ve.colorgap.ShotRecognition;
+import com.heaven7.ve.colorgap.*;
 
 import java.util.List;
 
@@ -43,6 +41,9 @@ public class SimpleShotRecognizer implements IShotRecognizer {
 
     @Override
     public int getShotType(MediaPartItem item) {
+        if(item.getContext().getInitializeParam().hasFlag(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE)){
+            return MetaInfo.getShotTypeFrom(item.imageMeta.getShotType());
+        }
         return ShotRecognition.getShotType(item);
     }
 }

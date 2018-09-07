@@ -4,6 +4,7 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.colorgap.helper.MainFaceRecognizer;
+import com.heaven7.ve.colorgap.helper.PersonCountRecognizer;
 import com.heaven7.ve.colorgap.helper.ShotTypeRecognizer;
 import com.heaven7.ve.template.TemplateData;
 
@@ -16,8 +17,7 @@ import java.util.List;
 public class JsonKingdom extends Kingdom{
 
     private ShotTypeRecognizer mShotTypeReg;
-    private MainFaceRecognizer mMainFaceReg;
-    private TemplateData templateData;
+    private PersonCountRecognizer mPersonCountReg;
 
     public JsonKingdom(KingdomData data) {
         super();
@@ -55,19 +55,19 @@ public class JsonKingdom extends Kingdom{
         if(data.getShotTypeMap() != null){
             mShotTypeReg = new ShotTypeRecognizer(data.getShotTypeMap());
         }
-        if(data.getMainFaceMap() != null){
-            mMainFaceReg = new MainFaceRecognizer(data.getMainFaceMap());
+        if(data.getPersonCountMap() != null){
+            mPersonCountReg = new PersonCountRecognizer(data.getPersonCountMap());
         }
         //init
         init();
     }
 
     @Override
-    public float getMainFaceScoreImpl(int mainFaceCount) {
-        if(mMainFaceReg != null){
-            return mMainFaceReg.getScore(mainFaceCount);
+    protected float getPersonCountScoreImpl(int personCount) {
+        if(mPersonCountReg != null){
+            return mPersonCountReg.getScore(personCount);
         }
-        return super.getMainFaceScore(mainFaceCount);
+        return super.getPersonCountScoreImpl(personCount);
     }
 
     @Override

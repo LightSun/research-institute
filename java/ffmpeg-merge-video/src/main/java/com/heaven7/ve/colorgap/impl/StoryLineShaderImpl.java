@@ -10,7 +10,6 @@ import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.filler.*;
 import com.heaven7.ve.gap.GapManager;
-import com.heaven7.ve.template.EffectData;
 import com.heaven7.ve.template.VETemplate;
 import com.heaven7.ve.utils.Flags;
 
@@ -30,7 +29,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
             = (Comparator<MediaPartItem>) (o1, o2) -> Long.compare(o1.getDate(), o2.getDate());
 
     @Override
-    public List<GapManager.GapItem> tintAndFill(Context context, List<CutInfo.PlaidInfo> plaids, VETemplate template, List<MediaPartItem> items,
+    public List<GapManager.GapItem> tintAndFill(ColorGapContext context, List<CutInfo.PlaidInfo> plaids, VETemplate template, List<MediaPartItem> items,
                                                 PlaidFiller filler, AirShotFilter filter) {
         if(DEBUG) {
             Logger.d(TAG, "tintAndFill", ">>> start story shader...items.size = " + items.size());
@@ -140,7 +139,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
             result.addAll(chapter.getFilledItems());
         }
         //mark effects
-        new EffectMarkerImpl().markEffects(VEGapUtils.asColorGapContext(context), chapters, result);
+        //TODO new EffectMarkerImpl().markEffects(context, chapters, result);
         return result;
     }
 

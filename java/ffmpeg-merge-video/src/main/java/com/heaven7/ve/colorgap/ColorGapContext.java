@@ -6,6 +6,8 @@ import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.kingdom.FileResourceManager;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
+import com.heaven7.ve.test.ShotAssigner;
+import com.heaven7.ve.utils.Flags;
 
 /**
  * @author heaven7
@@ -18,6 +20,8 @@ public interface ColorGapContext extends Context {
     int TEST_TYPE_LOCAL_SERVER = 2;
     /** test type server */
     int TEST_TYPE_SERVER       = 3;
+
+    int FLAG_ASSIGN_SHOT_TYPE = 1;
 
     @SystemResource
     void setInitializeParam(InitializeParam ip);
@@ -82,6 +86,10 @@ public interface ColorGapContext extends Context {
         private String debugOutDir;
         private TransitionDelegate transitionDelegate;
 
+        //--------------------- just for test ------------------------
+        private int flags;
+        private ShotAssigner shotAssigner;
+
         public TransitionDelegate getTransitionDelegate() {
             return transitionDelegate;
         }
@@ -129,6 +137,24 @@ public interface ColorGapContext extends Context {
         }
         public void setEffectDir(String effectDir) {
             this.effectDir = effectDir;
+        }
+
+        //----------------- just for test some -----------------
+        public int getFlags() {
+            return flags;
+        }
+        public void setFlags(int flags) {
+            this.flags = flags;
+        }
+
+        public ShotAssigner getShotAssigner() {
+            return shotAssigner;
+        }
+        public void setShotAssigner(ShotAssigner shotAssigner) {
+            this.shotAssigner = shotAssigner;
+        }
+        public boolean hasFlag(int flag) {
+            return Flags.hasFlags(this.flags, flag);
         }
     }
 }

@@ -19,15 +19,21 @@ public class NormalStageFiller extends StageFiller {
 
     @Override
     protected void fillImpl(Context context, List<CutInfo.PlaidInfo> newPlaids, List<MediaPartItem> items, GapManager.GapCallback callback) {
+
+        System.out.println("start ====================== MatchStageFiller =====================");
         //match
         LeftFillInfo leftFillInfo = matchFiller.fill(context, newPlaids, items, callback);
+
+        System.out.println("start ====================== MaxScoreStageFiller =====================");
         //max score
         if(!Predicates.isEmpty(leftFillInfo.getPlaids()) && !Predicates.isEmpty(leftFillInfo.getItems())){
             leftFillInfo = maxFiller.fill(context, leftFillInfo.getPlaids(),leftFillInfo.getItems(), callback);
         }
+        System.out.println("start ====================== ReuseItemStageFiller =====================");
         //reuse item
         if(!Predicates.isEmpty(leftFillInfo.getPlaids())){
             reuseFiller.fill(context, leftFillInfo.getPlaids(), items, callback);
         }
+        System.out.println("start ====================== end all StageFiller =====================");
     }
 }

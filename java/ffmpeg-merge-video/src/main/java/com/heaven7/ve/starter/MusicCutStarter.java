@@ -97,7 +97,6 @@ public class MusicCutStarter implements IStarter, MusicCutter {
             final int duration = context.getMontageParameter().getDuration();
             // String fileName = FileUtils.getFileName(musicPath);
             String[] strs = cuts.split(",");
-            List<CutInfo.PlaidInfo> result = new ArrayList<>();
             CollectionVisitService<Float> service = VisitServices.from(Arrays.asList(strs))
                     .map(new ResultVisitor<String, Float>() {
                 @Override
@@ -111,6 +110,9 @@ public class MusicCutStarter implements IStarter, MusicCutter {
                 @Override
                 public boolean visit(Object param, int count, int step, List<Float> floats) {
                     //1.5  3.2  4.8  5.7  8.2  9.8 12 . need 10 seconds.   10-9.8 < 1s so last interval is 8.2-10
+                    if(floats.size() < 2){
+                        return true;
+                    }
                     Float start = floats.get(0);
                     Float end = floats.get(1);
                     if(start >= duration){

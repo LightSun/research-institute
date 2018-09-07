@@ -158,7 +158,7 @@ public interface MetaInfo {
         switch (shotType) {
             case "closeUp":
                 return SHOT_TYPE_CLOSE_UP;
-            case "mediaCloseUp":
+            case "mediumCloseUp":
                 return SHOT_TYPE_MEDIUM_CLOSE_UP;
             case "mediumShot":
                 return SHOT_TYPE_MEDIUM_SHOT;
@@ -177,7 +177,7 @@ public interface MetaInfo {
             case SHOT_TYPE_CLOSE_UP:
                 return "closeUp";
             case SHOT_TYPE_MEDIUM_CLOSE_UP:
-                return "mediaCloseUp";
+                return "mediumCloseUp";
             case SHOT_TYPE_MEDIUM_SHOT:
                 return "mediumShot";
             case SHOT_TYPE_MEDIUM_LONG_SHOT:
@@ -443,6 +443,8 @@ public interface MetaInfo {
 
         /** 主人脸个数 */
         private int mainFaceCount = -1;
+        private int mBodyCount = -1;
+
         /** 通用tag信息 */
         private List<FrameTags> rawVideoTags;
         /** 人脸框信息 */
@@ -453,7 +455,6 @@ public interface MetaInfo {
         private List<Integer> domainTags;
         private List<Integer> adjTags;
 
-
         //-------------------------- start High-Light ----------------------------
         /** set metadata for high light data. (from load high light) */
         public void setMediaData(MediaData mediaData) {
@@ -463,7 +464,10 @@ public interface MetaInfo {
                 VisitServices.from(hlMap).fire(new FireVisitor<MediaData.HighLightPair>() {
                     @Override
                     public Boolean visit(MediaData.HighLightPair pair, Object param) {
-                        highLightMap.put(pair.getTime(), pair.getDatas());
+                        List<MediaData.HighLightData> highLightData = VEGapUtils.filterHighLightByScore(pair.getDatas());
+                        if(!Predicates.isEmpty(highLightData)){
+                            highLightMap.put(pair.getTime(), highLightData);
+                        }
                         return null;
                     }
                 });
@@ -631,6 +635,15 @@ public interface MetaInfo {
         }
         public void setLocation(LocationMeta location) {
             this.location = location;
+        }
+        public void setBodyCount(int size) {
+            this.mBodyCount = size;
+        }
+        public int getBodyCount(){
+            return mBodyCount;
+        }
+        public int getPersonCount() {
+            return Math.max(mBodyCount, mainFaceCount);
         }
 
         //============================================================

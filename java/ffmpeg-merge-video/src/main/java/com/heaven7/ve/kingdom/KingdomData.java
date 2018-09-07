@@ -23,8 +23,8 @@ public class KingdomData {
     @SerializedName("shot_type_score")
     private Map<String, Float> shotTypeMap;
     @JsonAdapter(FloatMapGsonAdapter.class)
-    @SerializedName("main_face_score")
-    private Map<String, Float> mainFaceMap;
+    @SerializedName("person_count_score")
+    private Map<String, Float> personCountMap;
 
     public Map<String, Float> getShotTypeMap() {
         return shotTypeMap;
@@ -33,11 +33,12 @@ public class KingdomData {
         this.shotTypeMap = shotTypeMap;
     }
 
-    public Map<String, Float> getMainFaceMap() {
-        return mainFaceMap;
+
+    public Map<String, Float> getPersonCountMap() {
+        return personCountMap;
     }
-    public void setMainFaceMap(Map<String, Float> mainFaceMap) {
-        this.mainFaceMap = mainFaceMap;
+    public void setPersonCountMap(Map<String, Float> personCountMap) {
+        this.personCountMap = personCountMap;
     }
 
     public List<ModuleData> getModuleDatas() {

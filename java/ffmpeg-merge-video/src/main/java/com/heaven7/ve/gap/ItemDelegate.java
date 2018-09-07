@@ -40,5 +40,8 @@ public interface ItemDelegate {
      * get max duration of video
      */
     long getMaxDuration();
+
+    @Override
+    String toString();
 }
 

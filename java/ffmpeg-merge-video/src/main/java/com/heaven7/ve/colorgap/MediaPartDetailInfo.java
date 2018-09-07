@@ -26,7 +26,9 @@ public class MediaPartDetailInfo {
     public int getMainFaceCount() {
         return item.imageMeta.getMainFaceCount();
     }
-
+    public int getBodyCount(){
+        return item.imageMeta.getBodyCount();
+    }
     /**
      * -1 , means no body
      */
@@ -111,6 +113,7 @@ public class MediaPartDetailInfo {
         try {
             return "MediaPartDetailInfo{" +
                     "mainFaceCount = " + getMainFaceCount() +
+                    ", bodyCount = " + getBodyCount() +
                     ", bodyRate = " + getBodyRate() +
                     ", shotType = " + getShotType() +
                     ", topTags = " + getTopTagsString() +

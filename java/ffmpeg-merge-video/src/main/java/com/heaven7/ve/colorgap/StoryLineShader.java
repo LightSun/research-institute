@@ -1,6 +1,5 @@
 package com.heaven7.ve.colorgap;
 
-import com.heaven7.utils.Context;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
 
@@ -24,7 +23,7 @@ public interface StoryLineShader {
      * @param filter the air shot filter
      * @return the gap items.
      */
-    List<GapManager.GapItem> tintAndFill(Context context, List<CutInfo.PlaidInfo> plaids, VETemplate template, List<MediaPartItem> items,
+    List<GapManager.GapItem> tintAndFill(ColorGapContext context, List<CutInfo.PlaidInfo> plaids, VETemplate template, List<MediaPartItem> items,
                                          PlaidFiller filler, AirShotFilter filter);
 
 }

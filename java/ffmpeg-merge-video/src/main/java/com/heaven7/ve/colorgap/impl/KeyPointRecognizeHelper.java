@@ -25,6 +25,9 @@ public abstract class KeyPointRecognizeHelper extends BaseRecognizeHelper<List<K
 
     @Override
     protected void onProcess(MediaPartItem part, List<KeyPointData> value) {
+        //set max person
+        part.imageMeta.setBodyCount(value.size());
+
         KeyPointData maxKPD = VisitServices.from(value).pile(new PileVisitor<KeyPointData>() {
             @Override
             public KeyPointData visit(Object o, KeyPointData kp1, KeyPointData kp2) {

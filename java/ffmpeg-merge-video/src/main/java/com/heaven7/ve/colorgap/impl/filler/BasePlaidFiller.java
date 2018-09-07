@@ -80,6 +80,12 @@ public class BasePlaidFiller implements PlaidFiller {
             this.infoes = infoes;
             this.parts = parts;
         }
+
+        @Override
+        public boolean isDebug() {
+            return getContext().getInitializeParam().isDebug();
+        }
+
         /** adjust the video start and end times. after call this the video parts' times may be overlapped. */
         public void adjustTimes() {
             VEGapUtils.adjustTime(getContext(), filledItems);
@@ -140,5 +146,6 @@ public class BasePlaidFiller implements PlaidFiller {
                 }
             });
         }
+
     }
 }

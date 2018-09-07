@@ -198,7 +198,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         final Kingdom kingdom = getKingdom();
         //1. 增加人脸得分
         if(imageMeta != null){
-            float score = kingdom.getMainFaceScore(imageMeta.getMainFaceCount());
+            float score = kingdom.getPersonCountScore(imageMeta.getPersonCount());
             mScores.setPersonNumberScore(score);
         }
         // 2. 增加镜头类型得分
@@ -391,7 +391,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
             return;
         }
         //belong to self shot (face rects)
-        List<FrameFaceRects> faceRects = imageMeta.getFaceRects(videoPart);
+        List<FrameFaceRects> faceRects = imageMeta.getRawFaceRects();
 
         List<FrameFaceRects> ffrs = VisitServices.from(faceRects)
                 .visitForQueryList(new PredicateVisitor<FrameFaceRects>() {

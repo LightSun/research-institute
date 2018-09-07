@@ -18,6 +18,7 @@ import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.gap.PlaidDelegate;
 import com.heaven7.ve.kingdom.Kingdom;
+import com.vida.common.entity.MediaData;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +60,33 @@ public class VEGapUtils {
         }
         List<IHighLightData> list = filterHighLightData(kingdom, value);
         return Predicates.isEmpty(list) ? null : KeyValuePair.create(pair.getKey(), list);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static  List<MediaData.HighLightData> filterHighLightByScore(@Nullable List<MediaData.HighLightData> list) {
+        if(list == null){
+            return null;
+        }
+        //clear repeat
+        if(!Predicates.isEmpty(list)){
+            list = VisitServices.from(list).removeRepeat(null, new Comparator<IHighLightData>() {
+                @Override
+                public int compare(IHighLightData o1, IHighLightData o2) {
+                    return o1.getName().equals(o2.getName()) ? 0 : 1;
+                }
+            }, new WeightVisitor<MediaData.HighLightData>() {
+                @Override
+                public Integer visit(MediaData.HighLightData data, Object param) {
+                    return Float.floatToIntBits(data.getScore());
+                }
+            }).filter(new PredicateVisitor<MediaData.HighLightData>() {
+                @Override
+                public Boolean visit(MediaData.HighLightData data, Object param) {
+                    return data.getScore() >= 0.41f;
+                }
+            }).getAsList();
+        }
+        return  list;
     }
 
     public static List<IHighLightData> filterHighLightData(Kingdom kingdom,@Nullable List<IHighLightData> value) {
@@ -207,7 +235,7 @@ public class VEGapUtils {
         if (isInRange(mainFaceArea,0.12f, 1.0f)) {
             return "closeUp";
         } else if (isInRange(mainFaceArea,0.06f, 0.12f)) {
-            return "mediaCloseUp";
+            return "mediumCloseUp";
         } else if (isInRange(mainFaceArea,0.016f, 0.06f)) {
             return "mediumShot";
         } else if (isInRange(mainFaceArea,0.011f, 0.016f)) {

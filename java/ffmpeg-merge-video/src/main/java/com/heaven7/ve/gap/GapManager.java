@@ -2,6 +2,7 @@ package com.heaven7.ve.gap;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 
 import java.util.List;
 
@@ -10,6 +11,8 @@ import java.util.List;
  */
 //TODO 视频太短小于音乐格子？
 public class GapManager {
+
+    private static final String TAG = "GapManager";
 
     /** the distance of different video src */
     private static final int DISTANCE = 10;
@@ -29,6 +32,7 @@ public class GapManager {
      * @param reuseItem true to reuse item.(may be reuse multi times)
      */
     public void fill(GapCallback callback, boolean reuseItem, boolean ignoreFillFailed){
+        final String method = "fill";
         List<GapItem> filledItems = callback.getFilledItems();
         Throwables.checkNull(filledItems);
         for(PlaidDelegate plaid : plaids){
@@ -43,6 +47,11 @@ public class GapManager {
                 GapItem gapItem = new GapItem(plaid, callback.bestMatch(plaid, items));
                 filledItems.add(gapItem);
                 gapItem.markHold();
+
+                if(callback.isDebug()) {
+                    callback.getPerformanceCollector().addMessage(ColorGapPerformanceCollector.MODULE_GAP_CALLBACK,
+                            TAG, method, "filled item by first gap. " + gapItem.item.toString());
+                }
             }else{
                 float maxValue = -1f;
                 ItemDelegate maxValueItem = null;
@@ -80,6 +89,12 @@ public class GapManager {
                 GapItem gapItem = new GapItem(plaid, !maxValueItem.isHold() ? maxValueItem : maxValueItem.copy());
                 filledItems.add(gapItem);
                 gapItem.markHold();
+
+                if(callback.isDebug()) {
+                    callback.getPerformanceCollector().addMessage(ColorGapPerformanceCollector.MODULE_GAP_CALLBACK,
+                            TAG, method, "filled item by max score. max score = " + maxValue
+                                    + ",\n" + gapItem.item.toString());
+                }
             }
         }
     }
@@ -133,5 +148,9 @@ public class GapManager {
        List<GapItem> getFilledItems();
 
        ItemDelegate bestMatch(PlaidDelegate plaid, List<ItemDelegate> items);
+
+       ColorGapPerformanceCollector getPerformanceCollector();
+
+       boolean isDebug();
     }
 }

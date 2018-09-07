@@ -1,7 +1,9 @@
 package com.vida.ai.test;
 
+import com.google.gson.Gson;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
@@ -9,6 +11,7 @@ import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.starter.KingdomStarter;
+import com.heaven7.ve.test.ShotsData;
 import com.heaven7.ve.test.TestUtils;
 
 import java.io.File;
@@ -26,7 +29,7 @@ public class ColorGapTest {
     }
 
     public static void main(String[] args) {
-        String music = "E:\\tmp\\music_cut\\M7.mp3";
+        String music = "E:\\tmp\\music_cut\\M6.mp3";
         String outDir = "F:\\videos\\temp_works\\ClothingWhite";
         List<String> files = FileUtils.getFiles(new File("F:\\videos\\ClothingWhite"), "mp4");
         List<BaseMediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, BaseMediaResourceItem>() {
@@ -45,7 +48,7 @@ public class ColorGapTest {
     public void start(String musicPath, List<BaseMediaResourceItem> items, String outDir){
         //montage param
         MontageParam param = new MontageParam();
-        param.setDuration(30);
+        param.setDuration(25);
         param.setEffectFileName("effect_dress");
         param.setTemplateFileName("template_dress");
 
@@ -80,6 +83,12 @@ public class ColorGapTest {
                 return 30;
             }
         });
+        ip.setFlags(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE);
+
+        String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
+        ShotsData data = new Gson().fromJson(shots, ShotsData.class);
+        ip.setShotAssigner(data);
+
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);
     }

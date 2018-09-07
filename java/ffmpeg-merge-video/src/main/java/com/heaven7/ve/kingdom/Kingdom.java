@@ -306,6 +306,31 @@ public abstract class Kingdom {
         return getMainFaceScoreImpl(mainFaceCount);
     }
 
+
+    /**
+     * get person count score
+     * @param personCount the person count
+     * @return the person count score
+     */
+    public final float getPersonCountScore(int personCount){
+        if(personCount <= 0){
+            return 0f;
+        }
+        return getPersonCountScoreImpl(personCount);
+    }
+
+    protected float getPersonCountScoreImpl(int personCount) {
+        if(personCount == 1){
+            return 0f;
+        }else if(personCount == 2){
+            return 1f;
+        }else if(personCount > 2 && personCount < 5){
+            return 1f;
+        }else{
+            return 1f;
+        }
+    }
+
     protected float getMainFaceScoreImpl(int mainFaceCount) {
         if(mainFaceCount == 1){
             return 0f;

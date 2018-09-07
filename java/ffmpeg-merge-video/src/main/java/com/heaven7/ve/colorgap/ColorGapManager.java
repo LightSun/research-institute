@@ -18,6 +18,7 @@ import com.heaven7.ve.colorgap.impl.AirShotFilterImpl;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
+import com.heaven7.ve.test.ShotAssigner;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -133,6 +134,14 @@ public class ColorGapManager extends BaseContextOwner{
             final List<MediaPartItem> newItems = VideoCutter.of(mediaItems).cut(mContext, plaids, mediaItems);
             module.end(TAG);
             Logger.d(TAG, "fill", "after cut, item.size = " + newItems.size());
+            if(getContext().getInitializeParam().hasFlag(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE)){
+                ShotAssigner assigner = getContext().getInitializeParam().getShotAssigner();
+                for (MediaPartItem item : newItems){
+                    int shotType = assigner.assignShotType(item);
+                    item.imageMeta.setShotType(MetaInfo.getShotTypeString(shotType));
+                }
+            }
+
             //shot recognition.for 'GeLayLiYa' ,mShotRecognizer is disabled.
             if(!getKingdom().isGeLaiLiYa() && mShotRecognizer != null && !Predicates.isEmpty(newItems)){
                 final VETemplate source_tem = srcTemplate;

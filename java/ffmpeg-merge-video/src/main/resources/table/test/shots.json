@@ -1,0 +1,34 @@
+{"shot_types":[
+  {  "LM0A0199":"mediumShot"},
+  {  "LM0A0204":"longShot"},
+  {  "LM0A0205":"closeUp"},
+  {  "LM0A0207":"closeUp"},
+  {  "LM0A0209":"mediumShot"},
+  {  "LM0A0210":"mediumShot"},
+
+  {  "LM0A0212":"mediumShot"},
+  {  "LM0A0213":"veryLongShot"},
+  {  "LM0A0215":"mediumShot"},
+  {  "LM0A0218":"mediumShot"},
+  {  "LM0A0219":"mediumLongShot"},
+  {  "LM0A0220":"mediumCloseUp"},
+
+  {  "LM0A0222":"mediumLongShot"},
+  {  "LM0A0223":"mediumCloseUp"},
+  {  "LM0A0224":"mediumCloseUp"},
+  {  "LM0A0226":"mediumShot"},
+  {  "LM0A0227":"mediumCloseUp"},
+  {  "LM0A0228":"mediumCloseUp"},
+  {  "LM0A0229":"closeUp"},
+
+  {  "LM0A0230":"closeUp"},
+  {  "LM0A0231":"mediumShot"},
+  {  "LM0A0232":"mediumLongShot"},
+  {  "LM0A0233":"mediumShot"},
+
+  {  "LM0A0237":"mediumCloseUp"},
+  {  "LM0A0238":"mediumLongShot"},
+  {  "LM0A0239":"longShot"},
+  {  "LM0A0240":"mediumShot"}
+]
+}
