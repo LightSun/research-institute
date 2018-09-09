@@ -2,9 +2,7 @@ package com.heaven7.ve.starter;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import com.heaven7.java.visitor.FireMultiVisitor;
 import com.heaven7.java.visitor.FireMultiVisitor2;
-import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.CollectionVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -67,7 +65,8 @@ public class MusicCutStarter implements IStarter, MusicCutter {
 
     @Override
     public CutInfo[] cut(Context context, String[] musicPath) {
-        List<CutInfo> list = VisitServices.from(Arrays.asList(musicPath)).map(new ResultVisitor<String, CutInfo>() {
+        List<CutInfo> list = VisitServices.from(Arrays.asList(musicPath))
+                .map(new ResultVisitor<String, CutInfo>() {
             @Override
             public CutInfo visit(String s, Object param) {
                 MusicCutData data = mMap.get(s);

@@ -16,8 +16,8 @@ public class Launcher {
     public static void launch(Context context) {
         new ImageDetectStarter().init(context, BaiduImageDetector.class.getName());
         new KingdomStarter().init(context, null);
-        String musicDir = "E:\\tmp\\music_cut";
-        new MusicCutStarter(new SimpleMusicPathProvider(musicDir)).init(context, null);
+        new MusicCutStarter(new SimpleMusicPathProvider(ColorGapTest.MUSIC_DIR))
+                .init(context, null);
     }
 
     public static void main(String[] args) {

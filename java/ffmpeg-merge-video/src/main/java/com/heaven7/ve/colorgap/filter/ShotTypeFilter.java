@@ -24,11 +24,6 @@ public class ShotTypeFilter extends GapColorFilter {
         return FLAG_SHOT_TYPE;
     }
 
-    @Override
-    protected float getPassScore() {
-        return PASS_SCORE_SHOT_TYPE;
-    }
-
     public static class ShotTypeCondition extends GapColorCondition{
 
         public ShotTypeCondition(String type) {

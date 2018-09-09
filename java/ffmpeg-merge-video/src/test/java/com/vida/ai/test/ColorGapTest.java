@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class ColorGapTest {
 
+    public static final String MUSIC_DIR = "I:\\guanguan\\test_musics";
     private static final SimpleColorGapContext sInitContext = new SimpleColorGapContext();
 
     static {
@@ -29,9 +30,13 @@ public class ColorGapTest {
     }
 
     public static void main(String[] args) {
-        String music = "E:\\tmp\\music_cut\\M6.mp3";
-        String outDir = "F:\\videos\\temp_works\\ClothingWhite";
-        List<String> files = FileUtils.getFiles(new File("F:\\videos\\ClothingWhite"), "mp4");
+        // String videoDir = "F:\\videos\\ClothingWhite";
+        // String outDir = "F:\\videos\\temp_works\\ClothingWhite";
+        // String music = "E:\\tmp\\music_cut\\M6.mp3";
+        String videoDir = "I:\\guanguan\\ClothingWhite";
+        String outDir = "I:\\guanguan\\clothing_out";
+        String music = MUSIC_DIR + File.separator + "M6.mp3";
+        List<String> files = FileUtils.getFiles(new File(videoDir), "mp4");
         List<BaseMediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, BaseMediaResourceItem>() {
             @Override
             public BaseMediaResourceItem visit(String s, Object param) {
@@ -48,7 +53,7 @@ public class ColorGapTest {
     public void start(String musicPath, List<BaseMediaResourceItem> items, String outDir){
         //montage param
         MontageParam param = new MontageParam();
-        param.setDuration(25);
+        param.setDuration(60);
         param.setEffectFileName("effect_dress");
         param.setTemplateFileName("template_dress");
 
@@ -75,7 +80,8 @@ public class ColorGapTest {
         ip.setTemplateDir("table");
         ip.setEffectDir("table");
         ip.setDebug(true);
-        ip.setDebugOutDir("F:\\videos\\temp_works\\ClothingWhite");
+       // ip.setDebugOutDir("F:\\videos\\temp_works\\ClothingWhite");
+        ip.setDebugOutDir("I:\\guanguan\\clothing_out");
         ip.setEffectResourceDir("E:\\tmp\\服装demo_数据_ios\\texture");
         ip.setTransitionDelegate(new TransitionDelegate() {
             @Override
@@ -83,11 +89,11 @@ public class ColorGapTest {
                 return 30;
             }
         });
-       /*
+
         ip.setFlags(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE);
         String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
         ShotsData data = new Gson().fromJson(shots, ShotsData.class);
-        ip.setShotAssigner(data);*/
+        ip.setShotAssigner(data);
 
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);
