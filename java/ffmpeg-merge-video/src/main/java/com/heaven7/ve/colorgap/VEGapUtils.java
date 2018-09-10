@@ -13,6 +13,7 @@ import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
+import com.heaven7.utils.Context;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
@@ -47,6 +48,21 @@ public class VEGapUtils {
             }
             item.computeScore();
         }
+    }
+
+    /**
+     * get shot from the cut-item delegate
+     * @param context the context
+     * @param delegate the cut item delegate
+     * @param startTime the start time in frames
+     * @param endTime the end time in frames
+     * @return the media part item.
+     */
+    public static MediaPartItem getShot(Context context, CutItemDelegate delegate, long startTime, long endTime){
+        TimeTraveller tt = new TimeTraveller();
+        tt.setStartTime(startTime);
+        tt.setEndTime(endTime);
+        return new MediaPartItem(context, (MetaInfo.ImageMeta) delegate.getImageMeta().copy(), delegate.getItem(), tt);
     }
 
     public static KeyValuePair<Integer, List<IHighLightData>> filterHighLight(Kingdom kingdom,

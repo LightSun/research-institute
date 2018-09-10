@@ -1,0 +1,17 @@
+{"moduleDatas":[
+  {"name":"printing","score":1,"shotType":"closeUp","level":0,"desc":"服装印花"},
+  {"name":"zipper","score":1,"shotType":"closeUp","level":0,"desc":"纽扣拉链"},
+  {"name":"selling_point","score":1,"shotType":"closeUp","level":0,"desc":"特⾊买点"},
+  {"name":"portrait","score":1,"shotType":"mediumShot","level":2,"desc":"肖像"},
+  {"name":"back","score":1.5,"shotType":"mediumLongShot","level":2,"desc":"背影"},
+  {"name":"foot","score":1,"shotType":"closeUp","level":1,"desc":"腿部"},
+  {"name":"hand","score":1,"shotType":"closeUp","level":1,"desc":"手部"}],
+  "shot_type_score":[
+    {"mediumShot":1},
+    {"mediumLongShot":1},
+    {"default":1.5}
+  ],
+  "person_count_score":[
+    {"1":0},{"2": 1},{"3-4-5":1},{"default":1}
+  ]
+}

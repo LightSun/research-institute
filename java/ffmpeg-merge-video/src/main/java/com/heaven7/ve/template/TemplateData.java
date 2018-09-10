@@ -53,6 +53,15 @@ public class TemplateData {
         private String relationship; // or/and
         @JsonAdapter(StringMapGsonAdapter.class)
         private Map<String, String> cases;
+        //chapter weight
+        private int weight;
+
+        public int getWeight() {
+            return weight;
+        }
+        public void setWeight(int weight) {
+            this.weight = weight;
+        }
 
         public float getProportion() {
             return proportion;
@@ -64,7 +73,6 @@ public class TemplateData {
         public String getRelationship() {
             return relationship;
         }
-
         public void setRelationship(String relationship) {
             this.relationship = relationship;
         }
@@ -72,7 +80,6 @@ public class TemplateData {
         public Map<String, String> getCases() {
             return cases;
         }
-
         public void setCases(Map<String, String> cases) {
             this.cases = cases;
         }

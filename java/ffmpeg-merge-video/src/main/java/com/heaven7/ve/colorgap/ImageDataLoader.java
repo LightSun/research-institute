@@ -55,9 +55,6 @@ public class ImageDataLoader {
         return tags;
     }
 
-    public static void main(String[] args) {
-        //TODO
-    }
 
     private static class ImageTagCallback extends TextReadHelper.BaseAssetsCallback<ImageTags>{
 

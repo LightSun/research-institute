@@ -27,4 +27,7 @@ public class BaseContextOwner {
     public ColorGapPerformanceCollector getPerformanceCollector(){
         return mContext.getColorGapPerformanceCollector();
     }
+    public ColorGapContext.InitializeParam getInitializeParam(){
+        return getContext().getInitializeParam();
+    }
 }

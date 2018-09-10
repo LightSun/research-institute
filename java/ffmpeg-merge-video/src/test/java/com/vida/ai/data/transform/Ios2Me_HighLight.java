@@ -22,8 +22,8 @@ import java.util.List;
 public class Ios2Me_HighLight {
 
     public static void main(String[] args) {
-        String inputDir = "I:\\guanguan\\clothing_highlight";
-        String outDir = "I:\\guanguan\\clothing_out";
+        String inputDir = "F:\\videos\\temp_works\\ios_highlight";
+        String outDir = "F:\\videos\\temp_works\\highlight";
         final Ios2Me_HighLight light = new Ios2Me_HighLight(inputDir, outDir);
         light.setImageWidth(1280);
         light.setImageHeight(720);

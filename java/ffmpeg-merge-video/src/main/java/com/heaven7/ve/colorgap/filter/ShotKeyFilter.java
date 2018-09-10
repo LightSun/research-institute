@@ -37,7 +37,6 @@ public class ShotKeyFilter extends GapColorFilter {
             super();
             this.shotKey = shotKey;
         }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;

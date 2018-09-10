@@ -70,6 +70,13 @@ public class EffectMarkerImpl implements EffectsMarker {
                     if(index < 0 ||index >= itemSize){
                         return false;
                     }
+                    //for last item of last item. no transition
+                    if(markType == MarkFlags.TYPE_TRANSITION){
+                        if(index == itemSize - 1){
+                            return false;
+                        }
+                    }
+
                     MediaPartItem mpi = (MediaPartItem) gapItems.get(index).item;
                     mpi.getMarkFlags().addEffectItemDelegate(markType, new MarkFlags.EffectItemDelegate(item, MarkFlags.FLAG_INDEX));
                     return false;
@@ -88,6 +95,12 @@ public class EffectMarkerImpl implements EffectsMarker {
                             int index = getRealIndex(item.getIndex(),  chapter.getPlaidCount());
                             if(index < 0 || index >= chapter.getPlaidCount()){
                                 return false;
+                            }
+                            //for last item of last chapter. no transition
+                            if(markType == MarkFlags.TYPE_TRANSITION){
+                                if(end && index == chapter.getPlaidCount() - 1){
+                                    return false;
+                                }
                             }
                             MediaPartItem mpi = (MediaPartItem) chapter.getFilledItems().get(index).item;
                             if(!mpi.getMarkFlags().hasFlags(markType, MarkFlags.FLAG_INDEX)) {
@@ -117,6 +130,12 @@ public class EffectMarkerImpl implements EffectsMarker {
                     VisitServices.from(parts).filter(new PredicateVisitor<MediaPartItem>() {
                         @Override
                         public Boolean visit(MediaPartItem mpi, Object param) {
+                            //for last item of last item. no transition
+                            if(markType == MarkFlags.TYPE_TRANSITION){
+                                if(parts.indexOf(mpi) == itemSize - 1){
+                                    return false;
+                                }
+                            }
                             ModuleData moduleData = mpi.getHighLightModuleData();
                             return moduleData != null && moduleData.getLevel() == item.getLevel();
                         }

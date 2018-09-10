@@ -22,20 +22,25 @@ import java.util.List;
  */
 public class ColorGapTest {
 
-    public static final String MUSIC_DIR = "I:\\guanguan\\test_musics";
+   // public static final String MUSIC_DIR = "I:\\guanguan\\test_musics";
+    public static final String MUSIC_DIR = "E:\\tmp\\music_cut";
     private static final SimpleColorGapContext sInitContext = new SimpleColorGapContext();
 
     static {
         init();
     }
 
+    /**
+     * 1, 关键点识别.
+     * @param args
+     */
     public static void main(String[] args) {
-        // String videoDir = "F:\\videos\\ClothingWhite";
-        // String outDir = "F:\\videos\\temp_works\\ClothingWhite";
+         String videoDir = "F:\\videos\\ClothingWhite";
+         String outDir = "F:\\videos\\temp_works\\ClothingWhite";
         // String music = "E:\\tmp\\music_cut\\M6.mp3";
-        String videoDir = "I:\\guanguan\\ClothingWhite";
-        String outDir = "I:\\guanguan\\clothing_out";
-        String music = MUSIC_DIR + File.separator + "M6.mp3";
+        // String videoDir = "I:\\guanguan\\ClothingWhite";
+        // String outDir = "I:\\guanguan\\clothing_out";
+        String music = MUSIC_DIR + File.separator + "M7.mp3"; //M6
         List<String> files = FileUtils.getFiles(new File(videoDir), "mp4");
         List<BaseMediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, BaseMediaResourceItem>() {
             @Override
@@ -53,7 +58,7 @@ public class ColorGapTest {
     public void start(String musicPath, List<BaseMediaResourceItem> items, String outDir){
         //montage param
         MontageParam param = new MontageParam();
-        param.setDuration(60);
+        param.setDuration(30);
         param.setEffectFileName("effect_dress");
         param.setTemplateFileName("template_dress");
 
@@ -80,8 +85,8 @@ public class ColorGapTest {
         ip.setTemplateDir("table");
         ip.setEffectDir("table");
         ip.setDebug(true);
-       // ip.setDebugOutDir("F:\\videos\\temp_works\\ClothingWhite");
-        ip.setDebugOutDir("I:\\guanguan\\clothing_out");
+        ip.setDebugOutDir("F:\\videos\\temp_works\\ClothingWhite");
+       // ip.setDebugOutDir("I:\\guanguan\\clothing_out");
         ip.setEffectResourceDir("E:\\tmp\\服装demo_数据_ios\\texture");
         ip.setTransitionDelegate(new TransitionDelegate() {
             @Override
@@ -90,7 +95,7 @@ public class ColorGapTest {
             }
         });
 
-        ip.setFlags(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE);
+        ip.setFlags(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE | ColorGapContext.FLAG_ASSIGN_SHOT_CUTS);
         String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
         ShotsData data = new Gson().fromJson(shots, ShotsData.class);
         ip.setShotAssigner(data);

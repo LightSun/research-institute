@@ -36,6 +36,7 @@ public interface MetaInfo {
 
     String DIR_EMPTY = "empty";
 
+
     //===========================
     float WEIGHT_CAMERA_MOTION = 1;
     float WEIGHT_LOCATION      = 1;
@@ -44,9 +45,9 @@ public interface MetaInfo {
 
     float WEIGHT_MEDIA_DIR     = 3f;
     float WEIGHT_TIME          = 3;
-    float WEIGHT_VIDEO_TAG     = 1.5f;
+    float WEIGHT_VIDEO_TAG     = 2.5f;
     float WEIGHT_SHOT_KEY      = 5f;
-    float WEIGHT_SHOT_CATEGORY = 3f;
+    float WEIGHT_SHOT_CATEGORY = 2.5f;
 
     int FLAG_TIME       = 0x0001;
     int FLAG_LOCATION   = 0x0002;

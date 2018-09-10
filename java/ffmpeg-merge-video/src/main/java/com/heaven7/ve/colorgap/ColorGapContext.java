@@ -21,7 +21,8 @@ public interface ColorGapContext extends Context {
     /** test type server */
     int TEST_TYPE_SERVER       = 3;
 
-    int FLAG_ASSIGN_SHOT_TYPE = 1;
+    int FLAG_ASSIGN_SHOT_TYPE = 0x0001;
+    int FLAG_ASSIGN_SHOT_CUTS = 0x0002;
 
     @SystemResource
     void setInitializeParam(InitializeParam ip);

@@ -113,7 +113,9 @@ public class StoryLineShaderImpl implements StoryLineShader {
                     chapter.setShortTypeFilter(startRule);
                 }
                 //2 . gap
-                BasePlaidFiller bp_filler = new BasePlaidFiller(new NormalStageFiller(), false);
+              //  BasePlaidFiller bp_filler = new BasePlaidFiller(new NormalStageFiller(), false);
+                BasePlaidFiller bp_filler = new BasePlaidFiller(new MultiStageFiller(
+                        new MaxScoreStageFiller(), new ReuseItemStageFiller()), false);
                 List<GapManager.GapItem> gapItems = bp_filler.fillPlaids(context, plaids, items, null);
                 //3, sort by shot-type
                 for (Chapter chapter : chapters){
@@ -139,7 +141,7 @@ public class StoryLineShaderImpl implements StoryLineShader {
             result.addAll(chapter.getFilledItems());
         }
         //mark effects
-        //TODO new EffectMarkerImpl().markEffects(context, chapters, result);
+        new EffectMarkerImpl().markEffects(context, chapters, result);
         return result;
     }
 

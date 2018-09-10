@@ -458,7 +458,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
             int tagIdx = dict.keyAt(i);
             List<Float> values = dict.valueAt(i);
             //compute average
-            float possibility = CollectionUtils.sum(values) / values.size();
+            float possibility = CollectionUtils.sum(values) / rawVideoTags.size();
             tags.add(new Tag(tagIdx, possibility));
         }
         //build tag idx
@@ -476,7 +476,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
                         return tag.getIndex();
                     }
                 }).save(result);
-        if(tags.size() <= count){
+        if(result.size() <= count){
             return result;
         }else{
             return result.subList(0, count);
