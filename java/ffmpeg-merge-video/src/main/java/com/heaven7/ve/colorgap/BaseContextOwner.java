@@ -34,4 +34,8 @@ public class BaseContextOwner {
     public DebugParam getDebugParam(){
         return getContext().getDebugParam();
     }
+
+    public boolean isDebug(){
+        return getContext().getInitializeParam().isDebug();
+    }
 }
