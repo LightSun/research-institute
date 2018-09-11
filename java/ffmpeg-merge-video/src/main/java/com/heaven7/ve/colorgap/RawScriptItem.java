@@ -14,7 +14,7 @@ import java.util.List;
  * one item correspond a logic-sentence. <br><br>
  * Created by heaven7 on 2018/4/11 0011.
  */
-
+@Deprecated
 public class RawScriptItem {
 
     /** the event, often is file dir */

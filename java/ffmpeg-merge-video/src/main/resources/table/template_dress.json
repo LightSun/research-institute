@@ -4,7 +4,7 @@
   "release_sentence":"false",
   "items": [
     {
-      "proportion":0.3,
+      "proportion":0.2,
       "relationship":"or",
       "cases": [
         {
@@ -14,7 +14,7 @@
 
     },
     {
-      "proportion":0.4,
+      "proportion":0.3,
       "relationship":"or",
       "cases": [
         {
@@ -23,7 +23,7 @@
       ]
     },
     {
-      "proportion":0.4,
+      "proportion":0.3,
       "relationship":"or",
       "cases": [
         {

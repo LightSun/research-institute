@@ -86,7 +86,8 @@ public class ShotRecognition {
             }else if(bodyShotType == MetaInfo.SHOT_TYPE_NONE){
                 return oldType;
             }
-            return Math.max(oldType, bodyShotType);
+            //get the nearest shot type
+            return Math.min(oldType, bodyShotType);
         }
     }
 

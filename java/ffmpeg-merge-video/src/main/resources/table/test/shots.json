@@ -1,67 +1,150 @@
-{"shot_types":[
-  {  "LM0A0199":"mediumShot"},
-  {  "LM0A0204":"longShot"},
-  {  "LM0A0205":"closeUp"},
-  {  "LM0A0207":"closeUp"},
-  {  "LM0A0209":"mediumShot"},
-  {  "LM0A0210":"mediumShot"},
+{"shots":[
+  {  "LM0A0199":{"shot_type":"mediumShot",
+    "shot_cut":"0-8",
+    "main_face_count":0,
+    "body_count":0
+  }},
+  {  "LM0A0204":{"shot_type":"longShot",
+    "shot_cut":"0-6",
+    "main_face_count":0,
+    "body_count":0
+  }},
+  {  "LM0A0205":{"shot_type":"closeUp",
+    "shot_cut":"0-12",
+    "main_face_count":1,
+    "body_count":0
+  }},
+  {  "LM0A0207":{"shot_type":"closeUp",
+    "shot_cut":"0-12",
+    "main_face_count":1,
+    "body_count":0
+  }},
+  {  "LM0A0209":{"shot_type":"mediumShot",
+    "shot_cut":"0-10",
+    "main_face_count":1,
+    "body_count":0
+  }},
 
-  {  "LM0A0212":"mediumShot"},
-  {  "LM0A0213":"veryLongShot"},
-  {  "LM0A0215":"mediumShot"},
-  {  "LM0A0218":"mediumShot"},
-  {  "LM0A0219":"mediumLongShot"},
-  {  "LM0A0220":"mediumCloseUp"},
+  {  "LM0A0210":{"shot_type":"mediumShot",
+    "shot_cut":"0-5",
+    "main_face_count":0,
+    "body_count":0
+  }},
+  {  "LM0A0212":{"shot_type":"mediumShot",
+    "shot_cut":"3-22",
+    "main_face_count":1,
+    "body_count":0
+  }},
+  {  "LM0A0213":{"shot_type":"veryLongShot",
+    "shot_cut":"0-7",
+    "main_face_count":0,
+    "body_count":0
+  }},
 
-  {  "LM0A0222":"mediumLongShot"},
-  {  "LM0A0223":"mediumCloseUp"},
-  {  "LM0A0224":"mediumCloseUp"},
-  {  "LM0A0226":"mediumShot"},
-  {  "LM0A0227":"mediumCloseUp"},
-  {  "LM0A0228":"mediumCloseUp"},
-  {  "LM0A0229":"closeUp"},
+  {  "LM0A0215":{"shot_type":"mediumShot",
+    "shot_cut":"0-8",
+    "main_face_count":1,
+    "body_count":1
+  }},
+  {  "LM0A0218":{"shot_type":"mediumShot",
+    "shot_cut":"0-8",
+    "main_face_count":2,
+    "body_count":1
+  }},
 
-  {  "LM0A0230":"closeUp"},
-  {  "LM0A0231":"mediumShot"},
-  {  "LM0A0232":"mediumLongShot"},
-  {  "LM0A0233":"mediumShot"},
+  {  "LM0A0219":{"shot_type":"mediumLongShot",
+    "shot_cut":"0-13",
+    "main_face_count":1,
+    "body_count":1
+  }},
+  {  "LM0A0220":{"shot_type":"mediumCloseUp",
+    "shot_cut":"0-5",
+    "main_face_count":0,
+    "body_count":0
+  }},
+  {  "LM0A0222":{"shot_type":"mediumLongShot",
+    "shot_cut":"0-6",
+    "main_face_count":0,
+    "body_count":0
+  }},
+  {  "LM0A0223":{"shot_type":"mediumCloseUp",
+    "shot_cut":"0-12",
+    "main_face_count":0,
+    "body_count":0
+  }},
+  {  "LM0A0224":{"shot_type":"mediumCloseUp",
+    "shot_cut":"0-6",
+    "main_face_count":0,
+    "body_count":0
+  }},
 
-  {  "LM0A0237":"mediumCloseUp"},
-  {  "LM0A0238":"mediumLongShot"},
-  {  "LM0A0239":"longShot"},
-  {  "LM0A0240":"mediumShot"}
-],
-  "shot_cuts":[
-    {  "LM0A0199":"0-8"},
-    {  "LM0A0204":"0-6"},
-    {  "LM0A0205":"0-12"},
-    {  "LM0A0207":"0-12"},
-    {  "LM0A0209":"0-10"},
-    {  "LM0A0210":"0-5"},
+  {  "LM0A0226":{"shot_type":"mediumShot",
+    "shot_cut":"2-12",
+    "main_face_count":1,
+    "body_count":0
+  }},
+  {  "LM0A0227":{"shot_type":"mediumCloseUp",
+    "shot_cut":"0-12",
+    "main_face_count":1,
+    "body_count":0
+  }},
+  {  "LM0A0228":{"shot_type":"mediumCloseUp",
+    "shot_cut":"0-10",
+    "main_face_count":1,
+    "body_count":0
+  }},
+  {  "LM0A0229":{"shot_type":"closeUp",
+    "shot_cut":"0-11",
+    "main_face_count":1,
+    "body_count":0
+  }},
+  {  "LM0A0230":{"shot_type":"closeUp",
+    "shot_cut":"0-12",
+    "main_face_count":1,
+    "body_count":0
+  }},
 
-    {  "LM0A0212":"3-22"},
-    {  "LM0A0213":"0-7"},
-    {  "LM0A0215":"0-8"},
-    {  "LM0A0218":"0-8"},
-    {  "LM0A0219":"0-13"},
-    {  "LM0A0220":"0-5"},
+  {  "LM0A0231":{"shot_type":"mediumShot",
+    "shot_cut":"0-11",
+    "main_face_count":1,
+    "body_count":1
+  }},
+  {  "LM0A0232":{"shot_type":"mediumLongShot",
+    "shot_cut":"2-13",
+    "main_face_count":1,
+    "body_count":1
+  }},
+  {  "LM0A0233":{"shot_type":"mediumShot",
+    "shot_cut":"0-6",
+    "main_face_count":0,
+    "body_count":0
+  }},
+  {  "LM0A0237":{"shot_type":"mediumCloseUp",
+    "shot_cut":"0-7",
+    "main_face_count":0,
+    "body_count":0
+  }},
 
-    {  "LM0A0222":"0-6"},
-    {  "LM0A0223":"0-12"},
-    {  "LM0A0224":"0-6"},
-    {  "LM0A0226":"2-12"},
-    {  "LM0A0227":"0-12"},
-    {  "LM0A0228":"0-10"},
-    {  "LM0A0229":"0-11"},
+  {  "LM0A0238":{"shot_type":"mediumLongShot",
+    "shot_cut":"0-12",
+    "main_face_count":0,
+    "body_count":0
+  }},
+  {  "LM0A0239":{"shot_type":"longShot",
+    "shot_cut":"0-19",
+    "main_face_count":1,
+    "body_count":1
+  }},
 
-    {  "LM0A0230":"0-12"},
-    {  "LM0A0231":"0-11"},
-    {  "LM0A0232":"2-13"},
-    {  "LM0A0233":"0-6"},
-
-    {  "LM0A0237":"0-7"},
-    {  "LM0A0238":"0-12"},
-    {  "LM0A0239":"0-19"},
-    {  "LM0A0240":"0-20,21-33"}
-  ]
+  {  "LM0A0240_1":{"shot_type":"mediumShot",
+    "shot_cut":"0-20",
+    "main_face_count":1,
+    "body_count":1
+  }},
+  {  "LM0A0240_2":{"shot_type":"mediumShot",
+    "shot_cut":"21-33",
+    "main_face_count":0,
+    "body_count":0
+  }}
+]
 }

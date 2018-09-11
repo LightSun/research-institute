@@ -41,9 +41,6 @@ public class SimpleShotRecognizer implements IShotRecognizer {
 
     @Override
     public int getShotType(MediaPartItem item) {
-        if(item.getContext().getInitializeParam().hasFlag(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE)){
-            return MetaInfo.getShotTypeFrom(item.imageMeta.getShotType());
-        }
         return ShotRecognition.getShotType(item);
     }
 }

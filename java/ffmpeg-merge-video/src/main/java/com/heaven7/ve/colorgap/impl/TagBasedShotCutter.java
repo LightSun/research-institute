@@ -394,9 +394,9 @@ public class TagBasedShotCutter extends VideoCutter {
             tt.setStartTime(CommonUtils.timeToFrame(bf_item.id, TimeUnit.SECONDS));
             tt.setEndTime(CommonUtils.timeToFrame(bf_item.id + frameBuffer.size() - 1, TimeUnit.SECONDS));
 
-            MediaPartItem mpi = new MediaPartItem(context,(MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, tt);
-            mpi.getImageMeta().setMainFaceCount(mainFaceCount);
-            return mpi;
+            MetaInfo.ImageMeta imageMeta = (MetaInfo.ImageMeta) item.imageMeta.copy();
+            imageMeta.setMainFaceCount(mainFaceCount);
+            return new MediaPartItem(context, imageMeta, item.item, tt);
         }
         return null;
     }

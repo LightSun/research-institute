@@ -29,6 +29,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import static com.heaven7.ve.collect.ColorGapPerformanceCollector.*;
+import static com.heaven7.ve.colorgap.ColorGapContext.FLAG_ASSIGN_BODY_COUNT;
 
 /**
  * Created by heaven7 on 2018/3/15 0015.
@@ -44,7 +45,6 @@ public class ColorGapManager extends BaseContextOwner{
     private final MediaAnalyser mediaAnalyser;
     private StoryLineShader mStoryShader;
 
-    private TemplateScriptProvider mProvider;
     private IShotRecognizer mShotRecognizer;
 
     public ColorGapManager(Context context, MediaAnalyser mediaAnalyser, MusicCutter musicCut,
@@ -71,13 +71,6 @@ public class ColorGapManager extends BaseContextOwner{
     }
     public void setShotRecognizer(IShotRecognizer mShotRecognizer) {
         this.mShotRecognizer = mShotRecognizer;
-    }
-    /**
-     * set the template script provider
-     * @param provider the template script provider
-     */
-    public void setTemplateScriptProvider(TemplateScriptProvider provider){
-        this.mProvider = provider;
     }
 
     public void setStoryLineShader(StoryLineShader storyShader) {
@@ -137,13 +130,24 @@ public class ColorGapManager extends BaseContextOwner{
             if(!getKingdom().isGeLaiLiYa() && mShotRecognizer != null && !Predicates.isEmpty(newItems)){
                 final VETemplate source_tem = srcTemplate;
                 getPerformanceCollector().startModule(MODULE_RECOGNIZE_SHOT, TAG);
-                mShotRecognizer.requestKeyPoint(newItems, new IShotRecognizer.Callback() {
-                    @Override
-                    public void onRecognizeDone(List<MediaPartItem> parts) {
-                        getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "KeyPoint", "onRecognizeDone", parts.toString());
-                        processShotType(newItems, plaids, source_tem, resultTemplate, callback);
+                //assign body count
+                ShotAssigner shotAssigner = getInitializeParam().getShotAssigner();
+                if(getInitializeParam().hasFlag(FLAG_ASSIGN_BODY_COUNT)){
+                    for(MediaPartItem item : newItems){
+                        int bodyCount = shotAssigner.assignBodyCount(item);
+                        item.getImageMeta().setBodyCount(bodyCount);
                     }
-                });
+                    getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "KeyPoint_Assign", "onRecognizeDone", newItems.toString());
+                    processShotType(newItems, plaids, source_tem, resultTemplate, callback);
+                }else {
+                    mShotRecognizer.requestKeyPoint(newItems, new IShotRecognizer.Callback() {
+                        @Override
+                        public void onRecognizeDone(List<MediaPartItem> parts) {
+                            getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "KeyPoint", "onRecognizeDone", parts.toString());
+                            processShotType(newItems, plaids, source_tem, resultTemplate, callback);
+                        }
+                    });
+                }
             }else {
                 getPerformanceCollector().startModule(MODULE_FILL_PLAID, "fill");
                 doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
@@ -161,6 +165,7 @@ public class ColorGapManager extends BaseContextOwner{
 
     private List<MediaPartItem> cutMediaShots(List<MediaItem> mediaItems, List<CutInfo.PlaidInfo> plaids) {
         List<MediaPartItem> newItems;
+        //assign shot-cuts
         if(getInitializeParam().hasFlag(ColorGapContext.FLAG_ASSIGN_SHOT_CUTS)){
             ShotAssigner shotAssigner = getInitializeParam().getShotAssigner();
             assert shotAssigner != null;
@@ -190,10 +195,10 @@ public class ColorGapManager extends BaseContextOwner{
         //do with shot type (may need subject items)
         final List<MediaPartItem> subjectItems = new ArrayList<>();
         if(getContext().getInitializeParam().hasFlag(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE)){
+            //assign shot type
             ShotAssigner assigner = getContext().getInitializeParam().getShotAssigner();
             for (MediaPartItem item : newItems){
-                int shotType = assigner.assignShotType(item);
-                item.imageMeta.setShotType(MetaInfo.getShotTypeString(shotType));
+                item.imageMeta.setShotType(assigner.assignShotType(item));
                 item.computeScore();
             }
         }else {

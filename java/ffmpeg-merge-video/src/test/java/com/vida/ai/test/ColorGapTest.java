@@ -17,6 +17,8 @@ import com.heaven7.ve.test.TestUtils;
 import java.io.File;
 import java.util.List;
 
+import static com.heaven7.ve.colorgap.ColorGapContext.*;
+
 /**
  * @author heaven7
  */
@@ -37,10 +39,11 @@ public class ColorGapTest {
     public static void main(String[] args) {
          String videoDir = "F:\\videos\\ClothingWhite";
          String outDir = "F:\\videos\\temp_works\\ClothingWhite";
+        // String outDir = "F:\\videos\\temp_works\\ClothingWhite_shotType";
         // String music = "E:\\tmp\\music_cut\\M6.mp3";
         // String videoDir = "I:\\guanguan\\ClothingWhite";
         // String outDir = "I:\\guanguan\\clothing_out";
-        String music = MUSIC_DIR + File.separator + "M7.mp3"; //M6
+        String music = MUSIC_DIR + File.separator + "M11.mp3"; //M6.M7
         List<String> files = FileUtils.getFiles(new File(videoDir), "mp4");
         List<BaseMediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, BaseMediaResourceItem>() {
             @Override
@@ -94,11 +97,17 @@ public class ColorGapTest {
                 return 30;
             }
         });
-
-        ip.setFlags(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE | ColorGapContext.FLAG_ASSIGN_SHOT_CUTS);
+         //TODO for test just assign data
+      /*  ip.setFlags(
+                FLAG_ASSIGN_SHOT_CUTS |
+                        FLAG_ASSIGN_SHOT_TYPE |
+                        FLAG_ASSIGN_FACE_COUNT |
+                        FLAG_ASSIGN_BODY_COUNT
+        );
         String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
         ShotsData data = new Gson().fromJson(shots, ShotsData.class);
-        ip.setShotAssigner(data);
+        data.resolve();
+        ip.setShotAssigner(data);*/
 
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);

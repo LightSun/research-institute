@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.heaven7.utils.FileUtils.getFileName;
+import static com.heaven7.ve.colorgap.ColorGapContext.FLAG_ASSIGN_FACE_COUNT;
 import static com.heaven7.ve.colorgap.VEGapUtils.getAverMainFaceArea;
 import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
 
@@ -387,6 +388,13 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         if(imageMeta == null){
             return;
         }
+        //assign face count
+        if(getInitializeParam().hasFlag(FLAG_ASSIGN_FACE_COUNT)){
+            int mainFaceCount = getInitializeParam().getShotAssigner().assignMainFaceCount(this);
+            imageMeta.setMainFaceCount(mainFaceCount);
+            return;
+        }
+
         if(Predicates.isEmpty(imageMeta.getRawFaceRects())){
             return;
         }
@@ -420,19 +428,19 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
             }
             total += mainFaceCount;
         }
-        float mainFaces = total * 1f/ ffrs.size();
+        int mainFaces = Math.round(total * 1f/ ffrs.size());
         // 双人脸判断（最大主人脸个数为2，倾向将mainFace设置为2）
-        if(maxMainFaces == 2 && (int)mainFaces == 1){
+        if(maxMainFaces == 2 && mainFaces == 1){
             mainFaces = 2;
         }
         // 多人脸判断（若1<mainFace<3，切shot中的maxFace>3，则将mainFace提升到3
         if(maxRects > 3 && mainFaces > 1 && mainFaces < 3){
             mainFaces = 3;
         }
-        imageMeta.setMainFaceCount((int)mainFaces);
+        imageMeta.setMainFaceCount(mainFaces);
     }
     private List<Integer> calculateTags(List<FrameTags> rawVideoTags,int vocabularyType) {
-        return calculateTags(rawVideoTags, 3, 0.7f, vocabularyType);
+        return calculateTags(rawVideoTags, 3, 0.5f, vocabularyType);
     }
     // 根据镜头的rawVideoTags统计计算tags. 得到对应的tag-index 数组
     private List<Integer> calculateTags(List<FrameTags> rawVideoTags, int count,

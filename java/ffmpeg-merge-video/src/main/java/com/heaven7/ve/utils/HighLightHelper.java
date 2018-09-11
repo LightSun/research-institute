@@ -3,7 +3,6 @@ package com.heaven7.ve.utils;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.image.detect.IHighLightData;
-import com.heaven7.java.image.detect.VideoHighLightManager;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.ve.TimeTraveller;
@@ -41,7 +40,7 @@ public class HighLightHelper {
         }
         int start = (int) CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
         int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
-        VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(context,
+        VideoHighLight vhl = new VideoHighLight(context,
                 new ScoreProviderImpl(), highLightMap);
         int time = vhl.getHighLightPoint(start, end);
         if(time == -1){
@@ -73,7 +72,7 @@ public class HighLightHelper {
         }
         int start = (int) CommonUtils.frameToTime(tt.getStartTime(), TimeUnit.SECONDS);
         int end = (int)CommonUtils.frameToTime(tt.getEndTime(), TimeUnit.SECONDS);
-        VideoHighLightManager.VideoHighLight vhl = new VideoHighLightManager.VideoHighLight(context,
+        VideoHighLight vhl = new VideoHighLight(context,
                 new ScoreProviderImpl(), highLightMap);
         return vhl.getHighLightArea(start, end);
     }
