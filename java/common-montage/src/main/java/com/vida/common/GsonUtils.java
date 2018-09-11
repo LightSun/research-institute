@@ -55,15 +55,13 @@ public class GsonUtils {
                     }
                 }
                 final SerializedName sn = f.getAnnotation(SerializedName.class);
-                if (sn == null) {
-                    continue;
-                }
+                String key = sn != null ? sn.value() : f.getName();
                 try {
                     Object val = f.get(data);
                     //ignore null.
                     if (val != null) {
                         //support single, array, list
-                        map.put(sn.value(), new GsonBuilder().create().toJson(val));
+                        map.put(key, new GsonBuilder().create().toJson(val));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
