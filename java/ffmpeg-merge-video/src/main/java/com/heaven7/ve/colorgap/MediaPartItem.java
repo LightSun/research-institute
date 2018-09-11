@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.heaven7.utils.FileUtils.getFileName;
-import static com.heaven7.ve.colorgap.ColorGapContext.FLAG_ASSIGN_FACE_COUNT;
+import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_FACE_COUNT;
 import static com.heaven7.ve.colorgap.VEGapUtils.getAverMainFaceArea;
 import static com.heaven7.ve.colorgap.VEGapUtils.getShotType;
 
@@ -389,8 +389,8 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
             return;
         }
         //assign face count
-        if(getInitializeParam().hasFlag(FLAG_ASSIGN_FACE_COUNT)){
-            int mainFaceCount = getInitializeParam().getShotAssigner().assignMainFaceCount(this);
+        if(getDebugParam().hasFlags(FLAG_ASSIGN_FACE_COUNT)){
+            int mainFaceCount = getDebugParam().getShotAssigner().assignMainFaceCount(this);
             imageMeta.setMainFaceCount(mainFaceCount);
             return;
         }

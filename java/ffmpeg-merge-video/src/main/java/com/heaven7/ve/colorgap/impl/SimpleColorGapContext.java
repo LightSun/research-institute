@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.ve.anno.SystemResource;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.ColorGapContext;
+import com.heaven7.ve.colorgap.DebugParam;
 import com.heaven7.ve.colorgap.MontageParam;
 import com.heaven7.ve.colorgap.MusicCutter;
 import com.heaven7.ve.kingdom.FileResourceManager;
@@ -22,6 +23,7 @@ public class SimpleColorGapContext implements ColorGapContext {
     private Kingdom mKingdom;
     private ColorGapPerformanceCollector mCollector;
     private MontageParam mMontageParam;
+    private DebugParam mDebugParam;
     private final FileResourceManager mFileResourceM = new FileResourceManager();
 
     @Override
@@ -31,6 +33,15 @@ public class SimpleColorGapContext implements ColorGapContext {
     @Override
     public InitializeParam getInitializeParam() {
         return mInitParam;
+    }
+
+    @Override
+    public void setDebugParam(DebugParam param) {
+        this.mDebugParam = param;
+    }
+    @Override
+    public DebugParam getDebugParam() {
+        return getInitializeParam().isDebug() ? mDebugParam : DebugParam.DEFAULT;
     }
 
     @Override

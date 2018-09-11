@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.List;
 
 import static com.heaven7.ve.colorgap.ColorGapContext.*;
+import static com.heaven7.ve.colorgap.DebugParam.*;
 
 /**
  * @author heaven7
@@ -64,12 +65,25 @@ public class ColorGapTest {
         param.setDuration(30);
         param.setEffectFileName("effect_dress");
         param.setTemplateFileName("template_dress");
+        //debug param
+        DebugParam dp = new DebugParam();
+        dp.setOutputDir("F:\\videos\\temp_works\\ClothingWhite");
+        //dp.setDebugOutDir("I:\\guanguan\\clothing_out");
+        dp.setFlags(FLAG_ASSIGN_SHOT_CUTS |
+                FLAG_ASSIGN_SHOT_TYPE |
+                FLAG_ASSIGN_FACE_COUNT |
+                FLAG_ASSIGN_BODY_COUNT);
+        String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
+        ShotsData data = new Gson().fromJson(shots, ShotsData.class);
+        data.resolve();
+        dp.setShotAssigner(data);
 
         SimpleColorGapContext context = new SimpleColorGapContext();
         sInitContext.copySystemResource(context);
         context.setKingdom(KingdomStarter.getKingdom(KingdomStarter.TYPE_DRESS));
         context.setColorGapPerformanceCollector(new ColorGapPerformanceCollector());
         context.setMontageParameter(param);
+        context.setDebugParam(dp);
         //gap
         ColorGapManager cgm = new ColorGapManager(context, new MediaAnalyserImpl(),
                context.getMusicCutter(), new MusicShaderImpl(), new BasePlaidFiller());
@@ -88,8 +102,6 @@ public class ColorGapTest {
         ip.setTemplateDir("table");
         ip.setEffectDir("table");
         ip.setDebug(true);
-        ip.setDebugOutDir("F:\\videos\\temp_works\\ClothingWhite");
-       // ip.setDebugOutDir("I:\\guanguan\\clothing_out");
         ip.setEffectResourceDir("E:\\tmp\\服装demo_数据_ios\\texture");
         ip.setTransitionDelegate(new TransitionDelegate() {
             @Override
@@ -97,17 +109,6 @@ public class ColorGapTest {
                 return 30;
             }
         });
-         //TODO for test just assign data
-      /*  ip.setFlags(
-                FLAG_ASSIGN_SHOT_CUTS |
-                        FLAG_ASSIGN_SHOT_TYPE |
-                        FLAG_ASSIGN_FACE_COUNT |
-                        FLAG_ASSIGN_BODY_COUNT
-        );
-        String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
-        ShotsData data = new Gson().fromJson(shots, ShotsData.class);
-        data.resolve();
-        ip.setShotAssigner(data);*/
 
         sInitContext.setInitializeParam(ip);
         Launcher.launch(sInitContext);

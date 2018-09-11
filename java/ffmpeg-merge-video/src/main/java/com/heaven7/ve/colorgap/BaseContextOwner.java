@@ -30,4 +30,8 @@ public class BaseContextOwner {
     public ColorGapContext.InitializeParam getInitializeParam(){
         return getContext().getInitializeParam();
     }
+
+    public DebugParam getDebugParam(){
+        return getContext().getDebugParam();
+    }
 }

@@ -6,8 +6,6 @@ import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.kingdom.FileResourceManager;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
-import com.heaven7.ve.test.ShotAssigner;
-import com.heaven7.ve.utils.Flags;
 
 /**
  * @author heaven7
@@ -21,14 +19,13 @@ public interface ColorGapContext extends Context {
     /** test type server */
     int TEST_TYPE_SERVER       = 3;
 
-    int FLAG_ASSIGN_SHOT_TYPE  = 0x0001;
-    int FLAG_ASSIGN_SHOT_CUTS  = 0x0002;
-    int FLAG_ASSIGN_FACE_COUNT = 0x0004;
-    int FLAG_ASSIGN_BODY_COUNT = 0x0008;
-
     @SystemResource
     void setInitializeParam(InitializeParam ip);
     InitializeParam getInitializeParam();
+
+    void setDebugParam(DebugParam param);
+    /** call this you should check if you open the debug mode by set {@linkplain InitializeParam#setDebug(boolean)} true. */
+    DebugParam getDebugParam();
 
     void setMontageParameter(MontageParam param);
     MontageParam getMontageParameter();
@@ -84,14 +81,9 @@ public interface ColorGapContext extends Context {
         private String effectDir;
         /** the effect file dir of resource */
         private String effectResourceDir;
+        /** the debug flag will effect {@linkplain ColorGapContext#getDebugParam()}. if debug is false. getDebugParam will return a default. */
         private boolean debug;
-        /** the debug output dir */
-        private String debugOutDir;
         private TransitionDelegate transitionDelegate;
-
-        //--------------------- just for test ------------------------
-        private int flags;
-        private ShotAssigner shotAssigner;
 
         public TransitionDelegate getTransitionDelegate() {
             return transitionDelegate;
@@ -105,13 +97,6 @@ public interface ColorGapContext extends Context {
         }
         public void setEffectResourceDir(String effectResourceDir) {
             this.effectResourceDir = effectResourceDir;
-        }
-
-        public String getDebugOutDir() {
-            return debugOutDir;
-        }
-        public void setDebugOutDir(String debugOutDir) {
-            this.debugOutDir = debugOutDir;
         }
 
         public boolean isDebug() {
@@ -140,24 +125,6 @@ public interface ColorGapContext extends Context {
         }
         public void setEffectDir(String effectDir) {
             this.effectDir = effectDir;
-        }
-
-        //----------------- just for test some -----------------
-        public int getFlags() {
-            return flags;
-        }
-        public void setFlags(int flags) {
-            this.flags = flags;
-        }
-
-        public ShotAssigner getShotAssigner() {
-            return shotAssigner;
-        }
-        public void setShotAssigner(ShotAssigner shotAssigner) {
-            this.shotAssigner = shotAssigner;
-        }
-        public boolean hasFlag(int flag) {
-            return Flags.hasFlags(this.flags, flag);
         }
     }
 }

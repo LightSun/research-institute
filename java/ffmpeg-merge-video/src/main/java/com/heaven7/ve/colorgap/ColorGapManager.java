@@ -29,7 +29,9 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import static com.heaven7.ve.collect.ColorGapPerformanceCollector.*;
-import static com.heaven7.ve.colorgap.ColorGapContext.FLAG_ASSIGN_BODY_COUNT;
+import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_BODY_COUNT;
+import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_SHOT_CUTS;
+import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_SHOT_TYPE;
 
 /**
  * Created by heaven7 on 2018/3/15 0015.
@@ -131,8 +133,8 @@ public class ColorGapManager extends BaseContextOwner{
                 final VETemplate source_tem = srcTemplate;
                 getPerformanceCollector().startModule(MODULE_RECOGNIZE_SHOT, TAG);
                 //assign body count
-                ShotAssigner shotAssigner = getInitializeParam().getShotAssigner();
-                if(getInitializeParam().hasFlag(FLAG_ASSIGN_BODY_COUNT)){
+                ShotAssigner shotAssigner = getDebugParam().getShotAssigner();
+                if(getDebugParam().hasFlags(FLAG_ASSIGN_BODY_COUNT)){
                     for(MediaPartItem item : newItems){
                         int bodyCount = shotAssigner.assignBodyCount(item);
                         item.getImageMeta().setBodyCount(bodyCount);
@@ -166,8 +168,8 @@ public class ColorGapManager extends BaseContextOwner{
     private List<MediaPartItem> cutMediaShots(List<MediaItem> mediaItems, List<CutInfo.PlaidInfo> plaids) {
         List<MediaPartItem> newItems;
         //assign shot-cuts
-        if(getInitializeParam().hasFlag(ColorGapContext.FLAG_ASSIGN_SHOT_CUTS)){
-            ShotAssigner shotAssigner = getInitializeParam().getShotAssigner();
+        if(getDebugParam().hasFlags(FLAG_ASSIGN_SHOT_CUTS)){
+            ShotAssigner shotAssigner = getDebugParam().getShotAssigner();
             assert shotAssigner != null;
             newItems = new ArrayList<>();
             VisitServices.from(mediaItems).map(new ResultVisitor<MediaItem, List<MediaPartItem>>() {
@@ -194,9 +196,9 @@ public class ColorGapManager extends BaseContextOwner{
                               FillCallback callback) {
         //do with shot type (may need subject items)
         final List<MediaPartItem> subjectItems = new ArrayList<>();
-        if(getContext().getInitializeParam().hasFlag(ColorGapContext.FLAG_ASSIGN_SHOT_TYPE)){
+        if(getDebugParam().hasFlags(FLAG_ASSIGN_SHOT_TYPE)){
             //assign shot type
-            ShotAssigner assigner = getContext().getInitializeParam().getShotAssigner();
+            ShotAssigner assigner = getDebugParam().getShotAssigner();
             for (MediaPartItem item : newItems){
                 item.imageMeta.setShotType(assigner.assignShotType(item));
                 item.computeScore();
@@ -258,7 +260,7 @@ public class ColorGapManager extends BaseContextOwner{
                     return null;
                 }
             });
-            FileUtils.writeTo(new File(getContext().getInitializeParam().getDebugOutDir(),
+            FileUtils.writeTo(new File(getDebugParam().getOutputDir(),
                     "media_part_detail.txt"), sb.toString());
         }
 
