@@ -1,5 +1,6 @@
 package com.vida.common.platform;
 
+import com.heaven7.utils.FileUtils;
 import com.vida.common.PlatformAICmdGenerator;
 
 import java.util.ArrayList;
@@ -56,6 +57,21 @@ public class WindowsCmdGenerator implements PlatformAICmdGenerator {
         cmds.add("process_img_batch2.py");
         cmds.add(outDir);
         cmds.addAll(images);
+        return toArray(cmds);
+    }
+
+    @Override
+    public String[] generateFaceForVideo2(String videoFile, String framesDir, String outDir) {
+        //py simple-video-filename input-dir outDir img-format bit-count
+        String fileName = FileUtils.getFileName(videoFile);
+        List<String> cmds = getBaseCmds();
+        cmds.add("python");
+        cmds.add("get_video_face_from_dir.py");
+        cmds.add(fileName);
+        cmds.add(framesDir);
+        cmds.add(outDir);
+        cmds.add("img_%s.jpg");
+        cmds.add(String.valueOf(5));
         return toArray(cmds);
     }
 

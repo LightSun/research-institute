@@ -69,6 +69,13 @@ public abstract class BaseGenerateRunner implements Runnable {
         }
     }
 
+    public String getParameter(int index){
+         if(io.length > index){
+             return io[index];
+         }
+         return null;
+    }
+
     public boolean isVideo() {
         File file = new File(io[0]);
         return file.exists() && file.isFile();

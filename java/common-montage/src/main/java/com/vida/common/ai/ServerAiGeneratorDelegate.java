@@ -4,6 +4,8 @@ import com.heaven7.utils.CmdHelper;
 import com.vida.common.PlatformAICmdGenerator;
 import com.vida.common.platform.PyDelegate;
 
+import java.io.File;
+
 /**
  * @author heaven7
  */
@@ -66,6 +68,11 @@ public class ServerAiGeneratorDelegate extends BaseAiGeneratorDelegate {
         Runner0 runner = new Runner0(io);
         switch (runner.type){
             case Runner0.TYPE_VIDEO:
+                String framesDir = runner.getParameter(2);
+                //gen face from frames which from video.
+                if(framesDir!= null && new File(framesDir).isDirectory()){
+                    return mAiCmdGen.generateFaceForVideo2(runner.getInput().get(0), framesDir ,runner.getOutput());
+                }
                 return mAiCmdGen.generateFaceForVideo(runner.getInput().get(0), runner.getOutput());
 
             case BaseGenerateRunner.TYPE_BATCH_IMAGE_MORE_DIR:

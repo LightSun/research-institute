@@ -19,6 +19,9 @@ public interface AiGenerateContext {
 
     void genTfRecord();
 
+    /**
+     * gen face by read video steam.
+     */
     void genFace();
 
     /**
