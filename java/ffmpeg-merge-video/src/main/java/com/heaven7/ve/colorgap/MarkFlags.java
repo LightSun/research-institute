@@ -5,12 +5,10 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
-import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.template.EffectData;
 import com.heaven7.ve.utils.EffectsHelper;
-import com.heaven7.ve.utils.MathUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,20 +111,6 @@ public class MarkFlags {
                 return "FLAG_LEVEL";
         }
         throw new RuntimeException("unsupport flag = " + flag);
-    }
-
-    public static String getFlagsString(int flags){
-        List<Integer> list = MathUtil.parseFlags(flags);
-        if(Predicates.isEmpty(list)){
-            return null;
-        }
-        return VisitServices.from(list)
-                .map(new ResultVisitor<Integer, String>() {
-                    @Override
-                    public String visit(Integer flag, Object param) {
-                        return getFlagString(flag);
-                    }
-                }).asListService().joinToString(", ");
     }
 
     public static class EffectItemDelegate{

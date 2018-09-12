@@ -2,7 +2,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.MediaPartItem;
-import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.colorgap.MetaInfoUtils;
 import com.heaven7.ve.colorgap.ShotSortDelegate;
 
 import java.util.ArrayList;
@@ -26,8 +26,8 @@ public class ShotSortDelegateImpl implements ShotSortDelegate {
                     @Override
                     public int compare(MediaPartItem o1, MediaPartItem o2) {
                         //close-up is min , so aesc
-                        int o2_shortType = MetaInfo.getShotTypeFrom(o2.getImageMeta().getShotType());
-                        int o1_shortType = MetaInfo.getShotTypeFrom(o1.getImageMeta().getShotType());
+                        int o2_shortType = MetaInfoUtils.getShotTypeFrom(o2.getImageMeta().getShotType());
+                        int o1_shortType = MetaInfoUtils.getShotTypeFrom(o1.getImageMeta().getShotType());
                         return Integer.compare(o1_shortType, o2_shortType);
                     }
                 });
@@ -38,8 +38,8 @@ public class ShotSortDelegateImpl implements ShotSortDelegate {
                     @Override
                     public int compare(MediaPartItem o1, MediaPartItem o2) {
                         //close-up is min , so desc
-                        int o2_shortType = MetaInfo.getShotTypeFrom(o2.getImageMeta().getShotType());
-                        int o1_shortType = MetaInfo.getShotTypeFrom(o1.getImageMeta().getShotType());
+                        int o2_shortType = MetaInfoUtils.getShotTypeFrom(o2.getImageMeta().getShotType());
+                        int o1_shortType = MetaInfoUtils.getShotTypeFrom(o1.getImageMeta().getShotType());
                         return Integer.compare(o2_shortType, o1_shortType);
                     }
                 });

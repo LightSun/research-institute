@@ -1,6 +1,6 @@
 package com.heaven7.ve.colorgap;
 
-import static com.heaven7.ve.colorgap.MetaInfo.computeWeight;
+import static com.heaven7.ve.colorgap.MetaInfoUtils.computeWeight;
 
 /**
  * Created by heaven7 on 2018/3/15 0015.

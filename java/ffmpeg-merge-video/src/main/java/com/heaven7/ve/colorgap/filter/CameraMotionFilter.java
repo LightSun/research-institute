@@ -3,6 +3,7 @@ package com.heaven7.ve.colorgap.filter;
 
 import com.heaven7.ve.colorgap.GapColorFilter;
 import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.colorgap.MetaInfoUtils;
 
 import static com.heaven7.ve.colorgap.MetaInfo.*;
 
@@ -28,7 +29,7 @@ public class CameraMotionFilter extends GapColorFilter {
     public static class CameraMotionCondition extends GapColorFilter.GapColorCondition {
 
         public CameraMotionCondition(String cameraMotion) {
-            super(MetaInfo.getCameraMotionFrom(cameraMotion));
+            super(MetaInfoUtils.getCameraMotionFrom(cameraMotion));
         }
 
         @Override

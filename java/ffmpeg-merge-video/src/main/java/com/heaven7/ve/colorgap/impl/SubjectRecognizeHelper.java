@@ -9,7 +9,7 @@ import com.heaven7.ve.colorgap.VEGapUtils;
 
 import java.util.List;
 
-import static com.heaven7.ve.colorgap.MetaInfo.getShotTypeString;
+import static com.heaven7.ve.colorgap.MetaInfoUtils.getShotTypeString;
 
 /**
  * the subject recognize/identify helper

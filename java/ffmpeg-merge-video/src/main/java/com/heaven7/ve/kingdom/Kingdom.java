@@ -9,6 +9,7 @@ import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.colorgap.MetaInfoUtils;
 import com.heaven7.ve.template.VETemplate;
 import com.vida.common.IOUtils;
 
@@ -291,7 +292,7 @@ public abstract class Kingdom {
             case MetaInfo.SHOT_TYPE_NONE:
                 return 0f;
         }
-        throw new UnsupportedOperationException("unsupport shot type = " + MetaInfo.getShotTypeString(shotType));
+        throw new UnsupportedOperationException("unsupport shot type = " + MetaInfoUtils.getShotTypeString(shotType));
     }
 
     /**

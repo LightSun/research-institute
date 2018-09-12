@@ -14,12 +14,10 @@ import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.collect.CollectModule;
-import com.heaven7.ve.colorgap.filter.MediaDirFilter;
-import com.heaven7.ve.colorgap.filter.VideoTagFilter;
 import com.heaven7.ve.colorgap.impl.AirShotFilterImpl;
 import com.heaven7.ve.gap.GapManager;
-import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
+import com.heaven7.ve.test.DebugUtils;
 import com.heaven7.ve.test.ShotAssigner;
 
 import java.io.File;
@@ -29,9 +27,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import static com.heaven7.ve.collect.ColorGapPerformanceCollector.*;
-import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_BODY_COUNT;
-import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_SHOT_CUTS;
-import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_SHOT_TYPE;
+import static com.heaven7.ve.colorgap.DebugParam.*;
 
 /**
  * Created by heaven7 on 2018/3/15 0015.
@@ -209,7 +205,7 @@ public class ColorGapManager extends BaseContextOwner{
                 if (shotType == MetaInfo.SHOT_TYPE_NONE) {
                     subjectItems.add(partItem);
                 } else {
-                    partItem.imageMeta.setShotType(MetaInfo.getShotTypeString(shotType));
+                    partItem.imageMeta.setShotType(MetaInfoUtils.getShotTypeString(shotType));
                     //recompute score
                     partItem.computeScore();
                 }
@@ -262,6 +258,8 @@ public class ColorGapManager extends BaseContextOwner{
             });
             FileUtils.writeTo(new File(getDebugParam().getOutputDir(),
                     "media_part_detail.txt"), sb.toString());
+            //cut video for debug.
+            DebugUtils.cutShotsToDir(newItems, getDebugParam().getShotsDir());
         }
 
         //process story to color filter(gen shot key, filter)

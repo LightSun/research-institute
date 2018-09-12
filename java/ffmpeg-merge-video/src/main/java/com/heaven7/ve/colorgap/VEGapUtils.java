@@ -42,9 +42,9 @@ public class VEGapUtils {
     /** set default shot type with recompute score. */
     public static void setDefaultShotType(List<MediaPartItem> parts){
         for (MediaPartItem item : parts){
-            if(MetaInfo.getShotTypeFrom(item.getImageMeta().getShotType()) == MetaInfo.SHOT_TYPE_NONE){
+            if(MetaInfoUtils.getShotTypeFrom(item.getImageMeta().getShotType()) == MetaInfo.SHOT_TYPE_NONE){
                 item.addDetail("default shot-type mediumShot\n");
-                item.getImageMeta().setShotType(MetaInfo.getShotTypeString(MetaInfo.SHOT_TYPE_MEDIUM_SHOT));
+                item.getImageMeta().setShotType(MetaInfoUtils.getShotTypeString(MetaInfo.SHOT_TYPE_MEDIUM_SHOT));
             }
             item.computeScore();
         }

@@ -74,7 +74,7 @@ public class ShotRecognition {
         String shotType = item.imageMeta.getShotType();
         int oldType = SHOT_TYPE_NONE;
         if (!TextUtils.isEmpty(shotType)) {
-            oldType = MetaInfo.getShotTypeFrom(shotType);
+            oldType = MetaInfoUtils.getShotTypeFrom(shotType);
         }
         int bodyShotType = getShotTypeByBody(item);
         //trans shot_type and body shotType is none
@@ -127,7 +127,7 @@ public class ShotRecognition {
             Logger.w(TAG , "getShotTypeOfHighLight", "no module data for name = " + hld.getName());
             return SHOT_TYPE_NONE;
         }
-        int shotType = MetaInfo.getShotTypeFrom(moduleData.getShotType());
+        int shotType = MetaInfoUtils.getShotTypeFrom(moduleData.getShotType());
         float areaRate = hld.getLocation().getArea() * 1f / (item.imageMeta.getWidth() * item.imageMeta.getHeight());
         if(CommonUtils.isInRange(areaRate, 0.5f, 1f)){
             //empty

@@ -28,6 +28,7 @@ public class DebugParam {
     private int flags;
     /** the output dir of debug  */
     private String outputDir;
+    private String shotsDir;
 
     public String getOutputDir() {
         return outputDir;
@@ -72,5 +73,12 @@ public class DebugParam {
     }
     public void setTagScanner(MediaResourceScanner tagScanner) {
         this.tagScanner = tagScanner;
+    }
+
+    public String getShotsDir() {
+        return shotsDir;
+    }
+    public void setShotsDir(String shotsDir) {
+        this.shotsDir = shotsDir;
     }
 }

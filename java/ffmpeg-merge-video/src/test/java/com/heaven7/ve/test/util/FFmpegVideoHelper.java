@@ -12,6 +12,7 @@ import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
 import com.heaven7.ve.test.CuttedItem;
+import com.vida.ai.third.baidu.temp.FileUtil;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -34,7 +35,11 @@ public class FFmpegVideoHelper {
                 .fire(new FireVisitor<String>() {
             @Override
             public Boolean visit(String s, Object param) {
-                return new File(s).delete();
+                String fileDir = FileUtils.getFileDir(s, 1, true);
+                if(dir.equals(fileDir)) {
+                    return new File(s).delete();
+                }
+                return false;
             }
         });
 

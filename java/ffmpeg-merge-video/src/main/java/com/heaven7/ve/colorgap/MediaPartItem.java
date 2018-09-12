@@ -134,7 +134,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
     @Override
     public GapColorFilter.GapColorCondition getColorCondition() {
         if(mCondition == null){
-            mCondition = MetaInfo.createColorCondition(imageMeta);
+            mCondition = MetaInfoUtils.createColorCondition(imageMeta);
         }
         return mCondition;
     }
@@ -206,7 +206,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         if(imageMeta != null){
             String shotType = imageMeta.getShotType();
             if (!TextUtils.isEmpty(shotType)) {
-                float score = kingdom.getShotTypeScore(MetaInfo.getShotTypeFrom(shotType));
+                float score = kingdom.getShotTypeScore(MetaInfoUtils.getShotTypeFrom(shotType));
                 mScores.setShotTypeScore(score);
             }
         }

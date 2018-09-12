@@ -12,6 +12,7 @@ import com.heaven7.ve.starter.KingdomStarter;
 import com.heaven7.ve.test.TestUtils;
 import com.vida.ai.test.impl.SimpleFaceScanner;
 import com.vida.ai.test.impl.SimpleHighLightScanner;
+import com.vida.ai.third.baidu.temp.FileUtil;
 
 import java.io.File;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ColorGapTest {
     public static final String MUSIC_DIR = "E:\\tmp\\music_cut";
     private static final SimpleColorGapContext sInitContext = new SimpleColorGapContext();
 
-    private static final String FACE_DATA_DIR = "F:\\videos\\ClothingWhite\\faces1"; //TODO
+    private static final String FACE_DATA_DIR = "F:\\videos\\ClothingWhite\\faces1";
     private static final String HIGHLIGHT_DATA_DIR = "F:\\videos\\ClothingWhite\\highlight";
 
     static {
@@ -41,7 +42,7 @@ public class ColorGapTest {
      */
     public static void main(String[] args) {
          String videoDir = "F:\\videos\\ClothingWhite";
-         String outDir = "F:\\videos\\temp_works\\人脸和高光对比\\all_self_face1";
+         String outDir = "F:\\videos\\temp_works\\ClothingWhite";
         // String music = "E:\\tmp\\music_cut\\M6.mp3";
         // String videoDir = "I:\\guanguan\\ClothingWhite";
         // String outDir = "I:\\guanguan\\clothing_out";
@@ -67,7 +68,10 @@ public class ColorGapTest {
         param.setEffectFileName("effect_dress");
         param.setTemplateFileName("template_dress");
         //debug param
+        File shots_dir = new File(outDir, "shots_videos");
+        shots_dir.mkdirs();
         DebugParam dp = new DebugParam();
+        dp.setShotsDir(shots_dir.getAbsolutePath());
         dp.setOutputDir(outDir);
         dp.addFlags(FLAG_ASSIGN_FACE_SCANNER |
                 FLAG_ASSIGN_HIGH_LIGHT_SCANNER

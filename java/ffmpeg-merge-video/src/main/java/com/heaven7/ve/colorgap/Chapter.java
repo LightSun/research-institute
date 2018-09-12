@@ -4,11 +4,13 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.FireIndexedVisitor;
+import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.Context;
+import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.colorgap.filter.ShotTypeFilter;
@@ -21,6 +23,7 @@ import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.EffectData;
 import com.sun.media.jfxmedia.Media;
 
+import java.io.File;
 import java.util.*;
 
 import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_FILL_PLAID;
@@ -579,6 +582,28 @@ public class Chapter extends BaseContextOwner{
         if(plaids.size() != filledItems.size()){
             throw new IllegalStateException("fill failed. plaid.size = " + plaids.size() + " ,filledItem.size = " + filledItems.size());
         }
+        //debug filled plaid
+        if(isDebug() && getContext().getTestType() == ColorGapContext.TEST_TYPE_LOCAL){
+            //log
+            StringBuilder sb = new StringBuilder();
+            sb.append("after fill before sort. chapter_index = ")
+                    .append(getChapterIndex())
+                    .append("\n");
+            VisitServices.from(filledItems).fireWithIndex(new FireIndexedVisitor<GapManager.GapItem>() {
+                @Override
+                public Void visit(Object param, GapManager.GapItem gapItem, int index, int size) {
+                    CutInfo.PlaidInfo info = (CutInfo.PlaidInfo) gapItem.plaid;
+                    MediaPartItem item = (MediaPartItem) gapItem.item;
+                    sb.append("plaid: ").append(info.getFilterString()).append("\n");
+                    sb.append("item: ").append(item.toString()).append("\n");
+                    sb.append("\r\n");
+                    return null;
+                }
+            });
+            FileUtils.writeTo(new File(getDebugParam().getOutputDir(),
+                    "chapter__" + getChapterIndex() + ".txt"), sb.toString());
+        }
+
         List<MediaPartItem> list = getFilledMediaPartItems();
         //sort by shot type.
         int rule = ShotSortDelegate.getNextSortRule(lastShotTypeRule);

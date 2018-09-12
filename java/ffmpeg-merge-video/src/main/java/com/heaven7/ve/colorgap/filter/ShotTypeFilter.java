@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap.filter;
 
 import com.heaven7.ve.colorgap.GapColorFilter;
 import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.colorgap.MetaInfoUtils;
 
 import static com.heaven7.ve.colorgap.MetaInfo.*;
 
@@ -27,7 +28,7 @@ public class ShotTypeFilter extends GapColorFilter {
     public static class ShotTypeCondition extends GapColorCondition{
 
         public ShotTypeCondition(String type) {
-            super(MetaInfo.getShotTypeFrom(type));
+            super(MetaInfoUtils.getShotTypeFrom(type));
         }
         public ShotTypeCondition(int shot_type) {
             super(shot_type);

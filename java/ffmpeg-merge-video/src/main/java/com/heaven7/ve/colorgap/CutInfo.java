@@ -5,6 +5,7 @@ import com.heaven7.ve.colorgap.filter.GroupFilter;
 import com.heaven7.ve.gap.PlaidDelegate;
 import com.heaven7.ve.template.ProportionConfig;
 import com.heaven7.ve.utils.Arrays2;
+import com.heaven7.ve.utils.Flags;
 
 import java.util.List;
 
@@ -223,6 +224,17 @@ public class CutInfo {
         }
         public boolean isAir() {
             return air;
+        }
+
+        public String getFilterString(){
+            if(colorFilter == null){
+                return null;
+            }
+            if(colorFilter instanceof GroupFilter){
+                int flags = ((GroupFilter) colorFilter).getTotalFlags();
+                return Flags.getFlagsString(flags, MetaInfoUtils::getFlagString);
+            }
+            return MetaInfoUtils.getFlagString(colorFilter.getFlag());
         }
     }
 
