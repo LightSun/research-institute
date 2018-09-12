@@ -10,7 +10,7 @@ public class BodyAnalysisSample {
 	public static void main(String[] args) throws Exception {
 
 		//返回字符串
-		String imagePath = "F:\\videos\\ClothingWhite\\temp\\LM0A0215\\img_00004.jpg";
+		String imagePath = "F:\\videos\\ClothingWhite\\temp\\LM0A0212\\img_00004.jpg";
 		String result = getBodyAnalysisResult(imagePath);
 		System.out.println(result);
 		//返回java对象

@@ -334,7 +334,7 @@ public class VEGapUtils {
         return mainFaces;
     }
 
-   /* public static int getShotTypeBySubjectRate(float val) {
+    /*public static int getShotTypeBySubjectRate(float val) {
        if(isInRange(val,0.75f, 1.0001f)){
             return MetaInfo.SHOT_TYPE_CLOSE_UP;
         }else if(isInRange(val,0.52f, 0.75f)){
@@ -350,7 +350,7 @@ public class VEGapUtils {
         }
         return MetaInfo.SHOT_TYPE_NONE;
     }*/
-    public static int getShotTypeBySubjectRate(float val) {
+   public static int getShotTypeBySubjectRate(float val) {
         if(isInRange(val,0.85f, 1.000001f)){
             return MetaInfo.SHOT_TYPE_BIG_LONG_SHORT;
         }else if(isInRange(val,0.75f, 0.85f)){

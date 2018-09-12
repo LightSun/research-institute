@@ -1,9 +1,7 @@
 package com.vida.ai.test;
 
-import com.google.gson.Gson;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
@@ -11,14 +9,15 @@ import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.starter.KingdomStarter;
-import com.heaven7.ve.test.ShotsData;
 import com.heaven7.ve.test.TestUtils;
+import com.vida.ai.test.impl.SimpleFaceScanner;
+import com.vida.ai.test.impl.SimpleHighLightScanner;
 
 import java.io.File;
 import java.util.List;
 
-import static com.heaven7.ve.colorgap.ColorGapContext.*;
-import static com.heaven7.ve.colorgap.DebugParam.*;
+import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_FACE_SCANNER;
+import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER;
 
 /**
  * @author heaven7
@@ -28,6 +27,9 @@ public class ColorGapTest {
    // public static final String MUSIC_DIR = "I:\\guanguan\\test_musics";
     public static final String MUSIC_DIR = "E:\\tmp\\music_cut";
     private static final SimpleColorGapContext sInitContext = new SimpleColorGapContext();
+
+    private static final String FACE_DATA_DIR = "F:\\videos\\ClothingWhite\\faces1"; //TODO
+    private static final String HIGHLIGHT_DATA_DIR = "F:\\videos\\ClothingWhite\\highlight";
 
     static {
         init();
@@ -39,7 +41,7 @@ public class ColorGapTest {
      */
     public static void main(String[] args) {
          String videoDir = "F:\\videos\\ClothingWhite";
-         String outDir = "F:\\videos\\temp_works\\ClothingWhite_shotType";
+         String outDir = "F:\\videos\\temp_works\\人脸和高光对比\\all_self_face1";
         // String music = "E:\\tmp\\music_cut\\M6.mp3";
         // String videoDir = "I:\\guanguan\\ClothingWhite";
         // String outDir = "I:\\guanguan\\clothing_out";
@@ -66,17 +68,21 @@ public class ColorGapTest {
         param.setTemplateFileName("template_dress");
         //debug param
         DebugParam dp = new DebugParam();
-        dp.setOutputDir("F:\\videos\\temp_works\\ClothingWhite");
-        //dp.setDebugOutDir("I:\\guanguan\\clothing_out");
-        dp.setFlags(FLAG_ASSIGN_SHOT_CUTS |
-               /* FLAG_ASSIGN_SHOT_TYPE |*/
+        dp.setOutputDir(outDir);
+        dp.addFlags(FLAG_ASSIGN_FACE_SCANNER |
+                FLAG_ASSIGN_HIGH_LIGHT_SCANNER
+        );
+        dp.setFaceScanner(new SimpleFaceScanner(FACE_DATA_DIR));
+        dp.setHighLightScanner(new SimpleHighLightScanner(HIGHLIGHT_DATA_DIR));
+       /* dp.addFlags(FLAG_ASSIGN_SHOT_CUTS |
+                FLAG_ASSIGN_SHOT_TYPE |
                 FLAG_ASSIGN_FACE_COUNT |
                 FLAG_ASSIGN_BODY_COUNT
         );
         String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
         ShotsData data = new Gson().fromJson(shots, ShotsData.class);
         data.resolve();
-        dp.setShotAssigner(data);
+        dp.setShotAssigner(data);*/
 
         SimpleColorGapContext context = new SimpleColorGapContext();
         sInitContext.copySystemResource(context);

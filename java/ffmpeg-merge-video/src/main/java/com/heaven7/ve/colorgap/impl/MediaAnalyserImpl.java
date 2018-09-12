@@ -28,7 +28,7 @@ public class MediaAnalyserImpl implements MediaAnalyser {
     @Override
     public List<MediaItem> analyse(Context context, List<BaseMediaResourceItem> items, CyclicBarrier barrier) {
         if(mVideoHelper == null) {
-            mVideoHelper = createVideoAnalyseHelper(VEGapUtils.asColorGapContext(context).getTestType());
+            mVideoHelper = createVideoAnalyseHelper(VEGapUtils.asColorGapContext(context));
         }
 
         List<MediaItem> outItems = new ArrayList<>();
@@ -52,19 +52,38 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         return outItems;
     }
 
-    private VideoAnalyseHelper createVideoAnalyseHelper(int testType) {
+    private VideoAnalyseHelper createVideoAnalyseHelper(ColorGapContext context) {
+        DebugParam param = context.getDebugParam();
+        MediaResourceScanner faceScanner ;
+        MediaResourceScanner tagScanner ;
+        MediaResourceScanner highLightScanner;
+
+        int testType = context.getTestType();
         switch (testType){
             case ColorGapContext.TEST_TYPE_LOCAL_SERVER:
-            case ColorGapContext.TEST_TYPE_SERVER:
-                return new VideoAnalyseHelper(new MediaFaceScanner(), new MediaTagScanner(), new MediaHighLightScanner(),
-                        new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
+            case ColorGapContext.TEST_TYPE_SERVER: {
+                 faceScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_FACE_SCANNER) ?
+                        param.getFaceScanner() : new MediaFaceScanner();
+                 tagScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_TAG_SCANNER) ?
+                        param.getTagScanner() : new MediaTagScanner();
+                 highLightScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER) ?
+                        param.getHighLightScanner() : new MediaHighLightScanner();
+            }break;
 
-            case ColorGapContext.TEST_TYPE_LOCAL:
-                return  new VideoAnalyseHelper(new LocalMediaFaceScanner(), new LocalTagScanner(), new LocalHighLightScanner(),
-                        new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
+            case ColorGapContext.TEST_TYPE_LOCAL: {
+                 faceScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_FACE_SCANNER) ?
+                        param.getFaceScanner() : new LocalMediaFaceScanner();
+                 tagScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_TAG_SCANNER) ?
+                        param.getTagScanner() : new LocalTagScanner();
+                 highLightScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER) ?
+                        param.getHighLightScanner() : new LocalHighLightScanner();
+            }break;
 
+            default:
+                throw new UnsupportedOperationException("test type = " + ColorGapContext.getTestTypeString(testType));
         }
-        throw new UnsupportedOperationException("test type = " + ColorGapContext.getTestTypeString(testType));
+        return new VideoAnalyseHelper(faceScanner, tagScanner, highLightScanner,
+                new MediaFaceLoader(), new MediaTagLoader(), new MediaHighLightLoader());
     }
 
     @Override
@@ -98,12 +117,6 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         //meta.setLocation();
         //VideoDataLoadUtils.load(context, "", )
         return meta;
-    }
-
-    private String getFileName(BaseMediaResourceItem item) {
-        String path = item.getFilePath();
-        int index = path.indexOf("/");
-        return path.substring(index + 1);
     }
 
 }

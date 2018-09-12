@@ -17,4 +17,17 @@ public class FFmpegTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void testExtractImages(){
+       String video = "F:\\videos\\ClothingWhite\\LM0A0215.mp4";
+       String outDir = "F:\\videos\\temp_works\\ClothingWhite_none\\215";
+       String cmd = "ffmpeg -i " + video + " -r 1 " + outDir + "/img-%05d.bmp -y";
+       new CmdHelper(getCmds(cmd)).execute();
+    }
+
+    private static String[] getCmds(String cmd){
+        return cmd.split(" ");
+    }
+
 }

@@ -11,10 +11,10 @@ import okhttp3.Call;
 public class KeyPointTest {
 
     public static void main(String[] args) {
-        String imagePath = "F:\\videos\\ClothingWhite\\temp\\LM0A0215\\img_00004.png";
+        String imagePath = "F:\\videos\\ClothingWhite\\temp\\LM0A0212\\img_00004.jpg";
         //String imagePath = "E:\\tmp\\ChenJun\\test.jpg";
 
-        ImageReader.ImageInfo imageInfo = JavaImageReader.DEFAULT.readBytes(imagePath, "png");
+        ImageReader.ImageInfo imageInfo = JavaImageReader.DEFAULT.readBytes(imagePath, "jpg");
         VThirdBaiduService service = new VThirdBaiduService();
         service.postBodyAnalysis(imageInfo.getData(), new VThirdBaiduCallback<VBodyAnalysis>(service) {
             @Override
