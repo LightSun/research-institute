@@ -32,12 +32,12 @@ public class FFmpegImageExtractTest extends BaseTest{
     @Test
     public void test2(){
         ImageExtractCmd cmd = new ImageExtractCmd.Builder()
-                .setVideoPath("F:\\videos\\story3\\welcome\\C0012.mp4")
+                .setVideoPath("F:\\videos\\ClothingWhite\\LM0A0215.mp4")
                 .setCountEverySecond(1)
                 //.setFrameCount(3)
                // .setStartTime(8)
-                .setSavePath("E:\\tmp\\upload_files")
-                .setJpg(true)
+                .setSavePath("F:\\videos\\ClothingWhite\\temp\\LM0A0215")
+                .setJpg(false)
                 .build();
         String[] cmds = FFmpegUtils.buildImageExtractCmd(cmd, true);
         new CmdHelper(cmds).execute();

@@ -39,8 +39,7 @@ public class ColorGapTest {
      */
     public static void main(String[] args) {
          String videoDir = "F:\\videos\\ClothingWhite";
-         String outDir = "F:\\videos\\temp_works\\ClothingWhite";
-        // String outDir = "F:\\videos\\temp_works\\ClothingWhite_shotType";
+         String outDir = "F:\\videos\\temp_works\\ClothingWhite_shotType";
         // String music = "E:\\tmp\\music_cut\\M6.mp3";
         // String videoDir = "I:\\guanguan\\ClothingWhite";
         // String outDir = "I:\\guanguan\\clothing_out";
@@ -70,9 +69,10 @@ public class ColorGapTest {
         dp.setOutputDir("F:\\videos\\temp_works\\ClothingWhite");
         //dp.setDebugOutDir("I:\\guanguan\\clothing_out");
         dp.setFlags(FLAG_ASSIGN_SHOT_CUTS |
-                FLAG_ASSIGN_SHOT_TYPE |
+               /* FLAG_ASSIGN_SHOT_TYPE |*/
                 FLAG_ASSIGN_FACE_COUNT |
-                FLAG_ASSIGN_BODY_COUNT);
+                FLAG_ASSIGN_BODY_COUNT
+        );
         String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
         ShotsData data = new Gson().fromJson(shots, ShotsData.class);
         data.resolve();

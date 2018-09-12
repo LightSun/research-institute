@@ -4,6 +4,7 @@ package com.vida.ai.third.baidu;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.heaven7.java.base.anno.VisibleForTest;
 import com.heaven7.java.base.util.threadpool.Executors2;
 import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
@@ -32,7 +33,8 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
     private static final String URL_SUBJECT = "https://aip.baidubce.com/rest/2.0/image-classify/v1/object_detect";
     private static final int QPS_LIMIT = 5;
 
-    private static VThirdBaiduAccessToken accessToken;
+    @VisibleForTest
+    public static VThirdBaiduAccessToken accessToken;
     private ExecutorService mService = Executors2.newFixedThreadPool(QPS_LIMIT - 1);
     private ExecutorService mStrictService = Executors2.newFixedThreadPool(QPS_LIMIT / 2);
 
@@ -209,7 +211,8 @@ public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
         return url.startsWith(URL_SUBJECT) ? mStrictService : mService;
     }
 
-    private String getRealUrl(String baseUrl) {
+    @VisibleForTest
+    public String getRealUrl(String baseUrl) {
         if (accessToken == null) {
             getAuth(API_KEY, SECURE_KEY);
         }
