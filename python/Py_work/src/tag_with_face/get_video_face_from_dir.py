@@ -8,6 +8,7 @@ IMG_FORMATS = ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG']
 
 # for face no need urlEncode
 def writeFaceData(imgFile, index, fileWriter, model='hog'):
+    print(imgFile + ", time = ", index)
     rgb = face_recognition.load_image_file(imgFile)
     face_locations = face_recognition.face_locations(rgb, model=model)
     height = rgb.shape[0]
@@ -46,24 +47,27 @@ def printError(msg):
 # py simple-video-filename input-dir outDir img-format bit-count
 
 print("args: len = ", len(sys.argv))
-print("0000%d" % 1)
+# print("0000%d" % 1)
 
+
+def getTemplate(left):
+    if left == 1:
+        return "0%d"
+    elif left == 2:
+        return "00%d"
+    elif left == 3:
+        return "000%d"
+    elif left == 4:
+        return "0000%d"
+    else:
+        raise NotImplementedError("called getTemplate(). left = " + left)
 
 def formatNumber(i, bit_count):
     if bit_count != 5:
         raise RuntimeError("current only support 5 bit for img")
     size = len(str(i))
-    if size == 1:
-        return "0000%d" % i
-    elif size == 2:
-        return "000%d" % i
-    elif size == 3:
-        return "00%d" % i
-    elif size == 4:
-        return "0%d" % i
-    else:
-        raise NotImplementedError(" i = " + i)
-
+    tem = getTemplate(bit_count - size)
+    return tem % i
 
 if len(sys.argv) < 6:
     printError(" Error! argument is not enough.")
@@ -72,7 +76,7 @@ else:
     inputDir = sys.argv[2].strip()
     outDir = sys.argv[3].strip()
     img_format = sys.argv[4].strip()
-    bit_count = sys.argv[5].strip()
+    bit_count = int(sys.argv[5].strip())
 
     # filename_rects.csv
     csv_name = '%s_rects.csv' % filename
