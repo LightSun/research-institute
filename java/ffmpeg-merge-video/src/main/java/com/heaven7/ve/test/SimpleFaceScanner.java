@@ -1,4 +1,4 @@
-package com.vida.ai.test.impl;
+package com.heaven7.ve.test;
 
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;

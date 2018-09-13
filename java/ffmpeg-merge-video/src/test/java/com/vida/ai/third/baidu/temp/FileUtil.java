@@ -5,7 +5,7 @@ import java.io.*;
 /**
  * 文件读取工具类
  */
-public class FileUtil {
+/*public*/ class FileUtil {
 
     /**
      * 读取文件内容，作为字符串返回

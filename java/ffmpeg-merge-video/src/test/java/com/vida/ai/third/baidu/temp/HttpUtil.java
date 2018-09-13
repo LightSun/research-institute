@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * http 工具类
  */
-public class HttpUtil {
+/*public*/ class HttpUtil {
 
     public static String post(String requestUrl, String accessToken, String params)
             throws Exception {

@@ -3,7 +3,7 @@ package com.vida.ai.third.baidu.temp;
 /**
  * Base64 工具类
  */
-public class Base64Util {
+/*public*/ class Base64Util {
     private static final char last2byte = (char) Integer.parseInt("00000011", 2);
     private static final char last4byte = (char) Integer.parseInt("00001111", 2);
     private static final char last6byte = (char) Integer.parseInt("00111111", 2);

@@ -1,0 +1,18 @@
+{
+  "test_type": 2,
+  "template_dir":"table",
+  "effect_dir":"table",
+  "debug":true,
+  "effect_res_dir":"E:\\tmp\\服装demo_数据_ios\\texture",
+  "music_dir_map":[
+    {"1-2":"E:\\tmp\\music_cut"},
+    {"3":"D:\\server\\config\\musics"}
+  ],
+  "face_data_dir":"F:\\videos\\ClothingWhite\\faces1",
+  "highlight_data_dir":"F:\\videos\\ClothingWhite\\highlight",
+  "tag_data_dir":"F:\\videos\\ClothingWhite\\tags",
+  "debug_flags":"16|32|64",
+  "default_kingdom_type":3,
+  "media_sdk_dir":"E:\\work\\codes\\mediasdk_Release\\Release",
+  "test_dir":"E:\\tmp\\test_dir"
+}

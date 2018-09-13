@@ -4,7 +4,6 @@ import com.google.gson.GsonBuilder;
 import com.heaven7.java.visitor.util.SparseArray;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.ReflectUtils;
-import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.kingdom.GelailiyaKingdom;
 import com.heaven7.ve.kingdom.Kingdom;
 

@@ -53,15 +53,33 @@ public class Project{
     // 比例类型
     private Integer rate_type = RATE_TYPE_16_9;
 
-    private Long duration = 25 * 1000L; //25s
+    private Long duration = 30 * 1000L; //25s
 
     private Integer template_type = TEMPLATE_DEFAULT; //模版类型
+    private Integer commodity_series = SERIES_TYPE_SINGLE;
 
     private ThirdCommodity commodity;
 
     private List<CommodityCategory> categories;
 
     private List<MediaInfo> mediaInfos;
+
+    private CommodityCategory category;
+    private CommodityCategory categorySec;
+
+    public CommodityCategory getCategory() {
+        return category;
+    }
+    public void setCategory(CommodityCategory category) {
+        this.category = category;
+    }
+
+    public CommodityCategory getCategorySec() {
+        return categorySec;
+    }
+    public void setCategorySec(CommodityCategory categorySec) {
+        this.categorySec = categorySec;
+    }
 
     public Long getUid() {
         return uid;

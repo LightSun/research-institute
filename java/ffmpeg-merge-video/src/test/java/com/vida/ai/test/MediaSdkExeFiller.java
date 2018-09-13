@@ -94,21 +94,17 @@ public class MediaSdkExeFiller implements ColorGapManager.FillCallback  {
                     return null;
                 }
             });
-            ConcurrentManager.getDefault().submit(new Runnable() {
+            //start cmd
+            CmdHelper cmdHelper = new CmdHelper(msp.toCmds(true));
+            System.out.println("start generate video >>> cmd = " + cmdHelper.getCmdActually());
+            cmdHelper.execute(new CmdHelper.LogCallback(){
                 @Override
-                public void run() {
-                    CmdHelper cmdHelper = new CmdHelper(msp.toCmds(true));
-                    System.out.println("start generate video >>> cmd = " + cmdHelper.getCmdActually());
-                    cmdHelper.execute(new CmdHelper.LogCallback(){
-                        @Override
-                        public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
-                            pb.directory(new File(mediaSdkDir));
-                            pb.inheritIO();
-                        }
-                    });
-                    System.out.println("generate video done <<< cmd = " + cmdHelper.getCmdActually());
+                public void beforeStartCmd(CmdHelper helper, ProcessBuilder pb) {
+                    pb.directory(new File(mediaSdkDir));
+                    pb.inheritIO();
                 }
             });
+            System.out.println("generate video done <<< cmd = " + cmdHelper.getCmdActually());
         }
     }
 

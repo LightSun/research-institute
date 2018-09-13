@@ -9,10 +9,9 @@ import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.starter.KingdomStarter;
+import com.heaven7.ve.test.SimpleFaceScanner;
+import com.heaven7.ve.test.SimpleHighLightScanner;
 import com.heaven7.ve.test.TestUtils;
-import com.vida.ai.test.impl.SimpleFaceScanner;
-import com.vida.ai.test.impl.SimpleHighLightScanner;
-import com.vida.ai.third.baidu.temp.FileUtil;
 
 import java.io.File;
 import java.util.List;

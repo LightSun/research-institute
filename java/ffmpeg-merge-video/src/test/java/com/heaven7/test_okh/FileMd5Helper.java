@@ -1,11 +1,16 @@
 package com.heaven7.test_okh;
 
+import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.utils.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 /**
  * @author heaven7
@@ -30,5 +35,18 @@ public class FileMd5Helper {
             throw new RuntimeException(e);
         }
         return bi.toString(16);
+    }
+
+    public static void main(String[] args) {
+        String dir = "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\resource";
+        List<String> files = FileUtils.getFiles(new File(dir), "mp4");
+        String md5s = VisitServices.from(files).map(new ResultVisitor<String, String>() {
+            @Override
+            public String visit(String s, Object param) {
+                return getMD5Three(s);
+            }
+        }).asListService().joinToString(",");
+        System.out.println(md5s);
+
     }
 }
