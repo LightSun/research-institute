@@ -259,7 +259,7 @@ public class ColorGapManager extends BaseContextOwner{
             FileUtils.writeTo(new File(getDebugParam().getOutputDir(),
                     "media_part_detail.txt"), sb.toString());
             //cut video for debug.
-            DebugUtils.cutShotsToDir(newItems, getDebugParam().getShotsDir());
+           // DebugUtils.cutShotsToDir(newItems, getDebugParam().getShotsDir());
         }
 
         //process story to color filter(gen shot key, filter)

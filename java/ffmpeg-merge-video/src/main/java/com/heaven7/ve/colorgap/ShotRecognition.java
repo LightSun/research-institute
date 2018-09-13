@@ -24,8 +24,6 @@ import static com.heaven7.ve.colorgap.MetaInfo.*;
  */
 public class ShotRecognition {
 
-    private static final float RATE_1_3 = 1f / 3;
-    private static final float RATE_1_9 = 1f / 9;
     private static final String TAG = "ShotRecognition";
 
     public static final int THRESOLD_KEY_POINT_COUNT = 9;

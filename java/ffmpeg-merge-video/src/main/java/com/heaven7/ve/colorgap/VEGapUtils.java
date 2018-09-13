@@ -368,4 +368,51 @@ public class VEGapUtils {
         }
         return MetaInfo.SHOT_TYPE_NONE;
     }
+
+    public static int getShotTypeByHeightRate(MediaPartItem part, float hRate, float hwRate, boolean atTop, boolean atBottom) {
+        // atBottom 决定远景 和 中景. true 中景的概率增大，反之 远景的概率增大. 中景-远景
+        // hwRate越大，那么中景的概率增大. 近景的概率缩小.
+        // atBottom = true. 优先级更高
+        // atTop = true , atBottom = true. 特写-中景
+        // atTop = true  特写-中景
+        part.addDetail(String.format("atBottom = %s, atTop = %s, hwRate = %.2f, hRate = %.2f",
+                atBottom, atTop, hwRate, hRate));
+        if(atBottom){
+            if(atTop){
+               if(hwRate > 1.5f){
+                   return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
+               }else{
+                   return MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP;
+               }
+            }else{
+                if(hwRate > 2f){
+                    return MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT;
+                }else if(hwRate > 1.35f){
+                    return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
+                }else{
+                    return MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP;
+                }
+            }
+        }else{
+            if(hRate > RATE_1_3 * 2){
+              if(hwRate > 1.35f){
+                    return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
+                }else{
+                    return MetaInfo.SHOT_TYPE_MEDIUM_CLOSE_UP;
+                }
+            }else{
+                if(hRate > 3f){
+                    return MetaInfo.SHOT_TYPE_BIG_LONG_SHORT;
+                }if(hRate > 2f){
+                    return MetaInfo.SHOT_TYPE_LONG_SHORT;
+                }else if(hRate > 1.35f){
+                    return MetaInfo.SHOT_TYPE_MEDIUM_LONG_SHOT;
+                }else{
+                    return MetaInfo.SHOT_TYPE_MEDIUM_SHOT;
+                }
+            }
+        }
+    }
+
+    private static final float RATE_1_3 = 1f/3;
 }

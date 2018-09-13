@@ -28,8 +28,8 @@
         "index": -1,
         "percentage": 0.5,
         "values": [
-          "leftMove",
-          "rightMove"
+          "left_move",
+          "right_move"
         ]
       }
     ],
@@ -38,15 +38,15 @@
         "level": 0,
         "percentage": 0.5,
         "values": [
-          "leftRoller",
-          "rightRoller"
+          "left_roller",
+          "right_roller"
         ]
       },
       {
         "level": 3,
         "percentage": 1,
         "values": [
-          "blackFade"
+          "black_fade"
         ]
       }
     ]

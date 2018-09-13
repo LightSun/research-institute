@@ -42,7 +42,7 @@ public class ColorGapTest {
      */
     public static void main(String[] args) {
          String videoDir = "F:\\videos\\ClothingWhite";
-         String outDir = "F:\\videos\\temp_works\\ClothingWhite";
+         String outDir = "F:\\videos\\temp_works\\修改主体识别后";
         // String music = "E:\\tmp\\music_cut\\M6.mp3";
         // String videoDir = "I:\\guanguan\\ClothingWhite";
         // String outDir = "I:\\guanguan\\clothing_out";
@@ -103,7 +103,9 @@ public class ColorGapTest {
         cgm.preLoadData(new ColorGapParam.Builder()
                 //.setResourceDataDir()
                 .build());
-        cgm.fill(new String[]{musicPath}, null, items, new FFMpegFiller(outDir));
+       // cgm.fill(new String[]{musicPath}, null, items, new FFMpegFiller(outDir));
+        String mediaSdDir = "E:\\work\\codes\\mediasdk_Release\\Release";
+        cgm.fill(new String[]{musicPath}, null, items, new MediaSdkExeFiller(mediaSdDir, outDir));
     }
 
     private static void init(){
