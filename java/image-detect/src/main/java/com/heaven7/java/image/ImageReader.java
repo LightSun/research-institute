@@ -10,6 +10,9 @@ public interface ImageReader {
 
      ImageInfo readMatrix(InputStream in);
 
+     int[] readWidthHeight(InputStream in);
+     int[] readWidthHeight(String imageFile);
+
      class ImageInfo{
           private Matrix2<Integer> mat;
           private int imageType;

@@ -1,16 +1,10 @@
 package com.heaven7.test;
 
 import com.heaven7.java.image.ImageReader;
-import com.heaven7.java.image.Matrix2;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
 
 import static com.heaven7.java.image.utils.ImageUtils.image2Matrix;
 
@@ -67,5 +61,29 @@ public class JavaImageReader implements ImageReader {
         imageInfo.setWidth(image.getWidth());
         imageInfo.setHeight(image.getHeight());
         return imageInfo;
+    }
+
+    @Override
+    public int[] readWidthHeight(InputStream in) {
+        BufferedImage image;
+        try {
+            image = ImageIO.read(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new int[]{image.getWidth(), image.getHeight()};
+    }
+
+    @Override
+    public int[] readWidthHeight(String imageFile) {
+       InputStream in = null;
+        try {
+            in = new FileInputStream(imageFile);
+            return readWidthHeight(in);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }finally {
+            com.vida.common.IOUtils.closeQuietly(in);
+        }
     }
 }
