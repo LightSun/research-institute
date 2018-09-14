@@ -22,6 +22,7 @@ import com.heaven7.ve.test.ShotAssigner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -63,6 +64,9 @@ public class ColorGapManager extends BaseContextOwner{
      * pre load data. like batch image data which is generate by AI.
      */
     public void preLoadData(ColorGapParam param){
+        if(getDebugParam() != null) {
+            getDebugParam().prepare(getContext());
+        }
         CollectModule module = getPerformanceCollector().startModule(MODULE_PRELOAD, TAG);
         mediaAnalyser.preLoadData(getContext(), param);
         module.end(TAG);
@@ -171,6 +175,9 @@ public class ColorGapManager extends BaseContextOwner{
             VisitServices.from(mediaItems).map(new ResultVisitor<MediaItem, List<MediaPartItem>>() {
                 @Override
                 public List<MediaPartItem> visit(MediaItem mediaItem, Object param) {
+                    if(mediaItem.getItem().isImage()){
+                        return Arrays.asList(mediaItem.asPart(getContext()));
+                    }
                     return shotAssigner.assignShotCuts(getContext(), mediaItem);
                 }
             }).fire(new FireVisitor<List<MediaPartItem>>() {

@@ -6,21 +6,29 @@ import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.colorgap.MediaResourceScanner;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author heaven7
  */
-public class SimpleFaceScanner extends MediaResourceScanner{
-
-    private final String faceDir;
+public class SimpleFaceScanner extends SimpleMediaResourceScanner{
 
     public SimpleFaceScanner(String faceDir) {
-        this.faceDir = faceDir;
+        super(faceDir);
+    }
+    public SimpleFaceScanner(List<String> videoDataDirs, List<String> imageDataDirs) {
+        super(videoDataDirs, imageDataDirs);
+    }
+
+    @Override
+    protected String getImageDataFile(Context context, String imageDataDir, BaseMediaResourceItem item) {
+        String fileName = FileUtils.getFileName(item.getFilePath());
+        return imageDataDir + File.separator + fileName + "_rects.csv";
     }
     @Override
-    public String scan(Context context, BaseMediaResourceItem item, String srcDir) {
+    protected String getVideoDataFile(Context context, String imageDataDir, BaseMediaResourceItem item) {
         String fileName = FileUtils.getFileName(item.getFilePath());
-        return faceDir + File.separator + fileName + "_rects.csv";
+        return imageDataDir + File.separator + fileName + "_rects.csv";
     }
 
 }

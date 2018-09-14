@@ -16,6 +16,7 @@ import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.utils.TextUtils;
+import com.heaven7.ve.PathTimeTraveller;
 import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.filter.*;
@@ -312,7 +313,7 @@ public interface MetaInfo {
                     }
                 });
             }
-            mHighLightHelper = new HighLightHelper(highLightMap);
+            mHighLightHelper = new HighLightHelper(highLightMap, mediaType == PathTimeTraveller.TYPE_IMAGE);
         }
         @SuppressWarnings("unchecked")
         public KeyValuePair<Integer, List<IHighLightData>> getHighLight(int time){
@@ -333,7 +334,7 @@ public interface MetaInfo {
 
         public void setHighLightMap(SparseArray<List<? extends IHighLightData>> highLightMap) {
             this.highLightMap = highLightMap;
-            this.mHighLightHelper = new HighLightHelper(highLightMap);
+            this.mHighLightHelper = new HighLightHelper(highLightMap, mediaType == PathTimeTraveller.TYPE_IMAGE);
         }
 
         //-------------------------- end High-Light ----------------------------

@@ -30,7 +30,8 @@ public class MultiStageFiller extends StageFiller {
             if(info == null) {
                 info = filler.fill(context, newPlaids, items, callback);
             }else{
-                info = filler.fill(context, info.getPlaids(), info.getItems(), callback);
+                List<MediaPartItem> list = filler instanceof ReuseItemStageFiller ? items : info.getItems();
+                info = filler.fill(context, info.getPlaids(), list, callback);
             }
             if(Predicates.isEmpty(info.getPlaids())){
                 break;

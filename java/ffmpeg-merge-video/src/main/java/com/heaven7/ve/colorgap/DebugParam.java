@@ -1,12 +1,14 @@
 package com.heaven7.ve.colorgap;
 
+import com.heaven7.utils.Context;
 import com.heaven7.ve.test.ShotAssigner;
 import com.heaven7.ve.utils.Flags;
+import com.heaven7.ve.utils.IPreRunDelegate;
 
 /**
  * @author heaven7
  */
-public class DebugParam {
+public class DebugParam implements IPreRunDelegate{
 
     /** the default debug param often used for online-env. not for debug */
     public static final DebugParam DEFAULT = new DebugParam();
@@ -80,5 +82,22 @@ public class DebugParam {
     }
     public void setShotsDir(String shotsDir) {
         this.shotsDir = shotsDir;
+    }
+
+    @Override
+    public void prepare(Context param) {
+        //resolve wong flag
+        if(shotAssigner == null){
+            this.flags &= ~(FLAG_ASSIGN_SHOT_TYPE | FLAG_ASSIGN_FACE_COUNT | FLAG_ASSIGN_SHOT_CUTS|FLAG_ASSIGN_BODY_COUNT);
+        }
+        if(faceScanner == null){
+            this.flags &= ~FLAG_ASSIGN_FACE_SCANNER;
+        }
+        if(tagScanner == null){
+            this.flags &= ~FLAG_ASSIGN_TAG_SCANNER;
+        }
+        if(highLightScanner == null){
+            this.flags &= ~FLAG_ASSIGN_HIGH_LIGHT_SCANNER;
+        }
     }
 }

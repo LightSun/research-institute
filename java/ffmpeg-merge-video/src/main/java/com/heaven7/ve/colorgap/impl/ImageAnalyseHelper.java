@@ -194,21 +194,15 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
      * 1, 加载所有图片相关的路径
      */
 
-    private class BatchScanner {
+    private class BatchScanner extends BaseContextOwner{
 
         private final List<MediaItem> mMediaItems;
         private final CyclicBarrier mBarrier;
-        private final Context mContext;
 
         BatchScanner(Context context, List<MediaItem> mediaItems, CyclicBarrier barrier) {
-            this.mContext = context;
+            super(context);
             this.mMediaItems = mediaItems;
             this.mBarrier = barrier;
-        }
-
-        public ColorGapPerformanceCollector getCollector(){
-            ColorGapContext cgc = (ColorGapContext) mContext;
-            return cgc.getColorGapPerformanceCollector();
         }
 
         /**
@@ -230,9 +224,9 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
                 group.markDownRects();
                 return;
             }
-            group.rects = ImageDataLoader.loadRects(mContext, imageRes.rectsPath, null);
+            group.rects = ImageDataLoader.loadRects(getContext(), imageRes.rectsPath, null);
             group.markDownRects();
-            getCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithBacthRects", "load batch rects done");
+            getPerformanceCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithBacthRects", "load batch rects done");
             doIfAllDone(group);
         }
 
@@ -242,8 +236,8 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
                 group.markDownTags();
                 return;
             }
-            group.tags = ImageDataLoader.loadTags(mContext, imageRes.tagPath, null);
-            getCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithBacthTags", "load batch tags done");
+            group.tags = ImageDataLoader.loadTags(getContext(), imageRes.tagPath, null);
+            getPerformanceCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithBacthTags", "load batch tags done");
             group.markDownTags();
             doIfAllDone(group);
         }
@@ -252,11 +246,20 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
             VisitServices.from(group.items).fire(new FireVisitor<MediaItem>() {
                 @Override
                 public Boolean visit(MediaItem item, Object param) {
-                    final String fileName = FileUtils.getFileName(item.item.getFilePath());
-                    //...data/highlight/filename.ihighlight.
-                    final String highLightFile = imageRes.getResourceDataDir() + File.separator
-                            + Constants.DIR_HIGH_LIGHT + File.separator + fileName
-                            + "." + Constants.EXTENSION_IMAGE_HIGH_LIGHT;
+                    String highLightFile = null;
+                    if(isDebug() && getDebugParam().hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER)){
+                        String fileDir = FileUtils.getFileDir(item.item.getFilePath(), 1, true);
+                        MediaResourceScanner scanner = getDebugParam().getHighLightScanner();
+                        highLightFile = scanner.scan(getContext(), item.getItem(), fileDir);
+                    }
+                    if(highLightFile == null) {
+                        final String fileName = FileUtils.getFileName(item.item.getFilePath());
+                        //...data/highlight/filename.ihighlight.
+                        highLightFile = imageRes.getResourceDataDir() + File.separator
+                                + Constants.DIR_HIGH_LIGHT + File.separator + fileName
+                                + "." + Constants.EXTENSION_IMAGE_HIGH_LIGHT;
+                    }
+
                     File file = new File(highLightFile);
                     if (!file.exists()) {
                         Logger.w(TAG, "doWithHighLights", "can't find high light file. " + highLightFile);
@@ -276,7 +279,7 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
                 }
             });
             group.markDownHighLight();
-            getCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithHighLights", "load image high-light done");
+            getPerformanceCollector().addMessage(MODULE_ANALYSE_MEDIA, TAG, "doWithHighLights", "load image high-light done");
             doIfAllDone(group);
         }
 

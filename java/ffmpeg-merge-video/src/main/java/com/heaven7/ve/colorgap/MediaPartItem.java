@@ -440,7 +440,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         imageMeta.setMainFaceCount(mainFaces);
     }
     private List<Integer> calculateTags(List<FrameTags> rawVideoTags,int vocabularyType) {
-        return calculateTags(rawVideoTags, 3, 0.5f, vocabularyType);
+        return calculateTags(rawVideoTags, 3, 0.1f, vocabularyType);
     }
     // 根据镜头的rawVideoTags统计计算tags. 得到对应的tag-index 数组
     private List<Integer> calculateTags(List<FrameTags> rawVideoTags, int count,

@@ -1,8 +1,11 @@
 package com.vida.ai.test;
 
 import com.heaven7.utils.Context;
+import com.heaven7.ve.colorgap.ColorGapContext;
+import com.heaven7.ve.colorgap.TransitionDelegate;
 import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
 import com.heaven7.ve.colorgap.impl.SimpleMusicPathProvider;
+import com.heaven7.ve.configs.BootStrapData;
 import com.heaven7.ve.starter.ImageDetectStarter;
 import com.heaven7.ve.starter.KingdomStarter;
 import com.heaven7.ve.starter.MusicCutStarter;
@@ -13,15 +16,48 @@ import com.vida.ai.third.baidu.BaiduImageDetector;
  */
 public class Launcher {
 
-    public static void launch(Context context) {
+    private static final SimpleColorGapContext sInitContext = new SimpleColorGapContext();
+
+    private static void init(){
+        BootStrapData data = BootStrapData.get(null);
+        ColorGapContext.InitializeParam ip = new ColorGapContext.InitializeParam();
+        ip.setTestType(data.getTestType());
+        ip.setTemplateDir(data.getTemplateDir());
+        ip.setEffectDir(data.getEffectDir());
+        ip.setDebug(data.isDebug());
+        ip.setEffectResourceDir(data.getEffectResourceDir());
+        ip.setTransitionDelegate(new TransitionDelegate() {
+            @Override
+            public long getDuration(int transitionType) {
+                return 30;
+            }
+        });
+        sInitContext.setInitializeParam(ip);
+    }
+
+    static {
+        init();
+    }
+
+    public static void launch(){
+        Launcher.launch(sInitContext);
+    }
+
+    private static void launch(Context context) {
         new ImageDetectStarter().init(context, BaiduImageDetector.class.getName());
         new KingdomStarter().init(context, null);
-        new MusicCutStarter(new SimpleMusicPathProvider(ColorGapTest.MUSIC_DIR))
+        new MusicCutStarter(new SimpleMusicPathProvider(BootStrapData.get(null).getMusicDir()))
                 .init(context, null);
     }
 
-    public static void main(String[] args) {
-        launch(new SimpleColorGapContext());
+    public static ColorGapContext createColorGapContext(){
+        SimpleColorGapContext context = new SimpleColorGapContext();
+        sInitContext.copySystemResource(context);
+        return context;
+    }
+
+    public static ColorGapContext.InitializeParam getInitializeParam(){
+        return sInitContext.getInitializeParam();
     }
 }
 

@@ -52,7 +52,7 @@ public class MediaPartDetailInfo {
     }
 
     public int getKeyFrameTime(){
-        return item.getKeyFrameTime();
+        return item.getItem().isImage() ? 0 : item.getKeyFrameTime();
     }
 
     public String getShotType() {

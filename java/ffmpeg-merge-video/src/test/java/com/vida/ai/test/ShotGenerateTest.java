@@ -9,6 +9,7 @@ import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
 import com.heaven7.ve.test.TestUtils;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,18 +24,14 @@ public class ShotGenerateTest {
     private final ShotInfoGenerator generator = new ShotInfoGenerator(mService);
 
     static {
-        ColorGapContext.InitializeParam ip = new ColorGapContext.InitializeParam();
-        ip.setTestType(ColorGapContext.TEST_TYPE_SERVER);
-        SimpleColorGapContext context = new SimpleColorGapContext();
-        context.setInitializeParam(ip);
-        Launcher.launch(context);
+        Launcher.launch();
     }
 
     public static void main(String[] args) {
-         new ShotGenerateTest().start();
+         new ShotGenerateTest().genShotInfoForImages();
     }
 
-    public void start(){
+    public void genShotInfoForVideos(){
         List<String> files = FileUtils.getFiles(new File(dir), "mp4");
         generator.genShotForVideo(VisitServices.from(files).map(new ResultVisitor<String, BaseMediaResourceItem>() {
             @Override
@@ -45,6 +42,21 @@ public class ShotGenerateTest {
             @Override
             public void onGenerateDone() {
                 System.out.println("gen all shot done...");
+            }
+        });
+    }
+
+    public void genShotInfoForImages(){
+        String dataDir = "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\highlight";
+        String[] images = {
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2542-1.jpg",
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2519.jpg",
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2507.jpg",
+        };
+        generator.genShotForImage(Arrays.asList(images), dataDir, new ShotInfoGenerator.Callback() {
+            @Override
+            public void onGenerateDone() {
+                System.out.println("gen for images done ......");
             }
         });
     }

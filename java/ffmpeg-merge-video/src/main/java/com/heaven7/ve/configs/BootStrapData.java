@@ -18,6 +18,7 @@ import com.vida.common.Platform;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,11 +43,18 @@ public class BootStrapData implements IPreRunDelegate{
     private MapRecognizer<String> musicDirReg;
 
     @SerializedName("face_data_dir")
-    private String faceDataDir; //can be null
+    private List<String> faceDataDirs; //can be null
     @SerializedName("highlight_data_dir")
-    private String highLightDataDir; //can be null
+    private List<String> highLightDataDirs; //can be null
     @SerializedName("tag_data_dir")
-    private String tagDataDir; //can be null
+    private List<String> tagDataDirs; //can be null
+
+    @SerializedName("face_data_img_dir")
+    private List<String> faceDataImageDirs; //can be null
+    @SerializedName("highlight_data_img_dir")
+    private List<String> highLightDataImageDirs; //can be null
+    @SerializedName("tag_data_img_dir")
+    private List<String> tagDataImageDirs; //can be null
 
     @SerializedName("debug_flags")
     private String debugFlags; //can be null. like: 32|16
@@ -61,12 +69,10 @@ public class BootStrapData implements IPreRunDelegate{
 
     //-------------------------------------------------------
     private static BootStrapData INSTANCE;
-    private static WeakReference<Context> sWeakContext;
 
     public static BootStrapData get(Context context){
         if(Platform.getSystemType() == Platform.ANDROID){
             Throwables.checkNull(context);
-            sWeakContext = new WeakReference<>(context);
             throw new RuntimeException("Android not support now.");
         }else{
             if(INSTANCE == null){
@@ -136,27 +142,53 @@ public class BootStrapData implements IPreRunDelegate{
     public void setEffectResourceDir(String effectResourceDir) {
         this.effectResourceDir = effectResourceDir;
     }
-    public String getFaceDataDir() {
-        return faceDataDir;
-    }
-    public void setFaceDataDir(String faceDataDir) {
-        this.faceDataDir = faceDataDir;
+
+    public List<String> getFaceDataDirs() {
+        return faceDataDirs;
     }
 
-    public String getHighLightDataDir() {
-        return highLightDataDir;
+    public void setFaceDataDirs(List<String> faceDataDirs) {
+        this.faceDataDirs = faceDataDirs;
     }
 
-    public void setHighLightDataDir(String highLightDataDir) {
-        this.highLightDataDir = highLightDataDir;
+    public List<String> getHighLightDataDirs() {
+        return highLightDataDirs;
     }
 
-    public String getTagDataDir() {
-        return tagDataDir;
+    public void setHighLightDataDirs(List<String> highLightDataDirs) {
+        this.highLightDataDirs = highLightDataDirs;
     }
 
-    public void setTagDataDir(String tagDataDir) {
-        this.tagDataDir = tagDataDir;
+    public List<String> getTagDataDirs() {
+        return tagDataDirs;
+    }
+
+    public void setTagDataDirs(List<String> tagDataDirs) {
+        this.tagDataDirs = tagDataDirs;
+    }
+
+    public List<String> getFaceDataImageDirs() {
+        return faceDataImageDirs;
+    }
+
+    public void setFaceDataImageDirs(List<String> faceDataImageDirs) {
+        this.faceDataImageDirs = faceDataImageDirs;
+    }
+
+    public List<String> getHighLightDataImageDirs() {
+        return highLightDataImageDirs;
+    }
+
+    public void setHighLightDataImageDirs(List<String> highLightDataImageDirs) {
+        this.highLightDataImageDirs = highLightDataImageDirs;
+    }
+
+    public List<String> getTagDataImageDirs() {
+        return tagDataImageDirs;
+    }
+
+    public void setTagDataImageDirs(List<String> tagDataImageDirs) {
+        this.tagDataImageDirs = tagDataImageDirs;
     }
 
     public int getDebugFlags() {

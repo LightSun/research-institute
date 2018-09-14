@@ -148,34 +148,31 @@ public class VEGapUtils {
             if(videoPart.getMaxDuration() < plaid.getDuration()){
                 throw new IllegalStateException("caused by video max duration < part music duration.");
             }
-            //if duration is the same . no need adjust time.
-            if(videoPart.getDuration() != plaid.getDuration()){
-                if(videoPart.getMaxDuration() < plaid.getDuration()){
-                    throw new IllegalStateException("video relative music part is too short.");
-                }
-                if(kingdom.isGeLaiLiYa()){
-                    videoPart.adjustTimeAsCenter(plaid.getDuration());
-                }else {
-                    HighLightArea area = mpi.getHighLightArea();
-                    if(area != null) {
-                        int plaidDurationInSeconds = (int) CommonUtils.frameToTime(plaid.getDuration(), TimeUnit.SECONDS);
-                        if (area.getDuration() <= plaidDurationInSeconds) {
-                            int over = plaidDurationInSeconds - area.getDuration();
-                            long start = CommonUtils.timeToFrame(area.getStartTime() - over / 2, TimeUnit.SECONDS);
-                            videoPart.setStartTime(start);
-                            videoPart.setEndTime(start + plaid.getDuration());
-                            videoPart.adjustByLimit();
-                        } else{
-                            int keyFrameTime = mpi.getKeyFrameTime();
-                            videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
-                                    plaid.getDuration());
-                        }
-                    }else {
-                        //the key frame time often is the high-light time
+            if(videoPart.getMaxDuration() < plaid.getDuration()){
+                throw new IllegalStateException("video relative music part is too short.");
+            }
+            if(kingdom.isGeLaiLiYa()){
+                videoPart.adjustTimeAsCenter(plaid.getDuration());
+            }else {
+                HighLightArea area = mpi.getHighLightArea();
+                if(area != null) {
+                    int plaidDurationInSeconds = (int) CommonUtils.frameToTime(plaid.getDuration(), TimeUnit.SECONDS);
+                    if (area.getDuration() <= plaidDurationInSeconds) {
+                        int over = plaidDurationInSeconds - area.getDuration();
+                        long start = CommonUtils.timeToFrame(area.getStartTime() - over / 2, TimeUnit.SECONDS);
+                        videoPart.setStartTime(start);
+                        videoPart.setEndTime(start + plaid.getDuration());
+                        videoPart.adjustByLimit();
+                    } else{
                         int keyFrameTime = mpi.getKeyFrameTime();
                         videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
                                 plaid.getDuration());
                     }
+                }else {
+                    //the key frame time often is the high-light time
+                    int keyFrameTime = mpi.getKeyFrameTime();
+                    videoPart.adjustTime(CommonUtils.timeToFrame(keyFrameTime, TimeUnit.SECONDS),
+                            plaid.getDuration());
                 }
             }
         }

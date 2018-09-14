@@ -41,7 +41,7 @@ public class ShotCutTest extends BaseMontageTest{
         super();
         mediaAnalyser = new MediaAnalyserImpl();
         cutter = new TagBasedShotCutter();
-        mContext = copySystemResource();
+        mContext = Launcher.createColorGapContext();
         mContext.setKingdom(KingdomStarter.getKingdom(KingdomStarter.TYPE_DRESS));
         mContext.setColorGapPerformanceCollector(new ColorGapPerformanceCollector());
     }

@@ -131,7 +131,7 @@ public class ShotInfoGenerator {
                     public Boolean visit(MediaData data, Object param) {
                         String fileName = FileUtils.getFileName(data.getFilePath());
                         String fileDir = FileUtils.getFileDir(data.getFilePath(), 1, true);
-                        String targetDir = fileDir + File.separator + Constants.DIR_HIGH_LIGHT;
+                        String targetDir = dataDir != null ? dataDir : fileDir + File.separator + Constants.DIR_HIGH_LIGHT;
                         new File(targetDir).mkdirs();
                         String targetFile = targetDir + File.separator + fileName + "." + EXTENSION_IMAGE_HIGH_LIGHT;
 

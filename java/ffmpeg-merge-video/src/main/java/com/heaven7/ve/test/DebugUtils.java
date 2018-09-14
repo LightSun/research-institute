@@ -16,6 +16,9 @@ public class DebugUtils {
             return;
         }
         for (MediaPartItem mpi : items){
+            if(mpi.isImage()){
+                continue;
+            }
             String[] cmds = FFmpegUtils.buildCutCmd(mpi.getItem().getFilePath(),
                     mpi.videoPart.getStartTime(), mpi.videoPart.getEndTime(), outDir, null);
             new CmdHelper(cmds).execute(new CmdHelper.InhertIoCallback());

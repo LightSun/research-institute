@@ -6,20 +6,28 @@ import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.colorgap.MediaResourceScanner;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author heaven7
  */
-public class SimpleTagScanner extends MediaResourceScanner {
+public class SimpleTagScanner extends SimpleMediaResourceScanner {
 
-    private final String tagDir;
+    public SimpleTagScanner(String dataDir) {
+        super(dataDir);
+    }
+    public SimpleTagScanner(List<String> videoDataDirs, List<String> imageDataDirs) {
+        super(videoDataDirs, imageDataDirs);
+    }
 
-    public SimpleTagScanner(String tagDir) {
-        this.tagDir = tagDir;
+    @Override
+    protected String getImageDataFile(Context context, String imageDataDir, BaseMediaResourceItem item) {
+        String fileName = FileUtils.getFileName(item.getFilePath());
+        return imageDataDir + File.separator + fileName + "_predictions.csv";
     }
     @Override
-    public String scan(Context context, BaseMediaResourceItem item, String srcDir) {
+    protected String getVideoDataFile(Context context, String imageDataDir, BaseMediaResourceItem item) {
         String fileName = FileUtils.getFileName(item.getFilePath());
-        return tagDir + File.separator + fileName + "_predictions.csv";
+        return imageDataDir + File.separator + fileName + "_predictions.csv";
     }
 }

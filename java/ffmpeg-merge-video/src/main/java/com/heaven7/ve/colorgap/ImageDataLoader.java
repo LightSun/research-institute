@@ -69,6 +69,10 @@ public class ImageDataLoader {
             if(TextUtils.isEmpty(line)){
                 return null;
             }
+            //start line
+            if("VideoId,LabelConfidencePairs".equals(line)){
+                return null;
+            }
             String[] strs = line.split(",");
             if(strs.length == 1){
                 return ImageTags.DEFAULT;

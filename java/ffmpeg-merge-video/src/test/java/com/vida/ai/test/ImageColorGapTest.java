@@ -1,12 +1,15 @@
 package com.vida.ai.test;
 
+import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
-import com.heaven7.ve.colorgap.impl.*;
+import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
+import com.heaven7.ve.colorgap.impl.MusicShaderImpl;
+import com.heaven7.ve.colorgap.impl.SimpleShotRecognizer;
+import com.heaven7.ve.colorgap.impl.StoryLineShaderImpl;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.configs.BootStrapData;
 import com.heaven7.ve.starter.KingdomStarter;
@@ -16,49 +19,43 @@ import com.heaven7.ve.test.SimpleTagScanner;
 import com.heaven7.ve.test.TestUtils;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
-import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_FACE_SCANNER;
-import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER;
-
 /**
- * the color gap test for video
  * @author heaven7
  */
-public class ColorGapTest {
-
-    public static final String MUSIC_DIR = "E:\\tmp\\music_cut";
+public class ImageColorGapTest {
 
     static {
         Launcher.launch();
     }
 
-    /**
-     * 1, 关键点识别.
-     * @param args
-     */
     public static void main(String[] args) {
-         String videoDir = "F:\\videos\\ClothingWhite";
-         String outDir = "F:\\videos\\temp_works\\修改主体识别后";
-        // String music = "E:\\tmp\\music_cut\\M6.mp3";
-        // String videoDir = "I:\\guanguan\\ClothingWhite";
-        // String outDir = "I:\\guanguan\\clothing_out";
-        String music = MUSIC_DIR + File.separator + "M11.mp3"; //M6.M7
-        List<String> files = FileUtils.getFiles(new File(videoDir), "mp4");
-        List<BaseMediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, BaseMediaResourceItem>() {
+        String music = BootStrapData.get(null).getMusicDir() + File.separator + "M11.mp3";
+        String output = "F:\\videos\\temp_works\\only_images";
+        String[] images = {
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2542-1.jpg",
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2519.jpg",
+                "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\DSC_2507.jpg",
+        };
+
+        new ImageColorGapTest().start(music, Arrays.asList(images), output);
+    }
+
+    public void start(String musicPath, List<String> images, String outDir){
+        List<BaseMediaResourceItem> items = VisitServices.from(images).map(
+                new ResultVisitor<String, BaseMediaResourceItem>() {
             @Override
             public BaseMediaResourceItem visit(String s, Object param) {
-                BaseMediaResourceItem item = TestUtils.createVideoItem(s);
-                item.setWidth(1280);
-                item.setHeight(720);
+                BaseMediaResourceItem item = TestUtils.createImageItem(s);
+                int[] wh = ImageFactory.getImageInitializer().getImageReader().readWidthHeight(s);
+                item.setWidth(wh[0]);
+                item.setHeight(wh[1]);
                 return item;
             }
         }).getAsList();
-        ColorGapTest cgt = new ColorGapTest();
-        cgt.start(music,  list, outDir);
-    }
 
-    public void start(String musicPath, List<BaseMediaResourceItem> items, String outDir){
         BootStrapData data = BootStrapData.get(null);
         //montage param
         MontageParam param = new MontageParam();
@@ -75,15 +72,6 @@ public class ColorGapTest {
         dp.setFaceScanner(new SimpleFaceScanner(data.getFaceDataDirs(), data.getFaceDataImageDirs()));
         dp.setHighLightScanner(new SimpleHighLightScanner(data.getHighLightDataDirs(), data.getHighLightDataImageDirs()));
         dp.setTagScanner(new SimpleTagScanner(data.getTagDataDirs(), data.getTagDataImageDirs()));
-       /* dp.addFlags(FLAG_ASSIGN_SHOT_CUTS |
-                FLAG_ASSIGN_SHOT_TYPE |
-                FLAG_ASSIGN_FACE_COUNT |
-                FLAG_ASSIGN_BODY_COUNT
-        );
-        String shots = ConfigUtil.loadResourcesAsString("table/test/shots.json");
-        ShotsData data = new Gson().fromJson(shots, ShotsData.class);
-        data.resolve();
-        dp.setShotAssigner(data);*/
 
         ColorGapContext context = Launcher.createColorGapContext();
         context.setKingdom(KingdomStarter.getKingdom(data.getKingdomType()));
@@ -92,14 +80,14 @@ public class ColorGapTest {
         context.setDebugParam(dp);
         //gap
         ColorGapManager cgm = new ColorGapManager(context, new MediaAnalyserImpl(),
-               context.getMusicCutter(), new MusicShaderImpl(), new BasePlaidFiller());
+                context.getMusicCutter(), new MusicShaderImpl(), new BasePlaidFiller());
         cgm.setStoryLineShader(new StoryLineShaderImpl());
         cgm.setShotRecognizer(new SimpleShotRecognizer());
         //for batch image .need this.
         cgm.preLoadData(new ColorGapParam.Builder()
-                //.setResourceDataDir()
+               //.setResourceDataDir()
+                .setBatchImageDataDir("D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\test\\images\\data2")
                 .build());
-       // cgm.fill(new String[]{musicPath}, null, items, new FFMpegFiller(outDir));
         cgm.fill(new String[]{musicPath}, null, items, new MediaSdkExeFiller(data.getMediaSdkDir(), outDir));
     }
 }
