@@ -55,6 +55,11 @@ public class ImageColorGapTest {
                 return item;
             }
         }).getAsList();
+        //mix video
+        BaseMediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\ClothingWhite\\LM0A0204.mp4");
+        item.setWidth(1280);
+        item.setHeight(720);
+        items.add(item);
 
         BootStrapData data = BootStrapData.get(null);
         //montage param
