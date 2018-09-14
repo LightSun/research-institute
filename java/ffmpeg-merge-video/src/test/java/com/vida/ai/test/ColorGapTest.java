@@ -18,9 +18,6 @@ import com.heaven7.ve.test.TestUtils;
 import java.io.File;
 import java.util.List;
 
-import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_FACE_SCANNER;
-import static com.heaven7.ve.colorgap.DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER;
-
 /**
  * the color gap test for video
  * @author heaven7

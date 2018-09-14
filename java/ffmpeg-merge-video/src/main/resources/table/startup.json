@@ -1,0 +1,8 @@
+{
+  "initMap":[
+    {"1": "init_local"},
+    {"2": "init_local_server"},
+    {"3": "init_server"}
+  ],
+  "use_type": 1
+}

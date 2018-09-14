@@ -10,13 +10,11 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
-import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.utils.IPreRunDelegate;
 import com.heaven7.ve.utils.MapRecognizer;
 import com.heaven7.ve.utils.StringMapGsonAdapter;
 import com.vida.common.Platform;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -70,13 +68,17 @@ public class BootStrapData implements IPreRunDelegate{
     //-------------------------------------------------------
     private static BootStrapData INSTANCE;
 
-    public static BootStrapData get(Context context){
+    public static BootStrapData get(ConfigContext context){
         if(Platform.getSystemType() == Platform.ANDROID){
             Throwables.checkNull(context);
             throw new RuntimeException("Android not support now.");
         }else{
             if(INSTANCE == null){
-                String json = ConfigUtil.loadResourcesAsString("table/init.json");
+                String json = ConfigUtil.loadResourcesAsString("table/startup.json");
+                StartUpData data = new Gson().fromJson(json, StartUpData.class);
+                String filename = data.getInitMap().get(String.valueOf(data.getType()));
+                Throwables.checkNull(filename);
+                json = ConfigUtil.loadResourcesAsString("table/"+ filename +".json");
                 INSTANCE = new Gson().fromJson(json, BootStrapData.class);
                 INSTANCE.prepare(context);
             }

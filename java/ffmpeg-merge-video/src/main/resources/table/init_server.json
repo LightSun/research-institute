@@ -1,0 +1,24 @@
+{
+  "test_type": 3,
+  "template_dir":"table",
+  "effect_dir":"table",
+  "debug":true,
+  "effect_res_dir":"",
+  "music_dir_map":[
+    {"1-2":"E:\\tmp\\music_cut"},
+    {"3":"D:\\servers\\musics"}
+  ],
+
+  "face_data_dir":[],
+  "tag_data_dir":[],
+  "highlight_data_dir":[],
+
+  "face_data_img_dir":[],
+  "tag_data_img_dir":[],
+  "highlight_data_img_dir":[],
+
+  "debug_flags":"0",
+  "default_kingdom_type":3,
+  "media_sdk_dir":"D:\\servers\\mediasdk\\Release",
+  "test_dir":"D:\\servers\\temp"
+}

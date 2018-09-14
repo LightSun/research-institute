@@ -42,6 +42,7 @@ public class MediaSdkExeFiller implements ColorGapManager.FillCallback  {
         }else{
             String exePath = new File(mediaSdkDir, "mediasdk.exe").getAbsolutePath();
             final MediaSdkParam msp = new MediaSdkParam(exePath);
+            msp.setOutputFile(new File(outDir, "merged.mp4").getAbsolutePath());
             //video .effect, transition.
             VisitServices.from(result.nodes).fireWithIndex(new FireIndexedVisitor<GapManager.GapItem>() {
                 long lastFramesIndex = 0;
@@ -95,7 +96,7 @@ public class MediaSdkExeFiller implements ColorGapManager.FillCallback  {
                 }
             });
             //start cmd
-            CmdHelper cmdHelper = new CmdHelper(msp.toCmds(true));
+            CmdHelper cmdHelper = new CmdHelper(msp.toCmds(false));
             System.out.println("start generate video >>> cmd = " + cmdHelper.getCmdActually());
             cmdHelper.execute(new CmdHelper.LogCallback(){
                 @Override

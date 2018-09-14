@@ -1,5 +1,5 @@
 {
-  "test_type": 3,
+  "test_type": 1,
   "template_dir":"table",
   "effect_dir":"table",
   "debug":true,

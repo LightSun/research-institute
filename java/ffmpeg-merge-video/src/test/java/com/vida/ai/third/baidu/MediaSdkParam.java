@@ -16,6 +16,7 @@ public class MediaSdkParam {
     private AudioParam audioParam;
     private List<TransitionParam> transitionParams;
     private List<EffectParam> effectParams;
+    private String outputFile;
 
     public MediaSdkParam(String mediaSdkExePath) {
         this.mediaSdkExePath = mediaSdkExePath;
@@ -58,6 +59,8 @@ public class MediaSdkParam {
                 cmds.add(param.getIndex() + "," + param.getType());
             }
         }
+        cmds.add("-output");
+        cmds.add(getOutputFile());
         return cmds.toArray(new String[cmds.size()]);
     }
 
@@ -205,6 +208,14 @@ public class MediaSdkParam {
             this.index = index;
             this.type = type;
         }
+    }
+
+    public String getOutputFile() {
+        return outputFile;
+    }
+
+    public void setOutputFile(String outputFile) {
+        this.outputFile = outputFile;
     }
 
     public String getMediaSdkExePath() {
