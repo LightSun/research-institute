@@ -1,6 +1,6 @@
 package com.vida.common.ai;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;

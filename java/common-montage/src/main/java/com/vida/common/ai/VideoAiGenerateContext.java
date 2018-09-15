@@ -1,6 +1,6 @@
 package com.vida.common.ai;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.vida.common.platform.PyDelegate;
 
 import static com.heaven7.utils.TextUtils.getRelativePathForPrefix;
