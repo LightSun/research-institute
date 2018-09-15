@@ -307,14 +307,11 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
         List<ImageDataLoader.ImageFaceRects> rects = new ArrayList<>();
         List<ImageDataLoader.ImageTags> tags = new ArrayList<>();
 
-        String filenamePrefix;
-
         Group(List<MediaItem> items) {
             this.items = items;
             this.mRectsCount = new AtomicInteger(items.size());
             this.mTagsCount = new AtomicInteger(items.size());
             this.mHighLightCount = new AtomicInteger(items.size());
-            filenamePrefix = ResourceInitializer.getImagesFileNamePrefix(items);
         }
 
         void reduceTags(int delta) {

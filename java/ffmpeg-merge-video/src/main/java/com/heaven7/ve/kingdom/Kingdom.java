@@ -1,16 +1,14 @@
 package com.heaven7.ve.kingdom;
 
 import com.google.gson.GsonBuilder;
+import com.heaven7.java.base.util.ResourceLoader;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
-import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.MetaInfo;
 import com.heaven7.ve.colorgap.MetaInfoUtils;
-import com.heaven7.ve.template.VETemplate;
 import com.vida.common.IOUtils;
 
 import java.io.BufferedReader;
@@ -112,23 +110,16 @@ public abstract class Kingdom {
         return new JsonKingdom(data);
     }
 
-    public static Kingdom fromKingdomData(String resPath, GsonBuilder builder) {
-        Reader reader = null;
-        try {
-            String json = IOUtils.readString(reader = new InputStreamReader(ConfigUtil.loadResourcesAsStream(resPath)));
-            KingdomData data = builder.create().fromJson(json, KingdomData.class);
-            return new JsonKingdom(data);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }finally {
-            IOUtils.closeQuietly(reader);
-        }
+    public static Kingdom fromKingdomData(Context context, String resPath, GsonBuilder builder) {
+        String json = ResourceLoader.getDefault().loadFileAsString(context, resPath);
+        KingdomData data = builder.create().fromJson(json, KingdomData.class);
+        return new JsonKingdom(data);
     }
 
     public static void loadVocabulary(Context context, String path) {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(ConfigUtil.loadResourcesAsStream(path)));
+            in = new BufferedReader(new InputStreamReader(ResourceLoader.getDefault().loadFileAsStream(context, path)));
             String line;
             while ((line = in.readLine()) != null) {
                 String[] strs = line.split(",");

@@ -1,17 +1,10 @@
 package com.heaven7.ve.template;
 
-import com.google.gson.Gson;
-import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.ConfigUtil;
-import com.heaven7.utils.FileUtils;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static com.heaven7.ve.colorgap.ShotRecognition.parseShotCategory;

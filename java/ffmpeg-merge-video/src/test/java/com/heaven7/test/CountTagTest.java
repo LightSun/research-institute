@@ -30,7 +30,6 @@ import static com.heaven7.util.CountUtils.*;
 public class CountTagTest {
 
     static {
-        ResourceInitializer.init(null);
     }
 
     @Test

@@ -9,7 +9,6 @@ import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.colorgap.MediaItem;
 import com.heaven7.ve.colorgap.MediaPartItem;
-import com.heaven7.ve.colorgap.ResourceInitializer;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
 import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
 import org.junit.Test;
@@ -50,8 +49,6 @@ public class ShotTypeTest {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ResourceInitializer.init(null);
-
                 MediaAnalyserImpl analyser = new MediaAnalyserImpl();
                 CyclicBarrier barrier = new CyclicBarrier(analyser.getAsyncModuleCount() + 1);
                 List<MediaItem> outItems = analyser.analyse(null, items, barrier);

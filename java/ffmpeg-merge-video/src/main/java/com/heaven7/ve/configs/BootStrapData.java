@@ -3,11 +3,11 @@ package com.heaven7.ve.configs;
 import com.google.gson.Gson;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.heaven7.java.base.util.ResourceLoader;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.utils.IPreRunDelegate;
@@ -74,11 +74,17 @@ public class BootStrapData implements IPreRunDelegate{
             throw new RuntimeException("Android not support now.");
         }else{
             if(INSTANCE == null){
-                String json = ConfigUtil.loadResourcesAsString("table/startup.json");
-                StartUpData data = new Gson().fromJson(json, StartUpData.class);
+                ResourceLoader loader = ResourceLoader.getDefault();
+                String startupJson;
+                if(loader.isFileExists(null, "table/main.json")){
+                    startupJson = loader.loadFileAsString(null, "table/main.json");
+                }else{
+                    startupJson = loader.loadFileAsString(null, "table/startup.json");
+                }
+                StartUpData data = new Gson().fromJson(startupJson, StartUpData.class);
                 String filename = data.getInitMap().get(String.valueOf(data.getType()));
                 Throwables.checkNull(filename);
-                json = ConfigUtil.loadResourcesAsString("table/"+ filename +".json");
+                String json = loader.loadFileAsString(null,"table/"+ filename +".json");
                 INSTANCE = new Gson().fromJson(json, BootStrapData.class);
                 INSTANCE.prepare(context);
             }

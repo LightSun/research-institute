@@ -1,7 +1,6 @@
 package com.heaven7.ve.colorgap;
 
 import com.heaven7.java.base.util.SparseArray;
-import com.heaven7.utils.ConfigUtil;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
 
@@ -215,39 +214,6 @@ public class Vocabulary {
         }
         return null;
     }
-    //=========================== end wedding ==============================
-
-    public static void loadVocabulary(Context context, String path) {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(ConfigUtil.loadResourcesAsStream(path)));
-            String line;
-            while ((line = in.readLine()) != null) {
-                String[] strs = line.split(",");
-                final int index;
-                try {//guard  index
-                    index = Integer.parseInt(strs[0]);
-                } catch (NumberFormatException e) {
-                    continue;
-                }
-                String name = strs[3];
-                if (!TextUtils.isEmpty(name)) {
-                    ID_TAG.put(index, name);
-                    TAG_ID.put(name, index);
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
     static {
         // loadVocabulary("data/table/" + VOCABULARY_FILE_NAME);
         WEDDING_NOUN_DICT = new HashMap<>();

@@ -43,7 +43,6 @@ public class CutShotTest extends TestCase {
     List<MediaPartItem> cutItems(List<BaseMediaResourceItem> items, CyclicBarrier barrier) {
         Context context = new SimpleColorGapContext();
         Throwables.checkEmpty(items);
-        ResourceInitializer.init(null);
         List<MediaItem> mediaItems = mediaAnalyser.analyse(null, items, barrier);
         try {
             barrier.await();

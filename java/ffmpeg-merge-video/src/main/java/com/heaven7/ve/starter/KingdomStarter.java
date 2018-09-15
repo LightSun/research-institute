@@ -29,7 +29,7 @@ public class KingdomStarter implements IStarter {
             sKingdomMap.put(TYPE_TARGET, kingdom);
         }
         //load all kingdom data.
-        Kingdom kingdom = Kingdom.fromKingdomData("table/kingdom_dress.json", new GsonBuilder());
+        Kingdom kingdom = Kingdom.fromKingdomData(context,"table/kingdom_dress.json", new GsonBuilder());
         sKingdomMap.put(TYPE_DRESS, kingdom);
         sKingdomMap.put(TYPE_GELAILIYA, new GelailiyaKingdom());
     }

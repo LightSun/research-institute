@@ -2,10 +2,10 @@ package com.heaven7.ve.kingdom;
 
 import com.google.gson.Gson;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.base.util.ResourceLoader;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.utils.ConfigUtil;
 import com.heaven7.ve.anno.CallOnce;
 import com.heaven7.ve.anno.FileResource;
 import com.heaven7.ve.colorgap.ColorGapContext;
@@ -57,14 +57,12 @@ public class FileResourceManager {
         //template
         String templateDir = context.getInitializeParam().getTemplateDir();
         String templatePath = templateDir + "/" + this.templateName + ".json";
-        String templateJson = CommonUtils.isRelativePath(templateDir) ? ConfigUtil.loadResourcesAsString(templatePath)
-                : IOUtils.readFileAsString(templatePath);
+        String templateJson = ResourceLoader.getDefault().loadFileAsString(context, templatePath);
         templateData = new Gson().fromJson(templateJson, TemplateData.class);
         //effect
         String effectDir = context.getInitializeParam().getEffectDir();
         String effectPath = effectDir + "/" + this.effectName + ".json";
-        String effectJson = CommonUtils.isRelativePath(effectDir) ? ConfigUtil.loadResourcesAsString(effectPath)
-                : IOUtils.readFileAsString(effectPath);
+        String effectJson = ResourceLoader.getDefault().loadFileAsString(context, effectPath);
         effectData = new Gson().fromJson(effectJson, EffectData.class);
     }
 
