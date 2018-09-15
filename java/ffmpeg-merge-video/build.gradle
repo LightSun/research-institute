@@ -19,7 +19,7 @@ dependencies {
     compile files('libs/common-montage.jar')
    // compile files('libs/java-os.jar')
 
-    compile 'com.heaven7.java.base:Java-base:1.1.3.2' //upgraded
+    compile 'com.heaven7.java.base:Java-base:1.1.3.3' //upgraded
     compile 'com.heaven7.java.visitor:Visitor:1.2.9.1' //upgraded
     compile 'com.google.code.gson:gson:2.8.2'
 

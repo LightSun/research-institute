@@ -10,6 +10,7 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
+import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.utils.IPreRunDelegate;
 import com.heaven7.ve.utils.MapRecognizer;
 import com.heaven7.ve.utils.StringMapGsonAdapter;
@@ -82,6 +83,7 @@ public class BootStrapData implements IPreRunDelegate{
                     startupJson = loader.loadFileAsString(null, "table/startup.json");
                 }
                 StartUpData data = new Gson().fromJson(startupJson, StartUpData.class);
+                System.out.println("start up --> test_type = " + ColorGapContext.getTestTypeString(data.getType()));
                 String filename = data.getInitMap().get(String.valueOf(data.getType()));
                 Throwables.checkNull(filename);
                 String json = loader.loadFileAsString(null,"table/"+ filename +".json");
