@@ -1,5 +1,6 @@
 package com.heaven7.utils;
 
+import com.heaven7.java.base.anno.Platform;
 import com.vida.common.IOUtils;
 
 import java.io.IOException;
@@ -9,6 +10,11 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * only used on pc.
+ * @author heaven7
+ */
+@Platform
 public class ConfigUtil {
 
     public static String loadResourcesAsString(String path){
