@@ -1,6 +1,6 @@
 package com.heaven7.ve.colorgap.impl.filler;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;

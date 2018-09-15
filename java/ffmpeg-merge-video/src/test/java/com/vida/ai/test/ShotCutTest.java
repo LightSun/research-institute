@@ -1,6 +1,6 @@
 package com.vida.ai.test;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.StartEndVisitor;

@@ -1,6 +1,6 @@
 package com.heaven7.ve.gap;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 

@@ -1,26 +1,21 @@
 package com.heaven7.ve.colorgap;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.image.detect.Location;
-import com.heaven7.java.image.detect.VideoHighLightManager;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.utils.FileUtils;
-import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.PathTimeTraveller;
 import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.TimeTraveller;
-import com.heaven7.ve.colorgap.filter.*;
-import com.heaven7.ve.colorgap.impl.ScoreProviderImpl;
 import com.heaven7.ve.utils.HighLightHelper;
 import com.vida.common.entity.MediaData;
 

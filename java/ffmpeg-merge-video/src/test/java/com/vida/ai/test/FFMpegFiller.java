@@ -1,6 +1,6 @@
 package com.vida.ai.test;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.ColorGapManager;
 import com.heaven7.ve.gap.GapManager;

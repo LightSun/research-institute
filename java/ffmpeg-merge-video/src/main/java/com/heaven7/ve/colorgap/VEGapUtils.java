@@ -62,6 +62,7 @@ public class VEGapUtils {
         TimeTraveller tt = new TimeTraveller();
         tt.setStartTime(startTime);
         tt.setEndTime(endTime);
+        tt.setMaxDuration(CommonUtils.timeToFrame(delegate.getItem().getDuration(), TimeUnit.MILLISECONDS));
         return new MediaPartItem(context, (MetaInfo.ImageMeta) delegate.getImageMeta().copy(), delegate.getItem(), tt);
     }
 
@@ -146,10 +147,12 @@ public class VEGapUtils {
             }
             TimeTraveller videoPart = mpi.videoPart;
             if(videoPart.getMaxDuration() < plaid.getDuration()){
-                throw new IllegalStateException("caused by video max duration < part music duration.");
-            }
-            if(videoPart.getMaxDuration() < plaid.getDuration()){
-                throw new IllegalStateException("video relative music part is too short.");
+                System.err.println("video max duration < part music duration. . video max duration = " + videoPart.getMaxDuration()
+                        + ", video = " + mpi.getItem().getFilePath());
+                videoPart.setStartTime(0);
+                videoPart.setEndTime(videoPart.getMaxDuration());
+                continue;
+               // throw new IllegalStateException("caused by video max duration < part music duration.");
             }
             if(kingdom.isGeLaiLiYa()){
                 videoPart.adjustTimeAsCenter(plaid.getDuration());

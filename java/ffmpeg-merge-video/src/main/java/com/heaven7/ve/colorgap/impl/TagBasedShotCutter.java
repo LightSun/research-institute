@@ -1,8 +1,8 @@
 package com.heaven7.ve.colorgap.impl;
 
 
-import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
@@ -290,6 +290,7 @@ public class TagBasedShotCutter extends VideoCutter {
             TimeTraveller tt = new TimeTraveller();
             tt.setStartTime(CommonUtils.timeToFrame(first.getFrameIdx(), TimeUnit.SECONDS));
             tt.setEndTime(tt.getStartTime() + CommonUtils.timeToFrame(frameBuffer.size() - 1, TimeUnit.SECONDS));
+            tt.setMaxDuration(CommonUtils.timeToFrame(item.getItem().getDuration(), TimeUnit.MILLISECONDS));
 
             MediaPartItem shot = new MediaPartItem(context, (MetaInfo.ImageMeta) item.getImageMeta().copy(), item.getItem(), tt);
             shot.addDetail("createShotByTag");
@@ -393,6 +394,7 @@ public class TagBasedShotCutter extends VideoCutter {
             TimeTraveller tt = new TimeTraveller();
             tt.setStartTime(CommonUtils.timeToFrame(bf_item.id, TimeUnit.SECONDS));
             tt.setEndTime(CommonUtils.timeToFrame(bf_item.id + frameBuffer.size() - 1, TimeUnit.SECONDS));
+            tt.setMaxDuration(CommonUtils.timeToFrame(item.item.getDuration(), TimeUnit.MILLISECONDS));
 
             MetaInfo.ImageMeta imageMeta = (MetaInfo.ImageMeta) item.imageMeta.copy();
             imageMeta.setMainFaceCount(mainFaceCount);

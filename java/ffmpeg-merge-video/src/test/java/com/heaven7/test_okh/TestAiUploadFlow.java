@@ -1,9 +1,8 @@
 package com.heaven7.test_okh;
 
 import com.google.gson.Gson;
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.ve.starter.JavaImageWriter;
 import okhttp3.*;
 
 import java.io.File;
@@ -101,6 +100,7 @@ public class TestAiUploadFlow {
         }
         //匿名上传 builder.addFormDataPart("project_id", "1");
         builder.addFormDataPart("file_md5s", VisitServices.from(md5s).joinToString(","));
+        builder.addFormDataPart("show_cmd", "true");
         return builder.build();
     }
 

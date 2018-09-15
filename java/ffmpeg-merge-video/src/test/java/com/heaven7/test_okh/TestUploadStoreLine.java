@@ -1,7 +1,7 @@
 package com.heaven7.test_okh;
 
 import com.google.gson.Gson;
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;

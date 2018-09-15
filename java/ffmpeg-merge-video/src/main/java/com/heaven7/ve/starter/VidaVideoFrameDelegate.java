@@ -1,6 +1,6 @@
 package com.heaven7.ve.starter;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.image.ImageReader;
 import com.heaven7.java.image.Matrix2;
 import com.heaven7.java.image.detect.AbstractVideoManager;

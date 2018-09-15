@@ -1,6 +1,5 @@
 package com.heaven7.ve.colorgap.impl;
 
-import com.heaven7.core.util.Logger;
 import com.heaven7.ve.colorgap.*;
 
 import java.util.List;

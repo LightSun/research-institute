@@ -1,6 +1,7 @@
 package com.heaven7.ve.collect;
 
-import com.heaven7.core.util.Logger;
+
+import com.heaven7.java.base.util.Logger;
 
 /**
  * the performance writer

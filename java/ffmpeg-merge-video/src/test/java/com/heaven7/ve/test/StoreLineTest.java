@@ -1,6 +1,6 @@
 package com.heaven7.ve.test;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;

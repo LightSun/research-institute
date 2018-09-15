@@ -1,6 +1,6 @@
 package com.heaven7.ve.template;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.ve.colorgap.CutInfo;
 
 import java.util.ArrayList;

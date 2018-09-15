@@ -2,7 +2,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.MapFireVisitor;
@@ -13,7 +13,6 @@ import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
 import com.heaven7.ve.Constants;
-import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.vida.common.IOUtils;
 import com.vida.common.entity.MediaData;

@@ -2,7 +2,7 @@ package com.vida.ai.test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.image.detect.*;
 import com.heaven7.java.image.utils.BatchProcessor;
 import com.heaven7.java.visitor.FireVisitor;

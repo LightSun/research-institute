@@ -2,7 +2,7 @@
   "test_type": 3,
   "template_dir":"table",
   "effect_dir":"table",
-  "debug":true,
+  "debug":false,
   "effect_res_dir":"",
   "music_dir_map":[
     {"1-2":"E:\\tmp\\music_cut"},

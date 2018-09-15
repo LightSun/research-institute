@@ -1,6 +1,6 @@
 package com.heaven7.test;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.ResultVisitor;

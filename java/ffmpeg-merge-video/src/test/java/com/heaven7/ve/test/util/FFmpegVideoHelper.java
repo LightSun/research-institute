@@ -12,12 +12,10 @@ import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
 import com.heaven7.ve.test.CuttedItem;
-import com.vida.ai.third.baidu.temp.FileUtil;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 

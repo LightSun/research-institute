@@ -1,7 +1,7 @@
 package com.heaven7.ve.colorgap;
 
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.Visitors;

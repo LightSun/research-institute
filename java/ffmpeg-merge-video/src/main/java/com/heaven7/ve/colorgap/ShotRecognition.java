@@ -1,23 +1,19 @@
 package com.heaven7.ve.colorgap;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
-import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.kingdom.ModuleData;
 
 import java.util.List;
 
-import static com.heaven7.ve.colorgap.IShotRecognizer.CATEGORY_ENV;
-import static com.heaven7.ve.colorgap.IShotRecognizer.CATEGORY_PART;
-import static com.heaven7.ve.colorgap.IShotRecognizer.CATEGORY_PRODUCT;
-import static com.heaven7.ve.colorgap.MetaInfo.*;
+import static com.heaven7.ve.colorgap.IShotRecognizer.*;
+import static com.heaven7.ve.colorgap.MetaInfo.SHOT_TYPE_NONE;
 
 /**
  * @author heaven7

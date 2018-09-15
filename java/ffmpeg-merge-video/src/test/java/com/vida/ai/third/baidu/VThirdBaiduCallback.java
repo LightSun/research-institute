@@ -3,7 +3,7 @@ package com.vida.ai.third.baidu;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Throwables;
 import com.vida.ai.third.baidu.entity.VThirdBaiduErrorResponse;
 import com.vida.common.GsonUtils;

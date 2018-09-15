@@ -1,8 +1,8 @@
 package com.heaven7.ve.colorgap.impl;
 
 
-import com.heaven7.core.util.Logger;
 import com.heaven7.java.base.anno.Nullable;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.CutInfo;

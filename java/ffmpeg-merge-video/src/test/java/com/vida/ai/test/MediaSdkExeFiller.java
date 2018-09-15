@@ -1,6 +1,6 @@
 package com.vida.ai.test;
 
-import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
@@ -9,7 +9,6 @@ import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.utils.ConcurrentManager;
 import com.heaven7.ve.SpecialEffect;
 import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.TransitionInfo;
@@ -96,7 +95,7 @@ public class MediaSdkExeFiller implements ColorGapManager.FillCallback  {
                 }
             });
             //start cmd
-            CmdHelper cmdHelper = new CmdHelper(msp.toCmds(false));
+            CmdHelper cmdHelper = new CmdHelper(msp.toCmds(true));
             System.out.println("start generate video >>> cmd = " + cmdHelper.getCmdActually());
             cmdHelper.execute(new CmdHelper.LogCallback(){
                 @Override
