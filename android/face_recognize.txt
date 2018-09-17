@@ -1,0 +1,6 @@
+
+self cloned res: 
+      dlib-face-recognition-android
+
+需要opencv支持：OpenCV-3.1.0-android-sdk
+详情阅读： envsetup (python脚本)
