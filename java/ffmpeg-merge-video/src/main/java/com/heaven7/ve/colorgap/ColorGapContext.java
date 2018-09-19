@@ -23,6 +23,9 @@ public interface ColorGapContext extends Context {
     void setInitializeParam(InitializeParam ip);
     InitializeParam getInitializeParam();
 
+    MediaResourceConfiguration getMediaResourceConfiguration();
+    void setMediaResourceConfiguration(MediaResourceConfiguration mrc);
+
     void setDebugParam(DebugParam param);
     /** call this you should check if you open the debug mode by set {@linkplain InitializeParam#setDebug(boolean)} true. */
     DebugParam getDebugParam();

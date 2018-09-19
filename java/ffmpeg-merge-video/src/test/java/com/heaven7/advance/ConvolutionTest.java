@@ -37,6 +37,7 @@ public class ConvolutionTest {
         Matrix2<Integer> matResult = ic.computeIntInt(core);
         System.out.println(Convolution.modeToString(mode));
         System.out.println(matResult.toString());
+        System.out.println("---------------------------------------");
     }
 
     @Test

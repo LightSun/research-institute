@@ -2,10 +2,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.ve.anno.SystemResource;
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
-import com.heaven7.ve.colorgap.ColorGapContext;
-import com.heaven7.ve.colorgap.DebugParam;
-import com.heaven7.ve.colorgap.MontageParam;
-import com.heaven7.ve.colorgap.MusicCutter;
+import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.kingdom.FileResourceManager;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
@@ -24,7 +21,17 @@ public class SimpleColorGapContext implements ColorGapContext {
     private ColorGapPerformanceCollector mCollector;
     private MontageParam mMontageParam;
     private DebugParam mDebugParam;
+    private MediaResourceConfiguration mMediaConfig;
     private final FileResourceManager mFileResourceM = new FileResourceManager();
+
+    @Override
+    public MediaResourceConfiguration getMediaResourceConfiguration() {
+        return mMediaConfig;
+    }
+    @Override
+    public void setMediaResourceConfiguration(MediaResourceConfiguration mrc) {
+        this.mMediaConfig = mrc;
+    }
 
     @Override
     public void setInitializeParam(InitializeParam ip) {

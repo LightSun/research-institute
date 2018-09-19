@@ -54,29 +54,48 @@ public class MediaAnalyserImpl implements MediaAnalyser {
 
     private VideoAnalyseHelper createVideoAnalyseHelper(ColorGapContext context) {
         DebugParam param = context.getDebugParam();
-        MediaResourceScanner faceScanner ;
-        MediaResourceScanner tagScanner ;
-        MediaResourceScanner highLightScanner;
+        MediaResourceScanner faceScanner = null;
+        MediaResourceScanner tagScanner = null;
+        MediaResourceScanner highLightScanner = null;
+        //from configuration
+        MediaResourceConfiguration configuration = context.getMediaResourceConfiguration();
+        if(configuration != null) {
+             faceScanner = configuration.getFaceScanner();
+             tagScanner = configuration.getTagScanner();
+             highLightScanner = configuration.getHighLightScanner();
+        }
 
         int testType = context.getTestType();
         switch (testType){
             case ColorGapContext.TEST_TYPE_LOCAL_SERVER:
-            case ColorGapContext.TEST_TYPE_SERVER: {
-                 faceScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_FACE_SCANNER) ?
-                        param.getFaceScanner() : new MediaFaceScanner();
-                 tagScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_TAG_SCANNER) ?
-                        param.getTagScanner() : new MediaTagScanner();
-                 highLightScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER) ?
-                        param.getHighLightScanner() : new MediaHighLightScanner();
+            case ColorGapContext.TEST_TYPE_SERVER: { //server config
+                 if(faceScanner == null) {
+                     faceScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_FACE_SCANNER) ?
+                            param.getFaceScanner() : new MediaFaceScanner();
+                 }
+                 if(tagScanner == null) {
+                     tagScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_TAG_SCANNER) ?
+                             param.getTagScanner() : new MediaTagScanner();
+                 }
+                 if(highLightScanner == null) {
+                     highLightScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER) ?
+                             param.getHighLightScanner() : new MediaHighLightScanner();
+                 }
             }break;
 
             case ColorGapContext.TEST_TYPE_LOCAL: {
-                 faceScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_FACE_SCANNER) ?
-                        param.getFaceScanner() : new LocalMediaFaceScanner();
-                 tagScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_TAG_SCANNER) ?
-                        param.getTagScanner() : new LocalTagScanner();
-                 highLightScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER) ?
-                        param.getHighLightScanner() : new LocalHighLightScanner();
+                 if(faceScanner == null) {
+                     faceScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_FACE_SCANNER) ?
+                            param.getFaceScanner() : new LocalMediaFaceScanner();
+                 }
+                 if(tagScanner == null) {
+                     tagScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_TAG_SCANNER) ?
+                             param.getTagScanner() : new LocalTagScanner();
+                 }
+                 if(highLightScanner == null) {
+                     highLightScanner = param.hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER) ?
+                             param.getHighLightScanner() : new LocalHighLightScanner();
+                 }
             }break;
 
             default:
