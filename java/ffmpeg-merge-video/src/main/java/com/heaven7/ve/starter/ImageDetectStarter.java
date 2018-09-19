@@ -1,5 +1,6 @@
 package com.heaven7.ve.starter;
 
+import com.heaven7.java.base.anno.Platform;
 import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.ImageInitializer;
 import com.heaven7.java.image.detect.AbstractVideoManager;
@@ -11,6 +12,7 @@ import com.heaven7.ve.colorgap.VEGapUtils;
 /**
  * @author heaven7
  */
+@Platform
 public class ImageDetectStarter implements IStarter{
 
     @Override

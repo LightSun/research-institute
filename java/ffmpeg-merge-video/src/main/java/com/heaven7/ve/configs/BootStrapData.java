@@ -70,28 +70,23 @@ public class BootStrapData implements IPreRunDelegate{
     private static BootStrapData INSTANCE;
 
     public static BootStrapData get(ConfigContext context){
-        if(Platform.getSystemType() == Platform.ANDROID){
-            Throwables.checkNull(context);
-            throw new RuntimeException("Android not support now.");
-        }else{
-            if(INSTANCE == null){
-                ResourceLoader loader = ResourceLoader.getDefault();
-                String startupJson;
-                if(loader.isFileExists(null, "table/main.json")){
-                    startupJson = loader.loadFileAsString(null, "table/main.json");
-                }else{
-                    startupJson = loader.loadFileAsString(null, "table/startup.json");
-                }
-                StartUpData data = new Gson().fromJson(startupJson, StartUpData.class);
-                System.out.println("start up --> test_type = " + ColorGapContext.getTestTypeString(data.getType()));
-                String filename = data.getInitMap().get(String.valueOf(data.getType()));
-                Throwables.checkNull(filename);
-                String json = loader.loadFileAsString(null,"table/"+ filename +".json");
-                INSTANCE = new Gson().fromJson(json, BootStrapData.class);
-                INSTANCE.prepare(context);
+        if(INSTANCE == null){
+            ResourceLoader loader = ResourceLoader.getDefault();
+            String startupJson;
+            if(loader.isFileExists(context, "table/main.json")){
+                startupJson = loader.loadFileAsString(context, "table/main.json");
+            }else{
+                startupJson = loader.loadFileAsString(context, "table/startup.json");
             }
-            return INSTANCE;
+            StartUpData data = new Gson().fromJson(startupJson, StartUpData.class);
+            System.out.println("start up --> test_type = " + ColorGapContext.getTestTypeString(data.getType()));
+            String filename = data.getInitMap().get(String.valueOf(data.getType()));
+            Throwables.checkNull(filename);
+            String json = loader.loadFileAsString(context,"table/"+ filename +".json");
+            INSTANCE = new Gson().fromJson(json, BootStrapData.class);
+            INSTANCE.prepare(context);
         }
+        return INSTANCE;
     }
 
     @Override
