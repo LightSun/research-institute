@@ -9,6 +9,7 @@ import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
 import com.heaven7.ve.colorgap.MetaInfo;
 import com.heaven7.ve.colorgap.MetaInfoUtils;
+import com.heaven7.ve.configs.DictionaryLoader;
 import com.vida.common.IOUtils;
 
 import java.io.BufferedReader;
@@ -22,7 +23,7 @@ import static com.heaven7.ve.kingdom.KingdomUtils.*;
 /**
  * @author heaven7
  */
-public abstract class Kingdom {
+public abstract class Kingdom implements DictionaryLoader.Callback{
 
     public static final int TYPE_NOUN = 1;
     public static final int TYPE_ADJECTIVE = 2;
@@ -114,37 +115,6 @@ public abstract class Kingdom {
         String json = ResourceLoader.getDefault().loadFileAsString(context, resPath);
         KingdomData data = builder.create().fromJson(json, KingdomData.class);
         return new JsonKingdom(data);
-    }
-
-    public static void loadVocabulary(Context context, String path) {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(ResourceLoader.getDefault().loadFileAsStream(context, path)));
-            String line;
-            while ((line = in.readLine()) != null) {
-                String[] strs = line.split(",");
-                final int index;
-                try {//guard  index
-                    index = Integer.parseInt(strs[0]);
-                } catch (NumberFormatException e) {
-                    continue;
-                }
-                String name = strs[3];
-                if (!TextUtils.isEmpty(name)) {
-                    ID_TAG.put(index, name);
-                    TAG_ID.put(name, index);
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
-            }
-        }
     }
 
     public static int getTagId(String tag) {
@@ -260,6 +230,12 @@ public abstract class Kingdom {
             default:
                 throw new IllegalArgumentException("wrong type = " + type);
         }
+    }
+
+    @Override
+    public final void onLoad(int index, String name) {
+        ID_TAG.put(index, name);
+        TAG_ID.put(name, index);
     }
     //-------------------------- special ===========================
 

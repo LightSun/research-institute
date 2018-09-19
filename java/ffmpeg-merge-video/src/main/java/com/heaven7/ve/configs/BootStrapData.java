@@ -14,7 +14,6 @@ import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.utils.IPreRunDelegate;
 import com.heaven7.ve.utils.MapRecognizer;
 import com.heaven7.ve.utils.StringMapGsonAdapter;
-import com.vida.common.Platform;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,10 +65,14 @@ public class BootStrapData implements IPreRunDelegate{
     @SerializedName("test_dir")
     private String testDir;
 
+    //-------------------------- cache --------------------------------
+    private DictionaryLoader mDicLoader; //never null
+    private String mDicName;
+
     //-------------------------------------------------------
     private static BootStrapData INSTANCE;
 
-    public static BootStrapData get(ConfigContext context){
+    public static BootStrapData get(Context context){
         if(INSTANCE == null){
             ResourceLoader loader = ResourceLoader.getDefault();
             String startupJson;
@@ -83,8 +86,22 @@ public class BootStrapData implements IPreRunDelegate{
             String filename = data.getInitMap().get(String.valueOf(data.getType()));
             Throwables.checkNull(filename);
             String json = loader.loadFileAsString(context,"table/"+ filename +".json");
+            //
             INSTANCE = new Gson().fromJson(json, BootStrapData.class);
+            String dicLoader = data.getDicLoader();
+            if(TextUtils.isEmpty(dicLoader)){
+                INSTANCE.mDicName = "vocabulary.csv";
+                INSTANCE.mDicLoader = DictionaryLoader.Y8M_LOADER;
+            }else{
+                String[] strs = dicLoader.split("-");
+                if(strs.length < 3){
+                    throw new RuntimeException("dic_loader value is wrong");
+                }
+                INSTANCE.mDicName = strs[2];
+                INSTANCE.mDicLoader = strs[0].equals("y8m") ? DictionaryLoader.Y8M_LOADER : DictionaryLoader.SIMPLE_LOADER;
+            }
             INSTANCE.prepare(context);
+
         }
         return INSTANCE;
     }
@@ -94,6 +111,12 @@ public class BootStrapData implements IPreRunDelegate{
          if(musicDirMap != null){
              musicDirReg = new MapRecognizer<String>(musicDirMap){};
          }
+    }
+    public DictionaryLoader getDictionaryLoader(){
+        return mDicLoader;
+    }
+    public String getDictionaryName(){
+        return mDicName;
     }
 
     public String getTestDir() {

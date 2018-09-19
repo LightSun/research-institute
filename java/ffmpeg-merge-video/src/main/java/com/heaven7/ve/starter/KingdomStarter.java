@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.heaven7.java.visitor.util.SparseArray;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.ReflectUtils;
+import com.heaven7.ve.configs.BootStrapData;
 import com.heaven7.ve.kingdom.GelailiyaKingdom;
 import com.heaven7.ve.kingdom.Kingdom;
 
@@ -23,7 +24,6 @@ public class KingdomStarter implements IStarter {
 
     @Override
     public void init(Context context, Object param) {
-        Kingdom.loadVocabulary(context, "table/vocabulary.csv");
         if(param != null){
             Kingdom kingdom = ReflectUtils.newInstance(param.toString());
             sKingdomMap.put(TYPE_TARGET, kingdom);
@@ -32,5 +32,11 @@ public class KingdomStarter implements IStarter {
         Kingdom kingdom = Kingdom.fromKingdomData(context,"table/kingdom_dress.json", new GsonBuilder());
         sKingdomMap.put(TYPE_DRESS, kingdom);
         sKingdomMap.put(TYPE_GELAILIYA, new GelailiyaKingdom());
+        // Kingdom.loadVocabulary(context, "table/vocabulary.csv");
+        if(sKingdomMap.size() == 0){
+            throw new RuntimeException("must provide kingdom");
+        }
+        BootStrapData data = BootStrapData.get(context);
+        data.getDictionaryLoader().loadDictionary(context, "table/" + data.getDictionaryName(), kingdom);
     }
 }

@@ -19,6 +19,9 @@ public class StartUpData {
     @SerializedName("use_type")
     private int type = ColorGapContext.TEST_TYPE_LOCAL;
 
+    @SerializedName("dic_loader")
+    private String dicLoader;
+
     public Map<String, String> getInitMap() {
         return initMap;
     }
@@ -31,5 +34,12 @@ public class StartUpData {
     }
     public void setType(int type) {
         this.type = type;
+    }
+
+    public String getDicLoader() {
+        return dicLoader;
+    }
+    public void setDicLoader(String dicLoader) {
+        this.dicLoader = dicLoader;
     }
 }
