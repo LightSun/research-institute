@@ -16,9 +16,9 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.OverScroller;
 
+import com.heaven7.android.scroll.IScrollHelper;
 import com.heaven7.android.scroll.NestedScrollFactory;
 import com.heaven7.android.scroll.NestedScrollHelper;
-import com.heaven7.core.util.Logger;
 import com.heaven7.vida.research.R;
 
 import java.util.Arrays;
@@ -147,6 +147,14 @@ public class VidaStickyLayout extends LinearLayout implements NestedScrollingChi
         mNestedHelper.smoothScrollBy(dx , dy);
     }
 
+
+    public void addOnScrollChangeListener(IScrollHelper.OnScrollChangeListener l) {
+        mNestedHelper.addOnScrollChangeListener(l);
+    }
+
+    public void removeOnScrollChangeListener(IScrollHelper.OnScrollChangeListener l) {
+        mNestedHelper.removeOnScrollChangeListener(l);
+    }
     @Override
     public void computeScroll() {
         mNestedHelper.computeScroll();
@@ -180,7 +188,6 @@ public class VidaStickyLayout extends LinearLayout implements NestedScrollingChi
 
     @Override
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
-       // Logger.d("CSS", "onNestedPreScroll", "dy = " );
         int flags = FLAG_SELF | FLAG_PARENT;
         if(mCallback != null){
             flags = mCallback.getNestedScrollFlags(this, target, dx, dy);

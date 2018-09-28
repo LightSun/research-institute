@@ -11,6 +11,8 @@ import android.view.View;
 import com.heaven7.adapter.BaseSelector;
 import com.heaven7.adapter.ISelectable;
 import com.heaven7.adapter.QuickRecycleViewAdapter;
+import com.heaven7.android.scroll.IScrollHelper;
+import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.ViewHelper;
 import com.heaven7.vida.research.R;
 import com.heaven7.vida.research.widget.VidaStickyLayout;
@@ -53,6 +55,16 @@ public class TestVidaStickyLayoutActivity extends AppCompatActivity {
                     return VidaStickyLayout.FLAG_PARENT;
                 }
                 return VidaStickyLayout.FLAG_PARENT | VidaStickyLayout.FLAG_SELF;
+            }
+        });
+        mVsl.addOnScrollChangeListener(new IScrollHelper.OnScrollChangeListener() {
+            @Override
+            public void onScrollStateChanged(View target, int state) {
+
+            }
+            @Override
+            public void onScrolled(View target, int dx, int dy) {
+                Logger.d("TestVidaStickyLayoutActivity", "onScrolled", "dy = " + dy);
             }
         });
     }
