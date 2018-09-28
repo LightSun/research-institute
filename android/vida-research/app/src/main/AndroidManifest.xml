@@ -42,6 +42,8 @@
         <activity android:name=".sample.TestV7_CircleImageViewActivity"/>
         <activity android:name=".sample.BalanceViewTest"/>
 
+        <activity android:name=".sample.TestVidaStickyLayoutActivity"/>
+
     </application>
 
 </manifest>

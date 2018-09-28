@@ -56,4 +56,11 @@
         <attr name="seek_narrowly_when_click" format="boolean|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="VidaStickyLayout">
+        <attr name="vsl_max_scroll_height" format="dimension|reference"/>
+        <attr name="vsl_auto_fit_percent" format="float|reference"/>
+        <attr name="vsl_auto_fit_enabled" format="boolean|reference"/>
+        <attr name="vsl_keep_visible_height" format="boolean|reference"/>
+    </declare-styleable>
+
 </resources>
