@@ -46,10 +46,6 @@ public interface IMediaResourceItem {
      */
     long getDuration();
 
-    float getRatio();
-
-    void setRatio(float ratio);
-
     @Override
     boolean equals(Object o);
 
