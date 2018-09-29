@@ -229,7 +229,9 @@ import java.util.List;
     }
     @Override
     public void setFrom(SimpleCopyDelegate scd) {
-        setFrom((ITimeTraveller)scd);
+        CopyHelper.copyTimeTraveller(this, scd);
+        CopyHelper.copyPathTimeTraveller(this, scd);
+        CopyHelper.copyPlaidInfo(this, scd);
     }
     @Override
     public long getDuration() {
@@ -258,12 +260,6 @@ import java.util.List;
     @Override
     public void adjustByLimit() {
         mPPT.adjustByLimit();
-    }
-    @Override
-    public void setFrom(ITimeTraveller src) {
-        CopyHelper.copyTimeTraveller(this, src);
-        CopyHelper.copyPathTimeTraveller(this, src);
-        CopyHelper.copyPlaidInfo(this, src);
     }
     @Override
     public String toString2() {

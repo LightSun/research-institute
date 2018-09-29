@@ -1,5 +1,6 @@
 package com.heaven7.ve.cross_os.pc;
 
+import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.cross_os.*;
 
 import java.util.Objects;
@@ -20,7 +21,7 @@ import java.util.Objects;
     }
 
     @Override
-    public void setFrom(ITimeTraveller src) {
+    public void setFrom(SimpleCopyDelegate src) {
         super.setFrom(src);
         CopyHelper.copyEffectInfo(this, src);
     }

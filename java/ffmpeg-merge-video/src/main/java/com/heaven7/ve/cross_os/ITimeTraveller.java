@@ -17,8 +17,6 @@ public interface ITimeTraveller extends Copyable<SimpleCopyDelegate> {
     long clampEndTime();
     void adjustByLimit();
 
-    void setFrom(ITimeTraveller src);
-
     String toString2();
 
     /**

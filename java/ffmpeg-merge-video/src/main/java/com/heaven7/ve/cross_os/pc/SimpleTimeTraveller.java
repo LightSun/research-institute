@@ -45,14 +45,9 @@ import com.heaven7.ve.cross_os.TimeTravellerHelper;
     }
 
     @Override
-    public void setFrom(ITimeTraveller src) {
-        CopyHelper.copyTimeTraveller(this, src);
-    }
-
-    @Override
-    public final void setFrom(SimpleCopyDelegate sc) {
+    public void setFrom(SimpleCopyDelegate sc) {
         if(sc instanceof ITimeTraveller){
-            setFrom((ITimeTraveller)sc);
+            CopyHelper.copyTimeTraveller(this, sc);
         }
     }
 

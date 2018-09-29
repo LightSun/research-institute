@@ -1,6 +1,7 @@
 package com.heaven7.ve.cross_os.pc;
 
 
+import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.cross_os.CopyHelper;
 import com.heaven7.ve.cross_os.IPathTimeTraveller;
 import com.heaven7.ve.cross_os.ITimeTraveller;
@@ -30,7 +31,7 @@ import com.heaven7.ve.cross_os.ITimeTraveller;
         this.type = type;
     }
     @Override
-    public void setFrom(ITimeTraveller src) {
+    public void setFrom(SimpleCopyDelegate src) {
         super.setFrom(src);
         CopyHelper.copyPathTimeTraveller(this, src);
     }
