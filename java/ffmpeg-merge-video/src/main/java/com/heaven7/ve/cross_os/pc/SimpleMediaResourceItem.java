@@ -12,7 +12,6 @@ import com.heaven7.ve.cross_os.IMediaResourceItem;
     private int width;
     private int height;
 
-    private float ratio; //height / width in album
     private long duration; //in mill seconds
 
     @Override
@@ -94,15 +93,6 @@ import com.heaven7.ve.cross_os.IMediaResourceItem;
     }
 
     @Override
-    public float getRatio() {
-        return ratio;
-    }
-    @Override
-    public void setRatio(float ratio) {
-        this.ratio = ratio;
-    }
-
-    @Override
     public String toString() {
         return "IMediaResourceItem{" +
                 ", title='" + title + '\'' +
@@ -125,7 +115,6 @@ import com.heaven7.ve.cross_os.IMediaResourceItem;
         mime = item.mime;
         width = item.width;
         height = item.height;
-        ratio = item.ratio;
         duration = item.duration;
     }
 
