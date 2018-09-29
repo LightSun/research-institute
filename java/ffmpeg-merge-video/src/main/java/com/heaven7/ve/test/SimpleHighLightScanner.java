@@ -4,7 +4,6 @@ import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
 import com.heaven7.ve.BaseMediaResourceItem;
 import com.heaven7.ve.Constants;
-import com.heaven7.ve.colorgap.MediaResourceScanner;
 
 import java.io.File;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.List;
  * @author heaven7
  */
 public class SimpleHighLightScanner extends SimpleMediaResourceScanner {
-
 
     public SimpleHighLightScanner(String dataDir) {
         super(dataDir);

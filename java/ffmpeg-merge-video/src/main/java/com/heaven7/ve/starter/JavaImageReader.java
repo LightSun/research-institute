@@ -1,13 +1,10 @@
 package com.heaven7.ve.starter;
 
 import com.heaven7.java.image.ImageReader;
-import com.heaven7.java.image.Matrix2;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.heaven7.java.image.utils.ImageUtils.image2Matrix;
 
