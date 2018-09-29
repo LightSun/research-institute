@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class GsonUtils {
 
+    /** get the Generic type of target class used. */
     public static Type getSuperclassTypeParameter(Class<?> subclass) {
         Type superclass = subclass.getGenericSuperclass();
         if (superclass instanceof Class) {

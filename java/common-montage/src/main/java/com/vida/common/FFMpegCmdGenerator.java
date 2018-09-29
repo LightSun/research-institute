@@ -1,10 +1,12 @@
 package com.vida.common;
 
 import com.heaven7.java.base.anno.Nullable;
+import com.heaven7.java.base.anno.Platform;
 
 /**
  * @author heaven7
  */
+@Platform
 public interface FFMpegCmdGenerator {
     /**
      * build get video duration cmd

@@ -1,5 +1,6 @@
 package com.heaven7.utils;
 
+import com.heaven7.java.base.anno.Platform;
 import com.heaven7.java.base.util.DefaultPrinter;
 
 import java.io.BufferedReader;
@@ -12,6 +13,7 @@ import java.text.SimpleDateFormat;
  * the command helper.
  * @author heaven7
  */
+@Platform
 public class CmdHelper {
 
     private final String[] cmds;

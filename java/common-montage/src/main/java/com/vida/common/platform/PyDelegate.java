@@ -1,5 +1,6 @@
 package com.vida.common.platform;
 
+import com.heaven7.java.base.anno.Platform;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
@@ -20,6 +21,7 @@ import java.util.List;
  *
  * @author heaven7
  */
+@Platform
 public abstract class PyDelegate {
 
     private static final PyDelegate INSTANCE = new PyDelegateImpl();

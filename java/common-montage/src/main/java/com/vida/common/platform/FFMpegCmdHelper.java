@@ -1,6 +1,8 @@
 package com.vida.common.platform;
 
+import com.heaven7.java.base.anno.Platform;
 import com.heaven7.java.base.util.DefaultPrinter;
+import com.heaven7.java.base.util.Platforms;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.TextUtils;
 import com.vida.common.FFMpegCmdGenerator;
@@ -14,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author heaven7
  */
+@Platform
 /*public*/ class FFMpegCmdHelper implements FFMpegCmdGenerator {
 
     private boolean showWindow;
@@ -129,12 +132,14 @@ import java.util.concurrent.TimeUnit;
 
     private List<String> getBaseCmds() {
         List<String> cmds = new ArrayList<>();
-        cmds.add("cmd");
-        cmds.add("/c");
-        cmds.add("start");
-        cmds.add("/wait");
-        if(!showWindow) {
-            cmds.add("/b");
+        if(Platforms.isWindows()) {
+            cmds.add("cmd");
+            cmds.add("/c");
+            cmds.add("start");
+            cmds.add("/wait");
+            if (!showWindow) {
+                cmds.add("/b");
+            }
         }
         return cmds;
     }

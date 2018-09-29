@@ -4,6 +4,7 @@ import com.vida.common.FFMpegCmdGenerator;
 import com.vida.common.Platform;
 import com.vida.common.PlatformAICmdGenerator;
 
+@com.heaven7.java.base.anno.Platform
 public class PlatformImpl extends Platform {
 
     @Override

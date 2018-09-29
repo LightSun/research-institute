@@ -1,5 +1,6 @@
 package com.vida.common.platform;
 
+import com.heaven7.java.base.anno.Platform;
 import com.heaven7.utils.FileUtils;
 import com.vida.common.PlatformAICmdGenerator;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * the windows cmd generator
  * @author heaven7
  */
+@Platform
 public class WindowsCmdGenerator implements PlatformAICmdGenerator {
 
     private static final String INFERENCE_PATH = "D:\\tensorflow\\youtube-8m\\inference.py";

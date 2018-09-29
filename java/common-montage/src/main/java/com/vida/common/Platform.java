@@ -52,6 +52,7 @@ public abstract class Platform {
         return isLinux() ? "\n" : "\r\n";
     }
 
+    @com.heaven7.java.base.anno.Platform
     public static Platform getDefault(){
         return sInstance;
     }
