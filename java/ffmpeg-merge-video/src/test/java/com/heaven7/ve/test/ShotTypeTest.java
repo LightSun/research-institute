@@ -6,11 +6,12 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.colorgap.MediaItem;
 import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
 import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 import org.junit.Test;
 
 import java.io.File;
@@ -45,7 +46,7 @@ public class ShotTypeTest {
 
     @Test
     public void testShotType1() throws RuntimeException{
-        final List<BaseMediaResourceItem> items = scanImageItems(FileUtils.ofDirFileFilter("丝麻山水长衬衫"));
+        final List<IMediaResourceItem> items = scanImageItems(FileUtils.ofDirFileFilter("丝麻山水长衬衫"));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -77,8 +78,8 @@ public class ShotTypeTest {
         }
     }
 
-    private List<BaseMediaResourceItem> scanImageItems(FileFilter filter) {
-        List<BaseMediaResourceItem> items = new ArrayList<>();
+    private List<IMediaResourceItem> scanImageItems(FileFilter filter) {
+        List<IMediaResourceItem> items = new ArrayList<>();
         File file = new File(SRC_DIR);
         List<String> videos = new ArrayList<>();
         FileUtils.getFiles(file, "jpg", filter, videos);

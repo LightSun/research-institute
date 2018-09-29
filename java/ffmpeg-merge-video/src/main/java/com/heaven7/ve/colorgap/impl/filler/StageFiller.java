@@ -4,8 +4,8 @@ import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.MediaPartItem;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 import com.heaven7.ve.gap.GapManager;
 
 import java.util.ArrayList;
@@ -19,17 +19,17 @@ import java.util.List;
  */
 public abstract class StageFiller {
 
-    public static final Comparator<CutInfo.PlaidInfo> COM_PLAID = new Comparator<CutInfo.PlaidInfo>() {
+    public static final Comparator<IPlaidInfo> COM_PLAID = new Comparator<IPlaidInfo>() {
         @Override
-        public int compare(CutInfo.PlaidInfo o1, CutInfo.PlaidInfo o2) {
-            float o2_weight = o2.getGapColorFilter() != null ? o2.getGapColorFilter().getWeight() : 0;
-            float o1_weight = o1.getGapColorFilter() != null ? o1.getGapColorFilter().getWeight() : 0;
+        public int compare(IPlaidInfo o1, IPlaidInfo o2) {
+            float o2_weight = o2.getColorFilter() != null ? o2.getColorFilter().getWeight() : 0;
+            float o1_weight = o1.getColorFilter() != null ? o1.getColorFilter().getWeight() : 0;
             return Float.compare(o2_weight, o1_weight);
         }
     };
 
-    public final LeftFillInfo fill(Context context, List<CutInfo.PlaidInfo> plaids, List<MediaPartItem> items, GapManager.GapCallback callback){
-        List<CutInfo.PlaidInfo> newPlaids = new ArrayList<>(plaids);
+    public final LeftFillInfo fill(Context context, List<IPlaidInfo> plaids, List<MediaPartItem> items, GapManager.GapCallback callback){
+        List<IPlaidInfo> newPlaids = new ArrayList<>(plaids);
         Collections.sort(newPlaids, COM_PLAID);
         fillImpl(context, newPlaids, items, callback);
         return buildLeftFillInfo(newPlaids, items, callback);
@@ -42,7 +42,7 @@ public abstract class StageFiller {
      * @param items the shot items
      * @param callback the gap callback
      */
-    protected abstract void fillImpl(Context context, List<CutInfo.PlaidInfo> newPlaids, List<MediaPartItem> items, GapManager.GapCallback callback);
+    protected abstract void fillImpl(Context context, List<IPlaidInfo> newPlaids, List<MediaPartItem> items, GapManager.GapCallback callback);
 
     /**
      * build left fill info
@@ -51,7 +51,7 @@ public abstract class StageFiller {
      * @param callback the gap callback
      * @return the left fill info.
      */
-    protected LeftFillInfo buildLeftFillInfo(List<CutInfo.PlaidInfo> plaids,
+    protected LeftFillInfo buildLeftFillInfo(List<IPlaidInfo> plaids,
                                              List<MediaPartItem> items, GapManager.GapCallback callback){
         //use filled items to filter used items.
         List<GapManager.GapItem> filledItems = callback.getFilledItems();
@@ -62,16 +62,16 @@ public abstract class StageFiller {
                         return (MediaPartItem) gapItem.item;
                     }
                 }).getAsList();
-        List<CutInfo.PlaidInfo> holdPlaids = VisitServices.from(filledItems).map(
-                new ResultVisitor<GapManager.GapItem, CutInfo.PlaidInfo>() {
+        List<IPlaidInfo> holdPlaids = VisitServices.from(filledItems).map(
+                new ResultVisitor<GapManager.GapItem, IPlaidInfo>() {
                     @Override
-                    public CutInfo.PlaidInfo visit(GapManager.GapItem gapItem, Object param) {
-                        return (CutInfo.PlaidInfo) gapItem.plaid;
+                    public IPlaidInfo visit(GapManager.GapItem gapItem, Object param) {
+                        return (IPlaidInfo) gapItem.plaid;
                     }
                 }).getAsList();
-        List<CutInfo.PlaidInfo> unusedPlaids = VisitServices.from(plaids).filter(new PredicateVisitor<CutInfo.PlaidInfo>() {
+        List<IPlaidInfo> unusedPlaids = VisitServices.from(plaids).filter(new PredicateVisitor<IPlaidInfo>() {
             @Override
-            public Boolean visit(CutInfo.PlaidInfo item, Object param) {
+            public Boolean visit(IPlaidInfo item, Object param) {
                 return !holdPlaids.contains(item);
             }
         }).getAsList();

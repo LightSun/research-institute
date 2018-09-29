@@ -2,7 +2,9 @@ package com.heaven7.ve.test;
 
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
+import com.heaven7.ve.cross_os.VEFactory;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +15,8 @@ public class TestUtils {
 
     private static final String TAG = "TestUtils";
 
-    public static BaseMediaResourceItem createImageItem(String path) {
-        BaseMediaResourceItem item = new BaseMediaResourceItem();
+    public static IMediaResourceItem createImageItem(String path) {
+        IMediaResourceItem item = VEFactory.getDefault().newMediaResourceItem();
         item.setFilePath(path);
 
         item.setTime(new File(path).lastModified());
@@ -22,9 +24,9 @@ public class TestUtils {
         item.setMime("image/jpg");
         return item;
     }
-    public static BaseMediaResourceItem createVideoItem(String path, long durationInMills){
+    public static IMediaResourceItem createVideoItem(String path, long durationInMills){
        // String path ="F:\\videos\\test_cut\\test_shot_cut\\GP5A0859.mp4";
-        BaseMediaResourceItem item = new BaseMediaResourceItem();
+        IMediaResourceItem item = VEFactory.getDefault().newMediaResourceItem();
         item.setFilePath(path);
 
         item.setTime(new File(path).lastModified());
@@ -32,7 +34,7 @@ public class TestUtils {
         item.setMime("video/mp4");
         return item;
     }
-    public static BaseMediaResourceItem createVideoItem(String path){
+    public static IMediaResourceItem createVideoItem(String path){
         // String path ="F:\\videos\\test_cut\\test_shot_cut\\GP5A0859.mp4";
         String[] cmds = FFmpegUtils.buildGetDurationCmd(path);
         CmdHelper.VideoDurationCallback dc = new CmdHelper.VideoDurationCallback();
@@ -40,7 +42,7 @@ public class TestUtils {
         long duration = dc.getDuration();
        // Logger.d(TAG, "createVideoItem", "duration = " + duration + " ,path = " + path);
 
-        BaseMediaResourceItem item = new BaseMediaResourceItem();
+        IMediaResourceItem item = VEFactory.getDefault().newMediaResourceItem();
         item.setFilePath(path);
         item.setDuration(duration);
         item.setTime(new File(path).lastModified());

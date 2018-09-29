@@ -3,8 +3,9 @@ package com.heaven7.ve.colorgap;
 import com.heaven7.java.base.util.Logger;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.BaseMediaResourceItem;
-import com.heaven7.ve.TimeTraveller;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
+import com.heaven7.ve.cross_os.ITimeTraveller;
+import com.heaven7.ve.cross_os.VEFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,8 @@ public class MediaItem implements CutItemDelegate{
     public static final int FLAG_INVALID  = 0x0002;
 
     public MetaInfo.ImageMeta imageMeta;
-    public BaseMediaResourceItem item; //path, duration, date
-    private List<TimeTraveller> videoParts;  //切割后的parts.
+    public IMediaResourceItem item; //path, duration, date
+    private List<ITimeTraveller> videoParts;  //切割后的parts.
     private int flags;
 
     public void clearFlags(){
@@ -36,14 +37,14 @@ public class MediaItem implements CutItemDelegate{
     public boolean isValid(){
         return (flags & FLAG_INVALID) != FLAG_INVALID;
     }
-    public void addVideoPart(TimeTraveller part) {
+    public void addVideoPart(ITimeTraveller part) {
         if(videoParts == null){
             videoParts = new ArrayList<>();
         }
         videoParts.add(part);
     }
 
-    public List<TimeTraveller> getVideoParts() {
+    public List<ITimeTraveller> getVideoParts() {
         return videoParts;
     }
 
@@ -54,7 +55,7 @@ public class MediaItem implements CutItemDelegate{
     }
 
     public MediaPartItem asPart(Context context) {
-        TimeTraveller tt = new TimeTraveller();
+        ITimeTraveller tt = VEFactory.getDefault().newTimeTraveller();
         tt.setStartTime(0);
         tt.setEndTime(CommonUtils.timeToFrame(item.getDuration(), TimeUnit.MILLISECONDS));
         return new MediaPartItem(context, (MetaInfo.ImageMeta) imageMeta.copy(), this.item, tt);
@@ -69,7 +70,7 @@ public class MediaItem implements CutItemDelegate{
         return imageMeta.getAllVideoTags();
     }
     @Override
-    public BaseMediaResourceItem getItem() {
+    public IMediaResourceItem getItem() {
         return item;
     }
 }

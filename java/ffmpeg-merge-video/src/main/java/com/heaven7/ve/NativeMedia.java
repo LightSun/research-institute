@@ -3,6 +3,7 @@ package com.heaven7.ve;
 /**
  * @author heaven7
  */
+/*
 public class NativeMedia implements INativeObject, ApiNativeMedia {
 
     private Callback mCallback;
@@ -60,3 +61,4 @@ public class NativeMedia implements INativeObject, ApiNativeMedia {
     private native void nRelease(long mPtr);
 
 }
+*/

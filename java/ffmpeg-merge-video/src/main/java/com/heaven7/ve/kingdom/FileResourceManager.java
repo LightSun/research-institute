@@ -5,17 +5,16 @@ import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.ResourceLoader;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.utils.CommonUtils;
 import com.heaven7.ve.anno.CallOnce;
 import com.heaven7.ve.anno.FileResource;
 import com.heaven7.ve.colorgap.ColorGapContext;
-import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.filter.ShotCategoryFilter;
+import com.heaven7.ve.cross_os.IPlaidInfo;
+import com.heaven7.ve.cross_os.VEFactory;
 import com.heaven7.ve.template.Cases;
 import com.heaven7.ve.template.EffectData;
 import com.heaven7.ve.template.TemplateData;
 import com.heaven7.ve.template.VETemplate;
-import com.vida.common.IOUtils;
 
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class FileResourceManager {
                 ls.setShotCategoryFlags(shotCategory);
                 int count = (int) (item.getProportion() * 100);
                 for (int i = count - 1; i >= 0; i--) {
-                    CutInfo.PlaidInfo info = new CutInfo.PlaidInfo();
+                    IPlaidInfo info = VEFactory.getDefault().newPlaidInfo();
                     info.addColorFilter(new ShotCategoryFilter(new ShotCategoryFilter.ShotCategoryCondition(shotCategory)));
                     ls.addPlaidInfo(info);
                 }

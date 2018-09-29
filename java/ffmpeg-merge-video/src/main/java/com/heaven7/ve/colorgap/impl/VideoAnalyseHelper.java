@@ -7,8 +7,9 @@ import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 import com.vida.common.entity.MediaData;
 
 import java.lang.ref.WeakReference;
@@ -251,13 +252,13 @@ public class VideoAnalyseHelper {
 
         final Context context;
         final String path;
-        final BaseMediaResourceItem item;
+        final IMediaResourceItem item;
         final MediaResourceLoader loader;
 
         final MetaInfo.ImageMeta out;
         final BatchProcessor parent;
 
-        /*public*/ LoadTask(Context context, BaseMediaResourceItem item, String path, MetaInfo.ImageMeta out,
+        /*public*/ LoadTask(Context context, IMediaResourceItem item, String path, MetaInfo.ImageMeta out,
                             MediaResourceLoader loader, BatchProcessor parent) {
             this.context = context;
             this.item = item;

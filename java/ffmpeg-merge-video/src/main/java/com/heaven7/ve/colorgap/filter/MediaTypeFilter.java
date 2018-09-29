@@ -20,7 +20,7 @@ public class MediaTypeFilter extends GapColorFilter {
     }
 
     /**
-     * the media type see {@linkplain com.heaven7.ve.PathTimeTraveller#TYPE_VIDEO} and etc.
+     * the media type see {@linkplain com.heaven7.ve.IPathTimeTraveller#TYPE_VIDEO} and etc.
      * Created by heaven7 on 2018/3/16 0016.
      */
     public static class MediaTypeCondition extends GapColorFilter.GapColorCondition {

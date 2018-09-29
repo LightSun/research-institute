@@ -7,14 +7,15 @@ import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
-import com.heaven7.java.visitor.Visitors;
 import com.heaven7.java.visitor.WeightVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.TimeTraveller;
+import com.heaven7.ve.cross_os.IPlaidInfo;
+import com.heaven7.ve.cross_os.ITimeTraveller;
+import com.heaven7.ve.cross_os.VEFactory;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.gap.PlaidDelegate;
@@ -59,7 +60,7 @@ public class VEGapUtils {
      * @return the media part item.
      */
     public static MediaPartItem getShot(Context context, CutItemDelegate delegate, long startTime, long endTime){
-        TimeTraveller tt = new TimeTraveller();
+        ITimeTraveller tt = VEFactory.getDefault().newTimeTraveller();
         tt.setStartTime(startTime);
         tt.setEndTime(endTime);
         tt.setMaxDuration(CommonUtils.timeToFrame(delegate.getItem().getDuration(), TimeUnit.MILLISECONDS));
@@ -137,7 +138,7 @@ public class VEGapUtils {
     public static void adjustTime(ColorGapContext context, List<GapManager.GapItem> filledItems){
         Kingdom kingdom = context.getKingdom();
         for(GapManager.GapItem gapItem : filledItems) {
-            CutInfo.PlaidInfo plaid = (CutInfo.PlaidInfo) gapItem.plaid;
+            IPlaidInfo plaid = (IPlaidInfo) gapItem.plaid;
             MediaPartItem mpi = (MediaPartItem) gapItem.item;
             //for image. set time directly
             if(mpi.item.isImage()){
@@ -145,7 +146,7 @@ public class VEGapUtils {
                 mpi.videoPart.setEndTime(plaid.getDuration());
                 continue;
             }
-            TimeTraveller videoPart = mpi.videoPart;
+            ITimeTraveller videoPart = mpi.videoPart;
             if(videoPart.getMaxDuration() < plaid.getDuration()){
                 System.err.println("video max duration < part music duration. . video max duration = " + videoPart.getMaxDuration()
                         + ", video = " + mpi.getItem().getFilePath());
@@ -221,8 +222,8 @@ public class VEGapUtils {
         }
         return bestItem;
     }
-    public static List<MediaPartItem> filter(CutInfo.PlaidInfo info, List<MediaPartItem> parts) {
-        GapColorFilter filter = info.getGapColorFilter();
+    public static List<MediaPartItem> filter(IPlaidInfo info, List<MediaPartItem> parts) {
+        GapColorFilter filter = info.getColorFilter();
         if(filter == null){
             return Collections.emptyList();
         }

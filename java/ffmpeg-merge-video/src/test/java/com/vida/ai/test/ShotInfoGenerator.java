@@ -12,8 +12,9 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.SparseArray;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.Constants;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 import com.vida.common.FFMpegCmdGenerator;
 import com.vida.common.ImageExtractCmd;
 import com.vida.common.Platform;
@@ -51,7 +52,7 @@ public class ShotInfoGenerator {
      * @param videoes the videos
      * @param callback the callback
      */
-    public void genShotForVideo(List<BaseMediaResourceItem> videoes, Callback callback) {
+    public void genShotForVideo(List<IMediaResourceItem> videoes, Callback callback) {
         Logger.i(TAG, "genShotForVideo", videoes.toString());
         /*
         1, cut video
@@ -59,9 +60,9 @@ public class ShotInfoGenerator {
          */
         BatchGenerator bg = new BatchGenerator(callback);
         bg.markStart();
-        VisitServices.from(videoes).fire(new FireVisitor<BaseMediaResourceItem>() {
+        VisitServices.from(videoes).fire(new FireVisitor<IMediaResourceItem>() {
             @Override
-            public Boolean visit(BaseMediaResourceItem mid, Object param) {
+            public Boolean visit(IMediaResourceItem mid, Object param) {
                 final String videoPath = mid.getFilePath();
                 String fileDir = FileUtils.getFileDir(mid.getFilePath(), 1, true);
                 Runnable r = new Runnable() {

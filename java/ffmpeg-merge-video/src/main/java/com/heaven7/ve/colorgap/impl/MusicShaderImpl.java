@@ -5,16 +5,12 @@ import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.MusicShader;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 import com.heaven7.ve.template.TransferDelegate;
 import com.heaven7.ve.template.VETemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by heaven7 on 2018/3/16 0016.
@@ -26,7 +22,7 @@ public class MusicShaderImpl implements MusicShader {
     private static final String TAG = "MusicShaderImpl";
 
     @Override
-    public VETemplate tint(Context context, @Nullable VETemplate template, List<CutInfo.PlaidInfo> plaids, int tintFlags) {
+    public VETemplate tint(Context context, @Nullable VETemplate template, List<IPlaidInfo> plaids, int tintFlags) {
 
         /*
          * if no template: we just regard the plaids as one logic-sentence

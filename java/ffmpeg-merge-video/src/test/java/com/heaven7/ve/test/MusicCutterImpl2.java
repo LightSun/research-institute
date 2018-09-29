@@ -4,6 +4,8 @@ import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.MusicCutter;
+import com.heaven7.ve.cross_os.IPlaidInfo;
+import com.heaven7.ve.cross_os.VEFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +30,13 @@ public class MusicCutterImpl2 implements MusicCutter {
         int duration = 281 * 1000; //00:04:41
         CutInfo info = new CutInfo();
         //cut,
-        List<CutInfo.PlaidInfo> infos = new ArrayList<>();
+        List<IPlaidInfo> infos = new ArrayList<>();
         //35个格子。每个2s
         int lastTime = 0; //second
         for(int i = 0 ; i < count ; i ++){
             long start = CommonUtils.timeToFrame(lastTime, TimeUnit.SECONDS);
             long end = start + CommonUtils.timeToFrame(2, TimeUnit.SECONDS);
-            CutInfo.PlaidInfo pi = new CutInfo.PlaidInfo();
+            IPlaidInfo pi = VEFactory.getDefault().newPlaidInfo();
             pi.setPath(NAME);
             pi.setStartTime(start);
             pi.setEndTime(end);

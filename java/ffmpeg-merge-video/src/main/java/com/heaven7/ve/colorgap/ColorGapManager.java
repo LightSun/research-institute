@@ -12,9 +12,11 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.ConcurrentUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.collect.CollectModule;
 import com.heaven7.ve.colorgap.impl.AirShotFilterImpl;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
 import com.heaven7.ve.test.DebugUtils;
@@ -87,7 +89,7 @@ public class ColorGapManager extends BaseContextOwner{
      * @param callback the fill callback
      */
     //return the FillResult which contains video editor nodes and src template.
-    public void fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<BaseMediaResourceItem> items, FillCallback callback) {
+    public void fill(String[] musicPath, @Nullable VETemplate srcTemplate, List<IMediaResourceItem> items, FillCallback callback) {
         final ColorGapContext mContext = getContext();
         // ResourceInitializer.init(mContext);
         //the barrier help we do two tasks: analyse, tint.
@@ -99,7 +101,7 @@ public class ColorGapManager extends BaseContextOwner{
         //cut music
         CollectModule musicModule = getPerformanceCollector().startModule(MODULE_CUT_MUSIC, TAG);
         CutInfo[] infoes = musicCut.cut(mContext, musicPath);
-        List<CutInfo.PlaidInfo> plaids = new ArrayList<>();
+        List<IPlaidInfo> plaids = new ArrayList<>();
         for (CutInfo info : infoes) {
             plaids.addAll(info.getPlaidInfos());
         }
@@ -165,7 +167,7 @@ public class ColorGapManager extends BaseContextOwner{
         }
     }
 
-    private List<MediaPartItem> cutMediaShots(List<MediaItem> mediaItems, List<CutInfo.PlaidInfo> plaids) {
+    private List<MediaPartItem> cutMediaShots(List<MediaItem> mediaItems, List<IPlaidInfo> plaids) {
         List<MediaPartItem> newItems;
         //assign shot-cuts
         if(getDebugParam().hasFlags(FLAG_ASSIGN_SHOT_CUTS)){
@@ -194,7 +196,7 @@ public class ColorGapManager extends BaseContextOwner{
     }
 
     // compute shot-type and judge if need request subject.
-    private void processShotType(List<MediaPartItem> newItems, List<CutInfo.PlaidInfo> plaids,
+    private void processShotType(List<MediaPartItem> newItems, List<IPlaidInfo> plaids,
                               @Nullable VETemplate srcTemplate, VETemplate resultTemplate,
                               FillCallback callback) {
         //do with shot type (may need subject items)
@@ -249,7 +251,7 @@ public class ColorGapManager extends BaseContextOwner{
         }
     }
 
-    private void doFillPlaids(List<MediaPartItem> newItems, List<CutInfo.PlaidInfo> plaids,
+    private void doFillPlaids(List<MediaPartItem> newItems, List<IPlaidInfo> plaids,
                               @Nullable VETemplate srcTemplate, VETemplate resultTemplate,
                               FillCallback callback) {
         //all is ensure, write debug info for local debug.

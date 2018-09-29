@@ -3,8 +3,10 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.java.base.util.Logger;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.cross_os.IPlaidInfo;
+import com.heaven7.ve.cross_os.ITimeTraveller;
+import com.heaven7.ve.cross_os.VEFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class VideoCutterImpl extends VideoCutter {
 
     @Override
-    public List<MediaPartItem> cut(Context mContext, List<CutInfo.PlaidInfo> plaids, List<MediaItem> items) {
+    public List<MediaPartItem> cut(Context mContext, List<IPlaidInfo> plaids, List<MediaItem> items) {
         //if video src.count > music.bag.size
         // -> color
         /*
@@ -32,7 +34,7 @@ public class VideoCutterImpl extends VideoCutter {
         int lackCount = 0;
         final int itemSize = items.size();
         for (int i = 0 , size = plaids.size() ; i < size ; i ++){
-            CutInfo.PlaidInfo info = plaids.get(i);
+            IPlaidInfo info = plaids.get(i);
             if(i >= itemSize){
                 lackCount ++;
             }else {
@@ -107,14 +109,14 @@ public class VideoCutterImpl extends VideoCutter {
         //populate to new parts.
         List<MediaPartItem> newItems = new ArrayList<>();
         for(MediaItem item : items){
-            List<TimeTraveller> parts = item.getVideoParts();
+            List<ITimeTraveller> parts = item.getVideoParts();
             //no parts . may be image
             if(parts == null || parts.size() == 0){
                 long maxDuration = CommonUtils.timeToFrame(item.item.getDuration(), TimeUnit.MILLISECONDS);
                 newItems.add(new MediaPartItem(mContext, (MetaInfo.ImageMeta) item.imageMeta.copy(), item.item,
-                        TimeTraveller.of(0, maxDuration, maxDuration)));
+                        VEFactory.getDefault().createTimeTraveller(0, maxDuration, maxDuration)));
             }else {
-                for (TimeTraveller part : parts) {
+                for (ITimeTraveller part : parts) {
                     newItems.add(new MediaPartItem(mContext, (MetaInfo.ImageMeta) item.imageMeta.copy(), item.item, part));
                 }
             }
@@ -131,7 +133,7 @@ public class VideoCutterImpl extends VideoCutter {
         long partDuration = maxDuration / count;
         for(int i = 0 ; i < count ; i++){
             long start = i * partDuration;
-            TimeTraveller tt = TimeTraveller.of(start, start + partDuration, maxDuration);
+            ITimeTraveller tt = VEFactory.getDefault().createTimeTraveller(start, start + partDuration, maxDuration);
             mediaItem.addVideoPart(tt);
         }
         mediaItem.dump();

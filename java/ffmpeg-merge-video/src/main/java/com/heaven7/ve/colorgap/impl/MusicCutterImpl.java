@@ -4,6 +4,8 @@ import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.MusicCutter;
+import com.heaven7.ve.cross_os.IPlaidInfo;
+import com.heaven7.ve.cross_os.VEFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,7 @@ public class MusicCutterImpl implements MusicCutter {
         String path = NAME;
 
         //cut,
-        List<CutInfo.PlaidInfo> infos = new ArrayList<>();
+        List<IPlaidInfo> infos = new ArrayList<>();
         Random r = new Random();
         originDuration = duration;
         if(duration > 60 * 1000){
@@ -36,7 +38,7 @@ public class MusicCutterImpl implements MusicCutter {
         int left = duration;
         long lastEndTime = 0;
         while(left > 500){
-            CutInfo.PlaidInfo pi = new CutInfo.PlaidInfo();
+            IPlaidInfo pi = VEFactory.getDefault().newPlaidInfo();
             long startTime = lastEndTime ;
             int val = r.nextInt(2000) + 1000;
             lastEndTime = startTime +  val;
@@ -48,7 +50,7 @@ public class MusicCutterImpl implements MusicCutter {
             left -= val;
         }
         if(left > CommonUtils.frameToTime(3, TimeUnit.MILLISECONDS)){
-            CutInfo.PlaidInfo pi = new CutInfo.PlaidInfo();
+            IPlaidInfo pi = VEFactory.getDefault().newPlaidInfo();
             pi.setStartTime(CommonUtils.timeToFrame(lastEndTime, TimeUnit.MILLISECONDS));
             pi.setEndTime(CommonUtils.timeToFrame(lastEndTime + left, TimeUnit.MILLISECONDS));
             pi.setPath(path);

@@ -3,7 +3,8 @@ package com.heaven7.ve.colorgap;
 
 import com.heaven7.utils.Context;
 import com.heaven7.utils.LoadException;
-import com.heaven7.ve.BaseMediaResourceItem;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
+
 
 /**
  * the media resource loader
@@ -19,6 +20,6 @@ public abstract class MediaResourceLoader {
      * @param filePath the file path of scan result. often is the generate tag/face file
      * @param callback the load callback
      */
-    public abstract void load(Context context, BaseMediaResourceItem item, String filePath, VideoDataLoadUtils.LoadCallback callback)
+    public abstract void load(Context context, IMediaResourceItem item, String filePath, VideoDataLoadUtils.LoadCallback callback)
                throws LoadException;
 }

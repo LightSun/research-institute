@@ -2,7 +2,6 @@ package com.heaven7.ve.test;
 
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.ve.NativeMedia;
 import org.junit.Test;
 
 import java.io.File;
@@ -52,8 +51,8 @@ public class NativeMediaTest {
 
     @Test
     public void test1() { //com.heaven7.ve.NativeMedia
-        NativeMedia media = new NativeMedia();
-        media.setWriteOutPath(DIR_DLL + File.separator + "a.mp4");
+       // NativeMedia media = new NativeMedia();
+       // media.setWriteOutPath(DIR_DLL + File.separator + "a.mp4");
         System.out.println("-------");
        /* try {
             Thread.currentThread().join();

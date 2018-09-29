@@ -5,12 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.heaven7.ve.EffectInfo;
-import com.heaven7.ve.FilterInfo;
-import com.heaven7.ve.SpecialEffect;
-import com.heaven7.ve.TransitionInfo;
-import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.filter.GroupFilter;
+import com.heaven7.ve.cross_os.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,14 +25,14 @@ public class TemplateFormatter {
     public String toJson(VETemplate template) {
         Gson gson = new GsonBuilder()
                 //.excludeFieldsWithoutExposeAnnotation()
-                .registerTypeAdapter(CutInfo.PlaidInfo.class, new PlaidAdapter())
+                .registerTypeAdapter(IPlaidInfo.class, new PlaidAdapter())
                 .create();
         return gson.toJson(template);
     }
 
-    private static class PlaidAdapter extends TypeAdapter<CutInfo.PlaidInfo> {
+    private static class PlaidAdapter extends TypeAdapter<IPlaidInfo> {
         @Override
-        public void write(JsonWriter out, CutInfo.PlaidInfo value) throws IOException {
+        public void write(JsonWriter out, IPlaidInfo value) throws IOException {
             out.beginObject();
             //here just mock color filter by type
             out.name("color_filter_type").value(COLOR_FILTER_GPS);
@@ -60,14 +56,14 @@ public class TemplateFormatter {
         }
 
         @Override
-        public CutInfo.PlaidInfo read(JsonReader in) throws IOException {
+        public IPlaidInfo read(JsonReader in) throws IOException {
             in.beginObject();
-            CutInfo.PlaidInfo info = new CutInfo.PlaidInfo();
+            IPlaidInfo info = VEFactory.getDefault().newPlaidInfo();
             while (in.hasNext()) {
                 String key = in.nextName();
                 switch (key) {
                     case "color_filter_type":
-                        info.setGapColorFilter(new GroupFilter());
+                        info.setColorFilter(new GroupFilter());
                         break;
 
                     case "effects":
@@ -75,13 +71,13 @@ public class TemplateFormatter {
                         break;
 
                     case "filter":
-                        FilterInfo fi = new FilterInfo();
+                        IFilterInfo fi = VEFactory.getDefault().newFilterInfo();
                         readEffect(in, fi, "filter_type");
                         info.setFilter(fi);
                         break;
 
                     case "transition":
-                        TransitionInfo ti = new TransitionInfo();
+                        ITransitionInfo ti = VEFactory.getDefault().newTransitionInfo();
                         readEffect(in, ti, "transition_type");
                         info.setTransitionInfo(ti);
                         break;
@@ -107,11 +103,11 @@ public class TemplateFormatter {
             return info;
         }
 
-        private void readEffects(JsonReader in, CutInfo.PlaidInfo info) throws IOException {
-            List<EffectInfo> list = new ArrayList<>();
+        private void readEffects(JsonReader in, IPlaidInfo info) throws IOException {
+            List<IEffectInfo> list = new ArrayList<>();
             in.beginArray();
             while (in.hasNext()) {
-                EffectInfo effect = new SpecialEffect();
+                IEffectInfo effect = VEFactory.getDefault().newEffectInfo();
                 readEffect(in, effect, "effect_type");
                 list.add(effect);
             }
@@ -119,7 +115,7 @@ public class TemplateFormatter {
             info.setEffects(list);
         }
 
-        private void readEffect(JsonReader in, EffectInfo effect, String type) throws IOException {
+        private void readEffect(JsonReader in, IEffectInfo effect, String type) throws IOException {
             in.beginObject();
             while (in.hasNext()) {
                 String key = in.nextName();
@@ -138,15 +134,15 @@ public class TemplateFormatter {
             in.endObject();
         }
 
-        private void writeEffects(JsonWriter out, List<EffectInfo> value) throws IOException {
+        private void writeEffects(JsonWriter out, List<IEffectInfo> value) throws IOException {
             out.beginArray();
-            for (EffectInfo info : value) {
+            for (IEffectInfo info : value) {
                 writeEffect(out, "effect_type", info);
             }
             out.endArray();
         }
 
-        private void writeEffect(JsonWriter out, String type_key, EffectInfo info) throws IOException {
+        private void writeEffect(JsonWriter out, String type_key, IEffectInfo info) throws IOException {
             out.beginObject();
             out.name(type_key).value(info.getType());
             out.name("start_time").value(info.getStartTime());

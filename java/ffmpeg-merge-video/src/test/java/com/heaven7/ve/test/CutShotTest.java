@@ -9,11 +9,14 @@ import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
-import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.colorgap.MediaAnalyser;
+import com.heaven7.ve.colorgap.MediaItem;
+import com.heaven7.ve.colorgap.MediaPartItem;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
 import com.heaven7.ve.colorgap.impl.SimpleColorGapContext;
 import com.heaven7.ve.colorgap.impl.TagBasedShotCutter;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
+import com.heaven7.ve.cross_os.VEFactory;
 import com.heaven7.ve.kingdom.Kingdom;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -40,7 +43,7 @@ public class CutShotTest extends TestCase {
         cutter = new TagBasedShotCutter();
     }
 
-    List<MediaPartItem> cutItems(List<BaseMediaResourceItem> items, CyclicBarrier barrier) {
+    List<MediaPartItem> cutItems(List<IMediaResourceItem> items, CyclicBarrier barrier) {
         Context context = new SimpleColorGapContext();
         Throwables.checkEmpty(items);
         List<MediaItem> mediaItems = mediaAnalyser.analyse(null, items, barrier);
@@ -63,13 +66,13 @@ public class CutShotTest extends TestCase {
     @Test
     public void testCutShot2() {
         //00:04:22 // 262
-       // BaseMediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\story4\\storyTest\\C0218.MP4", 411000);
-        BaseMediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\story4\\storyTest\\C0013.MP4", 91000);
-        ArrayList<BaseMediaResourceItem> list = new ArrayList<>(Arrays.asList(item));
+       // IMediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\story4\\storyTest\\C0218.MP4", 411000);
+        IMediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\story4\\storyTest\\C0013.MP4", 91000);
+        ArrayList<IMediaResourceItem> list = new ArrayList<>(Arrays.asList(item));
         testCutShot(list);
     }
 
-    private void testCutShot(List<BaseMediaResourceItem> items) {
+    private void testCutShot(List<IMediaResourceItem> items) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -122,17 +125,17 @@ public class CutShotTest extends TestCase {
                 item.videoPart.getEndTime(), dir);
     }
 
-    private List<BaseMediaResourceItem> createItems() {
-        List<BaseMediaResourceItem> items = new ArrayList<>();
+    private List<IMediaResourceItem> createItems() {
+        List<IMediaResourceItem> items = new ArrayList<>();
        /* String path ="F:\\videos\\test_cut\\test_shot_cut\\concat_output.mp4";
-        BaseMediaResourceItem item = new BaseMediaResourceItem();
+        IMediaResourceItem item = new IMediaResourceItem();
         item.setFilePath(path);
         item.setTime(new File(path).lastModified());
         item.setDuration(11000);//11s
         item.setMime("video/mp4");*/
 
         String path = "F:\\videos\\test_cut\\test_shot_cut\\GP5A0859.mp4";
-        BaseMediaResourceItem item = new BaseMediaResourceItem();
+        IMediaResourceItem item = VEFactory.getDefault().newMediaResourceItem();
         item.setFilePath(path);
         item.setTime(new File(path).lastModified());
         item.setDuration(196000);//03:16

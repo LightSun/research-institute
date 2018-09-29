@@ -18,8 +18,8 @@ import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
-import com.heaven7.ve.TimeTraveller;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
+import com.heaven7.ve.cross_os.ITimeTraveller;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.kingdom.ModuleData;
@@ -45,8 +45,8 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
     //private static final String TAG = "MediaPartItem";
 
     final public MetaInfo.ImageMeta imageMeta;
-    final public BaseMediaResourceItem item;
-    final public TimeTraveller videoPart;
+    final public IMediaResourceItem item;
+    final public ITimeTraveller videoPart;
 
     private GapColorFilter.GapColorCondition mCondition;
     private boolean hold; //是否已经被占用
@@ -76,7 +76,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
      * @param item the media resource item
      * @param videoPart the video part. will auto set max duration.
      */
-    public MediaPartItem(Context context, MetaInfo.ImageMeta imageMeta, BaseMediaResourceItem item, TimeTraveller videoPart) {
+    public MediaPartItem(Context context, MetaInfo.ImageMeta imageMeta, IMediaResourceItem item, ITimeTraveller videoPart) {
         super(context);
         this.imageMeta = imageMeta;
         this.item = item;
@@ -171,7 +171,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     @Override
     public ItemDelegate copy() {
-        MediaPartItem mpi = new MediaPartItem(getContext(), (MetaInfo.ImageMeta) imageMeta.copy(), item, (TimeTraveller) videoPart.copy());
+        MediaPartItem mpi = new MediaPartItem(getContext(), (MetaInfo.ImageMeta) imageMeta.copy(), item, (ITimeTraveller) videoPart.copy());
         mpi.mCondition = this.mCondition;
         mpi.mScores = (Scores) this.mScores.copy();
         mpi.storyId = this.storyId;
@@ -512,7 +512,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         return imageMeta.getVideoTags(videoPart);
     }
     @Override
-    public BaseMediaResourceItem getItem() {
+    public IMediaResourceItem getItem() {
         return item;
     }
     /*** for debug */
@@ -529,7 +529,7 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         return  tempList.size() * 1f / rects.size();
     }
 
-    public void applyEffects(@Nullable TimeTraveller nextShot){
+    public void applyEffects(@Nullable ITimeTraveller nextShot){
         getMarkFlags().applyEffects(getContext(), videoPart, nextShot);
     }
 

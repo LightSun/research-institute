@@ -4,11 +4,12 @@ import com.heaven7.java.base.util.Logger;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.FFmpegUtils;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.ColorGapManager;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.test.util.FFmpegVideoHelper;
 import junit.framework.TestCase;
@@ -30,7 +31,7 @@ public class StoreLineTest extends TestCase {
     private static final String CUT_OUT_WEDDING_DIR =
             "E:\\study\\github\\research-institute\\java\\ffmpeg-merge-video\\cut_videos\\story4";
 
-    List<BaseMediaResourceItem> mItems;
+    List<IMediaResourceItem> mItems;
 
     @Override
     protected void setUp() throws Exception {
@@ -38,8 +39,8 @@ public class StoreLineTest extends TestCase {
     }
 
     //filter: help we filter files.
-    private List<BaseMediaResourceItem> scanWeddingItems(FileFilter filter) {
-        List<BaseMediaResourceItem> items = new ArrayList<>();
+    private List<IMediaResourceItem> scanWeddingItems(FileFilter filter) {
+        List<IMediaResourceItem> items = new ArrayList<>();
         File file = new File(STORY2_DIR);
         List<String> videos = new ArrayList<>();
         FileUtils.getFiles(file, "mp4", filter, videos);

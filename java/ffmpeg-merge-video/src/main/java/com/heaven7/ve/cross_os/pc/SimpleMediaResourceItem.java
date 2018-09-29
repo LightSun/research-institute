@@ -1,6 +1,9 @@
-package com.heaven7.ve;
+package com.heaven7.ve.cross_os.pc;
 
-public class BaseMediaResourceItem implements IMediaResourceItem {
+
+import com.heaven7.ve.cross_os.IMediaResourceItem;
+
+/*public*/ class SimpleMediaResourceItem implements IMediaResourceItem {
 
     private String title;
     private long time; //time of photo/video .the last modified
@@ -101,7 +104,7 @@ public class BaseMediaResourceItem implements IMediaResourceItem {
 
     @Override
     public String toString() {
-        return "BaseMediaResourceItem{" +
+        return "IMediaResourceItem{" +
                 ", title='" + title + '\'' +
                 ", time='" + time + '\'' +
                 ", duration='" + duration + '\'' +
@@ -112,10 +115,10 @@ public class BaseMediaResourceItem implements IMediaResourceItem {
                 '}';
     }
 
-    public BaseMediaResourceItem() {
+    public SimpleMediaResourceItem() {
     }
 
-    public BaseMediaResourceItem(BaseMediaResourceItem item) {
+    public SimpleMediaResourceItem(SimpleMediaResourceItem item) {
         title = item.title;
         time = item.time;
         filePath = item.filePath;
@@ -131,7 +134,7 @@ public class BaseMediaResourceItem implements IMediaResourceItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BaseMediaResourceItem item = (BaseMediaResourceItem) o;
+        SimpleMediaResourceItem item = (SimpleMediaResourceItem) o;
 
         return filePath != null ? filePath.equals(item.filePath) : item.filePath == null;
     }

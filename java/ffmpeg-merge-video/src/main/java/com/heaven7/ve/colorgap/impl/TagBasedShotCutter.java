@@ -9,8 +9,10 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.cross_os.IPlaidInfo;
+import com.heaven7.ve.cross_os.ITimeTraveller;
+import com.heaven7.ve.cross_os.VEFactory;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +38,7 @@ public class TagBasedShotCutter extends VideoCutter {
     private static final String TAG = "TagBasedShotCutter";
 
     @Override
-    public List<MediaPartItem> cut(Context context, List<CutInfo.PlaidInfo> musicInfos, List<MediaItem> items) {
+    public List<MediaPartItem> cut(Context context, List<IPlaidInfo> musicInfos, List<MediaItem> items) {
         List<MediaPartItem> resultList = new ArrayList<>();
 
         for(MediaItem item : items){
@@ -132,7 +134,7 @@ public class TagBasedShotCutter extends VideoCutter {
                         TimeUnit.SECONDS) >= MIN_SHOT_BUFFER_LENGTH){
                     //判断是否人脸为主
                     MediaPartItem partItem = new MediaPartItem(context, (MetaInfo.ImageMeta) item.getImageMeta().copy(),
-                            item.getItem(), TimeTraveller.of(0, startTime1, maxDuration));
+                            item.getItem(), VEFactory.getDefault().createTimeTraveller(0, startTime1, maxDuration));
                     result.add(partItem);
                 }
             }
@@ -142,7 +144,7 @@ public class TagBasedShotCutter extends VideoCutter {
                 long delta = maxDuration - endTime2;
                 if(CommonUtils.frameToTime(delta, TimeUnit.SECONDS) >= MIN_SHOT_BUFFER_LENGTH){
                     MediaPartItem partItem = new MediaPartItem(context,(MetaInfo.ImageMeta) item.getImageMeta().copy(),
-                            item.getItem(), TimeTraveller.of(endTime2, maxDuration, maxDuration));
+                            item.getItem(), VEFactory.getDefault().createTimeTraveller(endTime2, maxDuration, maxDuration));
                     result.add(partItem);
                 }
             }
@@ -150,7 +152,7 @@ public class TagBasedShotCutter extends VideoCutter {
             long delta = startTime2 - endTime1;
             if(CommonUtils.frameToTime(delta, TimeUnit.SECONDS) >= MIN_SHOT_BUFFER_LENGTH){
                 MediaPartItem partItem = new MediaPartItem(context,(MetaInfo.ImageMeta) item.getImageMeta().copy(),
-                        item.getItem(), TimeTraveller.of(endTime1, startTime2, maxDuration));
+                        item.getItem(), VEFactory.getDefault().createTimeTraveller(endTime1, startTime2, maxDuration));
                 result.add(partItem);
             }
         }
@@ -287,7 +289,7 @@ public class TagBasedShotCutter extends VideoCutter {
     private static MediaPartItem createShotByTag(Context context, List<FrameTags> frameBuffer, Set<Integer> tagSet, CutItemDelegate item) {
         if(frameBuffer.size() >= MIN_SHOT_BUFFER_LENGTH){
             FrameTags first = frameBuffer.get(0);
-            TimeTraveller tt = new TimeTraveller();
+            ITimeTraveller tt = VEFactory.getDefault().newTimeTraveller();
             tt.setStartTime(CommonUtils.timeToFrame(first.getFrameIdx(), TimeUnit.SECONDS));
             tt.setEndTime(tt.getStartTime() + CommonUtils.timeToFrame(frameBuffer.size() - 1, TimeUnit.SECONDS));
             tt.setMaxDuration(CommonUtils.timeToFrame(item.getItem().getDuration(), TimeUnit.MILLISECONDS));
@@ -391,7 +393,7 @@ public class TagBasedShotCutter extends VideoCutter {
         if(frameBuffer.size() >= MIN_SHOT_BUFFER_LENGTH){
             // 注意：用ffmpeg切的视频帧，pic-001其实代表第0秒，因此此处要-1
             FrameItem bf_item = frameBuffer.get(0);
-            TimeTraveller tt = new TimeTraveller();
+            ITimeTraveller tt = VEFactory.getDefault().newTimeTraveller();
             tt.setStartTime(CommonUtils.timeToFrame(bf_item.id, TimeUnit.SECONDS));
             tt.setEndTime(CommonUtils.timeToFrame(bf_item.id + frameBuffer.size() - 1, TimeUnit.SECONDS));
             tt.setMaxDuration(CommonUtils.timeToFrame(item.item.getDuration(), TimeUnit.MILLISECONDS));

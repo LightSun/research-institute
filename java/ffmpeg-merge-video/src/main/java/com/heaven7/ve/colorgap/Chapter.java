@@ -4,7 +4,6 @@ import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.Throwables;
 import com.heaven7.java.visitor.FireIndexedVisitor;
-import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -16,12 +15,10 @@ import com.heaven7.ve.colorgap.filter.ShotKeyFilter;
 import com.heaven7.ve.colorgap.filter.ShotTypeFilter;
 import com.heaven7.ve.colorgap.impl.ChapterColorGapPostProcessor;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
-import com.heaven7.ve.colorgap.impl.filler.MatchStageFiller;
 import com.heaven7.ve.colorgap.impl.filler.StageFiller;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.kingdom.Kingdom;
-import com.heaven7.ve.template.EffectData;
-import com.sun.media.jfxmedia.Media;
 
 import java.io.File;
 import java.util.*;
@@ -37,26 +34,26 @@ public class Chapter extends BaseContextOwner{
 
     private static final int MIN_SHOT_COUNT_IN_STORY = 1;
 
-    private final List<CutInfo.PlaidInfo> plaids;
+    private final List<IPlaidInfo> plaids;
     private final List<MediaPartItem> items;
     private final int chapterIndex;
 
     /**
      * the air plaids which comes from {@linkplain #plaids}
      */
-    private List<CutInfo.PlaidInfo> airPlaids;
+    private List<IPlaidInfo> airPlaids;
     private boolean air;
 
     private List<GapManager.GapItem> filledItems = new ArrayList<>();
     private List<Story> mStories;
 
-    public Chapter(Context context, List<CutInfo.PlaidInfo> plaids, List<MediaPartItem> items, int chapterIndex) {
+    public Chapter(Context context, List<IPlaidInfo> plaids, List<MediaPartItem> items, int chapterIndex) {
         super(context);
         this.plaids = plaids;
         this.items = items;
         this.chapterIndex = chapterIndex;
 
-        for (CutInfo.PlaidInfo plaid : plaids) {
+        for (IPlaidInfo plaid : plaids) {
             if (plaid.isAir()) {
                 addAirPlaid(plaid);
             }
@@ -76,7 +73,7 @@ public class Chapter extends BaseContextOwner{
         return item.imageMeta.getDate();
     }
 
-    private void addAirPlaid(CutInfo.PlaidInfo plaid) {
+    private void addAirPlaid(IPlaidInfo plaid) {
         if (airPlaids == null) {
             airPlaids = new ArrayList<>();
         }
@@ -97,7 +94,7 @@ public class Chapter extends BaseContextOwner{
     public List<GapManager.GapItem> getFilledItems() {
         return filledItems != null? filledItems : Collections.emptyList();
     }
-    public CutInfo.PlaidInfo getAirPlaid() {
+    public IPlaidInfo getAirPlaid() {
         Throwables.checkEmpty(airPlaids);
         return airPlaids.get(0);
     }
@@ -215,7 +212,7 @@ public class Chapter extends BaseContextOwner{
         List<MediaPartItem> shots = getAllShots(stories);
         final int size = Math.min(plaidCount, shots.size());
         for (int i = 0; i < size; i++) {
-            CutInfo.PlaidInfo info = plaids.get(i);
+            IPlaidInfo info = plaids.get(i);
             info.addColorFilter(new ShotKeyFilter(new ShotKeyFilter.ShotKeyCondition(
                     shots.get(i).imageMeta.getShotKey())));
         }
@@ -234,7 +231,7 @@ public class Chapter extends BaseContextOwner{
                     i < count ; i ++){
                 //air-shot replace bias-shot
                 GapManager.GapItem gapItem = filledBiasShots.get(i);
-                MediaPartItem item = airFilter.filter((CutInfo.PlaidInfo)gapItem.plaid,
+                MediaPartItem item = airFilter.filter((IPlaidInfo)gapItem.plaid,
                         (MediaPartItem) gapItem.item, airShots);
                 if(item != null) {
                     MediaPartItem oldItem = (MediaPartItem) gapItem.setItemDelegate(item);
@@ -262,7 +259,7 @@ public class Chapter extends BaseContextOwner{
                 int mediaumStart = shortTypeParam.getNearCount();
                 int longStart = mediaumStart + shortTypeParam.getMediumCount();
                 for (int i = 0; i < plaidCount; i++) {
-                    CutInfo.PlaidInfo info = plaids.get(i);
+                    IPlaidInfo info = plaids.get(i);
                     if (i < mediaumStart) {
                         //near
                         info.addColorFilter(new ShotTypeFilter(new ShotTypeFilter.ShotTypeCondition(MetaInfo.SHOT_TYPE_CLOSE_UP)));
@@ -280,7 +277,7 @@ public class Chapter extends BaseContextOwner{
                 int mediaumStart = shortTypeParam.getLongCount();
                 int nearStart = mediaumStart + shortTypeParam.getMediumCount();
                 for (int i = 0; i < plaidCount; i++) {
-                    CutInfo.PlaidInfo info = plaids.get(i);
+                    IPlaidInfo info = plaids.get(i);
                     if (i < mediaumStart) {
                         //long
                         info.addColorFilter(new ShotTypeFilter(new ShotTypeFilter.ShotTypeCondition(MetaInfo.SHOT_TYPE_LONG_SHORT)));
@@ -303,9 +300,9 @@ public class Chapter extends BaseContextOwner{
             filledItems = new ArrayList<>();
         }
         List<MediaPartItem> newItems = truncateItems(items);
-        VisitServices.from(plaids).fireWithIndex(new FireIndexedVisitor<CutInfo.PlaidInfo>() {
+        VisitServices.from(plaids).fireWithIndex(new FireIndexedVisitor<IPlaidInfo>() {
             @Override
-            public Void visit(Object param, CutInfo.PlaidInfo plaidInfo, int index, int size) {
+            public Void visit(Object param, IPlaidInfo plaidInfo, int index, int size) {
                 filledItems.add(new GapManager.GapItem(plaids.get(index), newItems.get(index)));
                 return null;
             }
@@ -547,11 +544,11 @@ public class Chapter extends BaseContextOwner{
 
     //----------------------------------------------------------
 
-    public List<CutInfo.PlaidInfo> getLeftPlaids() {
-        List<CutInfo.PlaidInfo> filledPlaids = getFilledPlaids();
-        return VisitServices.from(this.plaids).filter(new PredicateVisitor<CutInfo.PlaidInfo>() {
+    public List<IPlaidInfo> getLeftPlaids() {
+        List<IPlaidInfo> filledPlaids = getFilledPlaids();
+        return VisitServices.from(this.plaids).filter(new PredicateVisitor<IPlaidInfo>() {
             @Override
-            public Boolean visit(CutInfo.PlaidInfo info, Object param) {
+            public Boolean visit(IPlaidInfo info, Object param) {
                 return !filledPlaids.contains(info);
             }
         }).getAsList();
@@ -592,7 +589,7 @@ public class Chapter extends BaseContextOwner{
             VisitServices.from(filledItems).fireWithIndex(new FireIndexedVisitor<GapManager.GapItem>() {
                 @Override
                 public Void visit(Object param, GapManager.GapItem gapItem, int index, int size) {
-                    CutInfo.PlaidInfo info = (CutInfo.PlaidInfo) gapItem.plaid;
+                    IPlaidInfo info = (IPlaidInfo) gapItem.plaid;
                     MediaPartItem item = (MediaPartItem) gapItem.item;
                     sb.append("plaid: ").append(info.getFilterString()).append("\n");
                     sb.append("item: ").append(item.toString()).append("\n");
@@ -644,12 +641,12 @@ public class Chapter extends BaseContextOwner{
                     }
                 }).getAsList();
     }
-    public List<CutInfo.PlaidInfo> getFilledPlaids() {
+    public List<IPlaidInfo> getFilledPlaids() {
         return VisitServices.from(filledItems).map(
-                new ResultVisitor<GapManager.GapItem, CutInfo.PlaidInfo>() {
+                new ResultVisitor<GapManager.GapItem, IPlaidInfo>() {
                     @Override
-                    public CutInfo.PlaidInfo visit(GapManager.GapItem gapItem, Object param) {
-                        return (CutInfo.PlaidInfo) gapItem.plaid;
+                    public IPlaidInfo visit(GapManager.GapItem gapItem, Object param) {
+                        return (IPlaidInfo) gapItem.plaid;
                     }
                 }).getAsList();
     }

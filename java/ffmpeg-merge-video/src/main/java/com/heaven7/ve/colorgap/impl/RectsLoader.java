@@ -1,9 +1,10 @@
 package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.utils.Context;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.colorgap.MediaResourceLoader;
 import com.heaven7.ve.colorgap.VideoDataLoadUtils;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 
 /**
  * only used for video
@@ -12,7 +13,7 @@ import com.heaven7.ve.colorgap.VideoDataLoadUtils;
 
 /*public*/ class RectsLoader extends MediaResourceLoader {
     @Override
-    public void load(Context context, BaseMediaResourceItem item, String filePath, VideoDataLoadUtils.LoadCallback callback) {
+    public void load(Context context, IMediaResourceItem item, String filePath, VideoDataLoadUtils.LoadCallback callback) {
         VideoDataLoadUtils.loadRectData(context, filePath, callback);
     }
 }

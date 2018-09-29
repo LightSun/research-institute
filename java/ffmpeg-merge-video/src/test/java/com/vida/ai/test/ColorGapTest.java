@@ -3,12 +3,13 @@ package com.vida.ai.test;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.*;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.configs.BootStrapData;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 import com.heaven7.ve.starter.KingdomStarter;
 import com.heaven7.ve.test.SimpleFaceScanner;
 import com.heaven7.ve.test.SimpleHighLightScanner;
@@ -42,10 +43,10 @@ public class ColorGapTest {
         // String outDir = "I:\\guanguan\\clothing_out";
         String music = MUSIC_DIR + File.separator + "M11.mp3"; //M6.M7
         List<String> files = FileUtils.getFiles(new File(videoDir), "mp4");
-        List<BaseMediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, BaseMediaResourceItem>() {
+        List<IMediaResourceItem> list = VisitServices.from(files).map(new ResultVisitor<String, IMediaResourceItem>() {
             @Override
-            public BaseMediaResourceItem visit(String s, Object param) {
-                BaseMediaResourceItem item = TestUtils.createVideoItem(s);
+            public IMediaResourceItem visit(String s, Object param) {
+                IMediaResourceItem item = TestUtils.createVideoItem(s);
                 item.setWidth(1280);
                 item.setHeight(720);
                 return item;
@@ -55,7 +56,7 @@ public class ColorGapTest {
         cgt.start(music,  list, outDir);
     }
 
-    public void start(String musicPath, List<BaseMediaResourceItem> items, String outDir){
+    public void start(String musicPath, List<IMediaResourceItem> items, String outDir){
         BootStrapData data = BootStrapData.get(null);
         //montage param
         MontageParam param = new MontageParam();

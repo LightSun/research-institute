@@ -9,10 +9,14 @@ import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CmdHelper;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.ve.SpecialEffect;
-import com.heaven7.ve.TimeTraveller;
-import com.heaven7.ve.TransitionInfo;
-import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.colorgap.ColorGapContext;
+import com.heaven7.ve.colorgap.ColorGapManager;
+import com.heaven7.ve.colorgap.MarkFlags;
+import com.heaven7.ve.colorgap.MediaPartItem;
+import com.heaven7.ve.cross_os.IPlaidInfo;
+import com.heaven7.ve.cross_os.ISpecialEffectInfo;
+import com.heaven7.ve.cross_os.ITimeTraveller;
+import com.heaven7.ve.cross_os.ITransitionInfo;
 import com.heaven7.ve.gap.GapManager;
 import com.vida.ai.third.baidu.MediaSdkParam;
 
@@ -57,14 +61,14 @@ public class MediaSdkExeFiller implements ColorGapManager.FillCallback  {
                             .setEndFrame(frames)
                             .build());
                     lastFramesIndex += frames;
-                    SparseArray<List<TimeTraveller>> effectMap = partItem.getMarkFlags().getAppliedEffectMap();
+                    SparseArray<List<ITimeTraveller>> effectMap = partItem.getMarkFlags().getAppliedEffectMap();
                     if(effectMap != null && effectMap.size() > 0){
-                        List<TimeTraveller> travellers = effectMap.get(MarkFlags.TYPE_TRANSITION);
+                        List<ITimeTraveller> travellers = effectMap.get(MarkFlags.TYPE_TRANSITION);
                         if(!Predicates.isEmpty(travellers)){
-                            VisitServices.from(travellers).fire(new FireVisitor<TimeTraveller>() {
+                            VisitServices.from(travellers).fire(new FireVisitor<ITimeTraveller>() {
                                 @Override
-                                public Boolean visit(TimeTraveller tt, Object param) {
-                                    TransitionInfo info = (TransitionInfo) tt;
+                                public Boolean visit(ITimeTraveller tt, Object param) {
+                                    ITransitionInfo info = (ITransitionInfo) tt;
                                     msp.addTransitionParam(new MediaSdkParam.TransitionParam(index, info.getType()));
                                     return null;
                                 }
@@ -72,10 +76,10 @@ public class MediaSdkExeFiller implements ColorGapManager.FillCallback  {
                         }
                         travellers = effectMap.get(MarkFlags.TYPE_SPECIAL_EFFECT);
                         if(!Predicates.isEmpty(travellers)){
-                            VisitServices.from(travellers).fire(new FireVisitor<TimeTraveller>() {
+                            VisitServices.from(travellers).fire(new FireVisitor<ITimeTraveller>() {
                                 @Override
-                                public Boolean visit(TimeTraveller tt, Object param) {
-                                    SpecialEffect se = (SpecialEffect) tt;
+                                public Boolean visit(ITimeTraveller tt, Object param) {
+                                    ISpecialEffectInfo se = (ISpecialEffectInfo) tt;
                                     msp.addEffectParam(new MediaSdkParam.EffectParam(index, se.getType()));
                                     return null;
                                 }
@@ -84,7 +88,7 @@ public class MediaSdkExeFiller implements ColorGapManager.FillCallback  {
                     }
                     if(index == size - 1){
                         //last
-                        CutInfo.PlaidInfo pi = (CutInfo.PlaidInfo) gapItem.plaid;
+                        IPlaidInfo pi = (IPlaidInfo) gapItem.plaid;
                         msp.setAudioParam(new MediaSdkParam.AudioParam.Builder()
                                 .setAudioPath(pi.getPath())
                                 .setStartTime(0)

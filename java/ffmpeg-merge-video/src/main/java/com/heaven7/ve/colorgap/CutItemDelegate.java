@@ -2,7 +2,7 @@ package com.heaven7.ve.colorgap;
 
 
 import com.heaven7.utils.Context;
-import com.heaven7.ve.BaseMediaResourceItem;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 
 import java.util.List;
 
@@ -22,5 +22,5 @@ public interface CutItemDelegate {
 
     List<FrameTags> getVideoTags();
 
-    BaseMediaResourceItem getItem();
+    IMediaResourceItem getItem();
 }

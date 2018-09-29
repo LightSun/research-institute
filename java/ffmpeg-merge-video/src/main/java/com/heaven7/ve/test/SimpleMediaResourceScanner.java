@@ -6,8 +6,9 @@ import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.colorgap.MediaResourceScanner;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 
 import java.io.File;
 import java.util.Arrays;
@@ -32,7 +33,7 @@ public abstract class SimpleMediaResourceScanner extends MediaResourceScanner {
     }
 
     @Override
-    public String scan(Context context, BaseMediaResourceItem item, String srcDir) {
+    public String scan(Context context, IMediaResourceItem item, String srcDir) {
         if(item.isImage()){
             if(Predicates.isEmpty(imageDataDirs)){
                 return null;
@@ -66,6 +67,6 @@ public abstract class SimpleMediaResourceScanner extends MediaResourceScanner {
         }
     }
 
-    protected abstract String getVideoDataFile(Context context, String imageDataDir, BaseMediaResourceItem item);
-    protected abstract String getImageDataFile(Context context, String imageDataDir, BaseMediaResourceItem item);
+    protected abstract String getVideoDataFile(Context context, String imageDataDir, IMediaResourceItem item);
+    protected abstract String getImageDataFile(Context context, String imageDataDir, IMediaResourceItem item);
 }

@@ -1,7 +1,8 @@
 package com.heaven7.ve.strategy;
 
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.colorgap.ColorGapContext;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 
 import java.util.List;
 
@@ -15,6 +16,6 @@ public interface ResourceStrategy {
     int STRATEGY_SINGLE_SHOT  = 3;
 
 
-    int getResourceStrategy(ColorGapContext context, List<BaseMediaResourceItem> list);
+    int getResourceStrategy(ColorGapContext context, List<IMediaResourceItem> list);
 
 }

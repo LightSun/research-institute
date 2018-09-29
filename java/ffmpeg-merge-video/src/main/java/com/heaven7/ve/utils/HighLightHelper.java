@@ -6,9 +6,9 @@ import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.ve.TimeTraveller;
 import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.impl.ScoreProviderImpl;
+import com.heaven7.ve.cross_os.ITimeTraveller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +41,7 @@ public class HighLightHelper {
         return KeyValuePair.create(time, data);
     }
     @SuppressWarnings("unchecked")
-    public KeyValuePair<Integer, List<IHighLightData>> getHighLight(ColorGapContext context, TimeTraveller tt){
+    public KeyValuePair<Integer, List<IHighLightData>> getHighLight(ColorGapContext context, ITimeTraveller tt){
         if(highLightMap == null){
             return null;
         }
@@ -65,7 +65,7 @@ public class HighLightHelper {
         return KeyValuePair.create(time, data);
     }
     @SuppressWarnings("unchecked")
-    public List<KeyValuePair<Integer, List<IHighLightData>>> getHighLights(ColorGapContext context, TimeTraveller tt){
+    public List<KeyValuePair<Integer, List<IHighLightData>>> getHighLights(ColorGapContext context, ITimeTraveller tt){
         if(highLightMap == null){
             return null;
         }
@@ -89,7 +89,7 @@ public class HighLightHelper {
         return result;
     }
     @SuppressWarnings("unchecked")
-    public HighLightArea getHighLightArea(ColorGapContext context, TimeTraveller tt){
+    public HighLightArea getHighLightArea(ColorGapContext context, ITimeTraveller tt){
         if(highLightMap == null){
             return null;
         }

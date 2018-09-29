@@ -6,7 +6,7 @@ import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.ve.TimeTraveller;
+import com.heaven7.ve.cross_os.ITimeTraveller;
 import com.heaven7.ve.template.EffectData;
 import com.heaven7.ve.utils.EffectsHelper;
 
@@ -31,7 +31,7 @@ public class MarkFlags {
 
     // key is type,
     private SparseArray<List<EffectItemDelegate>> mEffectMap;
-    private SparseArray<List<TimeTraveller>> mAppliedEffectMap;
+    private SparseArray<List<ITimeTraveller>> mAppliedEffectMap;
 
     public boolean hasFlags(int type, int flag){
         if(mEffectMap == null){
@@ -67,7 +67,7 @@ public class MarkFlags {
             mEffectMap.clear();
         }
     }
-    public SparseArray<List<TimeTraveller>> getAppliedEffectMap(){
+    public SparseArray<List<ITimeTraveller>> getAppliedEffectMap(){
         return mAppliedEffectMap;
     }
     public List<EffectItemDelegate> getEffectItemDelegates(int type){
@@ -83,7 +83,7 @@ public class MarkFlags {
      * @param tt the time traveller.
      * @param nextTt the next time traveller.
      */
-    public void applyEffects(ColorGapContext context, TimeTraveller tt, TimeTraveller nextTt) {
+    public void applyEffects(ColorGapContext context, ITimeTraveller tt, ITimeTraveller nextTt) {
         if(mEffectMap == null){
             return;
         }

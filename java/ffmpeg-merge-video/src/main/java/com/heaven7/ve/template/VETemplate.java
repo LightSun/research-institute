@@ -1,9 +1,9 @@
 package com.heaven7.ve.template;
 
 import com.heaven7.java.base.util.Predicates;
-import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.GapColorFilter;
 import com.heaven7.ve.colorgap.MetaInfo;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +86,7 @@ public class VETemplate {
 
     public static class LogicSentence{
 
-        private List<CutInfo.PlaidInfo> plaids;
+        private List<IPlaidInfo> plaids;
         /** the weight */
         private int weight = -1 ;
         /** is the air shot or not .(this is used to join double sentence.) */
@@ -120,7 +120,7 @@ public class VETemplate {
             this.air = air;
             setDir(air ? MetaInfo.DIR_EMPTY : null);
             if(!Predicates.isEmpty(plaids)) {
-                for (CutInfo.PlaidInfo info : plaids) {
+                for (IPlaidInfo info : plaids) {
                     info.setAir(air);
                 }
             }
@@ -142,10 +142,10 @@ public class VETemplate {
             this.weight = weight;
         }
 
-        public List<CutInfo.PlaidInfo> getPlaids() {
+        public List<IPlaidInfo> getPlaids() {
             return plaids;
         }
-        public void setPlaids(List<CutInfo.PlaidInfo> plaids) {
+        public void setPlaids(List<IPlaidInfo> plaids) {
             this.plaids = plaids;
         }
         /*public*/ void setScale(float scale) {
@@ -157,7 +157,7 @@ public class VETemplate {
             int colorFilterCount = 0;
             int size = plaids.size();
             for(int i = 0; i < size ; i ++ ){
-                CutInfo.PlaidInfo info = plaids.get(i);
+                IPlaidInfo info = plaids.get(i);
                 ProportionConfig.Rule effect = mRuleConfig.new Rule(i,size - 1, info.getEffectType());
                 ProportionConfig.Rule filter = mRuleConfig.new Rule(i, size - 1, info.getFilterType());
                 ProportionConfig.Rule transition = mRuleConfig.new Rule(i, size - 1,info.getTransitionType());
@@ -166,7 +166,7 @@ public class VETemplate {
                 effectCount += info.hasEffect() ? 1 : 0;
                 filterCount += info.getFilter() != null ? 1 : 0;
                 transitionCount += info.getTransitionInfo() != null ? 1 : 0;
-                colorFilterCount += info.getGapColorFilter() != null ? 1 : 0;
+                colorFilterCount += info.getColorFilter() != null ? 1 : 0;
                 mRuleConfig.addEffectRule(effect);
                 mRuleConfig.addFilterRule(filter);
                 mRuleConfig.addColorFilterRule(colorFilter);
@@ -184,7 +184,7 @@ public class VETemplate {
 
         public long getDuration() {
             long duration = 0;
-            for(CutInfo.PlaidInfo info : plaids){
+            for(IPlaidInfo info : plaids){
                 duration += info.getDuration();
             }
             return duration;
@@ -199,7 +199,7 @@ public class VETemplate {
             return percent;
         }
         public void clearEffects() {
-            for(CutInfo.PlaidInfo info : plaids){
+            for(IPlaidInfo info : plaids){
                 info.clearEffects();
             }
         }
@@ -208,13 +208,13 @@ public class VETemplate {
             ls.weight = this.weight;
             ls.air = this.air;
             if(getPlaids() != null){
-                for(CutInfo.PlaidInfo info : getPlaids()){
-                    ls.addPlaidInfo((CutInfo.PlaidInfo) info.copy());
+                for(IPlaidInfo info : getPlaids()){
+                    ls.addPlaidInfo((IPlaidInfo) info.copy());
                 }
             }
             return ls;
         }
-        public void addPlaidInfo(CutInfo.PlaidInfo info) {
+        public void addPlaidInfo(IPlaidInfo info) {
             if(plaids == null){
                 plaids = new ArrayList<>();
             }
@@ -227,7 +227,7 @@ public class VETemplate {
 
         /** tint the all flags by target filter. */
         public void addColorFilter(GapColorFilter filter) {
-            for(CutInfo.PlaidInfo info : plaids){
+            for(IPlaidInfo info : plaids){
                 info.addColorFilter(filter);
             }
         }

@@ -10,6 +10,8 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.cross_os.IPlaidInfo;
+import com.heaven7.ve.cross_os.VEFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +61,7 @@ public class MusicCutStarter implements IStarter, MusicCutter {
                     @Override
                     public CutInfo visit(String s, Object param) {
                         MusicCutData data = mMap.get(s);
-                        List<CutInfo.PlaidInfo> cuts = data.getCuts(context, s);
+                        List<IPlaidInfo> cuts = data.getCuts(context, s);
                         CutInfo info = new CutInfo();
                         info.setPlaidInfos(cuts);
                         return info;
@@ -82,7 +84,7 @@ public class MusicCutStarter implements IStarter, MusicCutter {
             this.name = name;
         }
 
-        public List<CutInfo.PlaidInfo> getCuts(Context ctx, String musicPath) {
+        public List<IPlaidInfo> getCuts(Context ctx, String musicPath) {
             final ColorGapContext context = (ColorGapContext) ctx;
             final int duration = context.getMontageParameter().getDuration();
             // String fileName = FileUtils.getFileName(musicPath);
@@ -125,9 +127,9 @@ public class MusicCutStarter implements IStarter, MusicCutter {
                 }
             });
 
-            return VisitServices.from(intervals).map(new ResultVisitor<TimeInterval, CutInfo.PlaidInfo>() {
+            return VisitServices.from(intervals).map(new ResultVisitor<TimeInterval, IPlaidInfo>() {
                 @Override
-                public CutInfo.PlaidInfo visit(TimeInterval interval, Object param) {
+                public IPlaidInfo visit(TimeInterval interval, Object param) {
                     return interval.toPlaid(musicPath, maxTime);
                 }
             }).getAsList();
@@ -148,8 +150,8 @@ public class MusicCutStarter implements IStarter, MusicCutter {
             this.end = end;
         }
 
-        public CutInfo.PlaidInfo toPlaid(String musicPath, float maxTime) {
-            CutInfo.PlaidInfo info = new CutInfo.PlaidInfo();
+        public IPlaidInfo toPlaid(String musicPath, float maxTime) {
+            IPlaidInfo info = VEFactory.getDefault().newPlaidInfo();
             info.setStartTime(CommonUtils.timeToFrame(start, TimeUnit.SECONDS));
             info.setEndTime(CommonUtils.timeToFrame(end, TimeUnit.SECONDS));
             info.setMaxDuration(CommonUtils.timeToFrame(maxTime, TimeUnit.SECONDS));

@@ -13,9 +13,9 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
 import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
-import com.heaven7.ve.PathTimeTraveller;
 import com.heaven7.ve.SimpleCopyDelegate;
-import com.heaven7.ve.TimeTraveller;
+import com.heaven7.ve.cross_os.IPathTimeTraveller;
+import com.heaven7.ve.cross_os.ITimeTraveller;
 import com.heaven7.ve.utils.HighLightHelper;
 import com.vida.common.entity.MediaData;
 
@@ -308,28 +308,28 @@ public interface MetaInfo {
                     }
                 });
             }
-            mHighLightHelper = new HighLightHelper(highLightMap, mediaType == PathTimeTraveller.TYPE_IMAGE);
+            mHighLightHelper = new HighLightHelper(highLightMap, mediaType == IPathTimeTraveller.TYPE_IMAGE);
         }
         @SuppressWarnings("unchecked")
         public KeyValuePair<Integer, List<IHighLightData>> getHighLight(int time){
            return mHighLightHelper.getHighLight(time);
         }
         @SuppressWarnings("unchecked")
-        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(ColorGapContext context, TimeTraveller tt){
+        public KeyValuePair<Integer, List<IHighLightData>> getHighLight(ColorGapContext context, ITimeTraveller tt){
             return mHighLightHelper.getHighLight(context, tt);
         }
 
-        public List<KeyValuePair<Integer, List<IHighLightData>>> getHighLights(ColorGapContext context, TimeTraveller tt){
+        public List<KeyValuePair<Integer, List<IHighLightData>>> getHighLights(ColorGapContext context, ITimeTraveller tt){
             return mHighLightHelper.getHighLights(context, tt);
         }
         @SuppressWarnings("unchecked")
-        public HighLightArea getHighLightArea(ColorGapContext context, TimeTraveller tt){
+        public HighLightArea getHighLightArea(ColorGapContext context, ITimeTraveller tt){
             return mHighLightHelper.getHighLightArea(context, tt);
         }
 
         public void setHighLightMap(SparseArray<List<? extends IHighLightData>> highLightMap) {
             this.highLightMap = highLightMap;
-            this.mHighLightHelper = new HighLightHelper(highLightMap, mediaType == PathTimeTraveller.TYPE_IMAGE);
+            this.mHighLightHelper = new HighLightHelper(highLightMap, mediaType == IPathTimeTraveller.TYPE_IMAGE);
         }
 
         //-------------------------- end High-Light ----------------------------
@@ -506,7 +506,7 @@ public interface MetaInfo {
             }
             return result;
         }
-        public List<FrameTags> getVideoTags(TimeTraveller part) {
+        public List<FrameTags> getVideoTags(ITimeTraveller part) {
             return getVideoTags(part.getStartTime(), part.getEndTime());
         }
 
@@ -543,7 +543,7 @@ public interface MetaInfo {
             }
             return result;
         }
-        public List<FrameFaceRects> getFaceRects(TimeTraveller part) {
+        public List<FrameFaceRects> getFaceRects(ITimeTraveller part) {
             return getFaceRects(part.getStartTime(), part.getEndTime());
         }
         /** get all face rects.  startTime and endTime in frames */

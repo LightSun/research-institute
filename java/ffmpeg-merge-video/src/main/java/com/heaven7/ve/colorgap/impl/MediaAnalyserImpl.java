@@ -4,10 +4,11 @@ package com.heaven7.ve.colorgap.impl;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.BaseMediaResourceItem;
-import com.heaven7.ve.PathTimeTraveller;
+
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.montage.*;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
+import com.heaven7.ve.cross_os.IPathTimeTraveller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +27,13 @@ public class MediaAnalyserImpl implements MediaAnalyser {
     private final ImageMediumFileHelper mImageHelper = new ImageMediumFileHelper();
 
     @Override
-    public List<MediaItem> analyse(Context context, List<BaseMediaResourceItem> items, CyclicBarrier barrier) {
+    public List<MediaItem> analyse(Context context, List<IMediaResourceItem> items, CyclicBarrier barrier) {
         if(mVideoHelper == null) {
             mVideoHelper = createVideoAnalyseHelper(VEGapUtils.asColorGapContext(context));
         }
 
         List<MediaItem> outItems = new ArrayList<>();
-        for(BaseMediaResourceItem item : items){
+        for(IMediaResourceItem item : items){
             final MediaItem mediaItem = new MediaItem();
             mediaItem.item = item;
             mediaItem.imageMeta = analyseMeta(context, item);
@@ -121,7 +122,7 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         mImageHelper.loadResource(context, param);
     }
 
-    protected MetaInfo.ImageMeta analyseMeta(Context context, BaseMediaResourceItem item) {
+    protected MetaInfo.ImageMeta analyseMeta(Context context, IMediaResourceItem item) {
         MetaInfo.ImageMeta meta = new MetaInfo.ImageMeta();
         meta.setPath(item.getFilePath());
         meta.setDate(item.getTime());
@@ -129,7 +130,7 @@ public class MediaAnalyserImpl implements MediaAnalyser {
         //meta.setFps();
         meta.setHeight(item.getHeight());
         meta.setWidth(item.getWidth());
-        meta.setMediaType(item.isImage() ? PathTimeTraveller.TYPE_IMAGE : PathTimeTraveller.TYPE_VIDEO);
+        meta.setMediaType(item.isImage() ? IPathTimeTraveller.TYPE_IMAGE : IPathTimeTraveller.TYPE_VIDEO);
         //meta.setShotType();
         //meta.setTags();
         //meta.setCameraMotion();

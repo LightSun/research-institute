@@ -12,7 +12,7 @@ import com.heaven7.ve.colorgap.VEGapUtils;
 /**
  * @author heaven7
  */
-@Platform
+@Platform()
 public class ImageDetectStarter implements IStarter{
 
     @Override

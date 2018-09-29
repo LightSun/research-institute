@@ -3,7 +3,7 @@ package com.vida.ai.test;
 import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.colorgap.impl.MediaAnalyserImpl;
@@ -12,6 +12,7 @@ import com.heaven7.ve.colorgap.impl.SimpleShotRecognizer;
 import com.heaven7.ve.colorgap.impl.StoryLineShaderImpl;
 import com.heaven7.ve.colorgap.impl.filler.BasePlaidFiller;
 import com.heaven7.ve.configs.BootStrapData;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 import com.heaven7.ve.starter.KingdomStarter;
 import com.heaven7.ve.test.SimpleFaceScanner;
 import com.heaven7.ve.test.SimpleHighLightScanner;
@@ -44,11 +45,11 @@ public class ImageColorGapTest {
     }
 
     public void start(String musicPath, List<String> images, String outDir){
-        List<BaseMediaResourceItem> items = VisitServices.from(images).map(
-                new ResultVisitor<String, BaseMediaResourceItem>() {
+        List<IMediaResourceItem> items = VisitServices.from(images).map(
+                new ResultVisitor<String, IMediaResourceItem>() {
             @Override
-            public BaseMediaResourceItem visit(String s, Object param) {
-                BaseMediaResourceItem item = TestUtils.createImageItem(s);
+            public IMediaResourceItem visit(String s, Object param) {
+                IMediaResourceItem item = TestUtils.createImageItem(s);
                 int[] wh = ImageFactory.getImageInitializer().getImageReader().readWidthHeight(s);
                 item.setWidth(wh[0]);
                 item.setHeight(wh[1]);
@@ -56,7 +57,7 @@ public class ImageColorGapTest {
             }
         }).getAsList();
         //mix video
-        BaseMediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\ClothingWhite\\LM0A0204.mp4");
+        IMediaResourceItem item = TestUtils.createVideoItem("F:\\videos\\ClothingWhite\\LM0A0204.mp4");
         item.setWidth(1280);
         item.setHeight(720);
         items.add(item);

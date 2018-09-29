@@ -2,6 +2,7 @@ package com.heaven7.ve.colorgap.impl;
 
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public class AirShotFilterImpl implements AirShotFilter {
 
     @Override
-    public MediaPartItem filter(CutInfo.PlaidInfo plaid, Chapter left, Chapter right, List<MediaPartItem> airShots) {
+    public MediaPartItem filter(IPlaidInfo plaid, Chapter left, Chapter right, List<MediaPartItem> airShots) {
         if(Predicates.isEmpty(airShots)){
             return null;
         }
@@ -32,7 +33,7 @@ public class AirShotFilterImpl implements AirShotFilter {
     }
 
     @Override
-    public MediaPartItem filter(CutInfo.PlaidInfo plaid, MediaPartItem biasShot, List<MediaPartItem> airShots) {
+    public MediaPartItem filter(IPlaidInfo plaid, MediaPartItem biasShot, List<MediaPartItem> airShots) {
         if(Predicates.isEmpty(airShots)){
             return null;
         }

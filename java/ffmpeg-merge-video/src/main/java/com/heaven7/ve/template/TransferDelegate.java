@@ -1,7 +1,7 @@
 package com.heaven7.ve.template;
 
 import com.heaven7.java.base.util.Logger;
-import com.heaven7.ve.colorgap.CutInfo;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +26,7 @@ public class TransferDelegate {
     }
 
     public void transferAll(VETemplate.LogicSentence from, VETemplate.LogicSentence to) {
-        final List<CutInfo.PlaidInfo> targetPlaids = to.getPlaids();
+        final List<IPlaidInfo> targetPlaids = to.getPlaids();
         if (targetPlaids.size() == 0) {
             //no need
             return;
@@ -39,12 +39,12 @@ public class TransferDelegate {
     }
 
     private void transfer(VETemplate.LogicSentence from, VETemplate.LogicSentence to, Callback callback) {
-        final List<CutInfo.PlaidInfo> targetPlaids = to.getPlaids();
+        final List<IPlaidInfo> targetPlaids = to.getPlaids();
         if (targetPlaids.size() == 0) {
             //no need
             return;
         }
-        final List<CutInfo.PlaidInfo> plaids = from.getPlaids();
+        final List<IPlaidInfo> plaids = from.getPlaids();
         final ProportionConfig pc = from.getProportionConfig();
 
         boolean scaleDown = pc.getScale() < 1;
@@ -102,8 +102,8 @@ public class TransferDelegate {
 
             //sort rules by weight.desc
             Collections.sort(tmp_rules, (o1, o2) -> {
-                CutInfo.PlaidInfo p1 = plaids.get(o1.index);
-                CutInfo.PlaidInfo p2 = plaids.get(o2.index);
+                IPlaidInfo p1 = plaids.get(o1.index);
+                IPlaidInfo p2 = plaids.get(o2.index);
 
                 return Integer.compare(callback.getWeight(p2), callback.getWeight(p1));
             });
@@ -171,7 +171,7 @@ public class TransferDelegate {
 
         List<ProportionConfig.Rule> getRules(ProportionConfig pc);
 
-        int getWeight(CutInfo.PlaidInfo info);
+        int getWeight(IPlaidInfo info);
 
         /**
          * applyEffects the skill from one to another.
@@ -179,7 +179,7 @@ public class TransferDelegate {
          * @param from the from plaid info
          * @param to   the to plaid info
          */
-        void apply(CutInfo.PlaidInfo from, CutInfo.PlaidInfo to);
+        void apply(IPlaidInfo from, IPlaidInfo to);
     }
 
     public static class ColorFilterCallback implements Callback {
@@ -199,12 +199,12 @@ public class TransferDelegate {
         }
 
         @Override
-        public int getWeight(CutInfo.PlaidInfo info) {
+        public int getWeight(IPlaidInfo info) {
             return info.getColorFilterWeight();
         }
         @Override
-        public void apply(CutInfo.PlaidInfo from, CutInfo.PlaidInfo to) {
-            to.setGapColorFilter(from.getGapColorFilter());
+        public void apply(IPlaidInfo from, IPlaidInfo to) {
+            to.setColorFilter(from.getColorFilter());
         }
     }
 
@@ -226,12 +226,12 @@ public class TransferDelegate {
         }
 
         @Override
-        public int getWeight(CutInfo.PlaidInfo info) {
+        public int getWeight(IPlaidInfo info) {
             return info.getEffectWeight();
         }
 
         @Override
-        public void apply(CutInfo.PlaidInfo from, CutInfo.PlaidInfo to) {
+        public void apply(IPlaidInfo from, IPlaidInfo to) {
             to.setEffects(from.getEffects());
         }
     }
@@ -253,12 +253,12 @@ public class TransferDelegate {
         }
 
         @Override
-        public int getWeight(CutInfo.PlaidInfo info) {
+        public int getWeight(IPlaidInfo info) {
             return info.getFilterWeight();
         }
 
         @Override
-        public void apply(CutInfo.PlaidInfo from, CutInfo.PlaidInfo to) {
+        public void apply(IPlaidInfo from, IPlaidInfo to) {
             to.setFilter(from.getFilter());
         }
     }
@@ -280,12 +280,12 @@ public class TransferDelegate {
         }
 
         @Override
-        public int getWeight(CutInfo.PlaidInfo info) {
+        public int getWeight(IPlaidInfo info) {
             return info.getTransitionWeight();
         }
 
         @Override
-        public void apply(CutInfo.PlaidInfo from, CutInfo.PlaidInfo to) {
+        public void apply(IPlaidInfo from, IPlaidInfo to) {
             to.setTransitionInfo(from.getTransitionInfo());
         }
     }

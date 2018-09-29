@@ -2,8 +2,8 @@ package com.heaven7.ve.colorgap.impl.filler;
 
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.utils.Context;
-import com.heaven7.ve.colorgap.CutInfo;
 import com.heaven7.ve.colorgap.MediaPartItem;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 import com.heaven7.ve.gap.GapManager;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ public class MultiStageFiller extends StageFiller {
     }
 
     @Override
-    protected void fillImpl(Context context, List<CutInfo.PlaidInfo> newPlaids, List<MediaPartItem> items, GapManager.GapCallback callback) {
+    protected void fillImpl(Context context, List<IPlaidInfo> newPlaids, List<MediaPartItem> items, GapManager.GapCallback callback) {
         LeftFillInfo info = null;
         for(StageFiller filler: fillers){
             if(info == null) {

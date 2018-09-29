@@ -1,6 +1,7 @@
 package com.heaven7.ve.colorgap;
 
 import com.heaven7.java.base.anno.Nullable;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface AirShotFilter {
      * @return the filtered air shot to fill the music plaid. or null if air-shots is empty.
      */
     @Nullable
-    MediaPartItem filter(CutInfo.PlaidInfo plaid, Chapter left, Chapter right, List<MediaPartItem> airShots);
+    MediaPartItem filter(IPlaidInfo plaid, Chapter left, Chapter right, List<MediaPartItem> airShots);
 
     /**
      * filter air shot between two stories.
@@ -28,6 +29,6 @@ public interface AirShotFilter {
      * @param airShots the air shots, may be hold . care about this.
      * @return the filtered air shot to fill the music plaid. or null if air-shots is empty.
      */
-   @Nullable MediaPartItem filter(CutInfo.PlaidInfo plaid, MediaPartItem biasShot, List<MediaPartItem> airShots);
+   @Nullable MediaPartItem filter(IPlaidInfo plaid, MediaPartItem biasShot, List<MediaPartItem> airShots);
 
 }

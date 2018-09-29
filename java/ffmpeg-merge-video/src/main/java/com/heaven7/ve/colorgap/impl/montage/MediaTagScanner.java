@@ -3,9 +3,10 @@ package com.heaven7.ve.colorgap.impl.montage;
 import com.heaven7.java.base.util.Logger;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.FileUtils;
-import com.heaven7.ve.BaseMediaResourceItem;
+
 import com.heaven7.ve.Constants;
 import com.heaven7.ve.colorgap.MediaResourceScanner;
+import com.heaven7.ve.cross_os.IMediaResourceItem;
 
 import java.io.File;
 
@@ -17,7 +18,7 @@ public class MediaTagScanner extends MediaResourceScanner {
     private static final String TAG = "MediaTagScanner";
 
     @Override
-    public String scan(Context context, BaseMediaResourceItem item, String srcDir) {
+    public String scan(Context context, IMediaResourceItem item, String srcDir) {
         String fileName = FileUtils.getFileName(item.getFilePath());
         if(!srcDir.endsWith("resource")){
             Logger.e(TAG, "scan", "resource dir is not right.");

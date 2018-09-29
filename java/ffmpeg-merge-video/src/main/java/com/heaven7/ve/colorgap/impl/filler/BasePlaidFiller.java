@@ -6,6 +6,7 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.cross_os.IPlaidInfo;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.gap.ItemDelegate;
 import com.heaven7.ve.gap.PlaidDelegate;
@@ -30,7 +31,7 @@ public class BasePlaidFiller implements PlaidFiller {
     }
 
     @Override
-    public List<GapManager.GapItem> fillPlaids(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts, ColorGapPostProcessor processor) {
+    public List<GapManager.GapItem> fillPlaids(Context mContext, List<IPlaidInfo> infoes, List<MediaPartItem> parts, ColorGapPostProcessor processor) {
         final boolean notEnough = parts.size() < infoes.size();
         if(notEnough){
             Logger.d(TAG, "fill", "shot is not enough --- expect plaid.count = "
@@ -72,10 +73,10 @@ public class BasePlaidFiller implements PlaidFiller {
     public static class GapCallbackImpl extends BaseContextOwner implements GapManager.GapCallback{
 
         final List<GapManager.GapItem> filledItems = new ArrayList<>();
-        final List<CutInfo.PlaidInfo> infoes;
+        final List<IPlaidInfo> infoes;
         final List<MediaPartItem> parts;
 
-        public GapCallbackImpl(Context mContext, List<CutInfo.PlaidInfo> infoes, List<MediaPartItem> parts) {
+        public GapCallbackImpl(Context mContext, List<IPlaidInfo> infoes, List<MediaPartItem> parts) {
             super(mContext);
             this.infoes = infoes;
             this.parts = parts;
@@ -111,7 +112,7 @@ public class BasePlaidFiller implements PlaidFiller {
         }
         @Override
         public ItemDelegate bestMatch(PlaidDelegate plaid, List<ItemDelegate> items) {
-            GapColorFilter filter = ((CutInfo.PlaidInfo) plaid).getGapColorFilter();
+            GapColorFilter filter = ((IPlaidInfo) plaid).getColorFilter();
             if(filter == null){
                 //if filter is null. return the first item directly
                 List<ItemDelegate> tmp_items = new ArrayList<>(items);
