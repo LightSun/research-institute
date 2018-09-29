@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * @author heaven7
  */
-/*public*/ class SimpleEffectInfo extends SimpleTimeTraveller implements IEffectInfo, ISpecialEffectInfo, IFilterInfo{
+/*public*/ class SimpleEffectInfo extends SimpleTimeTraveller implements IEffectInfo, IFilterInfo{
 
     private int type;
     @Override
@@ -27,7 +27,7 @@ import java.util.Objects;
 
     @Override
     public void setTypeFrom(String val) {
-        EffectsHelper.setTypeForSpecialEffect(this, val);
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -28,7 +28,7 @@ public class PCVEFactory extends VEFactory {
     }
     @Override
     public ISpecialEffectInfo newSpecialEffectInfo() {
-        return new SimpleEffectInfo();
+        return new SimpleSpecialEffectInfo();
     }
     @Override
     public IFilterInfo newFilterInfo() {

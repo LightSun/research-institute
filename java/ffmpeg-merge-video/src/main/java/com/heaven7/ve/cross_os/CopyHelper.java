@@ -46,4 +46,12 @@ public class CopyHelper {
             dst.setType(src.getType());
         }
     }
+
+    public static void copySpecialEffectInfo(ISpecialEffectInfo info, Object obj) {
+         if(obj instanceof ISpecialEffectInfo){
+             ISpecialEffectInfo src = (ISpecialEffectInfo) obj;
+             info.setCategory(src.getCategory());
+             info.setMultiple(src.getMultiple());
+         }
+    }
 }

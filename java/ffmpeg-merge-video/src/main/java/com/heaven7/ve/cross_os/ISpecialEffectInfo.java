@@ -12,4 +12,9 @@ public interface ISpecialEffectInfo extends IEffectInfo {
     int TYPE_RIGHT_MOVE = 4;
     int TYPE_VERY_SLOW = 5;
 
+    void setCategory(int category);
+    int getCategory();
+    void setMultiple(float multiple);
+    float getMultiple();
+
 }
