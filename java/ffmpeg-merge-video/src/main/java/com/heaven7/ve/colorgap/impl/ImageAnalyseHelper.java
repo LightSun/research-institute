@@ -245,9 +245,12 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
             VisitServices.from(group.items).fire(new FireVisitor<MediaItem>() {
                 @Override
                 public Boolean visit(MediaItem item, Object param) {
+                    String fileDir = FileUtils.getFileDir(item.item.getFilePath(), 1, true);
                     String highLightFile = null;
-                    if(isDebug() && getDebugParam().hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER)){
-                        String fileDir = FileUtils.getFileDir(item.item.getFilePath(), 1, true);
+                    MediaResourceConfiguration config = getMediaResourceConfiguration();
+                    if(config != null && config.getHighLightScanner() != null){
+                        highLightFile = config.getHighLightScanner().scan(getContext(), item.getItem(), fileDir);
+                    }else if(isDebug() && getDebugParam().hasFlags(DebugParam.FLAG_ASSIGN_HIGH_LIGHT_SCANNER)){
                         MediaResourceScanner scanner = getDebugParam().getHighLightScanner();
                         highLightFile = scanner.scan(getContext(), item.getItem(), fileDir);
                     }

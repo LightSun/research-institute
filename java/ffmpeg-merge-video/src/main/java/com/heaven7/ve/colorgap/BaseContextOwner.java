@@ -38,4 +38,8 @@ public class BaseContextOwner {
     public boolean isDebug(){
         return getContext().getInitializeParam().isDebug();
     }
+
+    public MediaResourceConfiguration getMediaResourceConfiguration(){
+        return getContext().getMediaResourceConfiguration();
+    }
 }
