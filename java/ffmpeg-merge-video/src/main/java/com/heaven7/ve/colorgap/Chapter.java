@@ -580,7 +580,8 @@ public class Chapter extends BaseContextOwner{
             throw new IllegalStateException("fill failed. plaid.size = " + plaids.size() + " ,filledItem.size = " + filledItems.size());
         }
         //debug filled plaid
-        if(isDebug() && getContext().getTestType() == ColorGapContext.TEST_TYPE_LOCAL){
+        if(isDebug() && getContext().getTestType() == ColorGapContext.TEST_TYPE_LOCAL
+                && !Predicates.isEmpty(getDebugParam().getOutputDir())){
             //log
             StringBuilder sb = new StringBuilder();
             sb.append("after fill before sort. chapter_index = ")

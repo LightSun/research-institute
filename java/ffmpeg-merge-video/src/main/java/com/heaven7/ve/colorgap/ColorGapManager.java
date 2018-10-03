@@ -256,7 +256,7 @@ public class ColorGapManager extends BaseContextOwner{
                               FillCallback callback) {
         //all is ensure, write debug info for local debug.
         if(getContext().getInitializeParam().getTestType() == ColorGapContext.TEST_TYPE_LOCAL
-                && isDebug()){
+                && isDebug() && !Predicates.isEmpty(getDebugParam().getOutputDir())){
             StringBuilder sb = new StringBuilder();
             VisitServices.from(newItems).fireWithIndex(new FireIndexedVisitor<MediaPartItem>() {
                 @Override
