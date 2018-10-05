@@ -102,6 +102,9 @@ public class TagBasedShotCutter extends VideoCutter {
                 }else{
                     resultList.addAll(faceItems);
                 }
+                if(Predicates.isEmpty(faceItems)){
+                    resultList.add(item.asPart(context));
+                }
             }
         }
         return resultList;
