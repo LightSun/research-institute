@@ -43,6 +43,7 @@
         <activity android:name=".sample.BalanceViewTest"/>
 
         <activity android:name=".sample.TestVidaStickyLayoutActivity"/>
+        <activity android:name=".sample.LocationTestActivity"/>
 
     </application>
 
