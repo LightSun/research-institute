@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.heaven7.vida.research.widget.SwitchImage
+        android:id="@+id/si"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#f6f6f6"
+        app:si_dot_enabled="true"
+        app:si_dot_margin_top="8dp"
+        app:si_dot_select_color="#3f3f3f"
+        app:si_dot_unselect_color="#d0d0d0"
+        app:si_dot_size="4dp"
+        app:si_dot_space="5dp"
+        />
+
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="10sp"
+        android:textColor="#3f3f3f"
+        android:layout_gravity="center_horizontal"
+        />
+
+
+</LinearLayout>

@@ -63,4 +63,13 @@
         <attr name="vsl_keep_visible_height" format="boolean|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="SwitchImage">
+        <attr name="si_dot_select_color" format="color|reference"/>
+        <attr name="si_dot_unselect_color" format="color|reference"/>
+        <attr name="si_dot_margin_top" format="dimension|reference"/>
+        <attr name="si_dot_space" format="dimension|reference"/>
+        <attr name="si_dot_size" format="dimension|reference"/>
+        <attr name="si_dot_enabled" format="boolean|reference"/>
+    </declare-styleable>
+
 </resources>

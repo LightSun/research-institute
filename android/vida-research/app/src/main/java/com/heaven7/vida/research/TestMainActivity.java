@@ -9,6 +9,7 @@ import com.heaven7.vida.research.sample.TestDiscViewActivity;
 import com.heaven7.vida.research.sample.TestRectProgresActivity;
 import com.heaven7.vida.research.sample.TestRoundViewActivity;
 import com.heaven7.vida.research.sample.TestShadowShapeActivity;
+import com.heaven7.vida.research.sample.TestSwitchImageActivity;
 import com.heaven7.vida.research.sample.TestV7_CircleImageViewActivity;
 import com.heaven7.vida.research.sample.TestVidaStickyLayoutActivity;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
@@ -41,6 +42,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestBaiduFace2Activity.class));
 
         list.add(new ActivityInfo(TestVidaStickyLayoutActivity.class));
+        list.add(new ActivityInfo(TestSwitchImageActivity.class));
     }
 
 }

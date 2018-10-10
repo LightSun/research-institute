@@ -44,6 +44,7 @@
 
         <activity android:name=".sample.TestVidaStickyLayoutActivity"/>
         <activity android:name=".sample.LocationTestActivity"/>
+        <activity android:name=".sample.TestSwitchImageActivity"/>
 
     </application>
 
