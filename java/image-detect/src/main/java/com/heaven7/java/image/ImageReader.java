@@ -15,6 +15,7 @@ public interface ImageReader {
 
      class ImageInfo{
           private Matrix2<Integer> mat;
+          /** the public image type . see {@linkplain ImageCons#TYPE_INT_ARGB} and etc.*/
           private int imageType;
           private int width;
           private int height;

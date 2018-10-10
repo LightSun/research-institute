@@ -12,6 +12,13 @@ public class LocationF {
         return width * height;
     }
 
+    public void scaleUp(float wRate, float hRate){
+        left *= wRate;
+        width *= wRate;
+        top *= hRate;
+        height *= hRate;
+    }
+
     @Override
     public String toString() {
         return "LocationF{" +

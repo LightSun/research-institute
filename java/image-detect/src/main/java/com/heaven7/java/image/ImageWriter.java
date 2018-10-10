@@ -10,7 +10,7 @@ public interface ImageWriter {
      *
      * @param mat the image matrix
      * @param dst the dst file
-     * @param imageType the image type often used by buffer image.
+     * @param imageType the image type .see {@linkplain ImageCons#TYPE_INT_ARGB} and etc.
      * @param format the format of generate, if null , will guess by file name.
      * @return true if write success.
      */

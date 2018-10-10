@@ -1,5 +1,6 @@
 package com.heaven7.test;
 
+import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.ImageReader;
 
 import javax.imageio.ImageIO;
@@ -21,6 +22,7 @@ public class JavaImageReader implements ImageReader {
         } catch (IOException e) {
             throw new RuntimeException("srcFile = " + img, e);
         }
+        imageType = ImageFactory.getImageInitializer().getImageTypeTransformer().nativeToPublic(imageType);
         ImageInfo imageInfo = new ImageInfo(image2Matrix(image), imageType);
         imageInfo.setWidth(image.getWidth());
         imageInfo.setHeight(image.getHeight());
@@ -43,7 +45,8 @@ public class JavaImageReader implements ImageReader {
             e.printStackTrace();
             return null;
         }
-        ImageInfo imageInfo = new ImageInfo(baos.toByteArray(), image.getType());
+        int imageType = ImageFactory.getImageInitializer().getImageTypeTransformer().nativeToPublic(image.getType());
+        ImageInfo imageInfo = new ImageInfo(baos.toByteArray(), imageType);
         imageInfo.setWidth(image.getWidth());
         imageInfo.setHeight(image.getHeight());
         return imageInfo;
@@ -57,7 +60,8 @@ public class JavaImageReader implements ImageReader {
         } catch (IOException e) {
            throw new RuntimeException(e);
         }
-        ImageInfo imageInfo = new ImageInfo(image2Matrix(image), image.getType());
+        int imageType = ImageFactory.getImageInitializer().getImageTypeTransformer().nativeToPublic(image.getType());
+        ImageInfo imageInfo = new ImageInfo(image2Matrix(image), imageType);
         imageInfo.setWidth(image.getWidth());
         imageInfo.setHeight(image.getHeight());
         return imageInfo;

@@ -59,7 +59,7 @@ public class MergeImageTest {
         String file = "E:\\tmp\\upload_files\\img_0000_merge12.jpg";
         String dst = "E:\\tmp\\upload_files\\img_0000_merge12_from_bytes.jpg";
         Matrix2<Integer> mat1 = IMAGE_READER.readMatrix(file).getMat();
-        ByteArrayInputStream in = new ByteArrayInputStream(IMAGE_TRANSFORMER.transform(mat1, BufferedImage.TYPE_INT_RGB, "jpg"));
+        ByteArrayInputStream in = new ByteArrayInputStream(IMAGE_TRANSFORMER.transform(mat1, ImageCons.TYPE_INT_RGB, "jpg"));
         try {
             BufferedImage image = ImageIO.read(in);
             ImageIO.write(image, "jpg",  new File(dst));

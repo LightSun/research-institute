@@ -1,6 +1,7 @@
 package com.heaven7.java.image.detect;
 
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.image.ImageCons;
 import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.ImageInitializer;
 import com.heaven7.java.image.Matrix2;
@@ -36,7 +37,9 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
     private Callback<T> mCallback;
 
     private int batchSize = DEFAULT_BATCH_SIZE;
+    /** the width from mat */
     private int width;
+    /** the height from mat */
     private int height;
 
     public AbstractVideoManager(String videoSrc) {
@@ -198,8 +201,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
     protected byte[] transformMat(Matrix2<Integer> mat) {
         ImageInitializer initer = ImageFactory.getImageInitializer();
         Throwables.checkNull(initer);
-        // default BufferImage.TYPE_RGB = 1;
-        return initer.getMatrix2Transformer().transform(mat, 1, "jpg");
+        return initer.getMatrix2Transformer().transform(mat, ImageCons.TYPE_INT_RGB, "jpg");
     }
 
     /**
@@ -309,6 +311,10 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
 
         @Override
         public void onSuccess(T data) {
+            /*if(data instanceof ImageInfoTransformer){
+                data = ((ImageInfoTransformer) data).transform()
+            }*/
+            //TODO
             dataMap.put(times.get(0), data);
             markEnd();
         }

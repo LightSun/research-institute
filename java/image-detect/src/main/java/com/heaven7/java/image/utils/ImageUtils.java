@@ -1,5 +1,6 @@
 package com.heaven7.java.image.utils;
 
+import com.heaven7.java.base.anno.Platform;
 import com.heaven7.java.image.Matrix2;
 
 import java.awt.image.BufferedImage;
@@ -11,6 +12,7 @@ import java.util.List;
  */
 public class ImageUtils {
 
+    @Platform
     public static Matrix2<Integer> image2Matrix(BufferedImage image){
         int w = image.getWidth();
         int h = image.getHeight();
@@ -24,4 +26,5 @@ public class ImageUtils {
         }
         return new Matrix2<>(list);
     }
+
 }

@@ -1,8 +1,8 @@
 package com.heaven7.test;
 
+import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.ImageWriter;
 import com.heaven7.java.image.Matrix2;
-import com.heaven7.java.image.utils.ImageUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -17,11 +17,12 @@ public class JavaImageWriter implements ImageWriter {
 
     @Override
     public boolean write(Matrix2<Integer> mat, File dst, int imageType, String format) {
+        int type = ImageFactory.getImageInitializer().getImageTypeTransformer().publicToNative(imageType);
         int w = mat.getRowCount();
         int h = mat.getColumnCount();
         // System.out.println(w);
         // System.out.println(h);
-        BufferedImage image = new BufferedImage(w, h, imageType);
+        BufferedImage image = new BufferedImage(w, h, type);
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
                 image.setRGB(i, j, mat.getRawValues().get(i).get(j));

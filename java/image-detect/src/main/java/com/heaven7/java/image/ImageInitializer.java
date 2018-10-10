@@ -11,6 +11,9 @@ public class ImageInitializer {
     private ImageDetector imageDetector;
     private Matrix2Transformer matrix2Transformer;
     private AbstractVideoManager.VideoFrameDelegate videoFrameDelegate;
+    private ImageTypeTransformer imageTypeTransformer;
+    private int maxWidth;
+    private int maxHeight;
 
     protected ImageInitializer(ImageInitializer.Builder builder) {
         this.imageReader = builder.imageReader;
@@ -18,6 +21,9 @@ public class ImageInitializer {
         this.imageDetector = builder.imageDetector;
         this.matrix2Transformer = builder.matrix2Transformer;
         this.videoFrameDelegate = builder.videoFrameDelegate;
+        this.imageTypeTransformer = builder.imageTypeTransformer;
+        this.maxWidth = builder.maxWidth;
+        this.maxHeight = builder.maxHeight;
     }
 
     public void setImageReader(ImageReader imageReader) {
@@ -57,12 +63,27 @@ public class ImageInitializer {
         return this.videoFrameDelegate;
     }
 
+    public ImageTypeTransformer getImageTypeTransformer() {
+        return this.imageTypeTransformer;
+    }
+
+    public int getMaxWidth() {
+        return this.maxWidth;
+    }
+
+    public int getMaxHeight() {
+        return this.maxHeight;
+    }
+
     public static class Builder {
         private ImageReader imageReader;
         private ImageWriter imageWriter;
         private ImageDetector imageDetector;
         private Matrix2Transformer matrix2Transformer;
         private AbstractVideoManager.VideoFrameDelegate videoFrameDelegate;
+        private ImageTypeTransformer imageTypeTransformer;
+        private int maxWidth;
+        private int maxHeight;
 
         public Builder setImageReader(ImageReader imageReader) {
             this.imageReader = imageReader;
@@ -86,6 +107,21 @@ public class ImageInitializer {
 
         public Builder setVideoFrameDelegate(AbstractVideoManager.VideoFrameDelegate videoFrameDelegate) {
             this.videoFrameDelegate = videoFrameDelegate;
+            return this;
+        }
+
+        public Builder setImageTypeTransformer(ImageTypeTransformer imageTypeTransformer) {
+            this.imageTypeTransformer = imageTypeTransformer;
+            return this;
+        }
+
+        public Builder setMaxWidth(int maxWidth) {
+            this.maxWidth = maxWidth;
+            return this;
+        }
+
+        public Builder setMaxHeight(int maxHeight) {
+            this.maxHeight = maxHeight;
             return this;
         }
 
