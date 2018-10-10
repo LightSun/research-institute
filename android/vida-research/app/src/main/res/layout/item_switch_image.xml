@@ -12,8 +12,8 @@
         android:background="#f6f6f6"
         app:si_dot_enabled="true"
         app:si_dot_margin_top="8dp"
-        app:si_dot_select_color="#3f3f3f"
-        app:si_dot_unselect_color="#d0d0d0"
+        app:si_dot_select_color="#ff0000"
+        app:si_dot_unselect_color="#00ff00"
         app:si_dot_size="4dp"
         app:si_dot_space="5dp"
         />

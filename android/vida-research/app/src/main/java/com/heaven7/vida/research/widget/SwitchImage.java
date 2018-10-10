@@ -79,17 +79,18 @@ public class SwitchImage extends View {
         mSelectItem.icon.draw(canvas);
         canvas.translate(-x, -y);
         //draw dots
-        int size = mItems.size();
-        int dotsWidth = size * mDotSize + (size - 1) * mDotSpace;
-        x = (width - dotsWidth) / 2;
-        y += (iconHeight + mDotMarginTop);
-        canvas.translate(x, y);
-        int cx = x + mDotSize / 2, cy = y + mDotSize / 2;
-        for (int i = 0 ; i < size ; i ++){
-            boolean select = mItems.get(i) == mSelectItem;
-            mPaint.setColor(select ? mSelectColor : mUnselectColor);
-            canvas.drawCircle(cx, cy, mDotSize / 2, mPaint);
-            cx += mDotSpace + mDotSize;
+        if(mDotEnabled) {
+            int size = mItems.size();
+            int dotsWidth = size * mDotSize + (size - 1) * mDotSpace;
+            x = (width - dotsWidth) / 2;
+            y += (iconHeight + mDotMarginTop);
+            int cx = x + mDotSize / 2, cy = y + mDotSize / 2;
+            for (int i = 0; i < size; i++) {
+                boolean select = mItems.get(i) == mSelectItem;
+                mPaint.setColor(select ? mSelectColor : mUnselectColor);
+                canvas.drawCircle(cx, cy, mDotSize / 2, mPaint);
+                cx += mDotSpace + mDotSize;
+            }
         }
         canvas.restore();
     }

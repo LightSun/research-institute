@@ -54,10 +54,10 @@ public class TestSwitchImageActivity extends AppCompatActivity {
                          SwitchImage.Item selectItem = mMap.get(position);
                          if(selectItem == null){
                              view.setSelectItem(item.items.get(0));
-                             view.setBackgroundColor(Color.parseColor("#f6f6f6"));
+                            // view.setBackgroundColor(Color.parseColor("#f6f6f6"));
                          }else{
                              view.setSelectItem(selectItem);
-                             view.setBackgroundColor(Color.RED);
+                            // view.setBackgroundColor(Color.RED);
                          }
                          vp.setText(R.id.tv_text, view.getSelectItem().getText());
                      }
