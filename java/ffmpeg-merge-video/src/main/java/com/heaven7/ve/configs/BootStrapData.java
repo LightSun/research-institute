@@ -5,6 +5,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.heaven7.java.base.util.ResourceLoader;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.image.ImageLimitInfo;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -65,6 +66,9 @@ public class BootStrapData implements IPreRunDelegate{
     @SerializedName("test_dir")
     private String testDir;
 
+    @SerializedName("image_limit_info")
+    private ImageLimitInfo imageLimitInfo;
+
     //-------------------------- cache --------------------------------
     private DictionaryLoader mDicLoader; //never null
     private String mDicName;
@@ -111,6 +115,10 @@ public class BootStrapData implements IPreRunDelegate{
          if(musicDirMap != null){
              musicDirReg = new MapRecognizer<String>(musicDirMap){};
          }
+    }
+
+    public ImageLimitInfo getImageLimitInfo() {
+        return imageLimitInfo;
     }
     public DictionaryLoader getDictionaryLoader(){
         return mDicLoader;

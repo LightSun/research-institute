@@ -1,6 +1,7 @@
 package com.heaven7.ve.starter;
 
 import com.heaven7.java.base.util.Logger;
+import com.heaven7.java.image.ImageLimitInfo;
 import com.heaven7.java.image.ImageReader;
 import com.heaven7.java.image.Matrix2;
 import com.heaven7.java.image.detect.AbstractVideoManager;
@@ -21,17 +22,14 @@ public class VidaVideoFrameDelegate implements AbstractVideoManager.VideoFrameDe
     private final FFMpegCmdGenerator mCmdGen = Platform.getDefault().getFFMpegCmdGenerator(false);
 
     @Override
-    public byte[] getFrame(String videoFile, int timeInSeconds) {
+    public ImageReader.ImageInfo getFrame(String videoFile, int timeInSeconds, ImageLimitInfo info) {
         String imagePath = getFrameImagePath(videoFile, timeInSeconds);
-        ImageReader.ImageInfo info = mReader.readBytes(imagePath, "jpg");
-        return info.getData();
+        return mReader.readBytes(imagePath, "jpg", info);
     }
-
     @Override
-    public Matrix2<Integer> getFrameMatrix(String videoFile, int timeInSeconds) {
+    public ImageReader.ImageInfo getFrameMatrix(String videoFile, int timeInSeconds, ImageLimitInfo info) {
         String imagePath = getFrameImagePath(videoFile, timeInSeconds);
-        ImageReader.ImageInfo info = mReader.readMatrix(imagePath);
-        return info.getMat();
+        return mReader.readMatrix(imagePath, info);
     }
 
     @Override

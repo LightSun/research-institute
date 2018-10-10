@@ -21,4 +21,9 @@
   "default_kingdom_type":3,
   "media_sdk_dir":"E:\\work\\codes\\mediasdk_Release\\Release",
   "test_dir":"E:\\tmp\\test_dir"
+
+  "image_limit_info":{
+    "maxWidth":2000,
+    "maxHeight":2000
+  }
 }

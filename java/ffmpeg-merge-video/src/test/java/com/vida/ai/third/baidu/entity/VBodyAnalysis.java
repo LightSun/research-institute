@@ -2,8 +2,10 @@ package com.vida.ai.third.baidu.entity;
 
 import com.google.gson.annotations.SerializedName;
 import com.heaven7.java.image.ImageBatchDataSplitter;
+import com.heaven7.java.image.detect.IDataTransformer;
 import com.heaven7.java.image.detect.KeyPointData;
 import com.heaven7.java.image.detect.LocationF;
+import com.heaven7.java.image.detect.TransformInfo;
 
 import java.util.List;
 
@@ -55,10 +57,17 @@ public class VBodyAnalysis {
         public LocationF getLocation() {
             return location;
         }
+
+        @Override
+        public KeyPointData transform(TransformInfo transformInfo) {
+            location = location.transform(transformInfo);
+            body_parts = body_parts.transform(transformInfo);
+            return this;
+        }
     }
 
     //身体部位信息
-    public static class Body_parts{
+    public static class Body_parts implements IDataTransformer<Body_parts>{
         private Position left_ankle; //左脚踝
         private Position left_elbow; //左手肘
         private Position left_hip;   //左髋部.也是胯部
@@ -151,10 +160,59 @@ public class VBodyAnalysis {
                     ", right_wrist=" + right_wrist +
                     '}';
         }
+
+        @Override
+        public Body_parts transform(TransformInfo info) {
+            if(left_ankle != null) {
+                left_ankle = left_ankle.transform(info);
+            }
+            if(left_elbow != null) {
+                left_elbow = left_elbow.transform(info);
+            }
+            if(left_hip != null) {
+                left_hip = left_hip.transform(info);
+            }
+            if(left_knee != null) {
+                left_knee = left_knee.transform(info);
+            }
+            if(left_shoulder != null) {
+                left_shoulder = left_shoulder.transform(info);
+            }
+            if(left_wrist != null) {
+                left_wrist = left_wrist.transform(info);
+            }
+           //-----------------
+            if(neck != null) {
+                neck = neck.transform(info);
+            }
+            if(nose != null) {
+                nose = nose.transform(info);
+            }
+            //---------------------
+            if(right_ankle != null) {
+                right_ankle = right_ankle.transform(info);
+            }
+            if(right_elbow != null) {
+                right_elbow = right_elbow.transform(info);
+            }
+            if(right_hip != null) {
+                right_hip = right_hip.transform(info);
+            }
+            if(right_knee != null) {
+                right_knee = right_knee.transform(info);
+            }
+            if(right_shoulder != null) {
+                right_shoulder = right_shoulder.transform(info);
+            }
+            if(right_wrist != null) {
+                right_wrist = right_wrist.transform(info);
+            }
+            return this;
+        }
     }
 
     /** 位置。带坐标信息的 */
-    public static class Position {
+    public static class Position implements IDataTransformer<Position>{
         float x, y;
 
         @Override
@@ -163,6 +221,12 @@ public class VBodyAnalysis {
                     "x=" + x +
                     ", y=" + y +
                     '}';
+        }
+        @Override
+        public Position transform(TransformInfo info) {
+            x /= info.widthRate;
+            y /= info.heightRate;
+            return this;
         }
     }
 

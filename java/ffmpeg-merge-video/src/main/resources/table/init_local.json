@@ -20,5 +20,9 @@
   "debug_flags":"16|32|64",
   "default_kingdom_type":3,
   "media_sdk_dir":"E:\\work\\codes\\mediasdk_Release\\Release",
-  "test_dir":"E:\\tmp\\test_dir"
+  "test_dir":"E:\\tmp\\test_dir",
+  "image_limit_info":{
+    "maxWidth":1000,
+    "maxHeight":1000
+  }
 }

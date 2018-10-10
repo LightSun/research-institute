@@ -8,6 +8,7 @@ import com.heaven7.java.image.detect.ImageDetector;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.VEGapUtils;
+import com.heaven7.ve.configs.BootStrapData;
 
 /**
  * @author heaven7
@@ -32,6 +33,8 @@ public class ImageDetectStarter implements IStarter{
                 .setImageDetector(detector)
                 .setVideoFrameDelegate(createVideoFrameDelegate(testType))
                 .setImageWriter(JavaImageWriter.DEFAULT)
+                .setImageTypeTransformer(new JavaImageTypeTransformer())
+                .setImageLimitInfo(BootStrapData.get(context).getImageLimitInfo())
                 .build());
     }
 

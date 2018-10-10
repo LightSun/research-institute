@@ -46,7 +46,7 @@ public class Launcher {
     private static void launch(Context context) {
         new ImageDetectStarter().init(context, BaiduImageDetector.class.getName());
         new KingdomStarter().init(context, null);
-        new MusicCutStarter(new SimpleMusicPathProvider(BootStrapData.get(null).getMusicDir()))
+        new MusicCutStarter(new SimpleMusicPathProvider(BootStrapData.get(context).getMusicDir()))
                 .init(context, null);
     }
 
