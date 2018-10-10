@@ -1,6 +1,6 @@
 package com.heaven7.java.image.detect;
 
-public class Location {
+public class Location implements IDataTransformer<Location>{
 
     public int left, top, width, height;
 
@@ -12,13 +12,6 @@ public class Location {
         return width * height;
     }
 
-    public void scaleUp(float wRate, float hRate){
-        left *= wRate;
-        width *= wRate;
-        top *= hRate;
-        height *= hRate;
-    }
-
     @Override
     public String toString() {
         return "Location{" +
@@ -27,5 +20,16 @@ public class Location {
                 ", width=" + width +
                 ", height=" + height +
                 '}';
+    }
+
+    @Override
+    public Location transform(TransformInfo info) {
+        if(info != null){
+            left /= info.widthRate;
+            width /= info.widthRate;
+            top /= info.heightRate;
+            height /= info.heightRate;
+        }
+        return this;
     }
 }

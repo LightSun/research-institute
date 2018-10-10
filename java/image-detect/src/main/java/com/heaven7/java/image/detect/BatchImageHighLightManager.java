@@ -1,5 +1,7 @@
 package com.heaven7.java.image.detect;
 
+import com.heaven7.java.image.utils.TransformUtils;
+
 import java.util.List;
 
 /**
@@ -16,5 +18,8 @@ public class BatchImageHighLightManager extends AbstractBatchImageManager<List<I
         detector.detectHighLight(data, new InternalCallback(imgFile));
     }
 
-
+    @Override
+    protected List<IHighLightData> transformData(List<IHighLightData> list, TransformInfo tInfo) {
+        return TransformUtils.transformData(list, tInfo);
+    }
 }

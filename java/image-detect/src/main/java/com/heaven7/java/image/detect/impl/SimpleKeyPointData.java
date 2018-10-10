@@ -2,6 +2,7 @@ package com.heaven7.java.image.detect.impl;
 
 import com.heaven7.java.image.detect.KeyPointData;
 import com.heaven7.java.image.detect.LocationF;
+import com.heaven7.java.image.detect.TransformInfo;
 
 /**
  * @author heaven7
@@ -26,5 +27,11 @@ public class SimpleKeyPointData implements KeyPointData {
     @Override
     public LocationF getLocation() {
         return location;
+    }
+
+    @Override
+    public KeyPointData transform(TransformInfo info) {
+        location.transform(info);
+        return this;
     }
 }

@@ -1,6 +1,7 @@
 package com.heaven7.java.image.detect;
 
 import com.heaven7.java.image.ImageFactory;
+import com.heaven7.java.image.ImageLimitInfo;
 import com.heaven7.java.image.ImageReader;
 import com.heaven7.java.image.utils.BatchProcessor;
 import com.heaven7.java.visitor.FireVisitor;
@@ -19,14 +20,21 @@ import java.util.Map;
 public abstract class AbstractBatchImageManager<T> extends BatchProcessor{
 
     private final List<String> mImages;
-    private final ImageDetector mImageDetector = ImageFactory.getImageInitializer().getImageDetector();
-    private final ImageReader mImageReader = ImageFactory.getImageInitializer().getImageReader();
-    private Callback<T> mCallback;
+    private final ImageDetector mImageDetector;
+    private final ImageReader mImageReader;
 
+    private final ImageLimitInfo limitInfo;
+    private final SparseArray<TransformInfo> mTransInfoMap;
+
+    private Callback<T> mCallback;
     private Map<String, T> mDataMap;
 
     public AbstractBatchImageManager(List<String> mImages) {
+        this.mImageDetector = ImageFactory.getImageInitializer().getImageDetector();
+        this.mImageReader = ImageFactory.getImageInitializer().getImageReader();
+        this.limitInfo = ImageFactory.getImageInitializer().getImageLimitInfo();
         this.mImages = mImages;
+        this.mTransInfoMap = new SparseArray<>();
     }
 
     public void detect(Callback<T> callback) {
@@ -36,9 +44,10 @@ public abstract class AbstractBatchImageManager<T> extends BatchProcessor{
         VisitServices.from(mImages).fire(new FireVisitor<String>() {
             @Override
             public Boolean visit(String file, Object param) {
-                byte[] data = readBytes(file).getData();
+                ImageReader.ImageInfo info = readBytes(file);
+                mTransInfoMap.put(file.hashCode(), TransformInfo.of(info.getWidthRate(), info.getHeightRate()));
                 addCount(1);
-                onDetect(mImageDetector, mCallback, file, data);
+                onDetect(mImageDetector, mCallback, file, info.getData());
                 return null;
             }
         });
@@ -56,10 +65,25 @@ public abstract class AbstractBatchImageManager<T> extends BatchProcessor{
         mCallback.onCallback(mDataMap);
     }
 
-    protected ImageReader.ImageInfo readBytes(String imgFile) {
-        return mImageReader.readBytes(imgFile, "jpg");
+    private T transformData0(T t, TransformInfo tInfo){
+        if(tInfo == null){
+            return t;
+        }
+        return transformData(t, tInfo);
     }
 
+    protected ImageReader.ImageInfo readBytes(String imgFile) {
+        return mImageReader.readBytes(imgFile, "jpg", limitInfo);
+    }
+    /**
+     * sometimes after data request back. and before we handle it . we want to transform . like scle.
+     * @param t the object to transform.
+     * @param tInfo the transform info
+     * @return the transformed object.
+     */
+    protected T transformData(T t, TransformInfo tInfo){
+        return t;
+    }
     /**
      * called on detect image which is from frame
      *
@@ -85,7 +109,11 @@ public abstract class AbstractBatchImageManager<T> extends BatchProcessor{
         }
         @Override
         public void onSuccess(T data) {
-            mDataMap.put(imageFile, data);
+            TransformInfo tInfo = mTransInfoMap.get(imageFile.hashCode());
+            if(tInfo != null) {
+                mTransInfoMap.delete(imageFile.hashCode());
+            }
+            mDataMap.put(imageFile, transformData0(data, tInfo));
             onTasksEnd(1);
         }
         @Override

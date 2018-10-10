@@ -3,6 +3,7 @@ package com.heaven7.test.baidu.entity;
 import com.heaven7.java.image.ImageBatchDataSplitter;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.image.detect.Location;
+import com.heaven7.java.image.detect.TransformInfo;
 
 import java.util.List;
 
@@ -60,6 +61,11 @@ public class VDetectionVidaSKI {
         @Override
         public float getY() {
             return location.top;
+        }
+        @Override
+        public IHighLightData transform(TransformInfo info) {
+            location = location.transform(info);
+            return this;
         }
     }
 }

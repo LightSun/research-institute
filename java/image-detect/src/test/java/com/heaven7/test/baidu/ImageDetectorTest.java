@@ -1,9 +1,6 @@
 package com.heaven7.test.baidu;
 
-import com.heaven7.java.image.ImageFactory;
-import com.heaven7.java.image.ImageInitializer;
-import com.heaven7.java.image.ImageReader;
-import com.heaven7.java.image.Matrix2;
+import com.heaven7.java.image.*;
 import com.heaven7.java.image.detect.*;
 import com.heaven7.java.visitor.util.SparseArray;
 import com.heaven7.test.JavaImageReader;
@@ -61,6 +58,10 @@ public class ImageDetectorTest {
         ImageFactory.setImageInitializer(new ImageInitializer.Builder()
                 .setImageDetector(detector)
                 .setMatrix2Transformer(new JavaMatrix2Transformer())
+                .setImageLimitInfo(new ImageLimitInfo.Builder()
+                        .setMaxWidth(1000)
+                        .setMaxHeight(1000)
+                        .build())
                 .setVideoFrameDelegate(new AbstractVideoManager.VideoFrameDelegate() {
                     @Override
                     public byte[] getFrame(String videoFile, int timeInSeconds) {
@@ -74,6 +75,18 @@ public class ImageDetectorTest {
                         String imagePath = getFrameImagePath(videoFile, timeInSeconds);
                         ImageReader.ImageInfo info = mReader.readMatrix(imagePath);
                         return info.getMat();
+                    }
+
+                    @Override
+                    public ImageReader.ImageInfo getFrame(String videoFile, int timeInSeconds, ImageLimitInfo info) {
+                        String imagePath = getFrameImagePath(videoFile, timeInSeconds);
+                        return mReader.readBytes(imagePath, "jpg", info);
+                    }
+
+                    @Override
+                    public ImageReader.ImageInfo getFrameMatrix(String videoFile, int timeInSeconds, ImageLimitInfo info) {
+                        String imagePath = getFrameImagePath(videoFile, timeInSeconds);
+                        return mReader.readMatrix(imagePath, info);
                     }
 
                     @Override

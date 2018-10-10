@@ -12,8 +12,7 @@ public class ImageInitializer {
     private Matrix2Transformer matrix2Transformer;
     private AbstractVideoManager.VideoFrameDelegate videoFrameDelegate;
     private ImageTypeTransformer imageTypeTransformer;
-    private int maxWidth;
-    private int maxHeight;
+    private ImageLimitInfo imageLimitInfo;
 
     protected ImageInitializer(ImageInitializer.Builder builder) {
         this.imageReader = builder.imageReader;
@@ -22,8 +21,7 @@ public class ImageInitializer {
         this.matrix2Transformer = builder.matrix2Transformer;
         this.videoFrameDelegate = builder.videoFrameDelegate;
         this.imageTypeTransformer = builder.imageTypeTransformer;
-        this.maxWidth = builder.maxWidth;
-        this.maxHeight = builder.maxHeight;
+        this.imageLimitInfo = builder.imageLimitInfo;
     }
 
     public void setImageReader(ImageReader imageReader) {
@@ -67,12 +65,8 @@ public class ImageInitializer {
         return this.imageTypeTransformer;
     }
 
-    public int getMaxWidth() {
-        return this.maxWidth;
-    }
-
-    public int getMaxHeight() {
-        return this.maxHeight;
+    public ImageLimitInfo getImageLimitInfo() {
+        return this.imageLimitInfo;
     }
 
     public static class Builder {
@@ -82,8 +76,7 @@ public class ImageInitializer {
         private Matrix2Transformer matrix2Transformer;
         private AbstractVideoManager.VideoFrameDelegate videoFrameDelegate;
         private ImageTypeTransformer imageTypeTransformer;
-        private int maxWidth;
-        private int maxHeight;
+        private ImageLimitInfo imageLimitInfo;
 
         public Builder setImageReader(ImageReader imageReader) {
             this.imageReader = imageReader;
@@ -115,13 +108,8 @@ public class ImageInitializer {
             return this;
         }
 
-        public Builder setMaxWidth(int maxWidth) {
-            this.maxWidth = maxWidth;
-            return this;
-        }
-
-        public Builder setMaxHeight(int maxHeight) {
-            this.maxHeight = maxHeight;
+        public Builder setImageLimitInfo(ImageLimitInfo imageLimitInfo) {
+            this.imageLimitInfo = imageLimitInfo;
             return this;
         }
 

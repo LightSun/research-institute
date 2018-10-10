@@ -3,7 +3,7 @@ package com.heaven7.java.image.detect;
 /**
  * the key-point of person
  */
-public interface KeyPointData {
+public interface KeyPointData extends IDataTransformer<KeyPointData>{
 
     /**
      * get the key point count

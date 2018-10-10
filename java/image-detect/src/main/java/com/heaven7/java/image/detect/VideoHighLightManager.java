@@ -3,6 +3,7 @@ package com.heaven7.java.image.detect;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.image.Matrix2;
+import com.heaven7.java.image.utils.TransformUtils;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -32,6 +33,11 @@ public class VideoHighLightManager extends AbstractVideoManager<List<IHighLightD
     @Override
     protected void onDetectBatch(BatchInfo info,ImageDetector detector, Callback<List<IHighLightData>> callback, List<Integer> times, byte[] batchData) {
         detector.detectHighLightBatch(info, batchData, new InternalCallback(times));
+    }
+
+    @Override
+    protected List<IHighLightData> transformData(List<IHighLightData> list, TransformInfo tInfo) {
+        return TransformUtils.transformData(list, tInfo);
     }
 
     public interface ScoreProvider {

@@ -25,4 +25,8 @@ public class VideoSubjectIdentifyManager extends AbstractVideoManager<Location> 
     protected void onDetectBatch(BatchInfo info, ImageDetector detector, Callback<Location> callback, List<Integer> times, byte[] batchData) {
         detector.detectSubjectIdentificationBatch(info, batchData, new InternalCallback(times));
     }
+    @Override
+    protected Location transformData(Location location, TransformInfo tInfo) {
+        return location.transform(tInfo);
+    }
 }

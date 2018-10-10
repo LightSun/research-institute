@@ -1,10 +1,7 @@
 package com.heaven7.java.image.detect;
 
 import com.heaven7.java.base.util.Throwables;
-import com.heaven7.java.image.ImageCons;
-import com.heaven7.java.image.ImageFactory;
-import com.heaven7.java.image.ImageInitializer;
-import com.heaven7.java.image.Matrix2;
+import com.heaven7.java.image.*;
 import com.heaven7.java.image.utils.BatchProcessor;
 import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.PileVisitor;
@@ -31,6 +28,8 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
     private final String videoSrc;
     private final int frameGap;
     private final ImageDetector detector;
+    private final ImageLimitInfo limitInfo;
+    private TransformInfo tInfo;
 
     private SparseArray<T> dataMap;
 
@@ -48,6 +47,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
 
     public AbstractVideoManager(String videoSrc, int gap) {
         this.detector = ImageFactory.getImageInitializer().getImageDetector();
+        this.limitInfo = ImageFactory.getImageInitializer().getImageLimitInfo();
         this.videoSrc = videoSrc;
         this.frameGap = gap;
     }
@@ -71,11 +71,15 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
         final int duration = vfd.getDuration(videoSrc);
         onPreDetect(callback, duration);
 
+
         int time = 0;
         while (time <= duration) {
-            byte[] data = vfd.getFrame(videoSrc, time);
+            ImageReader.ImageInfo info = vfd.getFrame(videoSrc, time, limitInfo);
+            if(tInfo == null){
+                tInfo = TransformInfo.of(info.getWidthRate(), info.getHeightRate());
+            }
             addCount(1);
-            onDetect(detector, callback, time, data);
+            onDetect(detector, callback, time, info.getData());
             time += frameGap;
         }
         markEnd();
@@ -101,7 +105,11 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
         Matrix2<Integer> single = null;
         while (time <= duration) {
             times.add(time);
-            Matrix2<Integer> mat = vfd.getFrameMatrix(videoSrc, time);
+            ImageReader.ImageInfo info = vfd.getFrameMatrix(videoSrc, time, limitInfo);
+            if(tInfo == null){
+                tInfo = TransformInfo.of(info.getWidthRate(), info.getHeightRate());
+            }
+            Matrix2<Integer> mat = info.getMat();
             if(width == 0){
                 width = mat.getRowCount();
                 height = mat.getColumnCount();
@@ -174,7 +182,12 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
         // divide = 2 means half capacity
         return new ArrayList<>(batchSize * 4 / 3 / divide + 1);
     }
-
+    private T transformData0(T t, TransformInfo tInfo){
+        if(tInfo == null){
+            return t;
+        }
+        return transformData(t, tInfo);
+    }
     @Override
     public void markStart() {
         super.markStart();
@@ -224,6 +237,16 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
     }
 
     /**
+     * sometimes after data request back. and before we handle it . we want to transform . like scle.
+     * @param t the object to transform.
+     * @param tInfo the transform info
+     * @return the transformed object.
+     */
+    protected T transformData(T t, TransformInfo tInfo){
+        return t;
+    }
+
+    /**
      * called on detect image which is from frame
      *
      * @param detector the image detector
@@ -248,22 +271,48 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
 
     public interface VideoFrameDelegate {
         /**
+         * <p>Use {@linkplain #getFrame(String, int, ImageLimitInfo)} instead</p>
          * get the frame from video file.
          *
          * @param videoFile     the video file
          * @param timeInSeconds the time to get the frame . in seconds
          * @return the frame data.
          */
-        byte[] getFrame(String videoFile, int timeInSeconds);
-
+        @Deprecated
+        default byte[] getFrame(String videoFile, int timeInSeconds){
+            return getFrame(videoFile, timeInSeconds, null).getData();
+        }
         /**
+         * <p>Use {@linkplain #getFrame(String, int, ImageLimitInfo)} instead.</p>
          * get the frame as int array. the stride is width
          *
          * @param videoFile     the video file
          * @param timeInSeconds the time in seconds
          * @return the int array.
          */
-        Matrix2<Integer> getFrameMatrix(String videoFile, int timeInSeconds);
+        @Deprecated
+        default Matrix2<Integer> getFrameMatrix(String videoFile, int timeInSeconds){
+            return getFrameMatrix(videoFile, timeInSeconds, null).getMat();
+        }
+
+        /**
+         * get the frame from video file.
+         *
+         * @param videoFile     the video file
+         * @param timeInSeconds the time to get the frame . in seconds
+         * @return the frame data as bytes
+         */
+        ImageReader.ImageInfo getFrame(String videoFile, int timeInSeconds, ImageLimitInfo info);
+
+
+        /**
+         * get the frame as int array. the stride is width
+         *
+         * @param videoFile     the video file
+         * @param timeInSeconds the time in seconds
+         * @return the frame info as matrix
+         */
+        ImageReader.ImageInfo getFrameMatrix(String videoFile, int timeInSeconds, ImageLimitInfo info);
 
         /**
          * get the video duration. in seconds
@@ -311,11 +360,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
 
         @Override
         public void onSuccess(T data) {
-            /*if(data instanceof ImageInfoTransformer){
-                data = ((ImageInfoTransformer) data).transform()
-            }*/
-            //TODO
-            dataMap.put(times.get(0), data);
+            dataMap.put(times.get(0), transformData0(data, tInfo));
             markEnd();
         }
 
@@ -328,7 +373,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
                                 public Void visit(Object param, Integer time, int index, int size) {
                                     T t = batch.get(index + 1);
                                     if (t != null) {
-                                        dataMap.put(time, t);
+                                        dataMap.put(time, transformData0(t, tInfo));
                                     }
                                     return null;
                                 }

@@ -1,5 +1,7 @@
 package com.heaven7.java.image.detect;
 
+import com.heaven7.java.image.utils.TransformUtils;
+
 import java.util.List;
 
 /**
@@ -22,5 +24,10 @@ public class VideoKeyPointManager extends AbstractVideoManager<List<KeyPointData
     @Override
     protected void onDetectBatch(BatchInfo info, ImageDetector detector, Callback<List<KeyPointData>> callback, List<Integer> times, byte[] batchData) {
         detector.detectKeyPointsBatch(info, batchData, new InternalCallback(times));
+    }
+
+    @Override
+    protected List<KeyPointData> transformData(List<KeyPointData> list, TransformInfo tInfo) {
+        return TransformUtils.transformData(list, tInfo);
     }
 }

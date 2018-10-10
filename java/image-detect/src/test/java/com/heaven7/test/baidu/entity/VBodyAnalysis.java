@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import com.heaven7.java.image.ImageBatchDataSplitter;
 import com.heaven7.java.image.detect.KeyPointData;
 import com.heaven7.java.image.detect.LocationF;
+import com.heaven7.java.image.detect.TransformInfo;
 
 import java.util.List;
 
@@ -54,6 +55,12 @@ public class VBodyAnalysis {
         @Override
         public LocationF getLocation() {
             return location;
+        }
+
+        @Override
+        public KeyPointData transform(TransformInfo info) {
+            location.transform(info);
+            return this;
         }
     }
 

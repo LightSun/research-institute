@@ -15,4 +15,8 @@ public class BatchImageSubjectIdentifyManager extends AbstractBatchImageManager<
     protected void onDetect(ImageDetector detector, Callback<Location> callback, String imgFile, byte[] data) {
         detector.detectSubjectIdentification(data, new InternalCallback(imgFile));
     }
+    @Override
+    protected Location transformData(Location location, TransformInfo tInfo) {
+        return location.transform(tInfo);
+    }
 }
