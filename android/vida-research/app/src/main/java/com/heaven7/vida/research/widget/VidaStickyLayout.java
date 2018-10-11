@@ -192,6 +192,7 @@ public class VidaStickyLayout extends LinearLayout implements NestedScrollingChi
         if(mCallback != null){
             flags = mCallback.getNestedScrollFlags(this, target, dx, dy);
         }
+        //pre scroll if permit
         if((flags & FLAG_SELF) == FLAG_SELF) {
             mNestedHelper.nestedScroll(dx, dy, consumed, true);
         }
