@@ -1,0 +1,55 @@
+apply from: '../constants.gradle'
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion project.ext.compileSdkVersion
+    buildToolsVersion project.ext.buildToolsVersion
+    defaultConfig {
+        applicationId "com.heaven7.android.androidhotfix"
+        targetSdkVersion project.ext.targetSdkVersion
+        minSdkVersion project.ext.minSdkVersion
+        versionCode 1
+        versionName "1.0"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-fexceptions"
+            }
+        }
+
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            multiDexKeepFile file('dex.keep')
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug{
+            multiDexKeepFile file('dex.keep')
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
+    testImplementation 'junit:junit:4.12'
+    implementation "com.android.support:multidex:1.0.3"
+
+    implementation 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor "com.jakewharton:butterknife-compiler:8.4.0"
+
+    implementation('com.heaven7.core.util:util-v1:1.1.2'){
+        exclude module: 'support-v4'
+        exclude module: 'appcompat-v7'
+    }
+}
