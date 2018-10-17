@@ -29,6 +29,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
     private final int frameGap;
     private final ImageDetector detector;
     private final ImageLimitInfo limitInfo;
+    private final EfficientImageDelegate efficientImageDelegate;
     private TransformInfo tInfo;
 
     private SparseArray<T> dataMap;
@@ -46,6 +47,7 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
     }
 
     public AbstractVideoManager(String videoSrc, int gap) {
+        this.efficientImageDelegate = ImageFactory.getImageInitializer().getEfficientImageDelegate();
         this.detector = ImageFactory.getImageInitializer().getImageDetector();
         this.limitInfo = ImageFactory.getImageInitializer().getImageLimitInfo();
         this.videoSrc = videoSrc;
@@ -81,6 +83,32 @@ public abstract class AbstractVideoManager<T> extends BatchProcessor{
             addCount(1);
             onDetect(detector, callback, time, info.getData());
             time += frameGap;
+        }
+        markEnd();
+    }
+
+    /**
+     * detect all frames in batch efficiently. which use {@linkplain EfficientImageDelegate}.
+     * @param callback the callback
+     */
+    public final void detectBatchEfficiently(Callback<T> callback){
+        markStart();
+        this.mCallback = callback;
+        final int duration = vfd.getDuration(videoSrc);
+        onPreDetect(callback, duration);
+
+        int time = 0;
+        while (time <= duration) {
+            EfficientImageDelegate.EfficientImageInfo einfo = efficientImageDelegate.getImageData(videoSrc, time, duration,
+                    batchSize, frameGap, limitInfo);
+            if(einfo != null) {
+                addCount(1);
+                BatchInfo batchInfo = BatchInfo.of(einfo.times.size(), einfo.baseImageInfo.getWidth(), einfo.baseImageInfo.getHeight());
+                onDetectBatch(batchInfo, detector, callback, einfo.times, einfo.mergedData);
+                time += einfo.totalFrameCount;
+            }else{
+                time += batchSize * frameGap;
+            }
         }
         markEnd();
     }

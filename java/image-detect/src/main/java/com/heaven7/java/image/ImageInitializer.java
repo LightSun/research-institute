@@ -13,6 +13,7 @@ public class ImageInitializer {
     private AbstractVideoManager.VideoFrameDelegate videoFrameDelegate;
     private ImageTypeTransformer imageTypeTransformer;
     private ImageLimitInfo imageLimitInfo;
+    private EfficientImageDelegate efficientImageDelegate;
 
     protected ImageInitializer(ImageInitializer.Builder builder) {
         this.imageReader = builder.imageReader;
@@ -22,6 +23,7 @@ public class ImageInitializer {
         this.videoFrameDelegate = builder.videoFrameDelegate;
         this.imageTypeTransformer = builder.imageTypeTransformer;
         this.imageLimitInfo = builder.imageLimitInfo;
+        this.efficientImageDelegate = builder.efficientImageDelegate;
     }
 
     public void setImageReader(ImageReader imageReader) {
@@ -69,6 +71,10 @@ public class ImageInitializer {
         return this.imageLimitInfo;
     }
 
+    public EfficientImageDelegate getEfficientImageDelegate() {
+        return this.efficientImageDelegate;
+    }
+
     public static class Builder {
         private ImageReader imageReader;
         private ImageWriter imageWriter;
@@ -77,6 +83,7 @@ public class ImageInitializer {
         private AbstractVideoManager.VideoFrameDelegate videoFrameDelegate;
         private ImageTypeTransformer imageTypeTransformer;
         private ImageLimitInfo imageLimitInfo;
+        private EfficientImageDelegate efficientImageDelegate;
 
         public Builder setImageReader(ImageReader imageReader) {
             this.imageReader = imageReader;
@@ -110,6 +117,11 @@ public class ImageInitializer {
 
         public Builder setImageLimitInfo(ImageLimitInfo imageLimitInfo) {
             this.imageLimitInfo = imageLimitInfo;
+            return this;
+        }
+
+        public Builder setEfficientImageDelegate(EfficientImageDelegate efficientImageDelegate) {
+            this.efficientImageDelegate = efficientImageDelegate;
             return this;
         }
 
