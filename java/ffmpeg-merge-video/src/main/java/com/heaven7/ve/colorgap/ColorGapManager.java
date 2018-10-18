@@ -93,6 +93,7 @@ public class ColorGapManager extends BaseContextOwner{
         final ColorGapContext mContext = getContext();
         // ResourceInitializer.init(mContext);
         //the barrier help we do two tasks: analyse, tint.
+        /* if the final run thread is in the broken thread .will throws BrokenException. */
         CyclicBarrier barrier = new CyclicBarrier(mediaAnalyser.getAsyncModuleCount() + 1);
         //analyse
         CollectModule module = getPerformanceCollector().startModule(MODULE_ANALYSE_MEDIA, TAG);
