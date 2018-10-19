@@ -4,6 +4,7 @@ import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.SparseArray;
 import com.heaven7.java.base.util.Throwables;
+import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.detect.HighLightArea;
 import com.heaven7.java.image.detect.IHighLightData;
 import com.heaven7.java.image.detect.KeyPointData;
@@ -611,6 +612,15 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
         long start = videoPart.getStartTime();
         long halfDuration = (videoPart.getDuration() / 2);
         return (int) CommonUtils.frameToTime(start + halfDuration, TimeUnit.SECONDS);
+    }
+
+    /** get the key frame image path. if is image .return the direct image. */
+    public String getKeyFrameImagePath(){
+        if(item.isVideo()){
+            return ImageFactory.getImageInitializer().getVideoFrameDelegate().getFrameImagePath(
+                    item.getFilePath(), getKeyFrameTime());
+        }
+        return item.getFilePath();
     }
 
     public void setKeyPointData(KeyPointData kpd) {

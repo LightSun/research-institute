@@ -144,7 +144,7 @@ public class ColorGapManager extends BaseContextOwner{
                     getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "KeyPoint_Assign", "onRecognizeDone", newItems.toString());
                     processShotType(newItems, plaids, source_tem, resultTemplate, callback);
                 }else {
-                    mShotRecognizer.requestKeyPoint(newItems, new IShotRecognizer.Callback() {
+                    mShotRecognizer.requestKeyPoint(getContext(),newItems, new IShotRecognizer.Callback() {
                         @Override
                         public void onRecognizeDone(List<MediaPartItem> parts) {
                             getPerformanceCollector().addMessage(MODULE_RECOGNIZE_SHOT, "KeyPoint", "onRecognizeDone", parts.toString());
@@ -235,7 +235,7 @@ public class ColorGapManager extends BaseContextOwner{
             doFillPlaids(newItems, plaids, srcTemplate, resultTemplate, callback);
         }else {
             final VETemplate source_tem = srcTemplate;
-            mShotRecognizer.requestSubject(subjectItems, new IShotRecognizer.Callback() {
+            mShotRecognizer.requestSubject(getContext(), subjectItems, new IShotRecognizer.Callback() {
                 @Override
                 public void onRecognizeDone(List<MediaPartItem> parts) {
                     //at last. if no shot-type. default is medium-shot

@@ -24,13 +24,13 @@ public interface IShotRecognizer {
      * request recognize key-point
      * @param parts the media parts
      */
-    void requestKeyPoint(List<MediaPartItem> parts, Callback callback);
+    void requestKeyPoint(ColorGapContext context, List<MediaPartItem> parts, Callback callback);
 
     /**
      * request recognize subject
      * @param parts the media parts
      */
-    void requestSubject(List<MediaPartItem> parts, Callback callback);
+    void requestSubject(ColorGapContext context, List<MediaPartItem> parts, Callback callback);
 
     /**
      * recognize the shot category

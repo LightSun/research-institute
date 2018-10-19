@@ -1,6 +1,5 @@
 package com.heaven7.ve.colorgap.impl;
 
-import com.heaven7.java.image.ImageFactory;
 import com.heaven7.java.image.detect.AbstractBatchImageManager;
 import com.heaven7.java.visitor.*;
 import com.heaven7.java.visitor.collection.KeyValuePair;
@@ -23,11 +22,7 @@ public abstract class BaseRecognizeHelper<T> implements AbstractBatchImageManage
         List<String> images = VisitServices.from(mItems).map(new ResultVisitor<MediaPartItem, String>() {
             @Override
             public String visit(MediaPartItem item, Object param) {
-                if(item.getItem().isVideo()){
-                    return ImageFactory.getImageInitializer().getVideoFrameDelegate().getFrameImagePath(
-                            item.item.getFilePath(), item.getKeyFrameTime());
-                }
-                return item.getItem().getFilePath();
+                return item.getKeyFrameImagePath();
             }
         }).getAsList();
         //save as pair
@@ -47,20 +42,21 @@ public abstract class BaseRecognizeHelper<T> implements AbstractBatchImageManage
 
     @Override
     public final void onCallback(Map<String, T> map) {
-        VisitServices.from(map).map2MapValue(new MapResultVisitor<String, T, MediaPartItem>() {
+        VisitServices.from(map).map2MapValue(new MapResultVisitor<String, T, Pair>() {
             @Override
-            public MediaPartItem visit(KeyValuePair<String, T> t, Object param) {
+            public Pair visit(KeyValuePair<String, T> t, Object param) {
                 return VisitServices.from(mPairs).query(new PredicateVisitor<Pair>() {
                     @Override
                     public Boolean visit(Pair pair, Object param) {
                         return pair.imgPath.equals(t.getKey());
                     }
-                }).partItem;
+                });
             }
-        }).fire(new MapFireVisitor<MediaPartItem, T>() {
+        }).fire(new MapFireVisitor<Pair, T>() {
             @Override
-            public Boolean visit(KeyValuePair<MediaPartItem, T> pair, Object param) {
-                onProcess(pair.getKey(), pair.getValue());
+            public Boolean visit(KeyValuePair<Pair, T> pair, Object param) {
+                Pair pairKey = pair.getKey();
+                onProcess(pairKey.partItem, pairKey.imgPath, pair.getValue());
                 return null;
             }
         });
@@ -72,9 +68,10 @@ public abstract class BaseRecognizeHelper<T> implements AbstractBatchImageManage
     /**
      * called when request done and we want to do with the part and value.
      * @param part the media part
+     * @param imgPath the image path used to request
      * @param value the value
      */
-    protected abstract void onProcess(MediaPartItem part, T value);
+    protected abstract void onProcess(MediaPartItem part, String imgPath, T value);
 
     /**
      * called on request and set property done done
