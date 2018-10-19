@@ -19,7 +19,6 @@ import com.heaven7.ve.cross_os.IMediaResourceItem;
 import com.heaven7.ve.cross_os.IPlaidInfo;
 import com.heaven7.ve.gap.GapManager;
 import com.heaven7.ve.template.VETemplate;
-import com.heaven7.ve.test.DebugUtils;
 import com.heaven7.ve.test.ShotAssigner;
 
 import java.io.File;
