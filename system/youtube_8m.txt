@@ -1,0 +1,15 @@
+win+r: mstsc(远程链接, 之后输入ip就可以了)
+192.168.3.142
+
+1, 运行batch.py 获得所有视频文件 tfrecord (1-1)
+2, 拷贝 tfrecord到远程机器上面(d:)
+      cp batch_inference.py
+
+3 , remote run  batch_inference.py ,结果在d://tmp//frame_level_logistic_model
+
+
+ps: 
+
+   注意修改文件路径，安装ffmpeg以及导入path
+   pip/pip3 install opencv-python
+   安装six. tensorflow 

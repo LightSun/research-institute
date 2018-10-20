@@ -1,0 +1,22 @@
+------------------------------------------------------------------------------------------------------------
+
+//https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/preparing_inputs.md
+python object_detection/dataset_tools/create_pascal_tf_record.py --label_map_path=object_detection/data/pascal_label_map.pbtxt --data_dir=VOCdevkit --year=VOC2012 --set=train --output_path=pascal_train.record
+
+python object_detection/dataset_tools/create_pascal_tf_record.py --label_map_path=object_detection/data/pascal_label_map.pbtxt --data_dir=VOCdevkit --year=VOC2012 --set=val --output_path=pascal_val.record
+
+
+//PATH_TO_BE_CONFIGURED = E:\study\github\THIRDS\models\research
+python object_detection/train.py --logtostderr --pipeline_config_path=E:\study\github\THIRDS\models\research\object_detection\samples\configs\faster_rcnn_resnet101_voc07_2.config --train_dir=train_logs
+
+====================================================================
+//http://wossoneri.github.io/2017/12/12/[Tensorflow]Train-model-with-SSD-MobileNet/
+python object_detection/train.py --train_dir object_detection/train --pipeline_config_path object_detection/ssd_model/ssd_mobilenet_v1_pets.config
+
+python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path object_detection/ssd_model/ssd_mobilenet_v1_pets.config --trained_checkpoint_prefix object_detection/train/model.ckpt-30000 --output_directory object_detection/ssd_model/model/
+
+tensorboard --logdir=E:\study\github\THIRDS\models\research\object_detection\ssd_model\train_log
+
+
+//examples/python/helloworld
+python -m grpc_tools.protoc -I../../protos --python_out=. --grpc_python_out=. ../../protos/helloworld.proto
