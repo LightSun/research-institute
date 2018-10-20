@@ -29,7 +29,7 @@ import java.util.concurrent.CyclicBarrier;
 /**
  * @author heaven7
  */
-public class ShotCutTest extends BaseMontageTest{
+public class ShotCutTest{
 
     private static final String TAG = "ShotCutTest";
     private static final String DIR = "F:\\videos\\ClothingWhite\\__cut__";
