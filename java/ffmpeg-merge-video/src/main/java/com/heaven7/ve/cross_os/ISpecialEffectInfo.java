@@ -37,6 +37,19 @@ public interface ISpecialEffectInfo extends IEffectInfo {
     /** 分屏: 水平 3分 */
     int TYPE_SPLIT_SCREEN_H3   = 34;
 
+    /* the position of split-screens */
+    int SPLIT_SCREEN_H2_LEFT  = 1;
+    int SPLIT_SCREEN_H2_RIGHT = 2;
+    int SPLIT_SCREEN_H3_LEFT  = 3;
+    int SPLIT_SCREEN_H3_RIGHT = 4;
+    int SPLIT_SCREEN_H3_CENTER = 5;
+
+    int SPLIT_SCREEN_V2_TOP    = 6;
+    int SPLIT_SCREEN_V2_BOTTOM = 7;
+    int SPLIT_SCREEN_V3_BOTTOM = 8;
+    int SPLIT_SCREEN_V3_TOP    = 9;
+    int SPLIT_SCREEN_V3_CENTER = 10;
+
     void setCategory(int category);
 
     int getCategory();

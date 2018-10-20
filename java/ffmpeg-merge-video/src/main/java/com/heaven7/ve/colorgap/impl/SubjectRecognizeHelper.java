@@ -1,19 +1,15 @@
 package com.heaven7.ve.colorgap.impl;
 
-import com.google.gson.Gson;
 import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.image.detect.AbstractBatchImageManager;
 import com.heaven7.java.image.detect.BatchImageSubjectIdentifyManager;
-import com.heaven7.java.image.detect.KeyPointData;
 import com.heaven7.java.image.detect.Location;
-import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.colorgap.FrameDataDelegate;
+import com.heaven7.ve.colorgap.MediaPartItem;
+import com.heaven7.ve.colorgap.MediaResourceConfiguration;
 import com.heaven7.ve.colorgap.helper.FrameDataUtils;
-import javafx.scene.shape.Arc;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.heaven7.ve.colorgap.MetaInfoUtils.getShotTypeString;
 
 /**
  * the subject recognize/identify helper
