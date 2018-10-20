@@ -1,5 +1,6 @@
 package com.heaven7.ve.colorgap.impl;
 
+import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.image.detect.AbstractBatchImageManager;
 import com.heaven7.java.visitor.*;
 import com.heaven7.java.visitor.collection.KeyValuePair;
@@ -42,21 +43,11 @@ public abstract class BaseRecognizeHelper<T> implements AbstractBatchImageManage
 
     @Override
     public final void onCallback(Map<String, T> map) {
-        VisitServices.from(map).map2MapValue(new MapResultVisitor<String, T, Pair>() {
+        VisitServices.from(mPairs).fire(new FireVisitor<Pair>() {
             @Override
-            public Pair visit(KeyValuePair<String, T> t, Object param) {
-                return VisitServices.from(mPairs).query(new PredicateVisitor<Pair>() {
-                    @Override
-                    public Boolean visit(Pair pair, Object param) {
-                        return pair.imgPath.equals(t.getKey());
-                    }
-                });
-            }
-        }).fire(new MapFireVisitor<Pair, T>() {
-            @Override
-            public Boolean visit(KeyValuePair<Pair, T> pair, Object param) {
-                Pair pairKey = pair.getKey();
-                onProcess(pairKey.partItem, pairKey.imgPath, pair.getValue());
+            public Boolean visit(Pair pair, Object param) {
+                T value = map.get(pair.imgPath);
+                onProcess(pair.partItem, pair.imgPath, value);
                 return null;
             }
         });
@@ -69,9 +60,9 @@ public abstract class BaseRecognizeHelper<T> implements AbstractBatchImageManage
      * called when request done and we want to do with the part and value.
      * @param part the media part
      * @param imgPath the image path used to request
-     * @param value the value
+     * @param value the value, null means request success. but data is empty
      */
-    protected abstract void onProcess(MediaPartItem part, String imgPath, T value);
+    protected abstract void onProcess(MediaPartItem part, String imgPath, @Nullable T value);
 
     /**
      * called on request and set property done done

@@ -1,5 +1,6 @@
 package com.heaven7.ve.colorgap.impl;
 
+import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.image.detect.KeyPointData;
 import com.heaven7.java.image.detect.Location;
 import com.heaven7.java.visitor.PredicateVisitor;
@@ -41,12 +42,16 @@ public class SimpleShotRecognizer implements IShotRecognizer {
                     return data == null;
                 }
             }).getAsList();
-            new KeyPointRecognizeHelper(requestItems){
-                @Override
-                protected void onDone() {
-                    callback.onRecognizeDone(parts);
-                }
-            }.start();
+            if(Predicates.isEmpty(requestItems)){
+                callback.onRecognizeDone(parts);
+            }else {
+                new KeyPointRecognizeHelper(requestItems) {
+                    @Override
+                    protected void onDone() {
+                        callback.onRecognizeDone(parts);
+                    }
+                }.start();
+            }
         }
     }
 
@@ -75,12 +80,16 @@ public class SimpleShotRecognizer implements IShotRecognizer {
                     return data == null;
                 }
             }).getAsList();
-            new SubjectRecognizeHelper(requestItems){
-                @Override
-                protected void onDone() {
-                    callback.onRecognizeDone(parts);
-                }
-            }.start();
+            if(Predicates.isEmpty(requestItems)){
+                callback.onRecognizeDone(parts);
+            }else {
+                new SubjectRecognizeHelper(requestItems) {
+                    @Override
+                    protected void onDone() {
+                        callback.onRecognizeDone(parts);
+                    }
+                }.start();
+            }
         }
     }
 

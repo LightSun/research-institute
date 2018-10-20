@@ -19,6 +19,7 @@ import com.heaven7.utils.CollectionUtils;
 import com.heaven7.utils.CommonUtils;
 import com.heaven7.utils.Context;
 import com.heaven7.utils.TextUtils;
+import com.heaven7.ve.SimpleCopyDelegate;
 import com.heaven7.ve.cross_os.IMediaResourceItem;
 import com.heaven7.ve.cross_os.ITimeTraveller;
 import com.heaven7.ve.gap.ItemDelegate;
@@ -624,11 +625,14 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
     }
 
     public void setKeyPointData(KeyPointData kpd) {
-        SimpleKeyPointData skp = new SimpleKeyPointData();
-        skp.setLocation(kpd.getLocation());
-        skp.setKeyPointCount(kpd.getKeyPointCount());
-
-        this.mKeyPointData = skp;
+        if(kpd instanceof SimpleKeyPointData){
+            this.mKeyPointData = (SimpleKeyPointData) kpd;
+        }else {
+            SimpleKeyPointData skp = new SimpleKeyPointData();
+            skp.setLocation(kpd.getLocation());
+            skp.setKeyPointCount(kpd.getKeyPointCount());
+            this.mKeyPointData = skp;
+        }
     }
 
     public HighLightArea getHighLightArea() {

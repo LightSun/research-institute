@@ -1,5 +1,7 @@
 package com.heaven7.ve.colorgap.impl;
 
+import com.heaven7.java.base.anno.Nullable;
+import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.image.detect.AbstractBatchImageManager;
 import com.heaven7.java.image.detect.BatchImageKeypointManager;
 import com.heaven7.java.image.detect.KeyPointData;
@@ -24,8 +26,10 @@ public abstract class KeyPointRecognizeHelper extends BaseRecognizeHelper<List<K
         return new BatchImageKeypointManager(images);
     }
     @Override
-    protected void onProcess(MediaPartItem part, String imgPath, List<KeyPointData> value) {
-        FrameDataUtils.applyKeyPointData(part, value);
+    protected void onProcess(MediaPartItem part, String imgPath, @Nullable List<KeyPointData> value) {
+        if(!Predicates.isEmpty(value)) {
+            FrameDataUtils.applyKeyPointData(part, value);
+        }
         MediaResourceConfiguration config = part.getContext().getMediaResourceConfiguration();
         if(config != null){
             FrameDataDelegate<List<KeyPointData>> delegate = config.getKeyPointDelegate();
