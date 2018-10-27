@@ -6,6 +6,7 @@ import com.heaven7.vida.research.sample.NativeSurfaceActivity;
 import com.heaven7.vida.research.sample.TestBaiduFace2Activity;
 import com.heaven7.vida.research.sample.TestBaiduFaceActivity;
 import com.heaven7.vida.research.sample.TestDiscViewActivity;
+import com.heaven7.vida.research.sample.TestReadAssetsActivity;
 import com.heaven7.vida.research.sample.TestRectProgresActivity;
 import com.heaven7.vida.research.sample.TestRecyclerViewSwipeActivity;
 import com.heaven7.vida.research.sample.TestRoundViewActivity;
@@ -45,6 +46,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestVidaStickyLayoutActivity.class));
         list.add(new ActivityInfo(TestSwitchImageActivity.class));
         list.add(new ActivityInfo(TestRecyclerViewSwipeActivity.class));
+        list.add(new ActivityInfo(TestReadAssetsActivity.class));
     }
 
 }

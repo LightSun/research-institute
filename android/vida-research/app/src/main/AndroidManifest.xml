@@ -47,6 +47,8 @@
         <activity android:name=".sample.TestSwitchImageActivity"/>
         <activity android:name=".sample.TestRecyclerViewSwipeActivity"/>
 
+        <activity android:name=".sample.TestReadAssetsActivity"/>
+
     </application>
 
 </manifest>
