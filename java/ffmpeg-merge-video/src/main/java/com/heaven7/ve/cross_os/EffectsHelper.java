@@ -9,13 +9,13 @@ public class EffectsHelper {
         int type;
         switch (val) {
             case "black_fade":
-                type = ITransitionInfo.TYPE_BLACK;
+                type = ITransitionInfo.TYPE_BLACK_FADE;
                 break;
             case "white_fade":
-                type = ITransitionInfo.TYPE_WHITE;
+                type = ITransitionInfo.TYPE_WHITE_FADE;
                 break;
-            case "mix":
-                type = ITransitionInfo.TYPE_MIX;
+            case "dissolve":
+                type = ITransitionInfo.TYPE_DISSOLVE;
                 break;
             case "left_roller":
                 type = ITransitionInfo.TYPE_LEFT_ROLLER;
@@ -29,9 +29,14 @@ public class EffectsHelper {
             case "right_move":
                 type = ITransitionInfo.TYPE_RIGHT_MOVE;
                 break;
-            case "sport_blur":
-                type = ITransitionInfo.TYPE_SPORT_BLUR;
+            case "right_move_low":
+                type = ITransitionInfo.TYPE_RIGHT_MOVE_LOW;
                 break;
+            case "left_move_low":
+                type = ITransitionInfo.TYPE_LEFT_MOVE_LOW;
+                break;
+//-------------------------------------------------------------
+            case "sport_blur":
             default:
                 throw new UnsupportedOperationException("wrong transition value = " + val);
         }
