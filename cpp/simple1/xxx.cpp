@@ -6,6 +6,7 @@
 #include "xxx.h"
 #include <iostream>
 
+
 void hello(void)
 {
     std::cout<<"Hello from dll!"<<std::endl;
