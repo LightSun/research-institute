@@ -48,6 +48,7 @@
         <activity android:name=".sample.TestRecyclerViewSwipeActivity"/>
 
         <activity android:name=".sample.TestReadAssetsActivity"/>
+        <activity android:name=".sample.TestVidaTransDrawable"/>
 
     </application>
 

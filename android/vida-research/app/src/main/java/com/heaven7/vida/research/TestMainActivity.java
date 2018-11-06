@@ -14,6 +14,7 @@ import com.heaven7.vida.research.sample.TestShadowShapeActivity;
 import com.heaven7.vida.research.sample.TestSwitchImageActivity;
 import com.heaven7.vida.research.sample.TestV7_CircleImageViewActivity;
 import com.heaven7.vida.research.sample.TestVidaStickyLayoutActivity;
+import com.heaven7.vida.research.sample.TestVidaTransDrawable;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestSwitchImageActivity.class));
         list.add(new ActivityInfo(TestRecyclerViewSwipeActivity.class));
         list.add(new ActivityInfo(TestReadAssetsActivity.class));
+        list.add(new ActivityInfo(TestVidaTransDrawable.class));
     }
 
 }
