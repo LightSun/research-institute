@@ -1,0 +1,5 @@
+
+搭建dart 开发环境
+
+1, 安装dart sdk.
+2, idea 安装dart插件
