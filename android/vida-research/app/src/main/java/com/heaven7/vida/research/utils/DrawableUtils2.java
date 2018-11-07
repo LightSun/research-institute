@@ -13,6 +13,9 @@ import android.support.v8.renderscript.RenderScript;
 import android.support.v8.renderscript.ScriptIntrinsicBlur;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Created by heaven7 on 2018/2/7 0007.
@@ -64,6 +67,23 @@ public class DrawableUtils2 {
         matrix.postScale(scaleWidth, scaleHeight);
         Bitmap newbmp = Bitmap.createBitmap(oldbmp, 0, 0, width, height, matrix, true);
         return new BitmapDrawable(context.getResources(), newbmp);
+    }
+
+    public static void saveBitmap(Bitmap bitmap , String filePath){
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(filePath);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        } finally {
+            if(out != null){
+                try {
+                    out.close();
+                } catch (IOException e) {
+                }
+            }
+        }
     }
 
     public static Bitmap drawableToBitmap(Drawable drawable) {

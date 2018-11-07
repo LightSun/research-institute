@@ -31,8 +31,8 @@ public class TestVidaTransDrawable extends AppCompatActivity {
         vtd.setBackgroundColor(Color.RED);
         vtd.setSize(80);
         vtd.setMiniDrawable(getResources().getDrawable(R.drawable.transition_dissolve));
-        vtd.setTint(Color.LTGRAY);
-        vtd.setTintMode(PorterDuff.Mode.SRC_IN);
+       /* vtd.setTint(Color.LTGRAY);
+        vtd.setTintMode(PorterDuff.Mode.SRC_IN);*/
         mIv.setImageDrawable(vtd);
     }
 }

@@ -7,6 +7,12 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-feature android:name="android.hardware.location.gps"/>
+    <uses-feature android:name="android.hardware.location.network"/>
+
     <application
         android:name=".VidaTestApplication"
         android:allowBackup="true"
@@ -49,6 +55,8 @@
 
         <activity android:name=".sample.TestReadAssetsActivity"/>
         <activity android:name=".sample.TestVidaTransDrawable"/>
+        <activity android:name=".sample.TestGetCityActivity"/>
+        <activity android:name=".sample.TestDynamicContentActivity"/>
 
     </application>
 

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/holo_red_light">
+
+    <Button
+        android:id="@+id/bt_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="start"
+        android:textAllCaps="false"
+        />
+
+    <Button
+        android:id="@+id/bt_scale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="scale"
+        android:textAllCaps="false"
+        />
+
+    <com.heaven7.vida.research.widget.DynamicContentView
+        android:id="@+id/dcv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:paddingRight="2dp"
+        android:layout_margin="10dp"
+        app:dcv_space="10dp"
+        />
+
+    <com.heaven7.vida.research.widget.DynamicContentView
+        android:id="@+id/dcv2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:paddingRight="2dp"
+        android:layout_margin="10dp"
+        app:dcv_space="10dp"
+        />
+    <com.heaven7.vida.research.widget.DynamicContentView
+        android:id="@+id/dcv3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:paddingRight="2dp"
+        android:layout_margin="10dp"
+        app:dcv_space="10dp"
+        />
+</LinearLayout>

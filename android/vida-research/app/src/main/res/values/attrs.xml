@@ -72,4 +72,8 @@
         <attr name="si_dot_enabled" format="boolean|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="DynamicContentView">
+        <attr name="dcv_space" format="dimension|reference"/>
+    </declare-styleable>
+
 </resources>
