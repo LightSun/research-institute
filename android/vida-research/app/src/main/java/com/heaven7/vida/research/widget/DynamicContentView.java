@@ -43,7 +43,7 @@ public class DynamicContentView extends View {
     private Content mContent;
     private TextSizeProvider mTextSizeProvider;
     private FontProvider mFontProvider;
-    /** the space between texts. */
+    /** the base space between texts. */
     private int mSpace;
     /** the scale */
     private float mScale = 1f;
@@ -207,22 +207,22 @@ public class DynamicContentView extends View {
 
         switch (subType){
             case SUB_TYPE_DAY:
-                int daySize = textP.getDayTextSize(type);
-                String dayPath = fontP.getDayFontPath(type);
+                int daySize = textP.getDayTextSize(this, type);
+                String dayPath = fontP.getDayFontPath(this, type);
                 p.setTextSize(daySize * mScale);
                 p.setTypeface(getTypeface0(context, dayPath));
                 break;
 
             case SUB_TYPE_MONTH:
-                int monthSize = textP.getMonthTextSize(type);
-                String monthPath = fontP.getMonthFontPath(type);
+                int monthSize = textP.getMonthTextSize(this, type);
+                String monthPath = fontP.getMonthFontPath(this, type);
                 p.setTextSize(monthSize * mScale);
                 p.setTypeface(getTypeface0(context, monthPath));
                 break;
 
             case SUB_TYPE_TIME:
-                int timeSize = textP.getTimeTextSize(type);
-                String timePath = fontP.getTimeFontPath(type);
+                int timeSize = textP.getTimeTextSize(this, type);
+                String timePath = fontP.getTimeFontPath(this, type);
                 p.setTextSize(timeSize * mScale);
                 p.setTypeface(getTypeface0(context, timePath));
                 break;
@@ -327,9 +327,9 @@ public class DynamicContentView extends View {
      * @
      */
     public interface TextSizeProvider{
-        int getMonthTextSize(int contentType);
-        int getDayTextSize(int contentType);
-        int getTimeTextSize(int contentType);
+        int getMonthTextSize(DynamicContentView view, int contentType);
+        int getDayTextSize(DynamicContentView view,int contentType);
+        int getTimeTextSize(DynamicContentView view, int contentType);
     }
 
     /**
@@ -337,9 +337,9 @@ public class DynamicContentView extends View {
      * if font path return null. means use default typeface.
      */
     public interface FontProvider{
-        String getMonthFontPath(int contentType);
-        String getDayFontPath(int contentType);
-        String getTimeFontPath(int contentType);
+        String getMonthFontPath(DynamicContentView view, int contentType);
+        String getDayFontPath(DynamicContentView view, int contentType);
+        String getTimeFontPath(DynamicContentView view, int contentType);
     }
 
     public static class Content{

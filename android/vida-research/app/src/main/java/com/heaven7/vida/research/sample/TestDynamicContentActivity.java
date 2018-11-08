@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.MainWorker;
@@ -42,6 +43,9 @@ public class TestDynamicContentActivity extends AppCompatActivity implements Dyn
     @BindView(R.id.dcv3)
     DynamicContentView mDcv3;
 
+    @BindView(R.id.vg_cover)
+    ViewGroup mVg_cover;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +78,16 @@ public class TestDynamicContentActivity extends AppCompatActivity implements Dyn
 
     }
 
+    @OnClick(R.id.bt_toggle_cover)
+    public void onClickToggleCover(View view){
+       if(mVg_cover.getVisibility() == View.VISIBLE){
+           mVg_cover.setVisibility(View.GONE);
+       }else{
+           mVg_cover.setVisibility(View.VISIBLE);
+           saveContent();
+       }
+    }
+
     @OnClick(R.id.bt_start)
     public void onClickStart(View v) {
         setContent(mDcv1, TYPE_MONTH);
@@ -88,6 +102,10 @@ public class TestDynamicContentActivity extends AppCompatActivity implements Dyn
         mDcv2.scale(4);
         mDcv3.scale(3);
 
+        //saveContent();
+    }
+
+    private void saveContent(){
         MainWorker.postDelay(2000, new Runnable() {
             @Override
             public void run() {
@@ -101,7 +119,6 @@ public class TestDynamicContentActivity extends AppCompatActivity implements Dyn
         });
     }
 
-
     private void setContent(DynamicContentView view, int type) {
         DynamicContentView.Content content3 = new DynamicContentView.Content.Builder()
                 .setDay("02")
@@ -114,32 +131,32 @@ public class TestDynamicContentActivity extends AppCompatActivity implements Dyn
     }
 
     @Override
-    public int getMonthTextSize(int contentType) {
+    public int getMonthTextSize(DynamicContentView view, int contentType) {
         return DimenUtil.sp2px(getApplicationContext(), 25);
     }
 
     @Override
-    public int getDayTextSize(int contentType) {
+    public int getDayTextSize(DynamicContentView view,int contentType) {
         return DimenUtil.sp2px(getApplicationContext(), 54);
     }
 
     @Override
-    public int getTimeTextSize(int contentType) {
+    public int getTimeTextSize(DynamicContentView view,int contentType) {
         return DimenUtil.sp2px(getApplicationContext(), 14);
     }
 
     @Override
-    public String getMonthFontPath(int contentType) {
+    public String getMonthFontPath(DynamicContentView view,int contentType) {
         return null;
     }
 
     @Override
-    public String getDayFontPath(int contentType) {
+    public String getDayFontPath(DynamicContentView view,int contentType) {
         return null;
     }
 
     @Override
-    public String getTimeFontPath(int contentType) {
+    public String getTimeFontPath(DynamicContentView view,int contentType) {
         return null;
     }
 }
