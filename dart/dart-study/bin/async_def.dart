@@ -18,6 +18,11 @@ Future<int> lookUpVersion() async {
   return 1;
 }
 
+//_开始的命名，表示私有。 函数，变量，类名都可以。
+void _test(){
+   print("_test");
+}
+
 class Stream0 implements Stream<num>{
   @override
   Future<bool> any(bool Function(num element) test) {

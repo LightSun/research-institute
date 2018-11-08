@@ -9,6 +9,7 @@ external void testMethod();
 void main() {
   print('Hello, World!' + name);
   testMethod();
+
   Rect rec = Rect();
   rec.top = 1;
   rec.left = 5;
