@@ -55,6 +55,7 @@
                     android:paddingRight="2dp"
                     android:layout_margin="10dp"
                     app:dcv_space="10dp"
+                    android:visibility="invisible"
                     />
 
                 <com.heaven7.vida.research.widget.DynamicContentView

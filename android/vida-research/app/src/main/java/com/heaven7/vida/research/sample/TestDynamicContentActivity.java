@@ -15,7 +15,6 @@ import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.vida.research.R;
 import com.heaven7.vida.research.utils.DimenUtil;
 import com.heaven7.vida.research.utils.DrawableUtils2;
-import com.heaven7.vida.research.utils.DrawingUtils;
 import com.heaven7.vida.research.widget.DynamicContentView;
 
 import butterknife.BindView;
@@ -109,6 +108,7 @@ public class TestDynamicContentActivity extends AppCompatActivity implements Dyn
         MainWorker.postDelay(2000, new Runnable() {
             @Override
             public void run() {
+                //save drawing cache. even if is invisible.
                 mDcv1.setDrawingCacheEnabled(true);
                 mDcv1.buildDrawingCache(true);
                 Bitmap bitmap = mDcv1.getDrawingCache();
