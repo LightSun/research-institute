@@ -70,6 +70,61 @@ public class MusicCutStarter implements IStarter, MusicCutter {
         return list.toArray(new CutInfo[list.size()]);
     }
 
+    /**
+     * convert the cuts
+     * @param musicPath the music file path
+     * @param cuts the cuts. like '1.1,1.5,1.6'
+     * @param duration the target duration (of video) to fit.
+     * @return the cut plaids.
+     */
+    public static List<IPlaidInfo> convertCuts(String musicPath, String cuts, int duration){
+        String[] strs = cuts.split(",");
+        CollectionVisitService<Float> service = VisitServices.from(Arrays.asList(strs))
+                .map(new ResultVisitor<String, Float>() {
+                    @Override
+                    public Float visit(String s, Object param) {
+                        return Float.valueOf(s);
+                    }
+                });
+        final Float maxTime = service.getAsList().get(service.size() - 1);
+        List<TimeInterval> intervals = new ArrayList<>();
+        service.asListService().fireMulti2(2, 1, null, new FireMultiVisitor2<Float>() {
+            @Override
+            public boolean visit(Object param, int count, int step, List<Float> floats) {
+                //1.5  3.2  4.8  5.7  8.2  9.8 12 . need 10 seconds.   10-9.8 < 1s so last interval is 8.2-10
+                if (floats.size() < 2) {
+                    return true;
+                }
+                Float start = floats.get(0);
+                Float end = floats.get(1);
+                if (start >= duration) {
+                    return true;
+                }
+                // in this interval.
+                if (duration <= end) {
+                    if (duration - start < 1) {
+                        //make last interval end time to duration.
+                        if (intervals.isEmpty()) throw new IllegalStateException("duration = " + duration);
+                        intervals.get(intervals.size() - 1).setEnd(duration);
+                    } else {
+                        intervals.add(new TimeInterval(start, duration));
+                    }
+                    return true;
+                }
+                //not reached max internal
+                intervals.add(new TimeInterval(start, end));
+                return false;
+            }
+        });
+
+        return VisitServices.from(intervals).map(new ResultVisitor<TimeInterval, IPlaidInfo>() {
+            @Override
+            public IPlaidInfo visit(TimeInterval interval, Object param) {
+                return interval.toPlaid(musicPath, maxTime);
+            }
+        }).getAsList();
+    }
+
     public static class MusicCutData {
         @SerializedName("music")
         private String music;
@@ -88,51 +143,7 @@ public class MusicCutStarter implements IStarter, MusicCutter {
             final ColorGapContext context = (ColorGapContext) ctx;
             final int duration = context.getMontageParameter().getDuration();
             // String fileName = FileUtils.getFileName(musicPath);
-            String[] strs = cuts.split(",");
-            CollectionVisitService<Float> service = VisitServices.from(Arrays.asList(strs))
-                    .map(new ResultVisitor<String, Float>() {
-                        @Override
-                        public Float visit(String s, Object param) {
-                            return Float.valueOf(s);
-                        }
-                    });
-            final Float maxTime = service.getAsList().get(service.size() - 1);
-            List<TimeInterval> intervals = new ArrayList<>();
-            service.asListService().fireMulti2(2, 1, null, new FireMultiVisitor2<Float>() {
-                @Override
-                public boolean visit(Object param, int count, int step, List<Float> floats) {
-                    //1.5  3.2  4.8  5.7  8.2  9.8 12 . need 10 seconds.   10-9.8 < 1s so last interval is 8.2-10
-                    if (floats.size() < 2) {
-                        return true;
-                    }
-                    Float start = floats.get(0);
-                    Float end = floats.get(1);
-                    if (start >= duration) {
-                        return true;
-                    }
-                    // in this interval.
-                    if (duration <= end) {
-                        if (duration - start < 1) {
-                            //make last interval end time to duration.
-                            if (intervals.isEmpty()) throw new IllegalStateException("duration = " + duration);
-                            intervals.get(intervals.size() - 1).setEnd(duration);
-                        } else {
-                            intervals.add(new TimeInterval(start, duration));
-                        }
-                        return true;
-                    }
-                    //not reached max internal
-                    intervals.add(new TimeInterval(start, end));
-                    return false;
-                }
-            });
-
-            return VisitServices.from(intervals).map(new ResultVisitor<TimeInterval, IPlaidInfo>() {
-                @Override
-                public IPlaidInfo visit(TimeInterval interval, Object param) {
-                    return interval.toPlaid(musicPath, maxTime);
-                }
-            }).getAsList();
+            return convertCuts(musicPath, cuts , duration);
         }
     }
 
@@ -141,7 +152,7 @@ public class MusicCutStarter implements IStarter, MusicCutter {
         final float start;
         float end;
 
-        public TimeInterval(float start, float end) {
+        TimeInterval(float start, float end) {
             this.start = start;
             this.end = end;
         }
