@@ -10,6 +10,14 @@ public class MontageParam {
     private String templateFileName;
     /** duration in seconds */
     private int duration;
+    private MusicCutter musicCutter;
+
+    public MusicCutter getMusicCutter() {
+        return musicCutter;
+    }
+    public void setMusicCutter(MusicCutter musicCutter) {
+        this.musicCutter = musicCutter;
+    }
 
     /** get the duration in seconds */
     public int getDuration() {
