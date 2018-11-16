@@ -606,6 +606,9 @@ public class MediaPartItem extends BaseContextOwner implements ItemDelegate , Cu
 
     /** get the key frame time ( in seconds). if has high light use high light time. */
     public int getKeyFrameTime() {
+        if(item.isImage()){
+            return 0;
+        }
         KeyValuePair<Integer, List<IHighLightData>> highLight = getHighLight();
         if(highLight != null){
             return highLight.getKey();

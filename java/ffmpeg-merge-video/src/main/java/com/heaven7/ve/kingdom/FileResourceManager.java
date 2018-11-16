@@ -53,6 +53,7 @@ public class FileResourceManager {
      */
     @CallOnce
     public void resolve(ColorGapContext context) {
+        mTemplate = null;
         //template
         String templateDir = context.getInitializeParam().getTemplateDir();
         String templatePath = templateDir + "/" + this.templateName + ".json";
