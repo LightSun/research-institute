@@ -76,4 +76,14 @@
         <attr name="dcv_space" format="dimension|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="PageTipView">
+        <attr name="ptv_tip_color" format="color|reference"/>
+        <attr name="ptv_tip_height" format="dimension|reference"/>
+        <attr name="ptv_tip_round_size" format="dimension|reference"/>
+        <attr name="ptv_tip_min_width" format="dimension|reference"/>
+        <attr name="ptv_tip_max_width" format="dimension|reference"/>
+        <attr name="ptv_tip_count" format="integer|reference"/>
+        <attr name="ptv_tip_space" format="dimension|reference"/>
+    </declare-styleable>
+
 </resources>

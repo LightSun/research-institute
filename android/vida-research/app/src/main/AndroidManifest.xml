@@ -57,6 +57,7 @@
         <activity android:name=".sample.TestVidaTransDrawable"/>
         <activity android:name=".sample.TestGetCityActivity"/>
         <activity android:name=".sample.TestDynamicContentActivity"/>
+        <activity android:name=".sample.TestPageTipViewActivity"/>
 
     </application>
 
