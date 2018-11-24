@@ -12,22 +12,32 @@
 #include <iostream>
 #include <vector>
 
+//see android frameworks/base/include/utils/RefBase.h
 using namespace std;
 
-template <typename T>
-class SmartPtr{
+template <class T>
+class LightRefBase
+{
 public:
-    SmartPtr(T *p = 0):ptr(p){}
+    inline LightRefBase() : mCount(0) { }
+    inline void incStrong(const void* id) const {
+       // android_atomic_inc(&mCount);
+    }
+    inline void decStrong(const void* id) const {
+       /* if (android_atomic_dec(&mCount) == 1) {
+            delete static_cast<const T*>(this);
+        }*/
+    }
+    //! DEBUGGING ONLY: Get current strong ref count.
+    inline int32_t getStrongCount() const {
+        return mCount;
+    }
 
-    ~SmartPtr(){delete ptr ;}
-
-    T &operator*(){return *ptr;}
-
-    T* operator->(){return ptr;}
+protected:
+    inline ~LightRefBase() { }
 
 private:
-
-    T *ptr ;
+    mutable volatile int32_t mCount;
 };
 
 

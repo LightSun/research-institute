@@ -59,6 +59,10 @@
         <activity android:name=".sample.TestDynamicContentActivity"/>
         <activity android:name=".sample.TestPageTipViewActivity"/>
 
+        <activity android:name=".sample.TestTransitionAnimationActivity1"/>
+        <activity android:name=".sample.TestTransitionAnimationActivity2"/>
+        <activity android:name=".sample.TestTransitionAnimationActivity3"/>
+
     </application>
 
 </manifest>
