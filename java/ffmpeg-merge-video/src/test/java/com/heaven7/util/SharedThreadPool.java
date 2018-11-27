@@ -40,6 +40,9 @@ public class SharedThreadPool {
     }
 
     public boolean removeMember(Object member){
+        if(mService == null){
+            return false;
+        }
         boolean result = hasMember0(member, true);
         gc();
         if(mMemberList.isEmpty()){
@@ -47,6 +50,18 @@ public class SharedThreadPool {
             mCallback = null;
         }
         return result;
+    }
+
+    public void destroy(){
+        if(mCallback != null && mService != null) {
+            destroyService(mCallback.onDestroyService(mService));
+            mMemberList.clear();
+            mCallback = null;
+        }
+    }
+
+    public boolean isActive(){
+        return mService != null;
     }
 
     public boolean hasMember(Object member) {
