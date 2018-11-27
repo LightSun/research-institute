@@ -52,6 +52,8 @@ public class CopyHelper {
              ISpecialEffectInfo src = (ISpecialEffectInfo) obj;
              info.setCategory(src.getCategory());
              info.setMultiple(src.getMultiple());
+             info.setStartSpeed(src.getStartSpeed());
+             info.setEndSpeed(src.getEndSpeed());
          }
     }
 }

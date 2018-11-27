@@ -58,4 +58,9 @@ public interface ISpecialEffectInfo extends IEffectInfo {
 
     float getMultiple();
 
+     float getStartSpeed();
+     float getEndSpeed();
+     void setStartSpeed(float speed);
+     void setEndSpeed(float speed);
+
 }

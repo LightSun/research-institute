@@ -12,6 +12,8 @@ import com.heaven7.ve.cross_os.ISpecialEffectInfo;
 
     private int category;
     private float multiple;
+    private float startSpeed;
+    private float endSpeed;
 
     @Override
     public void setCategory(int category) {
@@ -30,6 +32,22 @@ import com.heaven7.ve.cross_os.ISpecialEffectInfo;
         return multiple;
     }
 
+    @Override
+    public float getStartSpeed() {
+        return startSpeed;
+    }
+    @Override
+    public float getEndSpeed() {
+        return endSpeed;
+    }
+    @Override
+    public void setStartSpeed(float speed) {
+        startSpeed = speed;
+    }
+    @Override
+    public void setEndSpeed(float speed) {
+        endSpeed = speed;
+    }
     @Override
     public void setTypeFrom(String val) {
         EffectsHelper.setTypeForSpecialEffect(this, val);
