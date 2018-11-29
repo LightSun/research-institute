@@ -32,7 +32,7 @@ california_housing_dataframe = pd.read_csv("california_housing_train.csv", sep="
 california_housing_dataframe = california_housing_dataframe.reindex(
     np.random.permutation(california_housing_dataframe.index))
 california_housing_dataframe["median_house_value"] /= 1000.0
-print(california_housing_dataframe)
+print(type(california_housing_dataframe))
 print(california_housing_dataframe.describe()) # 输出摘要信息
 
 # Define the input feature: total_rooms.
