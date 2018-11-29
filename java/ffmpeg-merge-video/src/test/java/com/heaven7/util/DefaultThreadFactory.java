@@ -10,10 +10,6 @@ public class DefaultThreadFactory implements ThreadFactory {
     private final String namePrefix;
     private boolean daemon;
 
-    public DefaultThreadFactory(boolean daemon) {
-        this("AsyncComPool", daemon);
-    }
-
     public DefaultThreadFactory(String prefix, boolean daemon) {
         this.daemon = daemon;
         SecurityManager s = System.getSecurityManager();
