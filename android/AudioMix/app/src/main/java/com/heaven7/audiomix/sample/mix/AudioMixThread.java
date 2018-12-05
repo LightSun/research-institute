@@ -8,6 +8,7 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Build;
 import android.os.Process;
+import android.util.Log;
 
 import com.heaven7.audiomix.sample.utils.MediaUtils;
 import com.heaven7.core.util.Logger;
@@ -54,7 +55,6 @@ import java.nio.ByteBuffer;
 
     @Override
     public void release() {
-        super.release();
         if (mEncoder != null) {
             mEncoder.stop();
             mEncoder.release();
@@ -63,6 +63,7 @@ import java.nio.ByteBuffer;
             mDecoder.stop();
             mDecoder.release();
         }
+        super.release();
     }
 
     @Override
@@ -86,8 +87,8 @@ import java.nio.ByteBuffer;
     }
 
     private void processSimpleAudio() {
-        MediaMuxer muxer = getMediaMuxer();
-        if (muxer == null || mTrackIndex < 0) {
+        MediaMixManagerDelegate delegate = getMediaMixManageDelegate();
+        if (delegate == null) {
             return;
         }
         MediaExtractor extractor = getMediaExtractor();
@@ -100,6 +101,8 @@ import java.nio.ByteBuffer;
     private void decodeInputBuffer(MediaExtractor extractor) {
         long endTime = getEndTime();
         long duration = getMediaInfo().duration;
+
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
         //decode input buffer
         for (; ; ) {
             int inputIndex = mDecoder.dequeueInputBuffer(TIMEOUT_US);
@@ -119,53 +122,79 @@ import java.nio.ByteBuffer;
                     }
                     mDecoder.queueInputBuffer(inputIndex, 0, sampleSize, sampleTime, 0);
                     extractor.advance();
-                    decodeOutputBuffer();
+                    if(!decodeOutputBuffer(info)){
+                        break;
+                    }
                 }else{
-                    break;
+                    Log.d(TAG, "InputBuffer BUFFER_FLAG_END_OF_STREAM");
+                    mDecoder.queueInputBuffer(inputIndex, 0, 0, 0,
+                            MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 }
+            }else{
+                break;
             }
         }
     }
 
-    private void decodeOutputBuffer() {
-        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+    private boolean decodeOutputBuffer(MediaCodec.BufferInfo info) {
         int outputIndex = mDecoder.dequeueOutputBuffer(info, -1);
-        if (outputIndex >= 0) {
-            ByteBuffer buffer = getDecodeOutputBuffer(outputIndex);
-            buffer.position(info.offset);
-            buffer.limit(info.offset + info.size);
-            byte[] chunk = new byte[info.size];
-            buffer.get(chunk);
-            buffer.clear();
-            mDecoder.releaseOutputBuffer(outputIndex, false);
-            if (info.size > 0) {
-                encodeData(chunk, info.presentationTimeUs);
-            }
+        switch (outputIndex){
+            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                Log.d(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
+                break;
+
+            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                MediaFormat format = mDecoder.getOutputFormat();
+                Log.d(TAG, "New format " + format);
+                //audioTrack.setPlaybackRate(format.getInteger(MediaFormat.KEY_SAMPLE_RATE));
+               // mTrackIndex = getMediaMixManageDelegate().addTrack(format);
+               // getMediaMixManageDelegate().markMuxerStart();
+                break;
+
+            case MediaCodec.INFO_TRY_AGAIN_LATER:
+                Log.d(TAG, "dequeueOutputBuffer timed out!");
+                break;
+
+            default:
+                ByteBuffer buffer = getDecodeOutputBuffer(outputIndex);
+                buffer.position(info.offset);
+                buffer.limit(info.offset + info.size);
+                if (info.size > 0) {
+                    encodeData(buffer, info.presentationTimeUs);
+                }
+                mDecoder.releaseOutputBuffer(outputIndex, false);
+                buffer.clear();
+
         }
+
+        if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+            Log.d(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
+            return false;
+        }
+        return true;
     }
 
-    private void encodeData(byte[] data, long presentationTimeUs) {
-        MediaMuxer muxer = getMediaMuxer();
+    private void encodeData(ByteBuffer data, long presentationTimeUs) {
+        MediaMixManagerDelegate delegate = getMediaMixManageDelegate();
         int inputIndex = mEncoder.dequeueInputBuffer(-1);
         if (inputIndex >= 0) {
             ByteBuffer buffer = getEncodeInputBuffer(inputIndex);
             buffer.clear();
             buffer.put(data);
 
-            mEncoder.queueInputBuffer(inputIndex, 0, data.length, presentationTimeUs, 0);
+            mEncoder.queueInputBuffer(inputIndex, 0, data.limit() - data.position(), presentationTimeUs, 0);
         }
 
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
         int outputIndex = mEncoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_US);
-        for (; outputIndex >= 0; ) {
+        while (outputIndex >= 0){
             ByteBuffer outputBuffer = getEncodeOutputBuffer(outputIndex);
             outputBuffer.position(bufferInfo.offset);
             outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
 
-            muxer.writeSampleData(mTrackIndex, outputBuffer, bufferInfo);
+            delegate.writeSampleData(mTrackIndex, outputBuffer, bufferInfo);
             mEncoder.releaseOutputBuffer(outputIndex, false);
-
-            outputIndex = mEncoder.dequeueOutputBuffer(bufferInfo, 0);
+            outputIndex = mEncoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_US);
         }
     }
 

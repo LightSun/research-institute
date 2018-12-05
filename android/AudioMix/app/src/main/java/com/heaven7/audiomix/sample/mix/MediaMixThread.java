@@ -5,6 +5,7 @@ import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -24,7 +25,6 @@ import java.nio.ByteBuffer;
     private final MediaExtractor mExtractor = new MediaExtractor();
     private final MediaInfo info = new MediaInfo();
     private final String path;
-    private MediaMuxer muxer;
     private MediaMixManagerDelegate mMixManageDelegate;
 
     private int mediaType = UNSUPPORT;
@@ -44,9 +44,6 @@ import java.nio.ByteBuffer;
     }
     public MediaExtractor getMediaExtractor() {
         return mExtractor;
-    }
-    public MediaMuxer getMediaMuxer() {
-        return muxer;
     }
     public MediaMixManagerDelegate getMediaMixManageDelegate() {
         return mMixManageDelegate;
@@ -76,13 +73,11 @@ import java.nio.ByteBuffer;
 
     public void init(MediaMuxer muxer, MediaMixManagerDelegate delegate) throws IOException{
         this.mMixManageDelegate = delegate;
-        this.muxer = muxer;
         this.mediaType = getMediaType(getPath());
         initImpl(muxer);
     }
 
     public void release(){
-        muxer = null;
         mMixManageDelegate = null;
     }
 
@@ -94,8 +89,8 @@ import java.nio.ByteBuffer;
      */
     protected void readAndWriteDirectly(int trackIndex) {
         //super.run();
-        MediaMuxer muxer = getMediaMuxer();
-        if(muxer == null || trackIndex < 0){
+        MediaMixManagerDelegate delegate = getMediaMixManageDelegate();
+        if(delegate == null || trackIndex < 0){
             return;
         }
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
@@ -118,7 +113,8 @@ import java.nio.ByteBuffer;
             if(endTime > 0 && endTime < info.presentationTimeUs){
                 break;
             }
-            muxer.writeSampleData(trackIndex, buffer, info);
+            delegate.writeSampleData(trackIndex, buffer, info);
+          //  muxer.writeSampleData(trackIndex, buffer, info);
             extractor.advance();
         }
     }
@@ -134,5 +130,11 @@ import java.nio.ByteBuffer;
         default void markVideoEnd(){}
         default void markAudioStart(){}
         default void markAudioEnd(){}
+
+        void writeSampleData(int trackIndex, @NonNull ByteBuffer byteBuf,
+                             @NonNull MediaCodec.BufferInfo bufferInfo);
+        boolean isStarted();
+        int addTrack(MediaFormat format);
+        void markMuxerStart();
     }
 }

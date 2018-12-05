@@ -24,7 +24,6 @@ public class TestVideoAudioMixActivity extends AppCompatActivity {
 
     private static final String TAG = "TestVideoAudioMix";
     private final PermissionHelper mHelper = new PermissionHelper(this);
-    // private VideoAudioMixer mMixer;
    // private Compounder mMixer;
     private MediaMixHelper mMixer ;
 
