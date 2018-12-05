@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 /*public*/ class AudioMixThread extends MediaMixThread {
 
     private static final String TAG = "AudioMixThread";
+    private final MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
     private MediaCodec mEncoder;
     private MediaCodec mDecoder;
     private int mTrackIndex = -1;
@@ -50,7 +51,7 @@ import java.nio.ByteBuffer;
         mEncoder.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mEncoder.start();
 
-        mTrackIndex = muxer.addTrack(mEncoder.getOutputFormat());
+       // mTrackIndex = muxer.addTrack(mEncoder.getOutputFormat());
     }
 
     @Override
@@ -85,6 +86,57 @@ import java.nio.ByteBuffer;
         }
         getMediaMixManageDelegate().markAudioEnd();
     }
+
+    /**
+     * The code profile, Sample rate, channel Count is used to
+     * produce the AAC Codec SpecificData.
+     * Android 4.4.2/frameworks/av/media/libstagefright/avc_utils.cpp refer
+     * to the portion of the code written.
+     *
+     * MPEG-4 Audio refer : http://wiki.multimedia.cx/index.php?title=MPEG-4_Audio#Audio_Specific_Config
+     *
+     * @param audioProfile is MPEG-4 Audio Object Types
+     * @param sampleRate
+     * @param channelConfig
+     * @return MediaFormat
+     */
+    private MediaFormat makeAACCodecSpecificData(int audioProfile, int sampleRate, int channelConfig) {
+        MediaFormat format = new MediaFormat();
+        format.setString(MediaFormat.KEY_MIME, "audio/mp4a-latm");
+        format.setInteger(MediaFormat.KEY_SAMPLE_RATE, sampleRate);
+        format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, channelConfig);
+
+        int samplingFreq[] = {
+                96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
+                16000, 12000, 11025, 8000
+        };
+
+        // Search the Sampling Frequencies
+        int sampleIndex = -1;
+        for (int i = 0; i < samplingFreq.length; ++i) {
+            if (samplingFreq[i] == sampleRate) {
+                Log.d("TAG", "kSamplingFreq " + samplingFreq[i] + " i : " + i);
+                sampleIndex = i;
+            }
+        }
+        if (sampleIndex == -1) {
+            throw new IllegalStateException("wrong sample rate");
+        }
+
+        ByteBuffer csd = ByteBuffer.allocate(2);
+        csd.put((byte) ((audioProfile << 3) | (sampleIndex >> 1)));
+
+        csd.position(1);
+        csd.put((byte) ((byte) ((sampleIndex << 7) & 0x80) | (channelConfig << 3)));
+        csd.flip();
+        format.setByteBuffer("csd-0", csd); // add csd-0
+
+        for (int k = 0; k < csd.capacity(); ++k) {
+            Log.e("TAG", "csd : " + csd.array()[k]);
+        }
+        return format;
+    }
+
 
     private void processSimpleAudio() {
         MediaMixManagerDelegate delegate = getMediaMixManageDelegate();
@@ -147,8 +199,6 @@ import java.nio.ByteBuffer;
                 MediaFormat format = mDecoder.getOutputFormat();
                 Log.d(TAG, "New format " + format);
                 //audioTrack.setPlaybackRate(format.getInteger(MediaFormat.KEY_SAMPLE_RATE));
-               // mTrackIndex = getMediaMixManageDelegate().addTrack(format);
-               // getMediaMixManageDelegate().markMuxerStart();
                 break;
 
             case MediaCodec.INFO_TRY_AGAIN_LATER:
@@ -159,11 +209,13 @@ import java.nio.ByteBuffer;
                 ByteBuffer buffer = getDecodeOutputBuffer(outputIndex);
                 buffer.position(info.offset);
                 buffer.limit(info.offset + info.size);
-                if (info.size > 0) {
-                    encodeData(buffer, info.presentationTimeUs);
-                }
-                mDecoder.releaseOutputBuffer(outputIndex, false);
+                byte[] chunk = new byte[info.size];
+                buffer.get(chunk);
                 buffer.clear();
+                mDecoder.releaseOutputBuffer(outputIndex, false);
+                if (info.size > 0) {
+                    encodeData(chunk, info.presentationTimeUs);
+                }
 
         }
 
@@ -174,27 +226,62 @@ import java.nio.ByteBuffer;
         return true;
     }
 
-    private void encodeData(ByteBuffer data, long presentationTimeUs) {
-        MediaMixManagerDelegate delegate = getMediaMixManageDelegate();
+    private void encodeData(byte[] data, long presentationTimeUs) {
         int inputIndex = mEncoder.dequeueInputBuffer(-1);
         if (inputIndex >= 0) {
             ByteBuffer buffer = getEncodeInputBuffer(inputIndex);
             buffer.clear();
             buffer.put(data);
 
-            mEncoder.queueInputBuffer(inputIndex, 0, data.limit() - data.position(), presentationTimeUs, 0);
+            mEncoder.queueInputBuffer(inputIndex, 0, data.length, presentationTimeUs, 0);
         }
+        encodeImpl();
+    }
 
-        MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
-        int outputIndex = mEncoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_US);
-        while (outputIndex >= 0){
-            ByteBuffer outputBuffer = getEncodeOutputBuffer(outputIndex);
-            outputBuffer.position(bufferInfo.offset);
-            outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
+    private void encodeImpl() {
+        MediaMixManagerDelegate delegate = getMediaMixManageDelegate();
+        MediaCodec.BufferInfo bufferInfo = this.mBufferInfo;
+        out:
+        while (true){
+            int outputIndex = mEncoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_US);
 
-            delegate.writeSampleData(mTrackIndex, outputBuffer, bufferInfo);
-            mEncoder.releaseOutputBuffer(outputIndex, false);
-            outputIndex = mEncoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_US);
+            switch (outputIndex){
+                case MediaCodec.INFO_TRY_AGAIN_LATER: //time out
+                    Logger.d(TAG, "encodeData", "INFO_TRY_AGAIN_LATER");
+                    break;
+
+                case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                    Logger.d(TAG, "encodeData", "INFO_OUTPUT_BUFFERS_CHANGED");
+                    break;
+
+                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                    Logger.d(TAG, "encodeData", "INFO_OUTPUT_FORMAT_CHANGED");
+                    mTrackIndex = getMediaMixManageDelegate().addTrack(mEncoder.getOutputFormat());
+                    getMediaMixManageDelegate().markMuxerStart();
+                    break;
+
+                default:
+                    if(outputIndex < 0){
+                        //ignore
+                        Logger.w(TAG, "encodeData", "unexpected result from encoder.dequeueOutputBuffer: " +
+                                outputIndex);
+                    }else{
+                        if(bufferInfo.size > 0) {
+                            ByteBuffer outputBuffer = getEncodeOutputBuffer(outputIndex);
+                            outputBuffer.position(bufferInfo.offset);
+                            outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
+
+                            delegate.writeSampleData(mTrackIndex, outputBuffer, bufferInfo);
+                            Logger.d(TAG, "encodeImpl", "send  " + bufferInfo.size + " bytes to muxer.");
+                        }
+                        mEncoder.releaseOutputBuffer(outputIndex, false);
+
+                        if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                            Logger.d(TAG, "encodeData", "end of stream reached");
+                            break out;      // out of while
+                        }
+                    }
+            }
         }
     }
 

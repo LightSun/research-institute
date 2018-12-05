@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * 音视频合成器
+ * 音视频合成器 test ok. 60s -> 15s
  */
 @TargetApi(18)
 public class Compounder {

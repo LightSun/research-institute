@@ -44,10 +44,9 @@ public class MediaMixHelper implements MediaMixThread.MediaMixManagerDelegate {
 
             mStartTime = System.currentTimeMillis();
 
-            markMuxerStart();
             //start audio wait audio format added.
             mAudioThread.start();
-            mVideoThread.start();
+            //mVideoThread.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,7 +63,7 @@ public class MediaMixHelper implements MediaMixThread.MediaMixManagerDelegate {
             Logger.d(TAG, "markMuxerStart", "");
             mMediaMuxer.start();
             //start video thread now.
-            //mVideoThread.start();
+            mVideoThread.start();
         }
     }
 
