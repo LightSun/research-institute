@@ -316,6 +316,7 @@ public class EncodeAndMuxTest{
         GLES20.glClearColor(TEST_R0 / 255.0f, TEST_G0 / 255.0f, TEST_B0 / 255.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
+        //裁剪测试 . glScissor 以左下角为原点
         GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
         GLES20.glScissor(startX, startY, mWidth / 4, mHeight / 2);
         GLES20.glClearColor(TEST_R1 / 255.0f, TEST_G1 / 255.0f, TEST_B1 / 255.0f, 1.0f);

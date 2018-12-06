@@ -23,7 +23,8 @@
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    
+    <uses-permission android:name="android.permission.CAMERA"/>
+
     <application
         android:label="@string/app_name" android:icon="@drawable/ic_launcher">
         <activity android:name="com.heaven7.android.TestMainActivity">
@@ -36,6 +37,8 @@
         <activity android:name=".MainActivity"/>
         <activity android:name="com.heaven7.android.sample.TestMediaCodecAudioTrackActivity"/>
         <activity android:name="com.heaven7.android.sample.TestEncodeAndMuxActivity"/>
+        <activity android:name="com.heaven7.android.sample.TestCameraToMpegActivity"/>
+        <activity android:name="com.heaven7.android.sample.TestExtractMpegFramesActivity"/>
     </application>
 
 </manifest>

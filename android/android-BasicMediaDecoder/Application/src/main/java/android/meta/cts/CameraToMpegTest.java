@@ -17,6 +17,7 @@
 package android.meta.cts;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.MediaCodec;
@@ -34,13 +35,17 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Display;
 import android.view.Surface;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+
+import static android.content.Context.WINDOW_SERVICE;
 
 //20131106: removed unnecessary glFinish(), removed hard-coded "/sdcard"
 //20131205: added alpha to EGLConfig
@@ -68,7 +73,7 @@ import java.nio.FloatBuffer;
 @TargetApi(18)
 public class CameraToMpegTest{
     private static final String TAG = "CameraToMpegTest";
-    private static final boolean VERBOSE = false;           // lots of logging
+    private static final boolean VERBOSE = true;           // lots of logging
 
     // where to put the output file (note: /sdcard requires WRITE_EXTERNAL_STORAGE permission)
     private static final File OUTPUT_DIR = Environment.getExternalStorageDirectory();
@@ -102,6 +107,11 @@ public class CameraToMpegTest{
 
     // allocate one of these up front so we don't need to do it every time
     private MediaCodec.BufferInfo mBufferInfo;
+    private final Context mContext;
+
+    public CameraToMpegTest(Context mContext) {
+        this.mContext = mContext;
+    }
 
     /** test entry point */
     public void testEncodeCameraToMp4() throws Throwable {
@@ -137,7 +147,7 @@ public class CameraToMpegTest{
             CameraToMpegWrapper wrapper = new CameraToMpegWrapper(obj);
             Thread th = new Thread(wrapper, "codec test");
             th.start();
-            th.join();
+            //th.join();
             if (wrapper.mThrowable != null) {
                 throw wrapper.mThrowable;
             }
@@ -310,6 +320,14 @@ public class CameraToMpegTest{
         SurfaceTexture st = mStManager.getSurfaceTexture();
         try {
             mCamera.setPreviewTexture(st);
+            Display display = ((WindowManager)mContext.getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+
+            if(display.getRotation() == Surface.ROTATION_0) {
+                mCamera.setDisplayOrientation(90);
+            }
+            if(display.getRotation() == Surface.ROTATION_270) {
+                mCamera.setDisplayOrientation(180);
+            }
         } catch (IOException ioe) {
             throw new RuntimeException("setPreviewTexture failed", ioe);
         }
@@ -848,11 +866,12 @@ public class CameraToMpegTest{
             if (mProgram == 0) {
                 throw new RuntimeException("failed creating program");
             }
+            //获取指向着色器中aPosition的index
             maPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
             checkLocation(maPositionHandle, "aPosition");
             maTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             checkLocation(maTextureHandle, "aTextureCoord");
-
+            //获取 uMVPMatrix的index(数据类型为uniform)
             muMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
             checkLocation(muMVPMatrixHandle, "uMVPMatrix");
             muSTMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uSTMatrix");
@@ -893,9 +912,11 @@ public class CameraToMpegTest{
         private int loadShader(int shaderType, String source) {
             int shader = GLES20.glCreateShader(shaderType);
             checkGlError("glCreateShader type=" + shaderType);
+            //向shader容器中添加源代码
             GLES20.glShaderSource(shader, source);
             GLES20.glCompileShader(shader);
             int[] compiled = new int[1];
+            //获取shader编译状态
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);
             if (compiled[0] == 0) {
                 Log.e(TAG, "Could not compile shader " + shaderType + ":");
@@ -926,6 +947,11 @@ public class CameraToMpegTest{
             checkGlError("glAttachShader");
             GLES20.glLinkProgram(program);
             int[] linkStatus = new int[1];
+            /* 从着色器返回一个值. pname 取值为下面任意一个：
+             * GL_DELETE_STATUS，GL_LINK_STATUS，GL_VALIDATE_STATUS，
+             * GL_INFO_LOG_LENGTH，GL_ATTACHED_SHADERS，GL_ACTIVE_ATTRIBUTES，
+             * GL_ACTIVE_UNIFORMS，GL_ACTIVE_ATTRIBUTE_MAX_LENGTH，GL_ACTIVE_UNIFORM_MAX_LENGTH。
+             */
             GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
             if (linkStatus[0] != GLES20.GL_TRUE) {
                 Log.e(TAG, "Could not link program: ");

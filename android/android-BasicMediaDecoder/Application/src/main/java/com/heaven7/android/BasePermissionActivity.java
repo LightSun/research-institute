@@ -14,7 +14,7 @@ public abstract class BasePermissionActivity extends BaseActivity {
 
     @Override
     protected void onInitialize(Context context, Bundle savedInstanceState) {
-        requestPermissions(new SdcardPermissionProvider());
+        requestPermissions(getPermissionProvider());
     }
 
     @Override
@@ -43,6 +43,10 @@ public abstract class BasePermissionActivity extends BaseActivity {
      * @param success true if request permission success
      */
     protected abstract void onRequestPermissionEnd(String permission, int requestCode, boolean success);
+
+    protected PermissionProvider getPermissionProvider(){
+        return new SdcardPermissionProvider();
+    }
 
 
     public interface PermissionProvider{
