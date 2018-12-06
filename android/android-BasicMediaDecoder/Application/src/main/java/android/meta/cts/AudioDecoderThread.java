@@ -22,10 +22,14 @@ public class AudioDecoderThread {
 
     private boolean eosReceived;
     private int mSampleRate = 0;
-    int channel = 0;
+    private int channel = 0;
     private final String TAG = "AACPlay";
+    /** in us */
+    private long startTime = -1;
+    /** in us */
+    private long endTime = -1;
 
-    final Runnable AACDecoderAndPlayRunnable = new Runnable() {
+    private final Runnable AACDecoderAndPlayRunnable = new Runnable() {
         @Override
         public void run() {
             AACDecoderAndPlay();
@@ -61,6 +65,12 @@ public class AudioDecoderThread {
     }
 
     public void AACDecoderAndPlay() {
+        //seek by start time
+        long startTime = getStartTime();
+        if(startTime > 0){
+            mExtractor.seekTo(startTime, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
+        }
+
         ByteBuffer[] inputBuffers = mDecoder.getInputBuffers();
         ByteBuffer[] outputBuffers = mDecoder.getOutputBuffers();
 
@@ -76,13 +86,14 @@ public class AudioDecoderThread {
         //启动AudioTrack
         audioTrack.play();
 
+        long endTime = getEndTime();
         while (!eosReceived) {
             int inIndex = mDecoder.dequeueInputBuffer(TIMEOUT_US);
             if (inIndex >= 0) {
                 ByteBuffer buffer = inputBuffers[inIndex];
                 //从MediaExtractor中读取一帧待解数据
                 int sampleSize = mExtractor.readSampleData(buffer, 0);
-                if (sampleSize < 0) {
+                if (sampleSize < 0 || (endTime > 0  && mExtractor.getSampleTime() > endTime)) {
                     // We shouldn't stop the playback at this point, just pass the EOS
                     // flag to mDecoder, we will get it again from the
                     // dequeueOutputBuffer
@@ -148,6 +159,20 @@ public class AudioDecoderThread {
         audioTrack.stop();
         audioTrack.release();
         audioTrack = null;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
     }
 
     public void stop() {

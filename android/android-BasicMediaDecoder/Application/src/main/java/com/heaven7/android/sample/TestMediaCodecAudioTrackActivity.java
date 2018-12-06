@@ -42,7 +42,9 @@ public class TestMediaCodecAudioTrackActivity extends BasePermissionActivity {
     public void onClickStart(View view){
         String video = Environment.getExternalStorageDirectory() + "/vida/test_videos/v1.mp4";
         String audio = Environment.getExternalStorageDirectory() + "/vida/test_videos/music.mp3";
-        try {
+        try {//2s - 10s
+            mAudioThread.setStartTime(2 * 1000000);
+            mAudioThread.setEndTime(10 * 1000000);
             mAudioThread.startPlay(audio);
             mAudioThread2.startPlay(video);
         } catch (IOException e) {
