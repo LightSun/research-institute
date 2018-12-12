@@ -42,8 +42,9 @@ public class TestAll {
     @Test
     public void test1(){
       //  String expre = "String.valueOf(1).test(1,2, Integer.valueOf(\"3\"))";
-       // String expre = "String. valueOf(a.b.c[1], a==b, a ? c :d==f) .test(true, Integer.valueOf(), Integer.valueOf(\"3\"))";
-        String expre = " z.intVal() == String.valueOf((a))";
+       // String expre = "String.valueOf(a.b.c[1], a==b, a ? c :d==f).test(true, Integer.valueOf(\"3\"))";
+      //  String expre = " a ? z.intVal() : a.test(a.b[1]==c, Integer.valueOf(c), f.c(x)[0])";
+        String expre = "f.c(x)[0]";
 
         CodePointCharStream stream = CharStreams.fromString(expre);
         //用 in 构造词法分析器 lexer，词法分析的作用是产生记号

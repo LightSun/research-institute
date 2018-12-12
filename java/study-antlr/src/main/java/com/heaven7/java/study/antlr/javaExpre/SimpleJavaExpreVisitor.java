@@ -58,6 +58,12 @@ public class SimpleJavaExpreVisitor<T> extends AbstractParseTreeVisitor<T> imple
     }
 
     @Override
+    public T visitMethodInvoke_ArrayOrMap(JavaExpreParser.MethodInvoke_ArrayOrMapContext ctx) {
+        log(ctx, "visitMethodInvoke_ArrayOrMap");
+        return visitChildren(ctx);
+    }
+
+    @Override
     public T visitArrayExpre(JavaExpreParser.ArrayExpreContext ctx) {
         log(ctx, "visitArrayExpre");
         return visitChildren(ctx);
@@ -117,6 +123,17 @@ public class SimpleJavaExpreVisitor<T> extends AbstractParseTreeVisitor<T> imple
     @Override
     public T visitVarNameExpre(JavaExpreParser.VarNameExpreContext ctx) {
         log(ctx, "visitVarNameExpre");
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public T visitStringExpr(JavaExpreParser.StringExprContext ctx) {
+        log(ctx, "visitStringExpr");
+        return visitChildren(ctx);
+    }
+    @Override
+    public T visitNumberExpr(JavaExpreParser.NumberExprContext ctx) {
+        log(ctx, "visitNumberExpr");
         return visitChildren(ctx);
     }
 

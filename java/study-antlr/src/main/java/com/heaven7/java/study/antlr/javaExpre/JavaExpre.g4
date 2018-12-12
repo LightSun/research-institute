@@ -15,7 +15,7 @@ surroundExpre
 
 // except BooleanExpre there are no boolean expre.
 expre
-    :varNameExpre | arrayInvoke | fieldInvoke | methodInvoke | StringLiteral | IntNumber | FloatNumber | booleanConstantExpre
+    :varNameExpre | arrayInvoke | fieldInvoke | methodInvoke_ArrayOrMap | stringExpr | numberExpr | booleanConstantExpre
     ;
 
 simpleExpreList
@@ -33,6 +33,9 @@ fieldInvoke
 methodInvoke
    // : qualifiedName ('.' V '('')')
     : (classNameExpre | varNameExpre) (DOT methodExpre)+
+    ;
+methodInvoke_ArrayOrMap
+    : methodInvoke (arrayExpre)?
     ;
 
 arrayExpre
@@ -93,13 +96,19 @@ classNameExpre
 varNameExpre
      :VarName
      ;
+stringExpr
+     :StringLiteral
+     ;
+numberExpr
+     :IntNumber| FloatNumber
+     ;
 
 ClassName
-    :[A-Z] JavaLetterOrDigit*
+    :[A-Z$] JavaLetterOrDigit*
     ;
 
 VarName
-    : [a-z$_] JavaLetterOrDigit *
+    : [a-z_] JavaLetterOrDigit *
     ;
 
 StringLiteral
