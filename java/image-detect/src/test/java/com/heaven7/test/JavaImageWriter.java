@@ -15,6 +15,8 @@ import java.io.IOException;
  */
 public class JavaImageWriter implements ImageWriter {
 
+    public static final JavaImageWriter DEFAULT = new JavaImageWriter();
+
     @Override
     public boolean write(Matrix2<Integer> mat, File dst, int imageType, String format) {
         int type = ImageFactory.getImageInitializer().getImageTypeTransformer().publicToNative(imageType);

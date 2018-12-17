@@ -13,6 +13,8 @@ import java.io.InputStream;
 
 public class JavaImageReader implements ImageReader {
 
+    public static final JavaImageReader DEFAULT = new JavaImageReader();
+
     @Override
     public ImageInfo readMatrix(String img, ImageLimitInfo info) {
         File srcFile = new File(img);

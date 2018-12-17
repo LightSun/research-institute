@@ -11,6 +11,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 public class ImageUtils {
 
     @Platform
-    public static Matrix2<Integer> image2Matrix(BufferedImage image){
+    public static Matrix2<Integer> image2Matrix(BufferedImage image) {
         int w = image.getWidth();
         int h = image.getHeight();
         List<List<Integer>> list = new ArrayList<>();
@@ -36,7 +37,7 @@ public class ImageUtils {
     }
 
     @Platform //exclude the mat
-    public static ImageReader.ImageInfo createBaseImageInfo(BufferedImage image){
+    public static ImageReader.ImageInfo createBaseImageInfo(BufferedImage image) {
         int imageType = ImageFactory.getImageInitializer().getImageTypeTransformer().nativeToPublic(image.getType());
         ImageReader.ImageInfo imageInfo = new ImageReader.ImageInfo();
         imageInfo.setImageType(imageType);
@@ -44,13 +45,14 @@ public class ImageUtils {
         imageInfo.setHeight(image.getHeight());
         return imageInfo;
     }
+
     @Platform
-    public static ImageReader.ImageInfo readMatrix(BufferedImage image, ImageLimitInfo info){
+    public static ImageReader.ImageInfo readMatrix(BufferedImage image, ImageLimitInfo info) {
         ImageReader.ImageInfo imageInfo = createBaseImageInfo(image);
         //scale if need
-        if(info != null && info.hasLimitWidthOrHeight()){
+        if (info != null && info.hasLimitWidthOrHeight()) {
             float scaleRate = computeScaleRate(image.getWidth(), image.getHeight(), info.getMaxWidth(), info.getMaxHeight());
-            if(scaleRate != 1f ){
+            if (scaleRate != 1f) {
                 AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scaleRate, scaleRate), null);
                 image = ato.filter(image, null);
             }
@@ -62,12 +64,12 @@ public class ImageUtils {
     }
 
     @Platform
-    public static ImageReader.ImageInfo readBytes(BufferedImage image, String format, ImageLimitInfo info){
+    public static ImageReader.ImageInfo readBytes(BufferedImage image, String format, ImageLimitInfo info) {
         ImageReader.ImageInfo imageInfo = createBaseImageInfo(image);
         //scale if need
-        if(info != null && info.hasLimitWidthOrHeight()){
+        if (info != null && info.hasLimitWidthOrHeight()) {
             float scaleRate = computeScaleRate(image.getWidth(), image.getHeight(), info.getMaxWidth(), info.getMaxHeight());
-            if(scaleRate != 1f) {
+            if (scaleRate != 1f) {
                 AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scaleRate, scaleRate), null);
                 image = ato.filter(image, null);
             }
@@ -86,15 +88,66 @@ public class ImageUtils {
         return imageInfo;
     }
 
-    public static float computeScaleRate(int width, int height, int maxWidth, int maxHeight){
+    public static float computeScaleRate(int width, int height, int maxWidth, int maxHeight) {
         float ratioW = 1f, ratioH = 1f;
-        if(width > maxWidth){
-            ratioW =  maxWidth * 1f / width;
+        if (width > maxWidth) {
+            ratioW = maxWidth * 1f / width;
         }
-        if(height > maxHeight){
-            ratioH =  maxHeight * 1f / height;
+        if (height > maxHeight) {
+            ratioH = maxHeight * 1f / height;
         }
-       return Math.min(ratioW, ratioH);
+        return Math.min(ratioW, ratioH);
+    }
+
+    /**
+     * @param source the src image
+     * @param startX the start x, include
+     * @param startY the start y, include
+     * @param endX the end x, exclude
+     * @param endY the end y, exclude
+     * @return cropped image
+     */
+    public static BufferedImage crop(BufferedImage source, int startX, int endX, int startY, int endY) {
+        if (startX < 0) {
+            endX -= startX;
+            startX = 0;
+        }else if(endX > source.getWidth()){
+            int diff = endX - (source.getWidth());
+            endX = source.getWidth();
+            startX -= diff;
+        }
+        if (startY < 0) {
+            endY -= startY;
+            startY = 0;
+        }else if(endY > source.getHeight()){
+            int diff = endY - source.getHeight();
+            endY = source.getHeight();
+            startY -= diff;
+        }
+        if(startX < 0 || startY < 0 || endX > source.getWidth() || endY > source.getHeight()){
+            throw new IllegalStateException();
+        }
+        BufferedImage result = new BufferedImage(endX - startX, endY - startY, source.getType());
+       // System.out.println("result w = " + result.getWidth() + " ,h = " + result.getHeight());
+        for (int y = startY; y < endY; y++) {
+            for (int x = startX; x < endX ; x++) {
+                int rgb = source.getRGB(x, y);
+                result.setRGB(x - startX, y - startY, rgb);
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        String file = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\白色吊带长裙\\DSC_2329.jpg";
+        String outFile = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\白色吊带长裙\\DSC_2329_test.jpg";
+        try {
+            BufferedImage in = ImageIO.read(new File(file));
+            BufferedImage out = crop(in, 300, 800, 500, 1000);
+            ImageIO.write(out, "jpg", new File(outFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
