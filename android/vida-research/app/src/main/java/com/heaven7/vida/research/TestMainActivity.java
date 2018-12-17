@@ -11,6 +11,7 @@ import com.heaven7.vida.research.sample.TestPageTipViewActivity;
 import com.heaven7.vida.research.sample.TestRectProgresActivity;
 import com.heaven7.vida.research.sample.TestRecyclerViewSwipeActivity;
 import com.heaven7.vida.research.sample.TestRoundViewActivity;
+import com.heaven7.vida.research.sample.TestScaleDrawableActivity;
 import com.heaven7.vida.research.sample.TestShadowShapeActivity;
 import com.heaven7.vida.research.sample.TestSwitchImageActivity;
 import com.heaven7.vida.research.sample.TestTransitionAnimationActivity1;
@@ -55,6 +56,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestDynamicContentActivity.class));
         list.add(new ActivityInfo(TestPageTipViewActivity.class));
         list.add(new ActivityInfo(TestTransitionAnimationActivity1.class));
+        list.add(new ActivityInfo(TestScaleDrawableActivity.class));
     }
 
 }

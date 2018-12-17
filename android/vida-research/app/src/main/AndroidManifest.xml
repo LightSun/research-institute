@@ -63,6 +63,8 @@
         <activity android:name=".sample.TestTransitionAnimationActivity2"/>
         <activity android:name=".sample.TestTransitionAnimationActivity3"/>
 
+        <activity android:name=".sample.TestScaleDrawableActivity"/>
+
     </application>
 
 </manifest>
