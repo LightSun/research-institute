@@ -7,6 +7,7 @@ import com.heaven7.vida.research.sample.TestBaiduFace2Activity;
 import com.heaven7.vida.research.sample.TestBaiduFaceActivity;
 import com.heaven7.vida.research.sample.TestDiscViewActivity;
 import com.heaven7.vida.research.sample.TestDynamicContentActivity;
+import com.heaven7.vida.research.sample.TestLottieActivity;
 import com.heaven7.vida.research.sample.TestPageTipViewActivity;
 import com.heaven7.vida.research.sample.TestRectProgresActivity;
 import com.heaven7.vida.research.sample.TestRecyclerViewSwipeActivity;
@@ -57,6 +58,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestPageTipViewActivity.class));
         list.add(new ActivityInfo(TestTransitionAnimationActivity1.class));
         list.add(new ActivityInfo(TestScaleDrawableActivity.class));
+        list.add(new ActivityInfo(TestLottieActivity.class));
     }
 
 }

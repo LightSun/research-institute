@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:lottie_fileName="aes/music_download.json"
+        />
+
+    <Button
+        android:id="@+id/bt_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textAllCaps="false"
+        />
+
+     <android.support.v7.widget.RecyclerView
+         android:id="@+id/rv"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:padding="10dp"
+         android:clipToPadding="false"
+         >
+     </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

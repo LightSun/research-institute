@@ -64,6 +64,7 @@
         <activity android:name=".sample.TestTransitionAnimationActivity3"/>
 
         <activity android:name=".sample.TestScaleDrawableActivity"/>
+        <activity android:name=".sample.TestLottieActivity"/>
 
     </application>
 
