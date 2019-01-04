@@ -14,6 +14,7 @@ import com.heaven7.core.util.ViewHelper;
 import com.heaven7.core.util.WeakHandler;
 import com.heaven7.vida.research.BaseActivity;
 import com.heaven7.vida.research.R;
+import com.heaven7.vida.research.utils.CycleLottie;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class TestLottieActivity extends BaseActivity {
 
     private final InternalHandler mHandler = new InternalHandler(this);
     private QuickRecycleViewAdapter<Item> mAdapter;
+    private CycleLottie mCycleLottie;
 
     @BindView(R.id.lav)
     LottieAnimationView mLav;
@@ -48,10 +50,12 @@ public class TestLottieActivity extends BaseActivity {
 
     @OnClick(R.id.bt_start)
     public void onClickStart(View view){
-        float progress = mLav.getProgress();
-        if(progress < 1){
-            progress += 0.05f;
-            mLav.setProgress(progress);
+        if(mCycleLottie == null){
+            mCycleLottie = CycleLottie.ofLoopKeyFrame(mLav, 10, 50);
+            mCycleLottie.start();
+        }else{
+            //break loop.
+            mCycleLottie.setKeyFrameLoopEnabled(false);
         }
     }
 
