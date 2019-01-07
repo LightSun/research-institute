@@ -5,10 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.airbnb.lottie.LottieComposition;
-import com.airbnb.lottie.LottieOnCompositionLoadedListener;
 import com.heaven7.android.component.lifecycle.LifeCycleComponent;
-import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.MainWorker;
 
 /**

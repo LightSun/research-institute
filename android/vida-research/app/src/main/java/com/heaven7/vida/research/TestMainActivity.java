@@ -11,6 +11,7 @@ import com.heaven7.vida.research.sample.TestLottieActivity;
 import com.heaven7.vida.research.sample.TestPageTipViewActivity;
 import com.heaven7.vida.research.sample.TestRectProgresActivity;
 import com.heaven7.vida.research.sample.TestRecyclerViewSwipeActivity;
+import com.heaven7.vida.research.sample.TestRingViewActivity;
 import com.heaven7.vida.research.sample.TestRoundViewActivity;
 import com.heaven7.vida.research.sample.TestScaleDrawableActivity;
 import com.heaven7.vida.research.sample.TestShadowShapeActivity;
@@ -59,6 +60,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestTransitionAnimationActivity1.class));
         list.add(new ActivityInfo(TestScaleDrawableActivity.class));
         list.add(new ActivityInfo(TestLottieActivity.class));
+        list.add(new ActivityInfo(TestRingViewActivity.class));
     }
 
 }
