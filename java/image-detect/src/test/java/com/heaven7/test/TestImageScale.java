@@ -70,7 +70,7 @@ public class TestImageScale {
                 input.getWidth() / 2, input.getHeight() / 2, ImageScaleDelegate.MODE_CLIP_SCALE);
         ImageIO.write(img_clip_scale, "jpg", new File(out_clip_scale));
     }
-    @Test
+    @Test // have bugs
     public void testClipScale_up3() throws Exception{
         //1000 * 1498
         String imageFile = "E:\\BaiduNetdiskDownload\\taobao_service\\照片\\女装\\白色吊带长裙\\DSC_2329_clip_scale.jpg";
