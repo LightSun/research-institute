@@ -5,6 +5,7 @@ import com.heaven7.vida.research.sample.BalanceViewTest;
 import com.heaven7.vida.research.sample.NativeSurfaceActivity;
 import com.heaven7.vida.research.sample.TestBaiduFace2Activity;
 import com.heaven7.vida.research.sample.TestBaiduFaceActivity;
+import com.heaven7.vida.research.sample.TestClipScaleActivity;
 import com.heaven7.vida.research.sample.TestDiscViewActivity;
 import com.heaven7.vida.research.sample.TestDynamicContentActivity;
 import com.heaven7.vida.research.sample.TestLottieActivity;
@@ -61,6 +62,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestScaleDrawableActivity.class));
         list.add(new ActivityInfo(TestLottieActivity.class));
         list.add(new ActivityInfo(TestRingViewActivity.class));
+        list.add(new ActivityInfo(TestClipScaleActivity.class));
     }
 
 }

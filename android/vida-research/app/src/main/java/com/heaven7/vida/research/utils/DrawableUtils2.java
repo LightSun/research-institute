@@ -22,6 +22,48 @@ import java.io.OutputStream;
  */
 public class DrawableUtils2 {
 
+    /** 居中裁剪 -- 缩放 */
+    public static Bitmap clipBitmap(Bitmap src, int requireW, int requireH){
+        int w = src.getWidth();
+        int h = src.getHeight();
+        float scaleW = requireW * 1f / w;
+        float scaleH = requireH * 1f / h;
+        float scale = Math.min(scaleW, scaleH);
+
+        int resultW = (int) (w * scale);
+        int resultH = (int) (h * scale);
+        int left = w / 2 - resultW / 2;
+        int top = h / 2 - resultH / 2;
+        Bitmap bitmap = Bitmap.createBitmap(src, left, top, resultW, resultH);
+        Bitmap result = Bitmap.createScaledBitmap(bitmap, requireW, requireH, false);
+        bitmap.recycle();
+        return result;
+    }
+
+    //先缩，再裁
+    public static Bitmap clipBitmap2(Bitmap src, int requireW, int requireH){
+        int w = src.getWidth();
+        int h = src.getHeight();
+        float scaleW = requireW * 1f / w;
+        float scaleH = requireH * 1f / h;
+        float scale = Math.max(scaleW, scaleH);
+
+        Matrix matrix = new Matrix();
+        matrix.setScale(scale, scale);
+        Bitmap scaled = Bitmap.createBitmap(src, 0, 0, w, h, matrix, false);
+
+        int sWidth = scaled.getWidth();
+        int sHeight = scaled.getHeight();
+        int left = 0, top = 0;
+        if(sWidth > requireW){
+            left = sWidth / 2 - requireW / 2;
+        }
+        if(sHeight > requireH){
+            top = sHeight / 2 - requireH/ 2;
+        }
+        return Bitmap.createBitmap(scaled, left, top, requireW, requireH);
+    }
+
     public static Drawable getDrawable(Context context, @DrawableRes int resId){
         Drawable d = context.getResources().getDrawable(resId);
         if(d == null){

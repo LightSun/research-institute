@@ -66,6 +66,7 @@
         <activity android:name=".sample.TestScaleDrawableActivity"/>
         <activity android:name=".sample.TestLottieActivity"/>
         <activity android:name=".sample.TestRingViewActivity"/>
+        <activity android:name=".sample.TestClipScaleActivity"/>
 
     </application>
 
