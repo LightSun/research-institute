@@ -35,7 +35,9 @@ public class DrawableUtils2 {
         int left = w / 2 - resultW / 2;
         int top = h / 2 - resultH / 2;
         Bitmap bitmap = Bitmap.createBitmap(src, left, top, resultW, resultH);
-        Bitmap result = Bitmap.createScaledBitmap(bitmap, requireW, requireH, false);
+        Matrix matrix = new Matrix();
+        matrix.setScale(scale, scale);
+        Bitmap result = Bitmap.createBitmap(bitmap,0,0, resultW, resultH, matrix, false);
         bitmap.recycle();
         return result;
     }
