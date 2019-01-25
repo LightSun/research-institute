@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion as Integer
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.github.hiteshsondhi88.sampleffmpeg"
+        minSdkVersion rootProject.ext.minSdkVersion as Integer
+        targetSdkVersion rootProject.ext.targetSdkVersion as Integer
+        versionCode rootProject.ext.versionCode as Integer
+        versionName rootProject.ext.versionName as String
+    }
+
+    sourceSets.main {
+        assets.srcDirs = ['assets']
+        jniLibs.srcDirs = ['libs']
+        jni.srcDirs = [] //disable automatic ndk-build
+    }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    annotationProcessor 'com.squareup.dagger:dagger-compiler:1.2.2'
+    implementation 'com.squareup.dagger:dagger:1.2.2'
+    implementation 'com.jakewharton:butterknife:5.1.2'
+    annotationProcessor 'com.jakewharton:butterknife:5.1.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation 'com.squareup.assertj:assertj-android:1.0.0'
+
+    implementation 'com.heaven7.core.util:util-v1:1.1.2'
+
+    implementation project(':FFmpegAndroid')
+}
