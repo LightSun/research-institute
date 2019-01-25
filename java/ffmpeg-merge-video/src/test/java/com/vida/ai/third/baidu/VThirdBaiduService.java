@@ -28,8 +28,10 @@ import java.util.concurrent.ExecutorService;
 
 public class VThirdBaiduService implements VThirdBaiduCallback.RequestService{
 
-    private static final String API_KEY     = "6dD8acznGrtKRIwkVOeCeaKZ";
-    private static final String SECURE_KEY  = "vNQIpqoFPHIU8G1WjeSO9EOOgUs1dzNj";
+   // private static final String API_KEY     = "6dD8acznGrtKRIwkVOeCeaKZ";
+   // private static final String SECURE_KEY  = "vNQIpqoFPHIU8G1WjeSO9EOOgUs1dzNj";
+    private static final String API_KEY     = "TAXTIVVyordQcP5OrBpv9fTz";
+    private static final String SECURE_KEY  = "FPU3k33NIhqyBG3iZqe5LvDlFXnmoUUr";
     private static final String URL_SUBJECT = "https://aip.baidubce.com/rest/2.0/image-classify/v1/object_detect";
     private static final int QPS_LIMIT = 5;
 
