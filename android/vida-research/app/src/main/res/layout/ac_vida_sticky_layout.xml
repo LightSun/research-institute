@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <com.heaven7.vida.research.widget.VidaStickyLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/vsl"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:vsl_auto_fit_enabled="true"
+    app:vsl_auto_fit_percent="0.2"
     app:vsl_max_scroll_height="200dp">
 
     <android.support.v7.widget.AppCompatImageView
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher"
-        />
+        android:src="@mipmap/ic_launcher" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="@color/colorAccent"
-        />
+        android:background="@color/colorAccent" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent" />
 
 </com.heaven7.vida.research.widget.VidaStickyLayout>

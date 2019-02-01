@@ -218,8 +218,8 @@ public class VidaStickyLayout extends LinearLayout implements NestedScrollingChi
 
     @Override
     public void onStopNestedScroll(View target) {
-        checkAutoFitScroll();
         mNestedScrollingParentHelper.onStopNestedScroll(target);
+        checkAutoFitScroll();
 
         // Dispatch up our nested parent
         stopNestedScroll();
