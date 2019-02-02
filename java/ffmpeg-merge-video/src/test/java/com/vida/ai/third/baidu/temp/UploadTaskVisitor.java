@@ -27,6 +27,7 @@ public class UploadTaskVisitor implements FireVisitor<BatchUpdateSample.Task> {
     private String tasksTag;
     private final AtomicInteger varCount = new AtomicInteger();
     private int count;
+    private Runnable end;
 
     protected UploadTaskVisitor(UploadTaskVisitor.Builder builder) {
         this.datasetId = builder.datasetId;
@@ -36,6 +37,7 @@ public class UploadTaskVisitor implements FireVisitor<BatchUpdateSample.Task> {
         this.emptyLogFile = builder.emptyLogFile;
         this.failedLogFile = builder.failedLogFile;
         this.tasksTag = builder.tasksTag;
+        this.end = builder.endTask;
     }
 
     @Override
@@ -47,19 +49,22 @@ public class UploadTaskVisitor implements FireVisitor<BatchUpdateSample.Task> {
                     sb_empty.append(image).append("\r\n");
                     super.onEmptyLabel(image, json);
                 }
+
                 @Override
-                public void onFailure(Call call, IOException e) {
+                protected void onFailed(String jsonPath) {
                     sb_failed.append(task.imagePath).append("\r\n");
-                    super.onFailure(call, e);
                 }
 
                 @Override
                 protected void postResponse() {
                     Logger.d(TAG, "postResponse", "upload finish(may fail). index = "
-                            + varCount.get() + " for tasksTag = " + tasksTag);
+                            + varCount.get() + ",count = " + count + ", for tasksTag = " + tasksTag);
                     if(varCount.incrementAndGet() == count){
                         FileUtils.writeTo(emptyLogFile, sb_empty.toString());
                         FileUtils.writeTo(failedLogFile, sb_failed.toString());
+                        if(end != null){
+                            end.run();
+                        }
                     }
                 }
                 @Override
@@ -112,7 +117,13 @@ public class UploadTaskVisitor implements FireVisitor<BatchUpdateSample.Task> {
         private String emptyLogFile;
         private String failedLogFile;
         private String tasksTag;
-        public int count;
+        private int count;
+        private Runnable endTask;
+
+        public Builder setEndTask(Runnable endTask) {
+            this.endTask = endTask;
+            return this;
+        }
 
         public Builder setDatasetId(int datasetId) {
             this.datasetId = datasetId;

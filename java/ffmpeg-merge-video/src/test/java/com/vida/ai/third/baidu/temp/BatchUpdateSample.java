@@ -73,30 +73,30 @@ public class BatchUpdateSample {
             }
         }).getAsList();
     }
-
-    public void detectAll(final int datasetId, String dir, String emptyLogFile,String failedLogFile){
+    public void detectAll(final int datasetId, String dir, String emptyLogFile, String failedLogFile){
+        detectAll(datasetId, dir, emptyLogFile, failedLogFile, null);
+    }
+    public void detectAll(final int datasetId, String dir, String emptyLogFile,String failedLogFile, Runnable runner){
+        StringBuilder sb_no_image = new StringBuilder();
         List<String> files = FileUtils.getFiles(new File(dir), "json");
         List<Task> tasks = VisitServices.from(files).map(new ResultVisitor<String, Task>() {
             @Override
             public Task visit(String s, Object param) {
+                //replace empty
+                final String oldJson = s;
                 String fileName = FileUtils.getFileName(s);
                 String dir = FileUtils.getFileDir(s, 1, true);
-                String imagePre = dir + File.separator + fileName;
-                String imagePath = VisitServices.from(FORMATS).map(new ResultVisitor<String, String>() {
-                    @Override
-                    public String visit(String s, Object param) {
-                        return imagePre + "." + s;
-                    }
-                }).query(new PredicateVisitor<String>() {
-                    @Override
-                    public Boolean visit(String s, Object param) {
-                        File file = new File(s);
-                        return file.exists() && file.isFile();
-                    }
-                });
+                String imagePath = findImagePath(fileName, dir);
                 if(imagePath == null){
-                    Logger.w(TAG, "detactAll", "can't find proper image for json = " + s);
-                    return null;
+                    //replace white char for file name
+                    fileName = fileName.replace(" ", "%20");
+                    imagePath = findImagePath(fileName, dir);
+                    if(imagePath == null){
+                        //can't find at last.
+                        Logger.w(TAG, "detactAll", "can't find proper image for json = " + s);
+                        sb_no_image.append(oldJson).append("\r\n");
+                        return null;
+                    }
                 }
 
                 Task task = new Task();
@@ -105,12 +105,17 @@ public class BatchUpdateSample {
                 return task;
             }
         }).getAsList();
+        //no mapping for json.
+        if(sb_no_image.length() > 0){
+            String file = "E:\\test\\batch_upload\\no_mapping.txt";
+            FileUtils.writeTo(file, sb_no_image.toString());
+        }
 
         StringBuilder sb = new StringBuilder();
         StringBuilder sb_failed = new StringBuilder();
         final int count = tasks.size();
         Logger.d(TAG, "detectAll", "start folder. count = " + count);
-        AtomicInteger varCount = new AtomicInteger();
+        final AtomicInteger varCount = new AtomicInteger();
         VisitServices.from(tasks).fire(new FireVisitor<Task>() {
             @Override
             public Boolean visit(Task task, Object param) {
@@ -121,19 +126,21 @@ public class BatchUpdateSample {
                             sb.append(image).append("\r\n");
                             super.onEmptyLabel(image, json);
                         }
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-                            sb_failed.append(task.imagePath).append("\r\n");
-                            super.onFailure(call, e);
-                        }
 
+                        @Override
+                        protected void onFailed(String jsonPath) {
+                            sb_failed.append(task.imagePath).append("\r\n");
+                        }
                         @Override
                         protected void postResponse() {
                             Logger.d(TAG, "postResponse", "index = "
-                                    + varCount.get() + " for folder = " + dir);
+                                    + varCount.get() + ", count = "+ count +" for folder = " + dir);
                             if(varCount.incrementAndGet() == count){
                                 FileUtils.writeTo(emptyLogFile, sb.toString());
                                 FileUtils.writeTo(failedLogFile, sb_failed.toString());
+                                if(runner != null){
+                                    runner.run();
+                                }
                             }
                         }
                     });
@@ -141,6 +148,22 @@ public class BatchUpdateSample {
                     e.printStackTrace();
                 }
                 return null;
+            }
+        });
+    }
+
+    public static String findImagePath(String fileName, String dir) {
+        String imagePre = dir + File.separator + fileName;
+        return VisitServices.from(FORMATS).map(new ResultVisitor<String, String>() {
+            @Override
+            public String visit(String s, Object param) {
+                return imagePre + "." + s;
+            }
+        }).query(new PredicateVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                File file = new File(s);
+                return file.exists() && file.isFile();
             }
         });
     }
@@ -270,6 +293,13 @@ public class BatchUpdateSample {
             labels.add(new JsonLabel("_default"));
         }
     }
+    public static class BDResponse{
+        String log_id;
+
+        public boolean hasLogId(){
+            return log_id != null;
+        }
+    }
     public static class ItemAdapter extends TypeAdapter<Item>{
         @Override
         public void write(JsonWriter out, Item value) throws IOException {
@@ -309,28 +339,51 @@ public class BatchUpdateSample {
             postResponse();
         }
 
-        public void onFailure(Call call, IOException e) {
+        public final void onFailure(Call call, IOException e) {
             preResponse();
+            onFailed(jsonPath);
             Logger.w(TAG, "LogCallback_onFailure", Throwables.getStackTraceAsString(e));
             postResponse();
         }
 
         @Override
-        public void onResponse(Call call, Response response) throws IOException {
+        public final void onResponse(Call call, Response response) throws IOException {
             try {
                 preResponse();
-                Logger.d(TAG, "onResponse", "" + response.body().string());
+                ResponseBody body = response.body();
+                boolean success = false;
+                if(body != null){
+                    String json = body.string();
+                    Logger.d(TAG, "onResponse", "" + json);
+                    try{
+                        BDResponse bdres = new Gson().fromJson(json, BDResponse.class);
+                        success = bdres != null && bdres.hasLogId();
+                    }catch (Exception e){
+                       //ignore
+                    }
+                }
+                if(success){
+                    onSuccess(jsonPath);
+                }else {
+                    onFailed(jsonPath);
+                }
             }finally {
                 response.close();
                 postResponse();
             }
+        }
+        protected void onSuccess(String jsonPath){
+
+        }
+        protected void onFailed(String jsonPath){
+
         }
         protected void postResponse() {
 
         }
 
         protected void preResponse() {
-            System.out.println(">>>>>>>>>> start jsonPath = " + jsonPath);
+            System.out.println(" preResponse >>>>>>>>>> start jsonPath = " + jsonPath);
         }
     }
 }
