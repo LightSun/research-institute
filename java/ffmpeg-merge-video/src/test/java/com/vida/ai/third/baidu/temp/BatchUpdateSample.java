@@ -22,11 +22,14 @@ import com.heaven7.utils.FileUtils;
 import com.vida.ai.third.baidu.VThirdBaiduService;
 import okhttp3.*;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -38,6 +41,7 @@ public class BatchUpdateSample {
     private static final String[] FORMATS = {
             "jpg", "png", "jpeg", "jpg.jpg", "png.png" ,"jpeg.jpeg"
     };
+    public static final String REQUEST_ENTITY_TOO_LARGE = "Request Entity Too Large";
 
     private final ExecutorService mService = Executors2.newFixedThreadPool(1);
     private VThirdBaiduService mBaiduService = new VThirdBaiduService();
@@ -58,6 +62,7 @@ public class BatchUpdateSample {
         });
     }
 
+
     public static List<Task> readTasks(String file){
         List<String> lines = ResourceLoader.getDefault().loadFileAsStringLines(null, file);
         return VisitServices.from(lines).map(new ResultVisitor<String, Task>() {
@@ -73,30 +78,30 @@ public class BatchUpdateSample {
             }
         }).getAsList();
     }
-
-    public void detectAll(final int datasetId, String dir, String emptyLogFile,String failedLogFile){
+    public void detectAll(final int datasetId, String dir, String emptyLogFile, String failedLogFile){
+        detectAll(datasetId, dir, emptyLogFile, failedLogFile, null);
+    }
+    public void detectAll(final int datasetId, String dir, String emptyLogFile,String failedLogFile, Runnable runner){
+        StringBuilder sb_no_image = new StringBuilder();
         List<String> files = FileUtils.getFiles(new File(dir), "json");
         List<Task> tasks = VisitServices.from(files).map(new ResultVisitor<String, Task>() {
             @Override
             public Task visit(String s, Object param) {
+                //replace empty
+                final String oldJson = s;
                 String fileName = FileUtils.getFileName(s);
                 String dir = FileUtils.getFileDir(s, 1, true);
-                String imagePre = dir + File.separator + fileName;
-                String imagePath = VisitServices.from(FORMATS).map(new ResultVisitor<String, String>() {
-                    @Override
-                    public String visit(String s, Object param) {
-                        return imagePre + "." + s;
-                    }
-                }).query(new PredicateVisitor<String>() {
-                    @Override
-                    public Boolean visit(String s, Object param) {
-                        File file = new File(s);
-                        return file.exists() && file.isFile();
-                    }
-                });
+                String imagePath = findImagePath(fileName, dir);
                 if(imagePath == null){
-                    Logger.w(TAG, "detactAll", "can't find proper image for json = " + s);
-                    return null;
+                    //replace white char for file name
+                    fileName = fileName.replace(" ", "%20");
+                    imagePath = findImagePath(fileName, dir);
+                    if(imagePath == null){
+                        //can't find at last.
+                        Logger.w(TAG, "detactAll", "can't find proper image for json = " + s);
+                        sb_no_image.append(oldJson).append("\r\n");
+                        return null;
+                    }
                 }
 
                 Task task = new Task();
@@ -105,13 +110,18 @@ public class BatchUpdateSample {
                 return task;
             }
         }).getAsList();
+        //no mapping for json.
+        if(sb_no_image.length() > 0){
+            String file = "E:\\test\\batch_upload\\no_mapping.txt";
+            FileUtils.writeTo(file, sb_no_image.toString());
+        }
 
         StringBuilder sb = new StringBuilder();
         StringBuilder sb_failed = new StringBuilder();
         final int count = tasks.size();
         Logger.d(TAG, "detectAll", "start folder. count = " + count);
-        AtomicInteger varCount = new AtomicInteger();
         VisitServices.from(tasks).fire(new FireVisitor<Task>() {
+            final AtomicInteger varCount = new AtomicInteger();
             @Override
             public Boolean visit(Task task, Object param) {
                 try {
@@ -121,19 +131,23 @@ public class BatchUpdateSample {
                             sb.append(image).append("\r\n");
                             super.onEmptyLabel(image, json);
                         }
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-                            sb_failed.append(task.imagePath).append("\r\n");
-                            super.onFailure(call, e);
-                        }
+
 
                         @Override
+                        protected void onFailed(String jsonPath) {
+                            sb_failed.append(task.imagePath).append("\r\n");
+                        }
+                        @Override
                         protected void postResponse() {
+                            final int value = varCount.getAndIncrement();
                             Logger.d(TAG, "postResponse", "index = "
-                                    + varCount.get() + " for folder = " + dir);
-                            if(varCount.incrementAndGet() == count){
+                                    + value + ", count = "+ count +" for folder = " + dir);
+                            if(value == count - 1){
                                 FileUtils.writeTo(emptyLogFile, sb.toString());
                                 FileUtils.writeTo(failedLogFile, sb_failed.toString());
+                                if(runner != null){
+                                    runner.run();
+                                }
                             }
                         }
                     });
@@ -141,6 +155,22 @@ public class BatchUpdateSample {
                     e.printStackTrace();
                 }
                 return null;
+            }
+        });
+    }
+
+    public static String findImagePath(String fileName, String dir) {
+        String imagePre = dir + File.separator + fileName;
+        return VisitServices.from(FORMATS).map(new ResultVisitor<String, String>() {
+            @Override
+            public String visit(String s, Object param) {
+                return imagePre + "." + s;
+            }
+        }).query(new PredicateVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                File file = new File(s);
+                return file.exists() && file.isFile();
             }
         });
     }
@@ -156,7 +186,7 @@ public class BatchUpdateSample {
         JsonLabels jl = new Gson().fromJson(json, JsonLabels.class);
         if(jl.isEmpty()){
             //if handle empty ,can continue.
-            if(!callback.handleEmpty(jl)){
+            if(!callback.preHandleEmpty(jl)){
                 callback.onEmptyLabel(imagePath, jsonPath);
                 return;
             }
@@ -201,6 +231,9 @@ public class BatchUpdateSample {
         }
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .dispatcher(new Dispatcher(mService))
+                .readTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
                 .build();
         Call call = okHttpClient.newCall(builder.build());
         call.enqueue(callback);
@@ -270,6 +303,13 @@ public class BatchUpdateSample {
             labels.add(new JsonLabel("_default"));
         }
     }
+    public static class BDResponse{
+        String log_id;
+
+        public boolean hasLogId(){
+            return log_id != null;
+        }
+    }
     public static class ItemAdapter extends TypeAdapter<Item>{
         @Override
         public void write(JsonWriter out, Item value) throws IOException {
@@ -290,7 +330,7 @@ public class BatchUpdateSample {
     public interface Callback extends okhttp3.Callback{
         void onEmptyLabel(String image, String json);
 
-        default boolean handleEmpty(JsonLabels labels){
+        default boolean preHandleEmpty(JsonLabels labels){
             return false;
         }
     }
@@ -304,33 +344,81 @@ public class BatchUpdateSample {
 
         @Override
         public void onEmptyLabel(String image, String json) {
-            preResponse();
             Logger.w(TAG, "onEmptyLabel", "empty json = " + json);
-            postResponse();
         }
 
-        public void onFailure(Call call, IOException e) {
+        public final void onFailure(Call call, IOException e) {
             preResponse();
+            onFailed(jsonPath);
             Logger.w(TAG, "LogCallback_onFailure", Throwables.getStackTraceAsString(e));
             postResponse();
         }
 
         @Override
-        public void onResponse(Call call, Response response) throws IOException {
+        public final void onResponse(Call call, Response response) throws IOException {
+            boolean success = false;
+            boolean toolarge = false;
             try {
                 preResponse();
-                Logger.d(TAG, "onResponse", "" + response.body().string());
-            }finally {
+                ResponseBody body = response.body();
+                if(body != null){
+                    String json = body.string();
+                    Logger.d(TAG, "onResponse", "" + json);
+                    try{
+                        if(json.contains(REQUEST_ENTITY_TOO_LARGE)){
+                            toolarge = true;
+                        }else {
+                            BDResponse bdres = new Gson().fromJson(json, BDResponse.class);
+                            success = bdres != null && bdres.hasLogId();
+                        }
+                    }catch (Exception e){
+                       //ignore
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            } finally{
                 response.close();
+            }
+            //callback
+            if(toolarge){
+                onImageTooLarge(jsonPath);
+            } else if(success){
+                onSuccess(jsonPath);
+            }else {
+                onFailed(jsonPath);
+            }
+            postResponse();
+        }
+
+        @Override
+        public final boolean preHandleEmpty(JsonLabels labels) {
+            preResponse();
+            boolean result = handleEmpty(labels);
+            if(!result){
                 postResponse();
             }
+            return result;
+        }
+        protected boolean handleEmpty(JsonLabels labels){
+            return false;
+        }
+
+        protected void onImageTooLarge(String jsonPath) {
+
+        }
+        protected void onSuccess(String jsonPath){
+
+        }
+        protected void onFailed(String jsonPath){
+
         }
         protected void postResponse() {
 
         }
 
         protected void preResponse() {
-            System.out.println(">>>>>>>>>> start jsonPath = " + jsonPath);
+            System.out.println(" preResponse >>>>>>>>>> start jsonPath = " + jsonPath);
         }
     }
 }
