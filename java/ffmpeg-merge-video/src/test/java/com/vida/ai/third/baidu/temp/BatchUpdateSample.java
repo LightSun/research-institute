@@ -22,11 +22,14 @@ import com.heaven7.utils.FileUtils;
 import com.vida.ai.third.baidu.VThirdBaiduService;
 import okhttp3.*;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -38,6 +41,7 @@ public class BatchUpdateSample {
     private static final String[] FORMATS = {
             "jpg", "png", "jpeg", "jpg.jpg", "png.png" ,"jpeg.jpeg"
     };
+    public static final String REQUEST_ENTITY_TOO_LARGE = "Request Entity Too Large";
 
     private final ExecutorService mService = Executors2.newFixedThreadPool(1);
     private VThirdBaiduService mBaiduService = new VThirdBaiduService();
@@ -57,6 +61,7 @@ public class BatchUpdateSample {
             }
         });
     }
+
 
     public static List<Task> readTasks(String file){
         List<String> lines = ResourceLoader.getDefault().loadFileAsStringLines(null, file);
@@ -115,8 +120,8 @@ public class BatchUpdateSample {
         StringBuilder sb_failed = new StringBuilder();
         final int count = tasks.size();
         Logger.d(TAG, "detectAll", "start folder. count = " + count);
-        final AtomicInteger varCount = new AtomicInteger();
         VisitServices.from(tasks).fire(new FireVisitor<Task>() {
+            final AtomicInteger varCount = new AtomicInteger();
             @Override
             public Boolean visit(Task task, Object param) {
                 try {
@@ -127,15 +132,17 @@ public class BatchUpdateSample {
                             super.onEmptyLabel(image, json);
                         }
 
+
                         @Override
                         protected void onFailed(String jsonPath) {
                             sb_failed.append(task.imagePath).append("\r\n");
                         }
                         @Override
                         protected void postResponse() {
+                            final int value = varCount.getAndIncrement();
                             Logger.d(TAG, "postResponse", "index = "
-                                    + varCount.get() + ", count = "+ count +" for folder = " + dir);
-                            if(varCount.incrementAndGet() == count){
+                                    + value + ", count = "+ count +" for folder = " + dir);
+                            if(value == count - 1){
                                 FileUtils.writeTo(emptyLogFile, sb.toString());
                                 FileUtils.writeTo(failedLogFile, sb_failed.toString());
                                 if(runner != null){
@@ -179,7 +186,7 @@ public class BatchUpdateSample {
         JsonLabels jl = new Gson().fromJson(json, JsonLabels.class);
         if(jl.isEmpty()){
             //if handle empty ,can continue.
-            if(!callback.handleEmpty(jl)){
+            if(!callback.preHandleEmpty(jl)){
                 callback.onEmptyLabel(imagePath, jsonPath);
                 return;
             }
@@ -224,6 +231,9 @@ public class BatchUpdateSample {
         }
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .dispatcher(new Dispatcher(mService))
+                .readTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
                 .build();
         Call call = okHttpClient.newCall(builder.build());
         call.enqueue(callback);
@@ -320,7 +330,7 @@ public class BatchUpdateSample {
     public interface Callback extends okhttp3.Callback{
         void onEmptyLabel(String image, String json);
 
-        default boolean handleEmpty(JsonLabels labels){
+        default boolean preHandleEmpty(JsonLabels labels){
             return false;
         }
     }
@@ -334,9 +344,7 @@ public class BatchUpdateSample {
 
         @Override
         public void onEmptyLabel(String image, String json) {
-            preResponse();
             Logger.w(TAG, "onEmptyLabel", "empty json = " + json);
-            postResponse();
         }
 
         public final void onFailure(Call call, IOException e) {
@@ -348,29 +356,56 @@ public class BatchUpdateSample {
 
         @Override
         public final void onResponse(Call call, Response response) throws IOException {
+            boolean success = false;
+            boolean toolarge = false;
             try {
                 preResponse();
                 ResponseBody body = response.body();
-                boolean success = false;
                 if(body != null){
                     String json = body.string();
                     Logger.d(TAG, "onResponse", "" + json);
                     try{
-                        BDResponse bdres = new Gson().fromJson(json, BDResponse.class);
-                        success = bdres != null && bdres.hasLogId();
+                        if(json.contains(REQUEST_ENTITY_TOO_LARGE)){
+                            toolarge = true;
+                        }else {
+                            BDResponse bdres = new Gson().fromJson(json, BDResponse.class);
+                            success = bdres != null && bdres.hasLogId();
+                        }
                     }catch (Exception e){
                        //ignore
                     }
                 }
-                if(success){
-                    onSuccess(jsonPath);
-                }else {
-                    onFailed(jsonPath);
-                }
-            }finally {
+            }catch (Exception e){
+                e.printStackTrace();
+            } finally{
                 response.close();
+            }
+            //callback
+            if(toolarge){
+                onImageTooLarge(jsonPath);
+            } else if(success){
+                onSuccess(jsonPath);
+            }else {
+                onFailed(jsonPath);
+            }
+            postResponse();
+        }
+
+        @Override
+        public final boolean preHandleEmpty(JsonLabels labels) {
+            preResponse();
+            boolean result = handleEmpty(labels);
+            if(!result){
                 postResponse();
             }
+            return result;
+        }
+        protected boolean handleEmpty(JsonLabels labels){
+            return false;
+        }
+
+        protected void onImageTooLarge(String jsonPath) {
+
         }
         protected void onSuccess(String jsonPath){
 

@@ -19,10 +19,39 @@ import static com.vida.ai.third.baidu.temp.BatchUpdateSample.findImagePath;
 public class TestUtils {
     private static final String TAG = "TestUtils";
 
-    //48408
+    //48408. real is 48385. failed is 11256. empty is 10584
     public static void main(String[] args) {
-        //testImageCount();
-        testEmptyCount();
+       // testImageCount();
+       // testEmptyCount();
+       // testFailedCount();
+        testLargeImageCount();
+    }
+
+    private static void testLargeImageCount() {
+
+    }
+
+    private static void testFailedCount() {
+        String dir = "E:\\test\\batch_upload";
+        List<BatchUpdateSample.Task> all = new ArrayList<>();
+        VisitServices.from(FileUtils.getFiles(new File(dir), "txt")).filter(new PredicateVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                return s.endsWith("_failed.txt");
+            }
+        }).map(new ResultVisitor<String, List<BatchUpdateSample.Task>>() {
+            @Override
+            public List<BatchUpdateSample.Task> visit(String s, Object param) {
+                return BatchUpdateSample.readTasks(s);
+            }
+        }).fire(new FireVisitor<List<BatchUpdateSample.Task>>() {
+            @Override
+            public Boolean visit(List<BatchUpdateSample.Task> tasks, Object param) {
+                all.addAll(tasks);
+                return null;
+            }
+        });
+        System.out.println(all.size());
     }
 
     private static void testEmptyCount() {
@@ -49,7 +78,8 @@ public class TestUtils {
     }
 
     private static void testImageCount() {
-        String dir = "E:\\test\\batch_upload\\pexels";
+       // String dir = "E:\\test\\batch_upload\\pexels";
+        String dir = "F:\\work\\素材";
         List<String> files = FileUtils.getFiles(new File(dir), "json");
         List<BatchUpdateSample.Task> tasks = VisitServices.from(files).map(new ResultVisitor<String, BatchUpdateSample.Task>() {
             @Override
