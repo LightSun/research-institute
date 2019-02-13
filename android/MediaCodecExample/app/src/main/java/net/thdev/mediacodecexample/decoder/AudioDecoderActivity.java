@@ -62,8 +62,8 @@ public class AudioDecoderActivity extends Activity {
 	public static class PlaceholderFragment extends Fragment {
 		//private static final String SAMPLE = Environment.getExternalStorageDirectory() + "/temp.aac";
 		private static final String SAMPLE = Environment.getExternalStorageDirectory() + "/temp.aac";
-		private static final String VIDEO = Environment.getExternalStorageDirectory() + "/vida/test_videos/v1.mp4";
-		private static final String AUDIO = Environment.getExternalStorageDirectory() + "/vida/test_videos/music.mp3";
+		//private static final String VIDEO = Environment.getExternalStorageDirectory() + "/vida/test_videos/v1.mp4";
+		//private static final String AUDIO = Environment.getExternalStorageDirectory() + "/vida/test_videos/music.mp3";
 		public PlaceholderFragment() {
 			mAudioDecoder = new AudioDecoderThread();
 		}
@@ -79,7 +79,7 @@ public class AudioDecoderActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					try {
-						mAudioDecoder.startPlay(AUDIO);
+						mAudioDecoder.startPlay(SAMPLE);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

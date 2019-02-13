@@ -1,8 +1,11 @@
 package com.heaven7.vida.research;
 
+import android.content.Intent;
+
 import com.heaven7.vida.research.drag.DragActivity;
 import com.heaven7.vida.research.sample.BalanceViewTest;
 import com.heaven7.vida.research.sample.NativeSurfaceActivity;
+import com.heaven7.vida.research.sample.TestAutoClickActivity;
 import com.heaven7.vida.research.sample.TestBaiduFace2Activity;
 import com.heaven7.vida.research.sample.TestBaiduFaceActivity;
 import com.heaven7.vida.research.sample.TestClipScaleActivity;
@@ -12,6 +15,7 @@ import com.heaven7.vida.research.sample.TestLottieActivity;
 import com.heaven7.vida.research.sample.TestPageTipViewActivity;
 import com.heaven7.vida.research.sample.TestRectProgresActivity;
 import com.heaven7.vida.research.sample.TestRecyclerViewSwipeActivity;
+import com.heaven7.vida.research.sample.TestRhinoActivity;
 import com.heaven7.vida.research.sample.TestRingViewActivity;
 import com.heaven7.vida.research.sample.TestRoundViewActivity;
 import com.heaven7.vida.research.sample.TestScaleDrawableActivity;
@@ -22,6 +26,9 @@ import com.heaven7.vida.research.sample.TestV7_CircleImageViewActivity;
 import com.heaven7.vida.research.sample.TestVidaStickyLayoutActivity;
 import com.heaven7.vida.research.sample.TestVidaTransDrawable;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
+import com.heaven7.vida.research.service.TestAccessibilityService;
+import com.heaven7.vida.research.utils.AccessibilityHelper;
+import com.heaven7.vida.research.utils.AccessibilityOperator;
 
 import java.util.List;
 
@@ -63,6 +70,30 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestLottieActivity.class));
         list.add(new ActivityInfo(TestRingViewActivity.class));
         list.add(new ActivityInfo(TestClipScaleActivity.class));
+
+        list.add(new ActivityInfo(TestRhinoActivity.class));
+        list.add(new ActivityInfo(TestAutoClickActivity.class));
+    }
+
+    @Override
+    protected void onDestroy() {
+       /* stopService(new Intent(this, TestAccessibilityService.class));
+        AccessibilityOperator.getInstance().updateEvent(null, null);*/
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+       // startTestServices();
+    }
+
+    private void startTestServices() {
+        if(!AccessibilityHelper.isAccessibilitySettingsOn(this,
+                TestAccessibilityService.class.getCanonicalName())) {
+            AccessibilityHelper.jumpToSettingPage(this);
+        }
+       // startService(new Intent(this, TestAccessibilityService.class));
     }
 
 }

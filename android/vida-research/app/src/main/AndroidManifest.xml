@@ -2,16 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heaven7.vida.research">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
-    <uses-feature android:name="android.hardware.location.gps"/>
-    <uses-feature android:name="android.hardware.location.network"/>
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>
+
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature android:name="android.hardware.location.network" />
 
     <application
         android:name=".VidaTestApplication"
@@ -29,45 +31,78 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".drag.MainActivity"/>
-        <activity android:name=".drag.DragActivity"/>
-        <activity android:name=".drag.YoutubeActivity"/>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".drag.MainActivity" />
+        <activity android:name=".drag.DragActivity" />
+        <activity android:name=".drag.YoutubeActivity" />
 
-        <activity android:name=".TestAndroidSpringActivity"/>
-        <activity android:name=".TestDampScrollView"/>
-        <activity android:name=".sample.TestRoundViewActivity"/>
-        <activity android:name=".sample.TestZoomDrawableActivity"/>
-        <activity android:name=".sample.TestDiscViewActivity"/>
-        <activity android:name=".sample.TestBaiduFaceActivity"/>
-        <activity android:name=".sample.TestBaiduFace2Activity"/>
+        <activity android:name=".TestAndroidSpringActivity" />
+        <activity android:name=".TestDampScrollView" />
+        <activity android:name=".sample.TestRoundViewActivity" />
+        <activity android:name=".sample.TestZoomDrawableActivity" />
+        <activity android:name=".sample.TestDiscViewActivity" />
+        <activity android:name=".sample.TestBaiduFaceActivity" />
+        <activity android:name=".sample.TestBaiduFace2Activity" />
 
-        <activity android:name=".sample.NativeSurfaceActivity"/>
-        <activity android:name=".sample.TestRectProgresActivity"/>
-        <activity android:name=".sample.TestShadowShapeActivity"/>
-        <activity android:name=".sample.TestV7_CircleImageViewActivity"/>
-        <activity android:name=".sample.BalanceViewTest"/>
+        <activity android:name=".sample.NativeSurfaceActivity" />
+        <activity android:name=".sample.TestRectProgresActivity" />
+        <activity android:name=".sample.TestShadowShapeActivity" />
+        <activity android:name=".sample.TestV7_CircleImageViewActivity" />
+        <activity android:name=".sample.BalanceViewTest" />
 
-        <activity android:name=".sample.TestVidaStickyLayoutActivity"/>
-        <activity android:name=".sample.LocationTestActivity"/>
-        <activity android:name=".sample.TestSwitchImageActivity"/>
-        <activity android:name=".sample.TestRecyclerViewSwipeActivity"/>
+        <activity android:name=".sample.TestVidaStickyLayoutActivity" />
+        <activity android:name=".sample.LocationTestActivity" />
+        <activity android:name=".sample.TestSwitchImageActivity" />
+        <activity android:name=".sample.TestRecyclerViewSwipeActivity" />
 
-        <activity android:name=".sample.TestReadAssetsActivity"/>
-        <activity android:name=".sample.TestVidaTransDrawable"/>
-        <activity android:name=".sample.TestGetCityActivity"/>
-        <activity android:name=".sample.TestDynamicContentActivity"/>
-        <activity android:name=".sample.TestPageTipViewActivity"/>
+        <activity android:name=".sample.TestReadAssetsActivity" />
+        <activity android:name=".sample.TestVidaTransDrawable" />
+        <activity android:name=".sample.TestGetCityActivity" />
+        <activity android:name=".sample.TestDynamicContentActivity" />
+        <activity android:name=".sample.TestPageTipViewActivity" />
 
-        <activity android:name=".sample.TestTransitionAnimationActivity1"/>
-        <activity android:name=".sample.TestTransitionAnimationActivity2"/>
-        <activity android:name=".sample.TestTransitionAnimationActivity3"/>
+        <activity android:name=".sample.TestTransitionAnimationActivity1" />
+        <activity android:name=".sample.TestTransitionAnimationActivity2" />
+        <activity android:name=".sample.TestTransitionAnimationActivity3" />
 
-        <activity android:name=".sample.TestScaleDrawableActivity"/>
-        <activity android:name=".sample.TestLottieActivity"/>
-        <activity android:name=".sample.TestRingViewActivity"/>
-        <activity android:name=".sample.TestClipScaleActivity"/>
+        <activity android:name=".sample.TestScaleDrawableActivity" />
+        <activity android:name=".sample.TestLottieActivity" />
+        <activity android:name=".sample.TestRingViewActivity" />
+        <activity android:name=".sample.TestClipScaleActivity" />
 
+        <activity android:name=".sample.TestRhinoActivity" />
+
+        <activity android:name=".sample.TestAutoClickActivity" />
+        <activity android:name=".sample.TestAutoClick2Activity" />
+        <activity android:name=".sample.AccessibilityOpenHelperActivity" />
+
+        <service
+            android:name=".service.TestAccessibilityService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="TestAccessibilityService"
+            android:process=":BackgroundService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice"
+                android:resource="@xml/test_accessibility_service"/>
+        </service>
+
+        <service
+        android:name=".service.ListeningService"
+        android:enabled="true"
+        android:exported="true"
+        android:label="ListeningService"
+        android:process=":BackgroundService"
+        android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+        <intent-filter>
+            <action android:name="android.accessibilityservice.AccessibilityService"/>
+        </intent-filter>
+        <meta-data android:name="android.accessibilityservice"
+            android:resource="@xml/test_accessibility_service"/>
+    </service>
     </application>
 
 </manifest>

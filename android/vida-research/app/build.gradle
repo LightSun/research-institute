@@ -69,4 +69,8 @@ dependencies {
 
    // implementation 'com.amap.api:location:latest.integration'
     implementation "com.airbnb.android:lottie:2.7.0"
+
+    //java running js without webview
+    api files('libs/rhino-1.7.9.jar')
+    implementation 'cc.chenhe:android-lua:1.0.3'
 }

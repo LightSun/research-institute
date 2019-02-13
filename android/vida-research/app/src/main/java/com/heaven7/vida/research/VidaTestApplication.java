@@ -17,4 +17,9 @@ public class VidaTestApplication extends Application {
         super.onCreate();
         RetrofitHelper.init(this, URL_FACE);
     }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+    }
 }
