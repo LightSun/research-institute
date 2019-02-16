@@ -1,5 +1,6 @@
 package com.vida.ai.test;
 
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.utils.Context;
 import com.heaven7.ve.colorgap.ColorGapContext;
 import com.heaven7.ve.colorgap.TransitionDelegate;
@@ -9,6 +10,7 @@ import com.heaven7.ve.configs.BootStrapData;
 import com.heaven7.ve.starter.ImageDetectStarter;
 import com.heaven7.ve.starter.KingdomStarter;
 import com.heaven7.ve.starter.MusicCutStarter;
+import com.heaven7.ve.utils.SharedThreadPool;
 import com.vida.ai.third.baidu.BaiduImageDetector;
 
 /**
@@ -16,6 +18,7 @@ import com.vida.ai.third.baidu.BaiduImageDetector;
  */
 public class Launcher {
 
+    private static final String TAG = "Launcher";
     private static final SimpleColorGapContext sInitContext = new SimpleColorGapContext();
 
     private static void init(){
@@ -33,6 +36,16 @@ public class Launcher {
             }
         });
         sInitContext.setInitializeParam(ip);
+        sInitContext.getSharedThreadPool().setTaskObserver(new SharedThreadPool.TaskObserver() {
+            @Override
+            public void onTaskStart(int module, String mark, Runnable r) {
+                Logger.d(TAG, "onTaskStart", mark);
+            }
+            @Override
+            public void onTaskEnd(int module, String mark, Runnable r) {
+                Logger.d(TAG, "onTaskEnd", mark);
+            }
+        });
     }
 
     static {

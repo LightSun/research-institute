@@ -6,6 +6,7 @@ import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.kingdom.FileResourceManager;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
+import com.heaven7.ve.utils.SharedThreadPool;
 
 /**
  * @author heaven7
@@ -36,6 +37,9 @@ public interface ColorGapContext extends Context {
     FileResourceManager getFileResourceManager();
     VETemplate getTemplate();
 
+    SharedThreadPool getSharedThreadPool();
+    @SystemResource
+    void setSharedThreadPool(SharedThreadPool pool);
     /**
      * get test type .default is {@linkplain #TEST_TYPE_SERVER}
      * @return the test type

@@ -59,6 +59,7 @@ public class ColorGapManager extends BaseContextOwner{
 
     public void cancel(){
         mediaAnalyser.cancel();
+        getContext().getSharedThreadPool().destroy();
     }
 
     /**

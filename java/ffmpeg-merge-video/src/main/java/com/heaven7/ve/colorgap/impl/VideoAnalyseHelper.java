@@ -8,8 +8,11 @@ import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
 
+import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.cross_os.IMediaResourceItem;
+import com.heaven7.ve.utils.MarkUtils;
+import com.heaven7.ve.utils.SharedThreadPool;
 import com.vida.common.entity.MediaData;
 
 import java.lang.ref.WeakReference;
@@ -63,7 +66,10 @@ public class VideoAnalyseHelper {
         }
     }
     public void scanAndLoad(Context context, List<MediaItem> items, final CyclicBarrier outBarrier) {
-        ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, items, outBarrier));
+        SharedThreadPool pool = VEGapUtils.asColorGapContext(context).getSharedThreadPool();
+        String mark = MarkUtils.marks(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA ,
+                "videos", "scanAndLoad");
+        pool.submit(mark, () -> scanAndLoad0(context, items, outBarrier));
     }
 
     /**
@@ -131,6 +137,7 @@ public class VideoAnalyseHelper {
 
         public void process() {
             Logger.i(TAG, "process", "start batch process >>> dir = " + dir);
+            SharedThreadPool pool = VEGapUtils.asColorGapContext(context).getSharedThreadPool();
             for (MediaItem item : sameDirItems) {
                 //Logger.d(TAG, "process", "start scan ---> item.path = " + item.item.getFilePath());
                 if(mCancelled.get()){
@@ -140,13 +147,17 @@ public class VideoAnalyseHelper {
                 ScanTask tags = new ScanTask(context, item, dir, tagsScanner, tagsLoader, this, "tags");
                 mCacheTasks.add(new WeakReference<>(rects));
                 mCacheTasks.add(new WeakReference<>(tags));
-                ConcurrentManager.getDefault().submit(rects);
-                ConcurrentManager.getDefault().submit(tags);
+                String rectsMark = MarkUtils.marks(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA,
+                        "videos","rects", item.getItem().getFilePath());
+                String tagsMark = MarkUtils.marks(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA, "videos_tags", item.getItem().getFilePath());
+                pool.submit(rectsMark, rects);
+                pool.submit(tagsMark, tags);
 
                 if(highLightScanner != null && highLightLoader != null) {
                     HighLightTask hlTask = new HighLightTask(this, item);
                     mCacheTasks.add(new WeakReference<>(hlTask));
-                    ConcurrentManager.getDefault().submit(hlTask);
+                    String hlMark = ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA + "_videos_highLights_" + item.getItem().getFilePath();
+                    pool.submit(hlMark, hlTask);
                 }else{
                     decreaseTask();
                 }
@@ -243,7 +254,11 @@ public class VideoAnalyseHelper {
                 parent.decreaseTask();
             }else {
                 Logger.d(TAG, "run", "<<< scan done "+ tag + ": path = " + item.item.getFilePath());
-                ConcurrentManager.getDefault().submit(new LoadTask(context, item.item, path, item.imageMeta, loader, parent));
+                SharedThreadPool pool = VEGapUtils.asColorGapContext(context).getSharedThreadPool();
+                String mark = MarkUtils.marks(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA ,
+                        "videos", "load", loader.getClass().getName() ,
+                        item.getItem().getFilePath());
+                pool.submit(mark, new LoadTask(context, item.item, path, item.imageMeta, loader, parent));
             }
         }
     }

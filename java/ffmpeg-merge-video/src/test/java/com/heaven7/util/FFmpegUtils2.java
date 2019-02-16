@@ -24,6 +24,39 @@ public class FFmpegUtils2 {
         new CmdHelper(cmds).execute(new CmdHelper.InhertIoCallback());
     }
 
+    public static String[] buildTransformFormatCmd(String inVideo, String outVideo) {
+        List<String> cmds = new ArrayList<>();
+        cmds.add("ffmpeg"); //on android no need this.
+        cmds.add("-i");
+        cmds.add(inVideo);
+        cmds.add("-vcodec");
+        cmds.add("copy");
+
+        cmds.add("-acodec");
+        cmds.add("copy");
+        cmds.add(outVideo);
+        cmds.add("-y");
+        return cmds.toArray(new String[cmds.size()]);
+    }
+    public static String[] buildTransformFormatCmd2(String inVideo, String bitRate, String maxBitRate,String outVideo) {
+        List<String> cmds = new ArrayList<>();
+        cmds.add("ffmpeg"); //on android no need this.
+        cmds.add("-i");
+        cmds.add(inVideo);
+
+        cmds.add("-b:v");
+        cmds.add(bitRate);
+        cmds.add("-bufsize");
+        cmds.add(bitRate);
+        if(maxBitRate != null){
+            cmds.add("-maxrate");
+            cmds.add(maxBitRate);
+        }
+        cmds.add(outVideo);
+        cmds.add("-y");
+        return cmds.toArray(new String[cmds.size()]);
+    }
+
     public static String[] buildMergeVideosCmd(String video1, String musicPath, String outPath) {
         List<String> cmds = new ArrayList<>();
         cmds.add("ffmpeg"); //on android no need this.

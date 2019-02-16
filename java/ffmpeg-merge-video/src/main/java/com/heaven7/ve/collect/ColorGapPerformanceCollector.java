@@ -22,6 +22,7 @@ public class ColorGapPerformanceCollector {
     public static final String MODULE_FILL_PLAID    = "FillPlaid";
     public static final String MODULE_CUT_MUSIC     = "CutMusic";
 
+    //just for message
     public static final String MODULE_GAP_CALLBACK  = "GapCallback";
 
     private final SparseArray<Collector> mModuleMap = new SparseArray<>();

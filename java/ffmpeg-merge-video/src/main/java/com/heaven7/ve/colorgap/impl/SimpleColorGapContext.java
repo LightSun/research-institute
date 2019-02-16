@@ -6,6 +6,7 @@ import com.heaven7.ve.colorgap.*;
 import com.heaven7.ve.kingdom.FileResourceManager;
 import com.heaven7.ve.kingdom.Kingdom;
 import com.heaven7.ve.template.VETemplate;
+import com.heaven7.ve.utils.SharedThreadPool;
 
 /**
  * @author heaven7
@@ -16,6 +17,7 @@ public class SimpleColorGapContext implements ColorGapContext {
     private MusicCutter mMusicCutter;
     @SystemResource
     private InitializeParam mInitParam;
+    private SharedThreadPool mPool;
 
     private Kingdom mKingdom;
     private ColorGapPerformanceCollector mCollector;
@@ -104,8 +106,21 @@ public class SimpleColorGapContext implements ColorGapContext {
     }
 
     @Override
+    public SharedThreadPool getSharedThreadPool() {
+        if(mPool == null){
+            mPool = new SharedThreadPool();
+        }
+        return mPool;
+    }
+    @Override
+    public void setSharedThreadPool(SharedThreadPool pool) {
+        this.mPool = pool;
+    }
+
+    @Override
     public void copySystemResource(ColorGapContext dst) {
         dst.setMusicCutter(getMusicCutter());
         dst.setInitializeParam(getInitializeParam());
+        dst.setSharedThreadPool(getSharedThreadPool());
     }
 }

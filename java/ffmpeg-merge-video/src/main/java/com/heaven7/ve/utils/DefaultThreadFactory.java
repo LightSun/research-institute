@@ -1,4 +1,4 @@
-package com.heaven7.util;
+package com.heaven7.ve.utils;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

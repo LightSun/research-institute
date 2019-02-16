@@ -13,7 +13,10 @@ import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.utils.*;
 import com.heaven7.ve.Constants;
+import com.heaven7.ve.collect.ColorGapPerformanceCollector;
 import com.heaven7.ve.colorgap.*;
+import com.heaven7.ve.utils.MarkUtils;
+import com.heaven7.ve.utils.SharedThreadPool;
 import com.vida.common.IOUtils;
 import com.vida.common.entity.MediaData;
 
@@ -41,7 +44,10 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
     private final ImageResource mImageRes = new ImageResource();
 
     public void scanAndLoad(Context context, List<MediaItem> imageItems, final CyclicBarrier barrier) {
-        ConcurrentManager.getDefault().submit(() -> scanAndLoad0(context, imageItems, barrier));
+        SharedThreadPool pool = VEGapUtils.asColorGapContext(context).getSharedThreadPool();
+        String marks = MarkUtils.marks(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA, "images", "scanAndLoad");
+        pool.submit(marks,
+                () -> scanAndLoad0(context, imageItems, barrier));
     }
 
     private void scanAndLoad0(Context context, List<MediaItem> imageItems, CyclicBarrier barrier) {
@@ -210,11 +216,16 @@ import static com.heaven7.ve.collect.ColorGapPerformanceCollector.MODULE_ANALYSE
          */
         public void startScanByDir() {
             Logger.d(TAG, "startScanByDir");
+            SharedThreadPool pool = VEGapUtils.asColorGapContext(getContext()).getSharedThreadPool();
             Group group = new Group(mMediaItems);
             ImageResource imageRes = ImageAnalyseHelper.this.mImageRes;
-            ConcurrentManager.getDefault().submit(() -> doWithBacthRects(group, imageRes));
-            ConcurrentManager.getDefault().submit(() -> doWithBacthTags(group, imageRes));
-            ConcurrentManager.getDefault().submit(() -> doWithHighLights(group, imageRes));
+
+            pool.submit(MarkUtils.marks(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA, "images", "doWithBacthRects"),
+                    () -> doWithBacthRects(group, imageRes));
+            pool.submit(MarkUtils.marks(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA, "images", "doWithBacthTags"),
+                    () -> doWithBacthTags(group, imageRes));
+            pool.submit(MarkUtils.marks(ColorGapPerformanceCollector.MODULE_ANALYSE_MEDIA, "images", "doWithHighLights"),
+                    () -> doWithHighLights(group, imageRes));
         }
 
         private void doWithBacthRects(Group group, ImageResource imageRes) {
