@@ -86,4 +86,10 @@
         <attr name="ptv_tip_space" format="dimension|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="MultiPieceProgressView">
+        <attr name="mppv_space" format="dimension|reference"/>
+        <attr name="mppv_background_color" format="color|reference"/>
+        <attr name="mppv_progress_color" format="color|reference"/>
+    </declare-styleable>
+
 </resources>

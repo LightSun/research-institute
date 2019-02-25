@@ -4,6 +4,6 @@
     {"2": "init_local_server"},
     {"3": "init_server"}
   ],
-  "use_type": 3,
+  "use_type": 1,
   "dic_loader":"y8m-pc-vocabulary.csv"
 }

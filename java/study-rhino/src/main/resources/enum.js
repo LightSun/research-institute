@@ -9,7 +9,8 @@ Implementing the interface java.util.Enumeration passing the object
 with JavaScript implementation directly to the constructor.
 This is a shorthand for JavaAdapter constructor:
 */
-
+//var mo= require("./Com");
+//console.log(mo);
 
 // an array to enumerate.
 var array = [0, 1, 2];

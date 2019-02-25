@@ -36,6 +36,7 @@ public class TestUtils {
 
     private static void testLargeImageCount() {
         String logFile = "E:\\test\\batch_upload\\large_images.txt";
+        String badFile = "E:\\test\\batch_upload\\bad_images.txt";
         String dir = "E:\\test\\batch_upload\\pexels";
         File file = new File(dir);
         List<String> files = new ArrayList<>();
@@ -43,22 +44,33 @@ public class TestUtils {
         FileUtils.getFiles(file, "jpeg", files);
         FileUtils.getFiles(file, "png", files);
 
-        FileUtils.getFiles(file, "JPG", files);
-        FileUtils.getFiles(file, "JPEG", files);
-        FileUtils.getFiles(file, "PNG", files);
-
         final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb_bad = new StringBuilder();
         VisitServices.from(files).fire(new FireVisitor<String>() {
             @Override
             public Boolean visit(String s, Object param) {
-                if(isLargeImage(s)){
+                if(isBadImage(s)){
+                    sb_bad.append(s).append("\r\n");
+                } else if(isLargeImage(s)){
                     sb.append(s).append("\r\n");
                 }
                 return false;
             }
         });
+        FileUtils.writeTo(badFile, sb_bad.toString());
         FileUtils.writeTo(logFile, sb.toString());
     }
+
+    private static boolean isBadImage(String s) {
+        //if the file is not image. or can't convert to image
+        try {
+            return ImageIO.read(new File(s)) == null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return true;
+        }
+    }
+
     private static boolean isLargeImage(String imagePath){
         //要求base64编码后大小不超过4M，最短边至少15px，最长边最大4096px,支持jpg/png/bmp格式
         try {

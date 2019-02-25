@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/bt_change_frame_index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="add frame index"
+        />
+
+    <com.heaven7.vida.research.widget.MultiPieceProgressView
+        android:id="@+id/mppv"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        app:mppv_space="2dp"
+        app:mppv_background_color="@color/colorPrimary"
+        app:mppv_progress_color="@color/colorAccent"
+        />
+
+</LinearLayout>

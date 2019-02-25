@@ -14,6 +14,7 @@
  * @version 1.3 Roland Pennings: Removes ../.. from the input directory name
  */
 defineClass("File")
+print(file.readLine());
 
 var functionDocArray = [];
 var inputDirName = "";
@@ -335,7 +336,7 @@ function processJSFile(filename,inputdir)
 
   if (!filename.match(/\.js$/)) {
 	print("Expected filename to end in '.js'; had instead " +
-	  filename + ". I don't treat the file.");
+	  filename + ". I don't treat the file." + filename);
   } else {
     if (inputdir==null)
 	{
@@ -444,7 +445,7 @@ function PrintOptions()
   quit();
 }
 
-
+arguments = "heaven7";
 // Main Script
 // first read the arguments
 if (! arguments)
