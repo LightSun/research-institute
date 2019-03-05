@@ -16,4 +16,5 @@ dependencies {
     //compile files('libs/nashorn.jar')
 
     compile 'org.mozilla:rhino:1.7.10'
+    compile 'org.javassist:javassist:3.24.1-GA'
 }
