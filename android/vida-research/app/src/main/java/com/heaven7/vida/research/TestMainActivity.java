@@ -14,6 +14,7 @@ import com.heaven7.vida.research.sample.TestDynamicContentActivity;
 import com.heaven7.vida.research.sample.TestLottieActivity;
 import com.heaven7.vida.research.sample.TestMultiPieceProgressView;
 import com.heaven7.vida.research.sample.TestPageTipViewActivity;
+import com.heaven7.vida.research.sample.TestPageTitleStrip;
 import com.heaven7.vida.research.sample.TestRectProgresActivity;
 import com.heaven7.vida.research.sample.TestRecyclerViewSwipeActivity;
 import com.heaven7.vida.research.sample.TestRhinoActivity;
@@ -75,6 +76,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestRhinoActivity.class));
         list.add(new ActivityInfo(TestAutoClickActivity.class));
         list.add(new ActivityInfo(TestMultiPieceProgressView.class));
+        list.add(new ActivityInfo(TestPageTitleStrip.class));
     }
 
     @Override

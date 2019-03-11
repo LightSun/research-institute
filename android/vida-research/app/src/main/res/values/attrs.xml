@@ -91,5 +91,11 @@
         <attr name="mppv_background_color" format="color|reference"/>
         <attr name="mppv_progress_color" format="color|reference"/>
     </declare-styleable>
+    <declare-styleable name="TwoTextOffsetView">
+        <attr name="ttov_text_space" format="dimension|reference"/>
+        <attr name="ttov_text_color" format="color|reference"/>
+        <attr name="ttov_text_size" format="dimension|reference"/>
+        <attr name="ttov_sample_text" format="string|reference"/>
+    </declare-styleable>
 
 </resources>

@@ -76,6 +76,7 @@
         <activity android:name=".sample.TestAutoClick2Activity" />
         <activity android:name=".sample.AccessibilityOpenHelperActivity" />
         <activity android:name=".sample.TestMultiPieceProgressView" />
+        <activity android:name=".sample.TestPageTitleStrip" />
 
         <service
             android:name=".service.TestAccessibilityService"
