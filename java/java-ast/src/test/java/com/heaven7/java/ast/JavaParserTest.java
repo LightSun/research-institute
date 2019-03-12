@@ -2,9 +2,14 @@ package com.heaven7.java.ast;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 import com.heaven7.java.base.util.ResourceLoader;
 import org.junit.Test;
 
@@ -69,5 +74,22 @@ public class JavaParserTest {
     myClass.addField(String.class, "name", PRIVATE);
     String code = myClass.toString();
     System.out.println(code);
+  }
+
+  @Test
+  public void testBlockStatement(){
+      //BlockStmt should start with "{"
+      String expre = "{int[] arr = {1,2,3};String.valueOf(arr[0]);}";
+      BlockStmt blockStmt = StaticJavaParser.parseBlock(expre);
+      NodeList<Statement> statements = blockStmt.getStatements();
+      System.out.println();
+      GenerateVisitor visitor = new GenerateVisitor();
+      for (Statement st : statements){
+          Object result = st.accept(visitor, null);
+      }
+  }
+
+  private static class GenerateVisitor extends GenericVisitorAdapter<Object, Object>{
+
   }
 }
