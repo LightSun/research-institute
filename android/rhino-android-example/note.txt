@@ -1,0 +1,4 @@
+
+in rhino:
+    1, int to double (js all is numbers)
+    2, JavaAdapter can't used on android

@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation('androidx.appcompat:appcompat:1.1.0-alpha02'){
+        exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
+    androidTestImplementation 'androidx.test:rules:1.1.2-alpha01'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.2-alpha01'
+
+    api 'org.mozilla:rhino:1.7.10'
+    implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3' //compat to jdk9
+    androidTestImplementation 'org.yaml:snakeyaml:1.19'
+    androidTestImplementation('com.google.caliper:caliper:1.0-beta-2') {
+        exclude group: 'asm', module: 'asm'
+    }
+}
