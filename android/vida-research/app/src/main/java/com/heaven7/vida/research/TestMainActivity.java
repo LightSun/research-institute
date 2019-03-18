@@ -1,7 +1,10 @@
 package com.heaven7.vida.research;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import com.heaven7.java.jartest.Test;
 import com.heaven7.vida.research.drag.DragActivity;
 import com.heaven7.vida.research.sample.BalanceViewTest;
 import com.heaven7.vida.research.sample.NativeSurfaceActivity;
@@ -32,6 +35,8 @@ import com.heaven7.vida.research.service.TestAccessibilityService;
 import com.heaven7.vida.research.utils.AccessibilityHelper;
 import com.heaven7.vida.research.utils.AccessibilityOperator;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -77,6 +82,26 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestAutoClickActivity.class));
         list.add(new ActivityInfo(TestMultiPieceProgressView.class));
         list.add(new ActivityInfo(TestPageTitleStrip.class));
+
+        testLoadImageFromJar();
+    }
+
+    //test ok
+    private void testLoadImageFromJar() {
+        //from aop.jar.
+        //jar:file:/data/app/com.heaven7.vida.research-xdQ48mUgjcWppqlAcca0kg==/base.apk!/res/ic_photo.png
+        try{
+            URL url = TestMainActivity.class.getClassLoader().getResource("res/ic_photo.png");
+            if(url != null) {
+                Bitmap btmp = BitmapFactory.decodeStream(url.openStream(), null, null);
+                System.out.println(btmp);
+            }else {
+                int resourceID = getResources().getIdentifier("ic_photo", "drawable", getPackageName());
+                Bitmap btmp = BitmapFactory.decodeResource(getResources(), resourceID, null);
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

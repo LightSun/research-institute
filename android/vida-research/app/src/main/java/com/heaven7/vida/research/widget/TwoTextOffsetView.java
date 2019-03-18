@@ -64,7 +64,7 @@ public class TwoTextOffsetView extends View {
         }
         mPaint.setColor(textColor);
         mPaint.setTextSize(textSize);
-        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStyle(Paint.Style.FILL_AND_STROKE); // must use this . or draw digital will make a emptu
     }
 
     public void concatViewPager(ViewPager pager){

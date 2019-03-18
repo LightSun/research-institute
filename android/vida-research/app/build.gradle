@@ -72,5 +72,6 @@ dependencies {
 
     //java running js without webview
     api files('libs/rhino-1.7.9.jar')
+    api files('libs/aop.jar')
     implementation 'cc.chenhe:android-lua:1.0.3'
 }
