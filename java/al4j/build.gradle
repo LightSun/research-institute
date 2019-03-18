@@ -1,0 +1,79 @@
+group 'com.heaven7.java.jartest'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+//准备jar的资源
+task makeJar(type:Jar) {
+    //指定生成的jar名
+    baseName 'al4j'
+    from("out/production/classes")
+    into('build/classes/java/main')
+    include("com/heaven7/java/jartest/*")
+    new File('build/classes/java/main/res').mkdirs()
+    copy{
+        from "drawables"
+        into "build/classes/java/main/res"
+    }
+   // ConfigurableFileCollection cfcs = files("drawables")
+ /*   cfcs.files.each {
+        File file ->
+            println file.getn
+    }*/
+    //遍历每一个文件
+   /* fileTree("drawables"){
+        it.visit {
+            FileVisitDetails fvd ->
+                println(fvd.file.getName())
+                from fvd.file
+                into 'build/classes/images/' + fvd.name
+        }
+    }*/
+}
+
+
+//打包任务
+task jarAopLib(type: Jar) {
+    archiveName = 'aop.jar'
+    from('build/classes/java/main')
+    destinationDir = file('build/libs')
+//    into('build/libs')
+    exclude('org/cmdmac/aop/BuildConfig.class')
+    exclude('org/cmdmac/aop/BuildConfig\$*.class')
+    exclude('**/R.class')
+    exclude('**/R\$*.class')
+    include('com/heaven7/java/jartest/*')
+    include('res/*')
+}
+
+//配置检查完后
+afterEvaluate {
+    logger.log(LogLevel.ERROR, assemble.getTaskDependencies().toString())
+    logger.log(LogLevel.ERROR, assemble.getTaskDependencies().getDependencies().toString())
+    //让打包任务先依赖assemble任务
+    def t = tasks.jarAopLib
+    t.dependsOn makeJar
+    t.dependsOn assemble.getTaskDependencies().getDependencies()
+    //让assemble任务再依赖jarAopLib，这样相当于在原有任务中插入任务jarAopLib
+    assemble.dependsOn t
+}
+
+jar {
+    baseName = 'al4j'
+    version = '0.0.1'
+    manifest {
+        attributes "Manifest-Version": 1.0
+       // , 'Main-Class': 'com.vida.server.montage.VidaApplication'
+    }
+}
