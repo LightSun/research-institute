@@ -39,6 +39,9 @@ public class JavaAssistTest {
             CtMethod ctMethodTwo = CtMethod.make("public void setEmpId(Integer empId) {this.empId = empId;}", clazz);
             clazz.addMethod(ctMethodTwo);
 
+            CtMethod ctm_print = CtMethod.make("public void print(String msg) {System.out.println(msg);}", clazz);
+            clazz.addMethod(ctm_print);
+
             //创建方法方法二
             clazz.addMethod(CtNewMethod.getter("getEmpAge", ctFieldTwo));
             clazz.addMethod(CtNewMethod.setter("setEmpAge", ctFieldTwo));

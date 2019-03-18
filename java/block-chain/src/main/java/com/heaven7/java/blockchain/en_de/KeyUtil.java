@@ -126,24 +126,7 @@ public class KeyUtil {
     }
 
     public static void savePublicKey(PublicKey key, String filename) {
-        try {
-            byte[] encode = KeyFactory.getInstance("EC").translateKey(key).getEncoded();
-
-
-            FileWriter fw = new FileWriter(filename);
-            String content = Base64.getEncoder().encodeToString(key.getEncoded());
-            fw.write(content);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     public static void savePrivateKey(PrivateKey key, String filename) {
-        try {
-            FileWriter fw = new FileWriter(filename);
-            String content = Base64.getEncoder().encodeToString(key.getEncoded());
-            fw.write(content);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

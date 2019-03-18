@@ -1,10 +1,8 @@
 package com.heaven7.vida.research;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import com.heaven7.java.jartest.Test;
 import com.heaven7.vida.research.drag.DragActivity;
 import com.heaven7.vida.research.sample.BalanceViewTest;
 import com.heaven7.vida.research.sample.NativeSurfaceActivity;
@@ -33,7 +31,6 @@ import com.heaven7.vida.research.sample.TestVidaTransDrawable;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
 import com.heaven7.vida.research.service.TestAccessibilityService;
 import com.heaven7.vida.research.utils.AccessibilityHelper;
-import com.heaven7.vida.research.utils.AccessibilityOperator;
 
 import java.io.IOException;
 import java.net.URL;
