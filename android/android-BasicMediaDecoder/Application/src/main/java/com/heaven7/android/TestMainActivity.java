@@ -5,6 +5,7 @@ import com.heaven7.android.sample.TestCameraToMpegActivity;
 import com.heaven7.android.sample.TestEncodeAndMuxActivity;
 import com.heaven7.android.sample.TestExtractMpegFramesActivity;
 import com.heaven7.android.sample.TestMediaCodecAudioTrackActivity;
+import com.heaven7.android.sample.TestMediaCodecAudioTrackActivity2;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestEncodeAndMuxActivity.class));
         list.add(new ActivityInfo(TestCameraToMpegActivity.class));
         list.add(new ActivityInfo(TestExtractMpegFramesActivity.class));
+        list.add(new ActivityInfo(TestMediaCodecAudioTrackActivity2.class));
     }
 
 }

@@ -21,6 +21,7 @@ public class AudioDecoderThread {
     private MediaCodec mDecoder;
 
     private boolean eosReceived;
+
     private int mSampleRate = 0;
     private int channel = 0;
     private final String TAG = "AACPlay";

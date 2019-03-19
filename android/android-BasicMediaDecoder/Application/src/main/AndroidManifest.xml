@@ -36,6 +36,7 @@
 
         <activity android:name=".MainActivity"/>
         <activity android:name="com.heaven7.android.sample.TestMediaCodecAudioTrackActivity"/>
+        <activity android:name="com.heaven7.android.sample.TestMediaCodecAudioTrackActivity2"/>
         <activity android:name="com.heaven7.android.sample.TestEncodeAndMuxActivity"/>
         <activity android:name="com.heaven7.android.sample.TestCameraToMpegActivity"/>
         <activity android:name="com.heaven7.android.sample.TestExtractMpegFramesActivity"/>

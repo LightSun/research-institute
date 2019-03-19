@@ -43,6 +43,9 @@ public class MediaUtils {
             } else {
                 throw new UnsupportedOperationException("wrong type = " + type);
             }
+            if(trackIndex == -1){
+                return null;
+            }
             extractor.selectTrack(trackIndex);
             extractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
             return extractor.getTrackFormat(trackIndex);
