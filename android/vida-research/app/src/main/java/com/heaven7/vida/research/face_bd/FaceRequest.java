@@ -7,8 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.os.Build;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.RequiresApi;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.vida.research.VidaTestApplication;

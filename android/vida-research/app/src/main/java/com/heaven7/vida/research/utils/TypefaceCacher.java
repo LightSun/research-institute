@@ -2,7 +2,9 @@ package com.heaven7.vida.research.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v4.util.ArrayMap;
+
+import androidx.collection.ArrayMap;
+//import androidx.core.util.ArrayMap;
 
 /**
  * Created by heaven7 on 2018/11/7 0007.

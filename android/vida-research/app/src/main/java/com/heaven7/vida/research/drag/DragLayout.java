@@ -2,8 +2,8 @@ package com.heaven7.vida.research.drag;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.widget.ViewDragHelper;
+import androidx.core.view.MotionEventCompat;
+import androidx.customview.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;

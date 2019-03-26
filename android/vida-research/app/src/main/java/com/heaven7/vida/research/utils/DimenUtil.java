@@ -3,7 +3,7 @@ package com.heaven7.vida.research.utils;/**
  */
 
 import android.content.Context;
-import android.support.annotation.DimenRes;
+import androidx.annotation.DimenRes;
 
 /**
  * @author heaven7

@@ -3,7 +3,7 @@ package com.heaven7.vida.research.sample;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.heaven7.core.util.MainWorker;

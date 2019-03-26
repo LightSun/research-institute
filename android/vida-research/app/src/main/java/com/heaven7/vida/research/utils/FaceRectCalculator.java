@@ -1,7 +1,7 @@
 package com.heaven7.vida.research.utils;
 
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.heaven7.vida.research.face_bd.FaceInfo;
 

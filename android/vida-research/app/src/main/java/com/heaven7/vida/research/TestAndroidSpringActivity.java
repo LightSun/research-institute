@@ -3,14 +3,12 @@ package com.heaven7.vida.research;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.animation.DynamicAnimation;
-import android.support.animation.FlingAnimation;
-import android.support.animation.SpringAnimation;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.SeekBar;
+
+import androidx.dynamicanimation.animation.SpringAnimation;
 
 public class TestAndroidSpringActivity extends Activity implements View.OnTouchListener {
 

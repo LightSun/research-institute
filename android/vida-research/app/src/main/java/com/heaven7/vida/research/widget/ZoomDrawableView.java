@@ -5,8 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.DrawableUtils;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.DrawableUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
