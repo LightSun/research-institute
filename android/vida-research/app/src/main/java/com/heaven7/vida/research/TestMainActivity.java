@@ -12,6 +12,7 @@ import com.heaven7.vida.research.sample.TestBaiduFaceActivity;
 import com.heaven7.vida.research.sample.TestClipScaleActivity;
 import com.heaven7.vida.research.sample.TestDiscViewActivity;
 import com.heaven7.vida.research.sample.TestDynamicContentActivity;
+import com.heaven7.vida.research.sample.TestGLSurfaceViewActivity;
 import com.heaven7.vida.research.sample.TestLottieActivity;
 import com.heaven7.vida.research.sample.TestMultiPieceProgressView;
 import com.heaven7.vida.research.sample.TestPageTipViewActivity;
@@ -79,6 +80,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestAutoClickActivity.class));
         list.add(new ActivityInfo(TestMultiPieceProgressView.class));
         list.add(new ActivityInfo(TestPageTitleStrip.class));
+        list.add(new ActivityInfo(TestGLSurfaceViewActivity.class));
 
         testLoadImageFromJar();
     }
