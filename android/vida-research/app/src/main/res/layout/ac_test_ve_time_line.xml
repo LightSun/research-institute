@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <com.heaven7.vida.research.widget.VideoEditTimeLine
+        android:id="@+id/tl"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="20dp"
+        app:vetl_dot_radius="1dp"
+        app:vetl_text_color="@color/colorPrimary"
+        app:vetl_text_size="15sp"
+        app:vetl_time_distance="100dp"
+        />
+
+</LinearLayout>

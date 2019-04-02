@@ -29,6 +29,7 @@ import com.heaven7.vida.research.sample.TestTransitionAnimationActivity1;
 import com.heaven7.vida.research.sample.TestV7_CircleImageViewActivity;
 import com.heaven7.vida.research.sample.TestVidaStickyLayoutActivity;
 import com.heaven7.vida.research.sample.TestVidaTransDrawable;
+import com.heaven7.vida.research.sample.TestVideoEditorTimeLineActivity;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
 import com.heaven7.vida.research.service.TestAccessibilityService;
 import com.heaven7.vida.research.utils.AccessibilityHelper;
@@ -81,6 +82,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestMultiPieceProgressView.class));
         list.add(new ActivityInfo(TestPageTitleStrip.class));
         list.add(new ActivityInfo(TestGLSurfaceViewActivity.class));
+        list.add(new ActivityInfo(TestVideoEditorTimeLineActivity.class));
 
         testLoadImageFromJar();
     }

@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
-    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>
+   <!-- <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>-->
 
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
@@ -78,6 +78,7 @@
         <activity android:name=".sample.TestMultiPieceProgressView" />
         <activity android:name=".sample.TestPageTitleStrip" />
         <activity android:name=".sample.TestGLSurfaceViewActivity" />
+        <activity android:name=".sample.TestVideoEditorTimeLineActivity" />
 
         <service
             android:name=".service.TestAccessibilityService"

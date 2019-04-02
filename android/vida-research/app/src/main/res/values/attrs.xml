@@ -98,4 +98,12 @@
         <attr name="ttov_sample_text" format="string|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="VideoEditTimeLine">
+        <attr name="vetl_text_size" format="dimension|reference"/>
+        <attr name="vetl_text_color" format="color|reference"/>
+        <attr name="vetl_dot_radius" format="dimension|reference"/>
+        <!-- the distance of one second -->
+        <attr name="vetl_time_distance" format="dimension|reference"/>
+    </declare-styleable>
+
 </resources>
