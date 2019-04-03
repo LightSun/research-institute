@@ -12,8 +12,10 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.heaven7.core.util.Logger;
 import com.heaven7.vida.research.R;
 import com.heaven7.vida.research.utils.DrawingUtils;
+import com.heaven7.vida.research.utils.ScrollerWrapper;
 
 import androidx.annotation.Nullable;
 import androidx.core.view.GestureDetectorCompat;
@@ -21,8 +23,9 @@ import androidx.core.view.GestureDetectorCompat;
 /**
  * Created by heaven7 on 2019/4/2.
  */
-public class VideoEditTimeLine extends View {
+public class VideoEditTimeLine extends View implements ScrollerWrapper.Callback{
 
+    private static final String TAG = "VideoEditTimeLine";
     private static final int MAX_DURATION_IN_SECONDS = 99 * 60;
     private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Rect mRect = new Rect();
@@ -39,10 +42,12 @@ public class VideoEditTimeLine extends View {
     private int mOffsetX;
     private int mDuration = 9; // in seconds
 
+    private final ScrollerWrapper mScroller;
     private GestureDetectorCompat mGestureDetector;
-    private int mHalfTextWidth;
     private int mMaxOffsetX;
     private int mMinOffsetX;
+
+    private Callback mCallback;
 
     public VideoEditTimeLine(Context context) {
         this(context, null);
@@ -72,7 +77,11 @@ public class VideoEditTimeLine extends View {
         mPaint.setTextSize(textSize);
         mPaint.setStyle(Paint.Style.FILL);
 
+        mScroller = new ScrollerWrapper(this, this);
         mGestureDetector = new GestureDetectorCompat(context, new GestureHelper());
+    }
+    public void setCallback(Callback callback){
+        this.mCallback = callback;
     }
 
     public void setDuration(int durationInSeconds){
@@ -91,8 +100,15 @@ public class VideoEditTimeLine extends View {
         invalidate();
     }
 
+    public void setOffsetPercent(float percent){
+        this.mOffsetX = (int) (mMaxOffsetX - (mMaxOffsetX - mMinOffsetX) * percent);
+        invalidate();
+    }
+
     public void setMaxOffsetX(int max){
-        this.mMaxOffsetX = max + getPaddingLeft();
+        int s = (int) (mDistance * mScale);
+        this.mMaxOffsetX = max - getPaddingLeft();
+        this.mMinOffsetX = mMaxOffsetX - s * mDuration;
     }
 
     @Override
@@ -115,18 +131,18 @@ public class VideoEditTimeLine extends View {
         canvas.translate(left + mOffsetX, top);
 
         final int duration = this.mDuration;
-        for (int i = 0 ; i < duration ; i++){
+        for (int i = 0 ; i <= duration ; i++){
             String timeText = mFormatter.format(i);
            // Logger.d("VideoEditTimeLine", "onDraw", " i = " + i + " ,text = " + timeText);
             mPaint.getTextBounds(timeText, 0, timeText.length(), mRect);
             mRange.set(- mRect.width() / 2, 0, mRect.width() / 2, contentHeight);
             mRange.offset(i * s, 0);
-            mHalfTextWidth = mRect.width() / 2;
+           // mHalfTextWidth = mRect.width() / 2;
 
             DrawingUtils.computeTextDrawingCoordinate(timeText, mPaint, mRange, mRectF);
             canvas.drawText(timeText, mRectF.left, mRectF.top - mPaint.ascent(), mPaint);
 
-            if( i != duration -1){
+            if( i != duration){
                 //not the end. draw dot.
                 float x = mRange.centerX() + s * 1f/ 2;
                 int y = mRange.centerY();
@@ -138,24 +154,95 @@ public class VideoEditTimeLine extends View {
             }
         }
         canvas.restore();
+        //just for debug
+        //canvas.drawLine(getWidth() / 2, 0, getWidth() / 2 ,100, mPaint);
+    }
+
+    @Override
+    public void computeScroll() {
+        mScroller.computeScroll();
+    }
+
+    @Override
+    public boolean onComputeScrolled(ScrollerWrapper wrapper, View view, int deltaX) {
+        if(!canScroll(-deltaX)){
+            dispatchTimeLineChangeEnd();
+            return false;
+        }
+        mOffsetX += deltaX;
+        clampOffsetX();
+        invalidate();
+        dispatchTimeLineChanged();
+        return true;
+    }
+
+    @Override
+    public void onFinish(ScrollerWrapper wrapper, View view) {
+        view.invalidate();
+        dispatchTimeLineChangeEnd();
+    }
+
+    private boolean canScroll(float dx) {
+        if (mOffsetX == mMinOffsetX && dx > 0) {
+            return false;
+        }
+        if (mOffsetX == mMaxOffsetX && dx < 0) {
+            return false;
+        }
+        return true;
+    }
+    private void clampOffsetX(){
+        if(mOffsetX > mMaxOffsetX){
+            mOffsetX = mMaxOffsetX;
+        }
+        if(mOffsetX < mMinOffsetX){
+            mOffsetX = mMinOffsetX;
+        }
+    }
+    private void dispatchTimeLineChanged(){
+        if(mCallback != null){
+            int delta = mOffsetX - mMaxOffsetX;
+            float percent = Math.abs(delta) * 1f/ Math.abs(mMaxOffsetX - mMinOffsetX);
+            mCallback.onTimeLineChanged(this, percent);
+        }
+    }
+    private void dispatchTimeLineChangeEnd(){
+         if(mCallback != null){
+             int delta = mOffsetX - mMaxOffsetX;
+             float percent = Math.abs(delta) * 1f/ Math.abs(mMaxOffsetX - mMinOffsetX);
+             mCallback.onTimeLineChangeEnd(this, percent);
+         }
     }
 
     private class GestureHelper extends GestureDetector.SimpleOnGestureListener{
+
         @Override
         public boolean onDown(MotionEvent e) {
             return true;
         }
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            return super.onScroll(e1, e2, distanceX, distanceY);
+            Logger.d(TAG, "onScroll", "distanceX = " + distanceX);
+            mOffsetX -= distanceX;
+            clampOffsetX();
+            invalidate();
+            dispatchTimeLineChanged();
+            return true;
         }
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            return super.onFling(e1, e2, velocityX, velocityY);
+            Logger.d(TAG, "onFling", "velocityX = " + velocityX);
+            mScroller.startFling(velocityX, velocityY);
+            return true;
         }
     }
 
-    public interface TimeFormatter{
+    public interface Callback{
+        void onTimeLineChanged(VideoEditTimeLine view,float percent);
+        void onTimeLineChangeEnd(VideoEditTimeLine view ,float percent);
+    }
+
+    /*public*/ interface TimeFormatter{
         String format(int seconds);
     }
 

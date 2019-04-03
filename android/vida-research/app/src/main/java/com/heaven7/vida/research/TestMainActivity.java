@@ -45,6 +45,7 @@ public class TestMainActivity extends AbsMainActivity {
 
     @Override
     protected void addDemos(List<ActivityInfo> list) {
+        //System.getProperties().put("dsfdsfsfs", "");
         list.add(new ActivityInfo(MainActivity.class));
         list.add(new ActivityInfo(com.heaven7.vida.research.drag.MainActivity.class));
         list.add(new ActivityInfo(DragActivity.class));
