@@ -14,6 +14,10 @@ import android.view.SurfaceView;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+/**
+ * decode media also can used something like :
+ * https://www.programcreek.com/java-api-examples/?code=Tai-Kimura/VideoApplication/VideoApplication-master/videolibrary/src/main/java/com/tanosys/videolibrary/MoviePlayer.java#
+ */
 public class DecodeActivity extends Activity implements SurfaceHolder.Callback {
     private static final String SAMPLE = Environment.getExternalStorageDirectory() + "/video.mp4";
     private PlayerThread mPlayer = null;
