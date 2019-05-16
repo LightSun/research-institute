@@ -66,15 +66,42 @@ public class MusicAnnotatorView extends WaveformView {
     }
 
     /**
+     * jump to previous annotator.
+     * @return true if success
+     */
+    public boolean previousAnnotator(){
+        if(mFocusLine != null){
+            int index = mAnnotatorLines.indexOf(mFocusLine);
+            if(index > 0){
+                AnnotatorLine line = mAnnotatorLines.get(index - 1);
+                startAnnotatorLine(line);
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * jump to next annotator.
+     * @return true if success
+     */
+    public boolean nextAnnotator(){
+        if(mFocusLine != null){
+            int index = mAnnotatorLines.indexOf(mFocusLine);
+            if(index < mAnnotatorLines.size() - 1){
+                AnnotatorLine line = mAnnotatorLines.get(index + 1);
+                startAnnotatorLine(line);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * called this to finish adjust mode.
      */
     public void finishAdjustMode(){
         if(mFocusLine != null){
-            int delta = mOffsetX - mFocusLine.mStartOffsetX;
-            //finish change the time-point of annotator line
-            mFocusLine.pix += delta;
-            mFocusLine.mesc = pixelsToMillisecs(mFocusLine.pix);
-            mFocusLine.resetForAdjust();
+            finishAdjustCurrentAnnotatorLine();
             mFocusLine = null;
             invalidate();
         }
@@ -90,7 +117,25 @@ public class MusicAnnotatorView extends WaveformView {
             invalidate();
         }
     }
+
     //-----------------------------------------------------------
+
+    private void startAnnotatorLine(AnnotatorLine line){
+        //reset last.;
+        if(mFocusLine != null){
+            finishAdjustCurrentAnnotatorLine();
+            mFocusLine = null;
+        }
+        // start anim
+        startLeanAnim(line.pix - mOffsetX - getWidth()/2, line);
+    }
+    private void finishAdjustCurrentAnnotatorLine() {
+        int delta = mOffsetX - mFocusLine.mStartOffsetX;
+        //finish change the time-point of annotator line
+        mFocusLine.pix += delta;
+        mFocusLine.mesc = pixelsToMillisecs(mFocusLine.pix);
+        mFocusLine.resetForAdjust();
+    }
 
     private AnnotatorLine findAnnotatorLine(MotionEvent e) {
         int by = mParams.viewHeight - mAP.startDy;
@@ -116,13 +161,7 @@ public class MusicAnnotatorView extends WaveformView {
         public boolean onSingleTapUp(MotionEvent e) {
             AnnotatorLine line = findAnnotatorLine(e);
             if(line != null){
-                //reset last.;
-                if(mFocusLine != null){
-                    mFocusLine.resetForAdjust();
-                    mFocusLine = null;
-                }
-                // start anim
-                startLeanAnim(line.pix - mOffsetX - getWidth()/2, line);
+                startAnnotatorLine(line);
                 return true;
             }
             return false;
