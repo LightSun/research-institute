@@ -1,0 +1,51 @@
+apply from: '../constants.gradle'
+apply plugin: 'com.android.application'
+//apply plugin: 'me.tatarka.retrolambda'
+
+android {
+    compileSdkVersion project.ext.compileSdkVersion
+    buildToolsVersion project.ext.buildToolsVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId "com.semantive.example"
+        targetSdkVersion project.ext.targetSdkVersion
+        minSdkVersion project.ext.minSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+
+
+    implementation project(':library')
+
+    implementation('com.heaven7.core.util:util-v1:1.1.2'){
+        exclude group: 'com.android.support'
+    }
+    implementation 'com.heaven7.core.adapter:adapter:1.8.9'
+    implementation 'com.heaven7.java.pc:Produce-consume:1.0.0'
+
+    implementation 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor "com.jakewharton:butterknife-compiler:8.4.0"
+}
+
+/*
+retrolambda {
+    jdk System.getenv("JAVA8_HOME")
+    oldJdk System.getenv("JAVA7_HOME")
+    javaVersion JavaVersion.VERSION_1_7
+}*/
