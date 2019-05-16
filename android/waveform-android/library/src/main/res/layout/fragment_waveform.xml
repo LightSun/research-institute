@@ -11,7 +11,8 @@
             android:layout_weight="1"
             android:paddingTop="40dip">
 
-        <com.semantive.waveformandroid.waveform.view.WaveformView android:id="@+id/waveform"
+        <com.semantive.waveformandroid.waveform.view.WaveformView3
+            android:id="@+id/waveform"
                                              android:layout_width="fill_parent"
                                              android:layout_height="fill_parent" />
 

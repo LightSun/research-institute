@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.semantive.waveformandroid.R;
 import com.semantive.waveformandroid.waveform.soundfile.CheapSoundFile;
 import com.semantive.waveformandroid.waveform.view.MarkerView;
-import com.semantive.waveformandroid.waveform.view.WaveformView;
+import com.semantive.waveformandroid.waveform.view.WaveformView3;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +50,7 @@ import java.util.List;
  *
  * Modified by Anna Stępień <anna.stepien@semantive.com>
  */
-public abstract class WaveformFragment extends Fragment implements MarkerView.MarkerListener, WaveformView.WaveformListener {
+public abstract class WaveformFragment extends Fragment implements MarkerView.MarkerListener, WaveformView3.WaveformListener {
 
     public static final String TAG = "WaveformFragment";
 
@@ -60,7 +60,7 @@ public abstract class WaveformFragment extends Fragment implements MarkerView.Ma
     protected CheapSoundFile mSoundFile;
     protected File mFile;
     protected String mFilename;
-    protected WaveformView mWaveformView;
+    protected WaveformView3 mWaveformView;
     protected MarkerView mStartMarker;
     protected MarkerView mEndMarker;
     protected TextView mStartText;
@@ -366,7 +366,7 @@ public abstract class WaveformFragment extends Fragment implements MarkerView.Ma
 
         enableDisableButtons();
 
-        mWaveformView = (WaveformView) view.findViewById(R.id.waveform);
+        mWaveformView = (WaveformView3) view.findViewById(R.id.waveform);
         mWaveformView.setListener(this);
         mWaveformView.setSegments(getSegments());
 

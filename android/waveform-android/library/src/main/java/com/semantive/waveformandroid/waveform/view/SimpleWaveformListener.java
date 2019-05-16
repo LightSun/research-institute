@@ -3,7 +3,7 @@ package com.semantive.waveformandroid.waveform.view;
 /**
  * Created by heaven7 on 2019/5/9.
  */
-public class SimpleWaveformListener implements WaveformView.WaveformListener {
+public class SimpleWaveformListener implements WaveformView3.WaveformListener {
 
     protected boolean mTouchDragging;
     protected float mTouchStart;
@@ -19,13 +19,13 @@ public class SimpleWaveformListener implements WaveformView.WaveformListener {
     protected int mStartPos;
     protected int mEndPos;
 
-    private final WaveformView2 mWaveformView;
+    private final WaveformView mWaveformView;
     private int mWidth;
 
     //-----------------------------------------
     private PlayerDelegate playerDelegate;
 
-    public SimpleWaveformListener(WaveformView2 waveformView) {
+    public SimpleWaveformListener(WaveformView waveformView) {
         mWaveformView = waveformView;
     }
 

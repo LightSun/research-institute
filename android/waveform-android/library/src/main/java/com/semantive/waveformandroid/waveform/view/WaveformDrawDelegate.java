@@ -60,7 +60,7 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
     }
 
     protected void drawWaveform(final Canvas canvas, WaveformParam param, AnnotatorParam ap, int i){
-        int measuredHeight = param.viewHeight - ap.startDy;
+        int measuredHeight = param.viewHeight;
         int ctr = param.viewHeight / 2;
 
         //背景
@@ -74,23 +74,47 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
                 ctr - h,
                 ctr + 1 + h,
                 paint);
-        //回拨
+        //回拨 mOffsetX = 16164 ,width = 540 ,maxPos = 16704
         /*  if (i + start == mPlaybackPos) {
             canvas.drawLine(i, 0, i, measuredHeight, mPlaybackLinePaint);
         }*/
     }
 
+    protected boolean drawNoTimeBackground() {
+        return true;
+    }
+
     @Override
     public void drawWaveform(Canvas canvas, WaveformParam param, AnnotatorParam ap) {
-        int i = 0;
-        while (i < param.width) {
+        final int offsetX = param.offsetX;
+        int len = offsetX >= 0 ? param.width : param.width - offsetX;
+
+        //the limit start means there is no time
+        int limitStart = offsetX < 0 ? Math.abs(offsetX) : -1;
+        if(drawNoTimeBackground()){
+            if(limitStart > 0){
+                //draw bg for no waveform
+                Paint paint = getSelectStateBackgroundPaint(-1, param);
+                canvas.drawRect(0, 0, limitStart + 1, param.viewHeight - ap.startDy, paint);
+            }
+        }
+
+        //0- abs(offsetX) draw nothing.
+        for (int i = 0 ; i < len ; i ++){
+            if(i <= limitStart){
+                continue;
+            }
             param.fractionalSecs += param.onePixelInSecs;
             // Draw waveform
             drawWaveform(canvas, param, ap, i);
-
-            i++;
+        }
+        //draw left bg.
+        if(drawNoTimeBackground()){
+            Paint paint = getSelectStateBackgroundPaint(-1, param);
+            canvas.drawRect(len, 0, len + param.viewWidth / 2, param.viewHeight - ap.startDy, paint);
         }
     }
+
     @Override
     public void drawSelectBorder(Canvas canvas, Paint paint, WaveformParam param, AnnotatorParam ap) {
         int mSelectionStart = param.selectionStart;
@@ -118,6 +142,9 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         while (i < param.width) {
             i++;
             fractionalSecs += param.onePixelInSecs;
+            if(fractionalSecs < 0){
+                continue;
+            }
             int integerSecs2 = (int) fractionalSecs;
             int integerTimecodeNew = (int) (fractionalSecs / param.timecodeIntervalSecs);
             if (integerTimecodeNew != integerTimecode) {
@@ -179,13 +206,13 @@ class UpWaveformDrawDelegate extends UpDownWaveformDrawDelegate{
     }
     @Override
     protected void drawWaveform(Canvas canvas, WaveformParam param, AnnotatorParam ap, int i) {
+        int bottomY = param.viewHeight - ap.startDy;
         //bg
         Paint bgPaint = getSelectStateBackgroundPaint(i, param);
-        drawWaveformLine(canvas, i, 0,  param.viewHeight - ap.startDy, bgPaint);
+        drawWaveformLine(canvas, i, 0,  bottomY, bgPaint);
         //波形高度
         Paint paint = getSelectStatePaint(i, param);
         int h = callback.getWaveformHeight(i, param);
-        int bottomY = param.viewHeight - ap.startDy;
         drawWaveformLine(
                 canvas, i,
                 bottomY - h,
@@ -210,5 +237,9 @@ class UpWaveformDrawDelegate extends UpDownWaveformDrawDelegate{
             paint.setStrokeWidth(0);
             canvas.drawCircle(x, wp.viewHeight - ap.startDy / 2, ap.dotMinRadius, paint);
         }
+    }
+    @Override
+    protected boolean drawNoTimeBackground() {
+        return false;
     }
 }

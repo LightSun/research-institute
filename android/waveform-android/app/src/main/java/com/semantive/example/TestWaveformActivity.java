@@ -11,7 +11,10 @@ import com.heaven7.core.util.MainWorker;
 import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.java.pc.schedulers.Schedulers;
 import com.semantive.waveformandroid.waveform.soundfile.CheapSoundFile;
+import com.semantive.waveformandroid.waveform.view.EditorWaveformView;
 import com.semantive.waveformandroid.waveform.view.MusicAnnotatorView;
+import com.semantive.waveformandroid.waveform.view.MusicStartEndView;
+import com.semantive.waveformandroid.waveform.view.WaveformView;
 
 import java.io.IOException;
 
@@ -24,7 +27,11 @@ import butterknife.OnClick;
 public class TestWaveformActivity extends BaseActivity {
 
     @BindView(R.id.waveform)
-    MusicAnnotatorView waveformView2;
+    MusicAnnotatorView mWaveformView;
+    @BindView(R.id.waveform2)
+    MusicStartEndView mStartEndWaveform;
+    @BindView(R.id.waveform3)
+    EditorWaveformView mEditWaveForm;
 
     private static final String TAG = "TestWaveformActivity";
     static final String FILE = Environment.getExternalStorageDirectory() + "/vida/resource/musics/M7.mp3";
@@ -43,37 +50,39 @@ public class TestWaveformActivity extends BaseActivity {
             public void onRequestPermissionResult(String requestPermission, int requestCode, boolean success) {
                 Logger.d("RingdroidSelectActivity", "onRequestPermissionResult", "success = " + success);
                 if(success){
-                    Schedulers.io().newWorker().schedule(() -> loadFile());
+                    Schedulers.io().newWorker().schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadFile(mWaveformView, new Task(mWaveformView));
+                            loadFile(mStartEndWaveform, new Task(mStartEndWaveform));
+                            loadFile(mEditWaveForm, new Runnable() {
+                                @Override
+                                public void run() {
+                                    mEditWaveForm.addAnnotatorWidthAnim(15000);
+                                }
+                            });
+                        }
+                    });
                 }
             }
         });
     }
 
-    private void loadFile() {
+    private void loadFile(final WaveformView wv, Runnable task) {
         try {
-            waveformView2.setSoundFile(CheapSoundFile.create(FILE, new CheapSoundFile.ProgressListener() {
+            wv.setSoundFile(CheapSoundFile.create(FILE, new CheapSoundFile.ProgressListener() {
                 @Override
                 public boolean reportProgress(double fractionComplete) {
                    // Logger.d(TAG, "reportProgress", "process = " + fractionComplete);
                     return true;
                 }
             }));
-            int start = waveformView2.millisecsToPixels(10000);
-            int end = waveformView2.millisecsToPixels(30000);
-            waveformView2.setParameters(start, end, start);
-            waveformView2.postInvalidate();
-           /* MainWorker.postDelay(1000, new Runnable() {
-                @Override
-                public void run() {
-                    waveformView2.addAnnotatorWidthAnim(15000);
-                }
-            });*/
-            MainWorker.postDelay(1000, new Runnable() {
-                @Override
-                public void run() {
-                    waveformView2.seekToCenter(0);
-                }
-            });
+            int start = wv.millisecsToPixels(10000);
+            int end = wv.millisecsToPixels(30000);
+            wv.setParameters(start, end, start);
+            wv.postInvalidate();
+            //test a delay task
+            MainWorker.postDelay(1000, task);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,5 +104,17 @@ public class TestWaveformActivity extends BaseActivity {
     @OnClick(R.id.bt_set_start)
     public void onClickSetOffset(){
 
+    }
+
+    private static class Task implements Runnable{
+        final WaveformView wv;
+
+        public Task(WaveformView wv) {
+            this.wv = wv;
+        }
+        @Override
+        public void run() {
+            wv.seekToCenter(0);
+        }
     }
 }

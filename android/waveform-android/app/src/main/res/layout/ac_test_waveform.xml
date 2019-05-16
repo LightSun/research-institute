@@ -37,4 +37,17 @@
         android:layout_height="200dp"
         />
 
+    <com.semantive.waveformandroid.waveform.view.MusicStartEndView
+        android:id="@+id/waveform2"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        />
+    <com.semantive.waveformandroid.waveform.view.EditorWaveformView
+        android:id="@+id/waveform3"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        />
+
 </LinearLayout>

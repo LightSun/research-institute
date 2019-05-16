@@ -18,20 +18,26 @@ package com.semantive.waveformandroid.waveform.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.DashPathEffect;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
+
+import com.heaven7.core.util.Logger;
 import com.semantive.waveformandroid.R;
-import com.semantive.waveformandroid.waveform.Segment;
+import com.semantive.waveformandroid.waveform.ScrollerWrapper;
 import com.semantive.waveformandroid.waveform.soundfile.CheapSoundFile;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 
 /**
  * WaveformView is an Android view that displays a visual representation
@@ -47,64 +53,68 @@ import java.util.TreeMap;
  * the selected part of the waveform in a different color.
  *
  * Modified by Anna Stępień <anna.stepien@semantive.com>
+ * Modified by heaven7
  */
-public class WaveformView extends View {
+public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     public static final String TAG = "WaveformView";
 
-    public interface WaveformListener {
-        public void waveformTouchStart(float x);
-        public void waveformTouchMove(float x);
-        public void waveformTouchEnd();
-        public void waveformFling(float x);
-        public void waveformDraw();
-        public void waveformZoomIn();
-        public void waveformZoomOut();
-    }
+    private final WaveformParam mParams = new WaveformParam();
+    /*private*/ final AnnotatorParam mAP = new AnnotatorParam();
+    protected final ScrollerWrapper mScroller;
+    private final GestureDetectorCompat mGestureDetector;
+    private WaveformDrawDelegate mDrawDelegate;
+    private TimeLineCallback mCallback;
 
+    private final List<AnnotatorLine> mAnnotatorLines = new ArrayList<>();
     // Colors
-    protected Paint mGridPaint;
     protected Paint mSelectedLinePaint;
     protected Paint mUnselectedLinePaint;
-    protected Paint mUnselectedBkgndLinePaint;
+    protected Paint mUnselectedBgLinePaint;
     protected Paint mBorderLinePaint;
     protected Paint mPlaybackLinePaint;
     protected Paint mTimecodePaint;
+    protected Paint mAnnotatorPaint;
 
     protected CheapSoundFile mSoundFile;
+
     protected int[] mLenByZoomLevel;
     protected float[] mZoomFactorByZoomLevel;
     protected int mZoomLevel;
     protected int mNumZoomLevels;
+
     protected int mSampleRate;
     protected int mSamplesPerFrame;
-    protected int mOffset;
+
+    protected int mOffsetX;
     protected int mSelectionStart;
     protected int mSelectionEnd;
+
     protected int mPlaybackPos;
     protected float mDensity;
-    protected float mInitialScaleSpan;
-    protected WaveformListener mListener;
-    protected GestureDetector mGestureDetector;
-    protected ScaleGestureDetector mScaleGestureDetector;
+
     protected boolean mInitialized;
 
     protected float range;
     protected float scaleFactor;
     protected float minGain;
 
-    protected NavigableMap<Double, Segment> segmentsMap;
-    protected Segment nextSegment;
+    /*private*/ int mMinOffsetX;
 
     public WaveformView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        // We don't want keys, the markers get these
-        setFocusable(false);
+        mAP.lineWidth = 3;
+        mAP.dotMinRadius = 3;
+        mAP.dotMaxRadius = 30;
+        mAP.startY = mAP.dotMaxRadius + 2;
+        mAP.dotLineDistance = 12;
+        //mAP.startDy = 30;
 
-        mGridPaint = new Paint();
-        mGridPaint.setAntiAlias(false);
-        mGridPaint.setColor(getResources().getColor(R.color.grid_line));
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(metrics);
+        mDensity = metrics.density;
 
         mSelectedLinePaint = new Paint();
         mSelectedLinePaint.setAntiAlias(false);
@@ -114,91 +124,91 @@ public class WaveformView extends View {
         mUnselectedLinePaint.setAntiAlias(false);
         mUnselectedLinePaint.setColor(getResources().getColor(R.color.waveform_unselected));
 
-        mUnselectedBkgndLinePaint = new Paint();
-        mUnselectedBkgndLinePaint.setAntiAlias(false);
-        mUnselectedBkgndLinePaint.setColor(getResources().getColor(R.color.waveform_unselected_bkgnd_overlay));
+        mUnselectedBgLinePaint = new Paint();
+        mUnselectedBgLinePaint.setAntiAlias(false);
+        mUnselectedBgLinePaint.setColor(getResources().getColor(R.color.waveform_unselected_bkgnd_overlay));
 
-        mBorderLinePaint = new Paint();
-        mBorderLinePaint.setAntiAlias(true);
-        mBorderLinePaint.setStrokeWidth(1.5f);
-        mBorderLinePaint.setPathEffect(new DashPathEffect(new float[]{3.0f, 2.0f}, 0.0f));
+        mBorderLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mBorderLinePaint.setStrokeWidth(3);
         mBorderLinePaint.setColor(getResources().getColor(R.color.selection_border));
 
         mPlaybackLinePaint = new Paint();
         mPlaybackLinePaint.setAntiAlias(false);
         mPlaybackLinePaint.setColor(getResources().getColor(R.color.playback_indicator));
 
-        mTimecodePaint = new Paint();
-        mTimecodePaint.setTextSize(12);
-        mTimecodePaint.setAntiAlias(true);
-        mTimecodePaint.setColor(getResources().getColor(R.color.timecode));
+        mTimecodePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mTimecodePaint.setTextSize(12 * mDensity);
+        mTimecodePaint.setColor(Color.BLUE);
 
-        mGestureDetector = new GestureDetector(
-                context,
-                new GestureDetector.SimpleOnGestureListener() {
-                    public boolean onFling(
-                            MotionEvent e1, MotionEvent e2, float vx, float vy) {
-                        mListener.waveformFling(vx);
-                        return true;
-                    }
-                });
+        mAnnotatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mAnnotatorPaint.setColor(Color.RED);
 
-        mScaleGestureDetector = new ScaleGestureDetector(
-                context,
-                new ScaleGestureDetector.SimpleOnScaleGestureListener() {
-                    public boolean onScaleBegin(ScaleGestureDetector d) {
-                        mInitialScaleSpan = Math.abs(d.getCurrentSpanX());
-                        return true;
-                    }
-                    public boolean onScale(ScaleGestureDetector d) {
-                        float scale = Math.abs(d.getCurrentSpanX());
-                        if (scale - mInitialScaleSpan > 40) {
-                            mListener.waveformZoomIn();
-                            mInitialScaleSpan = scale;
-                        }
-                        if (scale - mInitialScaleSpan < -40) {
-                            mListener.waveformZoomOut();
-                            mInitialScaleSpan = scale;
-                        }
-                        return true;
-                    }
-                });
+        mScroller = new ScrollerWrapper(this, createScrollerCallback());
+        mGestureDetector = new GestureDetectorCompat(context, createGestureListener());
 
         mSoundFile = null;
         mLenByZoomLevel = null;
-        mOffset = 0;
+        mOffsetX = 0;
         mPlaybackPos = -1;
         mSelectionStart = 0;
         mSelectionEnd = 0;
-        mDensity = 1.0f;
         mInitialized = false;
-        segmentsMap = new TreeMap<>();
-        nextSegment = null;
+    }
+
+    /** make the target time point line to the center line. */
+    public void seekToCenter(int millsecs){
+        mOffsetX = millisecsToPixels(millsecs) - getWidth() / 2;
+        postInvalidate();
+    }
+    public void addAnnotator(int msec){
+        if(isInitialized()){
+            mAnnotatorLines.add(new AnnotatorLine(msec, millisecsToPixels(msec)));
+        }else {
+            mAnnotatorLines.add(new AnnotatorLine(msec, -1));
+        }
+    }
+    @VisibleForTesting
+    public void addAnnotatorWidthAnim(int msec){
+        addAnnotator(msec);
+        mAnnotatorLines.get(mAnnotatorLines.size() - 1).startAnimation(this);
+    }
+
+    public void clearAnnotator(){
+        mAnnotatorLines.clear();
+    }
+    public void setWaveformDrawDelegate(WaveformDrawDelegate delegate) {
+        this.mDrawDelegate = delegate;
+    }
+
+    protected GestureDetector.SimpleOnGestureListener createGestureListener(){
+        return new GestureImpl();
+    }
+
+    protected ScrollerWrapper.Callback createScrollerCallback(){
+        return new ScrollCallbackImpl();
+    }
+
+    protected boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2,
+                               float dx, float dy) {
+        //dx < 0 右滑， dy < 0 下滑
+        mOffsetX += dx;
+        clampOffsetX();
+        invalidate();
+        dispatchTimeLineChanged();
+        return true;
+    }
+    @Override
+    public void computeScroll() {
+        mScroller.computeScroll();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mScaleGestureDetector.onTouchEvent(event);
-        if (mGestureDetector.onTouchEvent(event)) {
-            return true;
-        }
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mListener.waveformTouchStart(event.getX());
-                break;
-            case MotionEvent.ACTION_MOVE:
-                mListener.waveformTouchMove(event.getX());
-                break;
-            case MotionEvent.ACTION_UP:
-                mListener.waveformTouchEnd();
-                break;
-        }
-        return true;
+        return mGestureDetector.onTouchEvent(event);
     }
 
-    public boolean hasSoundFile() {
-        return mSoundFile != null;
+    public void setTimeLineCallback(TimeLineCallback mCallback) {
+        this.mCallback = mCallback;
     }
 
     public void setSoundFile(CheapSoundFile soundFile) {
@@ -206,6 +216,12 @@ public class WaveformView extends View {
         mSampleRate = mSoundFile.getSampleRate();
         mSamplesPerFrame = mSoundFile.getSamplesPerFrame();
         computeDoublesForAllZoomLevels();
+        mAnnotatorLines.clear();
+        postInvalidate();
+    }
+    //--------------------------------------------------------------
+    public boolean hasSoundFile() {
+        return mSoundFile != null;
     }
 
     public boolean isInitialized() {
@@ -230,11 +246,11 @@ public class WaveformView extends View {
             float factor = mLenByZoomLevel[mZoomLevel] / (float) mLenByZoomLevel[mZoomLevel - 1];
             mSelectionStart *= factor;
             mSelectionEnd *= factor;
-            int offsetCenter = mOffset + (int) (getMeasuredWidth() / factor);
+            int offsetCenter = mOffsetX + (int) (getMeasuredWidth() / factor);
             offsetCenter *= factor;
-            mOffset = offsetCenter - (int) (getMeasuredWidth() / factor);
-            if (mOffset < 0)
-                mOffset = 0;
+            mOffsetX = offsetCenter - (int) (getMeasuredWidth() / factor);
+            if (mOffsetX < 0)
+                mOffsetX = 0;
             invalidate();
         }
     }
@@ -249,17 +265,31 @@ public class WaveformView extends View {
             float factor = mLenByZoomLevel[mZoomLevel + 1] / (float) mLenByZoomLevel[mZoomLevel];
             mSelectionStart /= factor;
             mSelectionEnd /= factor;
-            int offsetCenter = (int) (mOffset + getMeasuredWidth() / factor);
+            int offsetCenter = (int) (mOffsetX + getMeasuredWidth() / factor);
             offsetCenter /= factor;
-            mOffset = offsetCenter - (int) (getMeasuredWidth() / factor);
-            if (mOffset < 0)
-                mOffset = 0;
+            mOffsetX = offsetCenter - (int) (getMeasuredWidth() / factor);
+            if (mOffsetX < 0)
+                mOffsetX = 0;
             invalidate();
         }
     }
 
-    public int maxPos() {
+    //最大能够滑动的位置。
+    public int maxPosX() {
         return mLenByZoomLevel[mZoomLevel];
+    }
+    public int maxOffsetX(){
+        return maxPosX() - getWidth() / 2;
+    }
+
+    private void clampOffsetX(){
+        //右边留半屏
+        if(mOffsetX > maxOffsetX()){
+            mOffsetX = maxOffsetX();
+        }
+        if(mOffsetX < mMinOffsetX){
+            mOffsetX = mMinOffsetX;
+        }
     }
 
     public int secondsToFrames(double seconds) {
@@ -286,11 +316,18 @@ public class WaveformView extends View {
         return (int) (pixels * (1000.0 * mSamplesPerFrame) / (mSampleRate * z) + 0.5);
     }
 
+    /**
+     * 设置绘制的参数，像素
+     * @param start 标记的起始位置
+     * @param end  标记的结束位置
+     * @param offset  绘制的起始点
+     */
     public void setParameters(int start, int end, int offset) {
-        System.out.println(String.format("start = %d, end = %d, offset = %d", start, end, offset));
+        Logger.i(TAG, "setParameters", "start = " + start + " ,end = "
+                + end + " ,offset = " + offset);
         mSelectionStart = start;
         mSelectionEnd = end;
-        mOffset = offset;
+        mOffsetX = offset;
     }
 
     public int getStart() {
@@ -302,34 +339,11 @@ public class WaveformView extends View {
     }
 
     public int getOffset() {
-        return mOffset;
+        return mOffsetX;
     }
 
     public void setPlayback(int pos) {
         mPlaybackPos = pos;
-    }
-
-    public void setListener(WaveformListener listener) {
-        mListener = listener;
-    }
-
-    public void setSegments(final List<Segment> segments) {
-        if (segments != null) {
-            for (Segment segment : segments) {
-                segmentsMap.put(segment.getStop(), segment);
-            }
-        }
-    }
-
-    public void recomputeHeights(float density) {
-        mDensity = density;
-        mTimecodePaint.setTextSize((int) (12 * density));
-
-        invalidate();
-    }
-
-    protected void drawWaveformLine(Canvas canvas, int x, int y0, int y1, Paint paint) {
-        canvas.drawLine(x, y0, x, y1, paint);
     }
 
     @Override
@@ -337,22 +351,17 @@ public class WaveformView extends View {
         super.onDraw(canvas);
         if (mSoundFile == null)
             return;
+        if(mDrawDelegate == null){
+            throw new NullPointerException();
+        }
 
-        int measuredWidth = getMeasuredWidth();
-        int measuredHeight = getMeasuredHeight();
-        int start = mOffset;
-        int width = mLenByZoomLevel[mZoomLevel] - start;
-        int ctr = measuredHeight / 2;
-
-        if (width > measuredWidth)
-            width = measuredWidth;
-
+         //一个像素多少秒
         double onePixelInSecs = pixelsToSeconds(1);
-        boolean onlyEveryFiveSecs = (onePixelInSecs > 1.0 / 50.0);
-        double fractionalSecs = mOffset * onePixelInSecs;
-        int integerSecs = (int) fractionalSecs;
-
+        // 偏移的时间
+        double fractionalSecs = mOffsetX * onePixelInSecs;
+        // 间隔的时间.second
         double timecodeIntervalSecs = 1.0;
+       // Logger.d(TAG, "onDraw", "timecodeIntervalSecs = " + timecodeIntervalSecs);
 
         int factor = 1;
         while (timecodeIntervalSecs / onePixelInSecs < 50) {
@@ -360,122 +369,30 @@ public class WaveformView extends View {
             factor++;
         }
 
-        int integerTimecode = (int) (fractionalSecs / timecodeIntervalSecs);
-        //draw grid
-        int i = 0;
-        while (i < width) {
-            fractionalSecs += onePixelInSecs;
-            int integerSecsNew = (int) fractionalSecs;
-            if (integerSecsNew != integerSecs) {
-                integerSecs = integerSecsNew;
-                if (!onlyEveryFiveSecs || 0 == (integerSecs % 5)) {
-                    canvas.drawLine(i + 1, 0, i + 1, measuredHeight, mGridPaint);
-                }
-            }
-
-            // Draw waveform
-            drawWaveform(canvas, i, start, measuredHeight, ctr, selectWaveformPaint(i, start, fractionalSecs));
-
-            i++;
+       // int integerTimecode = (int) (fractionalSecs / timecodeIntervalSecs);
+        mParams.minOffsetX = mMinOffsetX;
+        mParams.viewHeight = getHeight();
+        mParams.viewWidth = getWidth();
+        mParams.offsetX = mOffsetX;
+        //the valid visible width of scaled.
+        if(mOffsetX < 0){
+            mParams.width = Math.min(maxPosX(), getWidth());
+        }else {
+            mParams.width = Math.min(maxPosX() - mOffsetX, getWidth());
         }
+        Logger.d(TAG, "onDraw", "mOffsetX = " + mOffsetX + " ,width = "
+                + mParams.width + " ,maxPos = " + maxPosX());
 
-        // If we can see the right edge of the waveform, draw the
-        // non-waveform area to the right as unselected
-        for (i = width; i < measuredWidth; i++) {
-            drawWaveformLine(canvas, i, 0, measuredHeight, mUnselectedBkgndLinePaint);
-        }
+        mParams.selectionStart = mSelectionStart;
+        mParams.selectionEnd = mSelectionEnd;
+        mParams.fractionalSecs = fractionalSecs;
+        mParams.onePixelInSecs = onePixelInSecs;
+        mParams.timecodeIntervalSecs = timecodeIntervalSecs;
 
-        // Draw borders
-        canvas.drawLine(
-                mSelectionStart - mOffset + 0.5f, 30,
-                mSelectionStart - mOffset + 0.5f, measuredHeight,
-                mBorderLinePaint);
-        canvas.drawLine(
-                mSelectionEnd - mOffset + 0.5f, 0,
-                mSelectionEnd - mOffset + 0.5f, measuredHeight - 30,
-                mBorderLinePaint);
-
-        // Draw grid
-        fractionalSecs = mOffset * onePixelInSecs;
-        i = 0;
-        while (i < width) {
-            i++;
-            fractionalSecs += onePixelInSecs;
-            int integerSecs2 = (int) fractionalSecs;
-            int integerTimecodeNew = (int) (fractionalSecs / timecodeIntervalSecs);
-            if (integerTimecodeNew != integerTimecode) {
-                integerTimecode = integerTimecodeNew;
-
-                // Turn, e.g. 67 seconds into "1:07"
-                String timecodeMinutes = "" + (integerSecs2 / 60);
-                String timecodeSeconds = "" + (integerSecs2 % 60);
-                if ((integerSecs2 % 60) < 10) {
-                    timecodeSeconds = "0" + timecodeSeconds;
-                }
-                String timecodeStr = timecodeMinutes + ":" + timecodeSeconds;
-                float offset = (float) (0.5 * mTimecodePaint.measureText(timecodeStr));
-                canvas.drawText(timecodeStr,
-                        i - offset,
-                        (int) (12 * mDensity),
-                        mTimecodePaint);
-            }
-        }
-
-        if (mListener != null) {
-            mListener.waveformDraw();
-        }
-    }
-
-    protected void drawWaveform(final Canvas canvas, final int i, final int start, final int measuredHeight, final int ctr, final Paint paint) {
-        if (i + start < mSelectionStart || i + start >= mSelectionEnd) {
-            drawWaveformLine(canvas, i, 0, measuredHeight,
-                    mUnselectedBkgndLinePaint);
-        }
-
-        int h = (int) (getScaledHeight(mZoomFactorByZoomLevel[mZoomLevel], start + i) * getMeasuredHeight() / 2);
-        drawWaveformLine(
-                canvas, i,
-                ctr - h,
-                ctr + 1 + h,
-                paint);
-
-        if (i + start == mPlaybackPos) {
-            canvas.drawLine(i, 0, i, measuredHeight, mPlaybackLinePaint);
-        }
-    }
-
-    protected Paint selectWaveformPaint(final int i, final int start, final double fractionalSecs) {
-        Paint paint;
-        if (i + start >= mSelectionStart && i + start < mSelectionEnd) {
-            paint = mSelectedLinePaint;
-        } else {
-            paint = mUnselectedLinePaint;
-        }
-
-        if (segmentsMap != null && !segmentsMap.isEmpty()) {
-            if (nextSegment == null) {
-                Double key = segmentsMap.ceilingKey(fractionalSecs);
-                if (key != null) {
-                    nextSegment = segmentsMap.get(segmentsMap.ceilingKey(fractionalSecs));
-                }
-            }
-
-            if (nextSegment != null) {
-                if (nextSegment.getStart().compareTo(fractionalSecs) <= 0 && nextSegment.getStop().compareTo(fractionalSecs) >= 0) {
-                    paint = new Paint();
-                    paint.setAntiAlias(false);
-                    paint.setColor(nextSegment.getColor());
-                    return paint;
-                } else {
-                    Double key = segmentsMap.ceilingKey(fractionalSecs);
-                    if (key != null) {
-                        nextSegment = segmentsMap.get(segmentsMap.ceilingKey(fractionalSecs));
-                    }
-                }
-            }
-        }
-
-        return paint;
+        mDrawDelegate.drawWaveform(canvas, mParams, mAP);
+        mDrawDelegate.drawSelectBorder(canvas, mBorderLinePaint, mParams, mAP);
+        mDrawDelegate.drawTime(canvas, mTimecodePaint, mParams, mAP);
+        mDrawDelegate.drawAnnotator(canvas, mAnnotatorPaint, mParams, mAP, mAnnotatorLines);
     }
 
     protected float getGain(int i, int numFrames, int[] frameGains) {
@@ -596,7 +513,7 @@ public class WaveformView extends View {
                 }
             }
         }
-
+        mZoomLevel = mNumZoomLevels - 1;
         mInitialized = true;
     }
 
@@ -636,6 +553,89 @@ public class WaveformView extends View {
             return getZoomedOutHeight(zoomLevel, i);
         }
         return getZoomedInHeight(zoomLevel, i);
+    }
+    private boolean canScroll(float dx) {
+        if (mOffsetX == mMinOffsetX && dx < 0) {
+            return false;
+        }
+        if (mOffsetX == maxOffsetX() && dx > 0) {
+            return false;
+        }
+        return true;
+    }
+    private void dispatchTimeLineChanged(){
+        if(mCallback != null){
+            int delta = mOffsetX - maxOffsetX();
+            float percent = Math.abs(delta) * 1f/ Math.abs(maxOffsetX() - mMinOffsetX);
+            mCallback.onTimeLineChanged(this, percent);
+        }
+    }
+    private void dispatchTimeLineChangeEnd(){
+        if(mCallback != null){
+            int delta = mOffsetX - maxOffsetX();
+            float percent = Math.abs(delta) * 1f/ Math.abs(maxOffsetX() - mMinOffsetX);
+            mCallback.onTimeLineChangeEnd(this, percent);
+        }
+    }
+
+    @Override
+    public int getWaveformHeight(int i, WaveformParam param) {
+        return (int) (getScaledHeight(mZoomFactorByZoomLevel[mZoomLevel], param.offsetX + i) * param.viewHeight/ 2);
+    }
+    @Override
+    public Paint getSelectStatePaint(boolean select) {
+        return select ? mSelectedLinePaint : mUnselectedLinePaint;
+    }
+    @Override
+    public Paint getSelectStateBackgroundPaint(boolean select) {
+        return mUnselectedBgLinePaint;
+    }
+
+    protected class GestureImpl extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            return super.onSingleTapUp(e);
+        }
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return WaveformView.this.onScroll(e1, e2, distanceX, distanceY);
+        }
+
+        public boolean onFling(
+                MotionEvent e1, MotionEvent e2, float vx, float vy) {
+            mScroller.startFling(vx, 0);
+            return true;
+        }
+    }
+
+    protected class ScrollCallbackImpl implements ScrollerWrapper.Callback{
+        @Override
+        public boolean onComputeScrolled(ScrollerWrapper wrapper, View view, int deltaX) {
+            if(!canScroll(deltaX)){
+                dispatchTimeLineChangeEnd();
+                return false;
+            }
+            mOffsetX -= deltaX;
+            clampOffsetX();
+            invalidate();
+            dispatchTimeLineChanged();
+            return true;
+        }
+
+        @Override
+        public void onFinish(ScrollerWrapper wrapper, View view) {
+            view.invalidate();
+            dispatchTimeLineChangeEnd();
+        }
+    }
+
+    public interface TimeLineCallback {
+        void onTimeLineChanged(WaveformView view, float percent);
+        void onTimeLineChangeEnd(WaveformView view, float percent);
     }
 }
 
