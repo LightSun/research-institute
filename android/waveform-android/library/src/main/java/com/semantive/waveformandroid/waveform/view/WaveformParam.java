@@ -1,6 +1,9 @@
 package com.semantive.waveformandroid.waveform.view;
 
 /*public*/ class WaveformParam{
+
+    int selectStrokeWidth;
+
     int minOffsetX;
     int offsetX;
     int width; //valid width of waveform

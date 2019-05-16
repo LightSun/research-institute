@@ -19,4 +19,8 @@ package com.semantive.waveformandroid.waveform.view;
     int startY;
     /** start delta y from down to up */
     int startDy;
+
+    int color;
+
+    int adjustColor;
 }

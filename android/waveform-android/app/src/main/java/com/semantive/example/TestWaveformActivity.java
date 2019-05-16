@@ -27,7 +27,7 @@ import butterknife.OnClick;
 public class TestWaveformActivity extends BaseActivity {
 
     @BindView(R.id.waveform)
-    MusicAnnotatorView mWaveformView;
+    MusicAnnotatorView mAnnotatorView;
     @BindView(R.id.waveform2)
     MusicStartEndView mStartEndWaveform;
     @BindView(R.id.waveform3)
@@ -53,7 +53,7 @@ public class TestWaveformActivity extends BaseActivity {
                     Schedulers.io().newWorker().schedule(new Runnable() {
                         @Override
                         public void run() {
-                            loadFile(mWaveformView, new Task(mWaveformView));
+                            loadFile(mAnnotatorView, new Task(mAnnotatorView));
                             loadFile(mStartEndWaveform, new Task(mStartEndWaveform));
                             loadFile(mEditWaveForm, new Runnable() {
                                 @Override
@@ -77,12 +77,21 @@ public class TestWaveformActivity extends BaseActivity {
                     return true;
                 }
             }));
-            int start = wv.millisecsToPixels(10000);
+            int start = wv.millisecsToPixels(3000);
             int end = wv.millisecsToPixels(30000);
-            wv.setParameters(start, end, start);
-            wv.postInvalidate();
+            wv.setSelectRange(start, end);
             //test a delay task
             MainWorker.postDelay(1000, task);
+            //
+            if(wv == mAnnotatorView){
+                MainWorker.postDelay(1000, new Runnable() {
+                    @Override
+                    public void run() {
+                        mAnnotatorView.addAnnotatorWidthAnim(5000);
+                        mAnnotatorView.addAnnotatorWidthAnim(8000);
+                    }
+                });
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,7 +104,7 @@ public class TestWaveformActivity extends BaseActivity {
 
     @OnClick(R.id.bt_set_start)
     public void onClickSetStart(){
-
+        mAnnotatorView.finishAdjustMode();
     }
     @OnClick(R.id.bt_set_end)
     public void onClickSetEnd(){
@@ -114,7 +123,7 @@ public class TestWaveformActivity extends BaseActivity {
         }
         @Override
         public void run() {
-            wv.seekToCenter(0);
+            wv.seekToCenter(3000);
         }
     }
 }

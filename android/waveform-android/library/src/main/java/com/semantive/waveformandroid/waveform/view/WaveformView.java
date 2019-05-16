@@ -25,6 +25,7 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Property;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -58,15 +59,27 @@ import java.util.List;
 public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     public static final String TAG = "WaveformView";
+    static final Property<WaveformView, Integer> sPROP_OFFSET = new Property<WaveformView, Integer>(
+            Integer.class, "offsetX") {
+        @Override
+        public Integer get(WaveformView object) {
+            return object.mOffsetX;
+        }
+        @Override
+        public void set(WaveformView object, Integer value) {
+            object.mOffsetX = value;
+            object.invalidate();
+        }
+    };
 
-    private final WaveformParam mParams = new WaveformParam();
+    /*private*/ final WaveformParam mParams = new WaveformParam();
     /*private*/ final AnnotatorParam mAP = new AnnotatorParam();
     protected final ScrollerWrapper mScroller;
     private final GestureDetectorCompat mGestureDetector;
     private WaveformDrawDelegate mDrawDelegate;
     private TimeLineCallback mCallback;
 
-    private final List<AnnotatorLine> mAnnotatorLines = new ArrayList<>();
+    /*private*/ final List<AnnotatorLine> mAnnotatorLines = new ArrayList<>();
     // Colors
     protected Paint mSelectedLinePaint;
     protected Paint mUnselectedLinePaint;
@@ -101,6 +114,8 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     /*private*/ int mMinOffsetX;
 
+    private boolean mFixSelectLength;
+
     public WaveformView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -109,12 +124,16 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mAP.dotMaxRadius = 30;
         mAP.startY = mAP.dotMaxRadius + 2;
         mAP.dotLineDistance = 12;
+        mAP.color = Color.RED;
+        mAP.adjustColor = Color.parseColor("#58c9b9");
         //mAP.startDy = 30;
+        mParams.selectStrokeWidth = 3;
 
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay().getMetrics(metrics);
         mDensity = metrics.density;
+        Logger.d(TAG, "WaveformView", "widthPixels = " + metrics.widthPixels);
 
         mSelectedLinePaint = new Paint();
         mSelectedLinePaint.setAntiAlias(false);
@@ -129,7 +148,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mUnselectedBgLinePaint.setColor(getResources().getColor(R.color.waveform_unselected_bkgnd_overlay));
 
         mBorderLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBorderLinePaint.setStrokeWidth(3);
+        mBorderLinePaint.setStrokeWidth(mParams.selectStrokeWidth);
         mBorderLinePaint.setColor(getResources().getColor(R.color.selection_border));
 
         mPlaybackLinePaint = new Paint();
@@ -141,7 +160,6 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mTimecodePaint.setColor(Color.BLUE);
 
         mAnnotatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mAnnotatorPaint.setColor(Color.RED);
 
         mScroller = new ScrollerWrapper(this, createScrollerCallback());
         mGestureDetector = new GestureDetectorCompat(context, createGestureListener());
@@ -153,11 +171,38 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mSelectionStart = 0;
         mSelectionEnd = 0;
         mInitialized = false;
+
+        getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                getViewTreeObserver().removeOnPreDrawListener(this);
+                WaveformView.this.onPreDraw();
+                return true;
+            }
+        });
     }
 
+    protected void onPreDraw() {
+
+    }
+
+    /**
+     * called in {@linkplain #clampOffsetX()}. used to do something when offset may changed.
+     */
+    protected void onOffsetMayChanged() {
+
+    }
+
+    /**
+     * called on action up
+     */
+    protected void resetTouch() {
+
+    }
     /** make the target time point line to the center line. */
     public void seekToCenter(int millsecs){
         mOffsetX = millisecsToPixels(millsecs) - getWidth() / 2;
+        clampOffsetX();
         postInvalidate();
     }
     public void addAnnotator(int msec){
@@ -190,11 +235,14 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     protected boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2,
                                float dx, float dy) {
+        if(mFixSelectLength && mSelectionEnd == maxPosX() && dx > 0){
+            return true;
+        }
         //dx < 0 右滑， dy < 0 下滑
         mOffsetX += dx;
         clampOffsetX();
-        invalidate();
         dispatchTimeLineChanged();
+        invalidate();
         return true;
     }
     @Override
@@ -204,7 +252,28 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return mGestureDetector.onTouchEvent(event);
+        boolean result = mGestureDetector.onTouchEvent(event);
+
+        switch (event.getActionMasked()) {
+
+            case MotionEvent.ACTION_UP:
+                Logger.d(TAG, "onTouchEvent", "ACTION_UP");
+                //if fling wait fling finish
+                //mScroller.abortIfNeed();
+                if(!mScroller.isFling()) {
+                    dispatchTimeLineChangeEnd();
+                }
+
+            case MotionEvent.ACTION_CANCEL:
+                Logger.d(TAG, "onTouchEvent", "ACTION_CANCEL");
+                resetTouch();
+                break;
+        }
+        return result;
+    }
+
+    public void setFixSelectLength(boolean mFixSelectLength) {
+        this.mFixSelectLength = mFixSelectLength;
     }
 
     public void setTimeLineCallback(TimeLineCallback mCallback) {
@@ -217,8 +286,12 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mSamplesPerFrame = mSoundFile.getSamplesPerFrame();
         computeDoublesForAllZoomLevels();
         mAnnotatorLines.clear();
+        //call the first time.
+        onOffsetMayChanged();
+
         postInvalidate();
     }
+
     //--------------------------------------------------------------
     public boolean hasSoundFile() {
         return mSoundFile != null;
@@ -290,6 +363,21 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         if(mOffsetX < mMinOffsetX){
             mOffsetX = mMinOffsetX;
         }
+        //should keep the select length
+        if(mFixSelectLength && mSelectionEnd > 0){
+            int expect_mSelectionStart = mOffsetX - mMinOffsetX;
+            int expect_mSelectionEnd = expect_mSelectionStart + (mSelectionEnd - mSelectionStart);
+            if(expect_mSelectionEnd > maxPosX()){
+                int dx = expect_mSelectionEnd - maxPosX();
+                mSelectionStart = expect_mSelectionStart - dx;
+                mSelectionEnd = expect_mSelectionEnd - dx;
+                mOffsetX -= dx;
+            }else {
+                mSelectionStart = expect_mSelectionStart;
+                mSelectionEnd = expect_mSelectionEnd;
+            }
+        }
+        onOffsetMayChanged();
     }
 
     public int secondsToFrames(double seconds) {
@@ -318,16 +406,20 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     /**
      * 设置绘制的参数，像素
-     * @param start 标记的起始位置
-     * @param end  标记的结束位置
-     * @param offset  绘制的起始点
+     * @param start 标记的起始位置 in pix
+     * @param end  标记的结束位置 in pix
      */
-    public void setParameters(int start, int end, int offset) {
-        Logger.i(TAG, "setParameters", "start = " + start + " ,end = "
-                + end + " ,offset = " + offset);
+    public void setSelectRange(int start, int end) {
+        Logger.i(TAG, "setSelectRange", "start = " + start + " ,end = " + end);
         mSelectionStart = start;
         mSelectionEnd = end;
+        postInvalidate();
+    }
+    //offset: 绘制的起始点
+    public void setOffset(int offset) {
         mOffsetX = offset;
+        clampOffsetX();
+        postInvalidate();
     }
 
     public int getStart() {
@@ -380,8 +472,8 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         }else {
             mParams.width = Math.min(maxPosX() - mOffsetX, getWidth());
         }
-        Logger.d(TAG, "onDraw", "mOffsetX = " + mOffsetX + " ,width = "
-                + mParams.width + " ,maxPos = " + maxPosX());
+       /* Logger.d(TAG, "onDraw", "mOffsetX = " + mOffsetX + " ,width = "
+                + mParams.width + " ,maxPos = " + maxPosX());*/
 
         mParams.selectionStart = mSelectionStart;
         mParams.selectionEnd = mSelectionEnd;
@@ -393,6 +485,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mDrawDelegate.drawSelectBorder(canvas, mBorderLinePaint, mParams, mAP);
         mDrawDelegate.drawTime(canvas, mTimecodePaint, mParams, mAP);
         mDrawDelegate.drawAnnotator(canvas, mAnnotatorPaint, mParams, mAP, mAnnotatorLines);
+        mDrawDelegate.drawCenterLine(canvas, mBorderLinePaint, mParams, mAP);
     }
 
     protected float getGain(int i, int numFrames, int[] frameGains) {
@@ -513,6 +606,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
                 }
             }
         }
+        //set max zoom level
         mZoomLevel = mNumZoomLevels - 1;
         mInitialized = true;
     }
@@ -607,6 +701,10 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
         public boolean onFling(
                 MotionEvent e1, MotionEvent e2, float vx, float vy) {
+            //velocityX > 0 ? left -> right  : right to left
+            if(mFixSelectLength && mSelectionEnd == maxPosX()){
+                return true;
+            }
             mScroller.startFling(vx, 0);
             return true;
         }

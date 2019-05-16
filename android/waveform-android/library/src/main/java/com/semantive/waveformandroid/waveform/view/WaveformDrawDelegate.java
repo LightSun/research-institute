@@ -28,6 +28,10 @@ import java.util.List;
     public abstract void drawTime(Canvas canvas, Paint paint, WaveformParam param, AnnotatorParam ap);
     //绘制打点
     public abstract void drawAnnotator(Canvas canvas, Paint paint, WaveformParam wp, AnnotatorParam ap, List<AnnotatorLine> lines);
+    //draw center line.
+    public void drawCenterLine(Canvas canvas, Paint paint, WaveformParam wp, AnnotatorParam ap) {
+
+    }
 
     public interface Callback{
         int getWaveformHeight(int i, WaveformParam param);
@@ -176,18 +180,23 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
             if(line.pix < wp.offsetX){
                 continue;
             }
-            Logger.d(TAG, "drawAnnotator", "start draw line.time = " + line.mesc);
+           // Logger.d(TAG, "drawAnnotator", "start draw line.time = " + line.mesc);
+            paint.setColor(line.adjustMode ? ap.adjustColor : ap.color);
             int x = line.pix - wp.offsetX;
             //center point
             paint.setStyle(Paint.Style.FILL);
             paint.setAlpha(255);
             paint.setStrokeWidth(0);
             canvas.drawCircle(x, ap.startY, ap.dotMinRadius, paint);
+            //for adjust mode. never draw line and circle
+            if(!line.drawVerticalLine){
+                continue;
+            }
             //line
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(ap.lineWidth);
             int lineY = ap.startY + ap.dotLineDistance;
-            canvas.drawLine(x, lineY, x, wp.viewHeight, paint);
+            canvas.drawLine(x, lineY, x, wp.viewHeight - ap.startDy, paint);
             //circle
             if(line.animProcess > 0){
                 paint.setStrokeWidth(line.animProcess * 3);
@@ -197,6 +206,22 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
                 canvas.drawCircle(x, ap.startY, radius, paint);
             }
         }
+    }
+}
+class MusicStartEndDrawDelegate extends UpDownWaveformDrawDelegate{
+
+    public MusicStartEndDrawDelegate(Callback callback) {
+        super(callback);
+    }
+    @Override
+    public void drawSelectBorder(Canvas canvas, Paint paint, WaveformParam param, AnnotatorParam ap) {
+       // super.drawSelectBorder(canvas, paint, param, ap);
+    }
+    @Override
+    public void drawCenterLine(Canvas canvas, Paint paint, WaveformParam wp, AnnotatorParam ap) {
+        float startX = wp.viewWidth * 1f / 2 - wp.selectStrokeWidth * 1f / 2;
+        float endX = wp.viewWidth * 1f / 2 + wp.selectStrokeWidth * 1f / 2;
+        canvas.drawLine(startX, 0, endX, wp.viewHeight - ap.startDy, paint);
     }
 }
 class UpWaveformDrawDelegate extends UpDownWaveformDrawDelegate{
@@ -229,7 +254,7 @@ class UpWaveformDrawDelegate extends UpDownWaveformDrawDelegate{
             if(line.pix < wp.offsetX){
                 continue;
             }
-            Logger.d(TAG, "drawAnnotator", "start draw line.time = " + line.mesc);
+           // Logger.d(TAG, "drawAnnotator", "start draw line.time = " + line.mesc);
             int x = line.pix - wp.offsetX;
             //center point at bottom
             paint.setStyle(Paint.Style.FILL);

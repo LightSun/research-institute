@@ -1,6 +1,7 @@
 package com.semantive.waveformandroid.waveform.view;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 
 /**
@@ -10,6 +11,18 @@ public class MusicStartEndView extends WaveformView {
 
     public MusicStartEndView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setWaveformDrawDelegate(new UpDownWaveformDrawDelegate(this));
+        setWaveformDrawDelegate(new MusicStartEndDrawDelegate(this));
+        setFixSelectLength(true);
+    }
+
+    @Override
+    protected void onPreDraw() {
+        mMinOffsetX = -getWidth() / 2;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        //TODO draw str.
     }
 }

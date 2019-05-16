@@ -5,8 +5,6 @@ import android.support.annotation.MainThread;
 import android.util.Property;
 import android.view.View;
 
-import com.heaven7.core.util.Logger;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -30,8 +28,15 @@ import java.lang.ref.WeakReference;
     int mesc;
     int pix;
 
-    /** [0,1] . 0 means no animation */
+    /** draw vertical line or not . default is true .*/
+    boolean drawVerticalLine = true;
+
+    /** [0,1] . 0 means no animation. often used for scale animation. */
     float animProcess = 0;
+    /** in adjust mode or not. */
+    boolean adjustMode;
+    /** the start offsetX in adjust mode */
+    int mStartOffsetX;
 
     private WeakReference<ObjectAnimator> weakAnim;
     private View view;
@@ -39,6 +44,12 @@ import java.lang.ref.WeakReference;
     public AnnotatorLine(int mesc, int pix) {
         this.mesc = mesc;
         this.pix = pix;
+    }
+
+    public void resetForAdjust(){
+        adjustMode = false;
+        mStartOffsetX = 0;
+        drawVerticalLine = true;
     }
 
     public void stopAnimation(){
@@ -53,7 +64,6 @@ import java.lang.ref.WeakReference;
     private void invalidate() {
         if(view != null){
             view.invalidate();
-            Logger.d("AnnotatorLine", "invalidate", "");
         }
     }
     @MainThread
