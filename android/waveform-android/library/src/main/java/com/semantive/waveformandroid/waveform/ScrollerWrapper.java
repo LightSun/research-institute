@@ -42,6 +42,8 @@ public class ScrollerWrapper {
     public void abortIfNeed() {
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation();
+            mTrigged = false;
+            mLastX = 0;
         }
     }
 
@@ -61,7 +63,6 @@ public class ScrollerWrapper {
 
     //velocityX > 0 ? LEFT_TO_RIGHT  : right to left
     public void startFling(float velocityX, float velocityY){
-        forceFinished();
         mTrigged = true;
         mScroller.fling(0, 0, (int) velocityX, (int) velocityY,
                 Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);

@@ -1,27 +1,53 @@
 package com.semantive.waveformandroid.waveform.view;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+
+import com.heaven7.core.util.Logger;
 
 /**
  * Created by heaven7 on 2019/5/16.
  */
 public class EditorWaveformView extends WaveformView {
 
-    private static final boolean DEBUG = true;
-    private final static float ADJUSTMENT = 3.5f;
+    private final static float ADJUSTMENT = 10f;
 
-    private final RectF mStartRect = new RectF();
-    private final RectF mEndRect = new RectF();
+    private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF mRectF = new RectF();
 
+    private final RectF mLeftRect = new RectF();
+    private final RectF mRightRect = new RectF();
+    private final RectF mContentRect = new RectF();
+    private TouchDelegate mTouchDelegate;
+
+    private final FocusParam mFocusParam = new FocusParam();
+    /** indicate is select state or not */
+    private boolean mSelected;
 
     public EditorWaveformView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setWaveformDrawDelegate(new UpWaveformDrawDelegate(this));
+        mPaint.setColor(Color.BLUE);
+        mPaint.setStyle(Paint.Style.FILL);
+
+        UpWaveformDrawDelegate drawDelegate = new UpWaveformDrawDelegate(this, new EditorWaveformCallbackImpl());
+        drawDelegate.setFocusParam(mFocusParam);
+        setWaveformDrawDelegate(drawDelegate);
+
+        mFocusParam.blockWidth = 60;
+        mFocusParam.blockRoundSize = 20;
+        mFocusParam.focusMarginTopBottom = 6;
         mAP.startDy = 30;
+        mParams.roundSize = 16;
+    }
+
+    public void setMinOffsetX(int minOffsetX){
+        this.mMinOffsetX = minOffsetX;
+        invalidate();
     }
 
     @Override
@@ -31,76 +57,123 @@ public class EditorWaveformView extends WaveformView {
 
     @Override
     protected void onOffsetMayChanged() {
-        float selectStartX = mSelectionStart - mOffsetX;
-        float selectEndX = mSelectionEnd - mOffsetX;
-        float hW = - mParams.selectStrokeWidth * 1f / 2;
+        Logger.d(TAG, "onOffsetMayChanged", "mTruncateWidth = " + mTruncateWidth);
+        int width = maxPosX() - mTruncateWidth;
+        mContentRect.set(-mOffsetX, 0, -mOffsetX + width, getHeight() - mAP.startDy);
 
-        mStartRect.set(selectStartX - hW - ADJUSTMENT , 0, selectStartX + hW + ADJUSTMENT, getHeight() - mAP.startDy);
-        mEndRect.set(selectEndX - hW - ADJUSTMENT , 0, selectEndX + hW + ADJUSTMENT, getHeight() - mAP.startDy);
-       /* Logger.d(TAG, "onOffsetMayChanged", "mStartRect = " + mStartRect);
-        Logger.d(TAG, "onOffsetMayChanged", "mEndRect = " + mEndRect);*/
+        mLeftRect.set(mContentRect.left - mFocusParam.blockWidth,
+                0,
+                mContentRect.left,
+                mContentRect.bottom);
+        mRightRect.set(mContentRect.right ,
+                0,
+                mContentRect.right + mFocusParam.blockWidth,
+                mContentRect.bottom);
+    }
+
+    @Override
+    protected int getValidWidth() {
+        return super.getValidWidth();
+    }
+
+    @Override
+    protected void resetTouch() {
+        mTouchDelegate = null;
+    }
+
+    private boolean contains(RectF rectF, MotionEvent e, float offset){
+        mRectF.set(rectF);
+        mRectF.inset(-offset, 0);
+        return mRectF.contains(e.getX(), e.getY());
     }
 
     private class Gesture0 extends WaveformView.GestureImpl {
         @Override
+        public void onLongPress(MotionEvent e) {
+            super.onLongPress(e);
+        }
+
+        @Override
         public boolean onDown(MotionEvent e) {
-            //Logger.d(TAG, "onDown", "x = " + e.getX() + ", y = " + e.getY());
-           /* if(mStartRect.contains(e.getX(), e.getY())){
-                mTouchDelegate = new StartTouchDelegate();
-                if(DEBUG){
-                    Logger.d(TAG, "onDown", "mStartRect is touched.");
+            if(mSelected){
+                if(contains(mLeftRect, e, ADJUSTMENT)){
+                    mTouchDelegate = new StartTouchDelegate();
+                }else if(contains(mRightRect, e, ADJUSTMENT)){
+                    mTouchDelegate = new EndTouchDelegate();
                 }
-            }else if(mEndRect.contains(e.getX(), e.getY())){
-                mTouchDelegate = new EndTouchDelegate();
-                if(DEBUG){
-                    Logger.d(TAG, "onDown", "mEndRect is touched.");
-                }
-            }*/
+            }
             return true;
         }
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            return super.onSingleTapUp(e);
+            mSelected = !mSelected;
+            invalidate();
+            return true;
         }
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            //滑动时， 中间的杆不滑动。只滑动图。 记得重新设置select start and end.
+            if(mTouchDelegate != null && mTouchDelegate.onScroll(e1, e2, distanceX, distanceY)){
+                return true;
+            }
             return super.onScroll(e1, e2, distanceX, distanceY);
         }
-        public boolean onFling(
-                MotionEvent e1, MotionEvent e2, float vx, float vy) {
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float vx, float vy) {
             return super.onFling(e1, e2, vx, vy);
         }
     }
+
     private interface TouchDelegate{
         boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY);
     }
     private class StartTouchDelegate implements TouchDelegate {
-        final int initSelectStart;
+        final int initOffset;
         float delta;
         StartTouchDelegate() {
-            this.initSelectStart = mSelectionStart;
+            this.initOffset = mOffsetX;
         }
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
-            delta -= distanceX;
-            mSelectionStart = (int) (initSelectStart + delta);
+            delta += distanceX;
+            setOffset((int) (initOffset + delta));
+            return true;
+        }
+    }
+    private class EndTouchDelegate implements TouchDelegate {
+        EndTouchDelegate() {
+        }
+        //dx < 0 右滑， dy < 0 下滑
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
+          //  Logger.d(TAG, "onScroll", "distanceX = " + distanceX);
+            //右滑减小 .truncateWidth
+            //左滑增大 truncateWidth
+            mTruncateWidth = Math.max(0, (int)(mTruncateWidth + distanceX));
             onOffsetMayChanged();
             invalidate();
             return true;
         }
     }
-    private class EndTouchDelegate implements TouchDelegate {
-        final int initSelectEnd;
-        float delta;
-        EndTouchDelegate() {
-            this.initSelectEnd = mSelectionEnd;
+
+    private class EditorWaveformCallbackImpl implements EditorWaveformCallback{
+        @Override
+        public RectF getContentRect() {
+            return mContentRect;
         }
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
-            delta -= distanceX;
-            mSelectionEnd = (int) (initSelectEnd + delta);
-            onOffsetMayChanged();
-            invalidate();
-            return true;
+        @Override
+        public boolean isSelected() {
+            return mSelected;
+        }
+        @Override
+        public RectF getTmpRectF() {
+            return mRectF;
+        }
+        @Override
+        public Paint getFocusPaint() {
+            return mPaint;
+        }
+        @Override
+        public float getTruncateTailWidth() {
+            return mTruncateWidth;
         }
     }
 }

@@ -114,7 +114,10 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     /*private*/ int mMinOffsetX;
 
+    /** true to fix the select length. */
     private boolean mFixSelectLength;
+    /** the truncate width of tail/end.(this will effect the {@linkplain #getValidWidth()}. */
+    /*private*/ int mTruncateWidth;
 
     public WaveformView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -259,7 +262,6 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
             case MotionEvent.ACTION_UP:
                 Logger.d(TAG, "onTouchEvent", "ACTION_UP");
                 //if fling wait fling finish
-                //mScroller.abortIfNeed();
                 if(!mScroller.isFling()) {
                     dispatchTimeLineChangeEnd();
                 }
@@ -467,11 +469,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mParams.viewWidth = getWidth();
         mParams.offsetX = mOffsetX;
         //the valid visible width of scaled.
-        if(mOffsetX < 0){
-            mParams.width = Math.min(maxPosX(), getWidth());
-        }else {
-            mParams.width = Math.min(maxPosX() - mOffsetX, getWidth());
-        }
+        mParams.width = getValidWidth();
        /* Logger.d(TAG, "onDraw", "mOffsetX = " + mOffsetX + " ,width = "
                 + mParams.width + " ,maxPos = " + maxPosX());*/
 
@@ -486,6 +484,13 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mDrawDelegate.drawTime(canvas, mTimecodePaint, mParams, mAP);
         mDrawDelegate.drawAnnotator(canvas, mAnnotatorPaint, mParams, mAP, mAnnotatorLines);
         mDrawDelegate.drawCenterLine(canvas, mBorderLinePaint, mParams, mAP);
+    }
+    protected int getValidWidth(){
+        if(mOffsetX < 0){
+            return Math.min(maxPosX(), getWidth()) - mTruncateWidth;
+        }else {
+            return Math.min(maxPosX() - mOffsetX, getWidth()) - mTruncateWidth;
+        }
     }
 
     protected float getGain(int i, int numFrames, int[] frameGains) {
@@ -704,6 +709,9 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
             //velocityX > 0 ? left -> right  : right to left
             if(mFixSelectLength && mSelectionEnd == maxPosX()){
                 return true;
+            }
+            if(mScroller.isFling()){
+                mScroller.abortIfNeed();
             }
             mScroller.startFling(vx, 0);
             return true;

@@ -2,6 +2,8 @@ package com.semantive.waveformandroid.waveform.view;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 
 import com.heaven7.core.util.Logger;
 
@@ -14,12 +16,15 @@ import java.util.List;
 
     static final String TAG = "WaveformDrawDelegate";
     static final boolean DEBUG = true;
-    protected final Callback callback;
+    final Callback callback;
+    FocusParam focusParam;
 
     public WaveformDrawDelegate(Callback callback) {
         this.callback = callback;
     }
-
+    public void setFocusParam(FocusParam focusParam) {
+        this.focusParam = focusParam;
+    }
     //绘制波形
     public abstract void drawWaveform(Canvas canvas, WaveformParam param, AnnotatorParam ap);
     //绘制选择范围的边框
@@ -46,6 +51,9 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         super(callback);
     }
 
+    protected boolean drawNoTimeBackground() {
+        return true;
+    }
     protected final Paint getSelectStatePaint(final int i, WaveformParam param) {
         int mSelectionStart = param.selectionStart;
         int mSelectionEnd = param.selectionEnd;
@@ -58,9 +66,17 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         int start = param.offsetX;
         return callback.getSelectStateBackgroundPaint(i + start >= mSelectionStart && i + start < mSelectionEnd);
     }
+    protected final void drawWaveformLine(Canvas canvas, float x, float sy, float ey, Paint paint) {
+        sy = wrapStartY(sy);
+        ey = wrapEndY(ey);
+        canvas.drawLine(x, sy, x, ey, paint);
+    }
+    protected float wrapStartY(float startY){
+        return focusParam != null ? startY + focusParam.focusMarginTopBottom : startY;
+    }
 
-    protected final void drawWaveformLine(Canvas canvas, int x, int y0, int y1, Paint paint) {
-        canvas.drawLine(x, y0, x, y1, paint);
+    protected float wrapEndY(float endY){
+        return focusParam != null ? endY - focusParam.focusMarginTopBottom : endY;
     }
 
     protected void drawWaveform(final Canvas canvas, WaveformParam param, AnnotatorParam ap, int i){
@@ -76,16 +92,12 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         drawWaveformLine(
                 canvas, i,
                 ctr - h,
-                ctr + 1 + h,
+                ctr + h,
                 paint);
         //回拨 mOffsetX = 16164 ,width = 540 ,maxPos = 16704
         /*  if (i + start == mPlaybackPos) {
             canvas.drawLine(i, 0, i, measuredHeight, mPlaybackLinePaint);
         }*/
-    }
-
-    protected boolean drawNoTimeBackground() {
-        return true;
     }
 
     @Override
@@ -99,8 +111,21 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
             if(limitStart > 0){
                 //draw bg for no waveform
                 Paint paint = getSelectStateBackgroundPaint(-1, param);
-                canvas.drawRect(0, 0, limitStart + 1, param.viewHeight - ap.startDy, paint);
+                canvas.drawRect(0,
+                        wrapStartY(0),
+                        limitStart + 1,
+                        wrapEndY(param.viewHeight - ap.startDy),
+                        paint);
             }
+        }
+        //draw right bg.
+        if(drawNoTimeBackground()){
+            Paint paint = getSelectStateBackgroundPaint(-1, param);
+            canvas.drawRect(len,
+                    wrapStartY(0),
+                    len + param.viewWidth / 2,
+                    wrapEndY(param.viewHeight - ap.startDy),
+                    paint);
         }
 
         //0- abs(offsetX) draw nothing.
@@ -112,11 +137,6 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
             // Draw waveform
             drawWaveform(canvas, param, ap, i);
         }
-        //draw left bg.
-        if(drawNoTimeBackground()){
-            Paint paint = getSelectStateBackgroundPaint(-1, param);
-            canvas.drawRect(len, 0, len + param.viewWidth / 2, param.viewHeight - ap.startDy, paint);
-        }
     }
 
     @Override
@@ -125,14 +145,9 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         int mSelectionEnd = param.selectionEnd;
         int bottomY = param.viewHeight - ap.startDy;
         int mOffsetX = param.offsetX;
-        canvas.drawLine(
-                mSelectionStart - mOffsetX + 0.5f, 0,
-                mSelectionStart - mOffsetX + 0.5f, bottomY,
-                paint);
-        canvas.drawLine(
-                mSelectionEnd - mOffsetX + 0.5f, 0,
-                mSelectionEnd - mOffsetX + 0.5f, bottomY,
-                paint);
+
+        drawWaveformLine(canvas, mSelectionStart - mOffsetX + 0.5f, 0, bottomY, paint);
+        drawWaveformLine(canvas, mSelectionEnd - mOffsetX + 0.5f, 0, bottomY, paint);
     }
 
     @Override
@@ -221,13 +236,20 @@ class MusicStartEndDrawDelegate extends UpDownWaveformDrawDelegate{
     public void drawCenterLine(Canvas canvas, Paint paint, WaveformParam wp, AnnotatorParam ap) {
         float startX = wp.viewWidth * 1f / 2 - wp.selectStrokeWidth * 1f / 2;
         float endX = wp.viewWidth * 1f / 2 + wp.selectStrokeWidth * 1f / 2;
-        canvas.drawLine(startX, 0, endX, wp.viewHeight - ap.startDy, paint);
+        canvas.drawLine(startX,
+                wrapStartY(0),
+                endX,
+                wrapEndY(wp.viewHeight - ap.startDy), paint);
     }
 }
 class UpWaveformDrawDelegate extends UpDownWaveformDrawDelegate{
 
-    public UpWaveformDrawDelegate(Callback callback) {
+    private final Path mPath = new Path();
+    private final EditorWaveformCallback mEWC;
+
+    public UpWaveformDrawDelegate(Callback callback, EditorWaveformCallback ewc) {
         super(callback);
+        this.mEWC = ewc;
     }
     @Override
     protected void drawWaveform(Canvas canvas, WaveformParam param, AnnotatorParam ap, int i) {
@@ -237,13 +259,33 @@ class UpWaveformDrawDelegate extends UpDownWaveformDrawDelegate{
         drawWaveformLine(canvas, i, 0,  bottomY, bgPaint);
         //波形高度
         Paint paint = getSelectStatePaint(i, param);
-        int h = callback.getWaveformHeight(i, param);
-        drawWaveformLine(
-                canvas, i,
-                bottomY - h,
-                bottomY,
-                paint);
+        int h = callback.getWaveformHeight(i, param);//may be 0
+
+        int by = bottomY - focusParam.focusMarginTopBottom;
+        canvas.drawLine(i, by - h,  i,  by,  paint);
     }
+
+    @Override
+    public void drawWaveform(Canvas canvas, WaveformParam param, AnnotatorParam ap) {
+        RectF contentRect = mEWC.getContentRect();
+        if(mEWC.isSelected()){
+            RectF rectF = mEWC.getTmpRectF();
+            rectF.set(contentRect.left - focusParam.blockWidth,
+                    contentRect.top,
+                    contentRect.right + focusParam.blockWidth,
+                    contentRect.bottom);
+            canvas.drawRoundRect(rectF, focusParam.blockRoundSize, focusParam.blockRoundSize, mEWC.getFocusPaint());
+            super.drawWaveform(canvas, param, ap);
+        }else {
+            mPath.reset();
+            mPath.addRoundRect(contentRect, param.roundSize, param.roundSize, Path.Direction.CW);
+            canvas.save();
+            canvas.clipPath(mPath);
+            super.drawWaveform(canvas, param, ap);
+            canvas.restore();
+        }
+    }
+
     @Override
     public void drawAnnotator(Canvas canvas, Paint paint, WaveformParam wp, AnnotatorParam ap, List<AnnotatorLine> lines) {
         for (AnnotatorLine line : lines){
