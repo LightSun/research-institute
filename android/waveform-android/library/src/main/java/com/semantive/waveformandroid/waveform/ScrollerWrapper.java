@@ -77,12 +77,12 @@ public class ScrollerWrapper {
         if(mScroller.computeScrollOffset()){
             //not finished
             int deltaX = getDeltaX();
-            Logger.d(TAG, "computeScroll", "not finished,  deltaX = " + deltaX);
+           // Logger.d(TAG, "computeScroll", "not finished,  deltaX = " + deltaX);
             if(!mCallback.onComputeScrolled(this, mView, deltaX)){
                 abortIfNeed();
             }
         }else{
-            Logger.d(TAG, "computeScroll", "finished");
+           // Logger.d(TAG, "computeScroll", "finished");
             mTrigged = false;
             mLastX = 0;
             //finished

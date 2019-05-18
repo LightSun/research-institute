@@ -158,7 +158,7 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         int len = getContentWidth(param);
 
         //the limit start means there is no time
-        int limitStart = offsetX < 0 ? Math.abs(offsetX) : -1;
+        int limitStart = offsetX < 0 ? Math.abs(offsetX) : 0;
         if(drawNoTimeBackground()){
             if(limitStart > 0){
                 //draw bg for no waveform
@@ -181,10 +181,7 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         }
 
         //0- abs(offsetX) draw nothing.
-        for (int i = 0 ; i < len ; i ++){
-            if(i <= limitStart){
-                continue;
-            }
+        for (int i = limitStart ; i < len ; i ++){
             param.fractionalSecs += param.onePixelInSecs;
             // Draw waveform
             drawWaveform(canvas, param, ap, i);
