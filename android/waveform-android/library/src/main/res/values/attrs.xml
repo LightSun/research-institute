@@ -8,7 +8,6 @@
         <attr name="wv_ap_dot_min_radius" format="dimension|reference"/>
         <attr name="wv_ap_dot_max_radius" format="dimension|reference"/>
         <attr name="wv_ap_start_y" format="dimension|reference"/>
-        <attr name="wv_ap_start_dy" format="dimension|reference"/>
 
         <attr name="wv_ap_default_color" format="color|reference"/>
         <attr name="wv_ap_adjust_color" format="color|reference"/>
@@ -21,5 +20,13 @@
         <attr name="wv_waveform_select_range_color" format="color|reference"/>
         <attr name="wv_waveform_select_range_dash_width" format="dimension|reference"/>
         <attr name="wv_waveform_select_range_dash_space" format="dimension|reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="EditorWaveformView">
+        <attr name="ewv_focus_block_width" format="dimension|reference"/>
+        <attr name="ewv_focus_block_round_size" format="dimension|reference"/>
+        <attr name="ewv_focus_margin_top_bottom" format="dimension|reference"/>
+        <attr name="ewv_focus_color" format="color|reference"/>
+        <attr name="wv_ap_start_dy" format="dimension|reference"/>
     </declare-styleable>
 </resources>

@@ -1,6 +1,7 @@
 package com.semantive.waveformandroid.waveform.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -9,6 +10,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 
 import com.heaven7.core.util.Logger;
+import com.semantive.waveformandroid.R;
 
 /**
  * Created by heaven7 on 2019/5/16.
@@ -25,6 +27,7 @@ public class EditorWaveformView extends WaveformView {
     private final RectF mContentRect = new RectF();
     private TouchDelegate mTouchDelegate;
 
+    /** used to draw focus scene */
     private final FocusParam mFocusParam = new FocusParam();
     /** indicate is select state or not */
     private boolean mSelected;
@@ -34,18 +37,32 @@ public class EditorWaveformView extends WaveformView {
 
     public EditorWaveformView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mPaint.setColor(Color.BLUE);
+
+        int focusColor = Color.BLUE;
+        if(attrs != null){
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EditorWaveformView);
+            try {
+                mAP.startDy = a.getDimensionPixelSize(R.styleable.WaveformView_wv_ap_start_y, 30);
+                mFocusParam.blockWidth = a.getDimensionPixelSize(R.styleable.EditorWaveformView_ewv_focus_block_width, 60);
+                mFocusParam.blockRoundSize = a.getDimensionPixelSize(R.styleable.EditorWaveformView_ewv_focus_block_round_size, 20);
+                mFocusParam.focusMarginTopBottom = a.getDimensionPixelSize(R.styleable.EditorWaveformView_ewv_focus_margin_top_bottom, 6);
+                focusColor = a.getColor(R.styleable.EditorWaveformView_ewv_focus_color, focusColor);
+            }finally {
+                a.recycle();
+            }
+        }else {
+            mFocusParam.blockWidth = 60;
+            mFocusParam.blockRoundSize = 20;
+            mFocusParam.focusMarginTopBottom = 6;
+            mAP.startDy = 30;
+        }
+
+        mPaint.setColor(focusColor);
         mPaint.setStyle(Paint.Style.FILL);
 
         UpWaveformDrawDelegate drawDelegate = new UpWaveformDrawDelegate(this, new EditorWaveformCallbackImpl());
         drawDelegate.setFocusParam(mFocusParam);
         setWaveformDrawDelegate(drawDelegate);
-
-        mFocusParam.blockWidth = 60;
-        mFocusParam.blockRoundSize = 20;
-        mFocusParam.focusMarginTopBottom = 6;
-        mAP.startDy = 30;
-        mParams.roundSize = 16;
     }
 
     public void setMinOffsetX(int minOffsetX){

@@ -17,6 +17,7 @@ package com.semantive.waveformandroid.waveform.view;
  */
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -85,7 +86,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     protected Paint mSelectedLinePaint;
     protected Paint mUnselectedLinePaint;
     protected Paint mUnselectedBgLinePaint;
-    protected Paint mBorderLinePaint;
+    protected Paint mSelectRangePaint;
     protected Paint mCenterLinePaint;
     protected Paint mTimecodePaint;
     protected Paint mAnnotatorPaint;
@@ -123,42 +124,74 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     public WaveformView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        mAP.lineWidth = 3;
-        mAP.dotMinRadius = 3;
-        mAP.dotMaxRadius = 30;
-        mAP.startY = mAP.dotMaxRadius + 2;
-        mAP.dotLineDistance = 12;
-        mAP.color = Color.RED;
-        mAP.adjustColor = Color.parseColor("#58c9b9");
-        //mAP.startDy = 30;
-        mParams.selectStrokeWidth = 3;
+        int dashWidth = 10;
+        int dashSpace = 5;
+        int selectBorderColor = Color.parseColor("#7e7e7e");
+        int selectLineColor = Color.parseColor("#7e7e7f");
+        int unselectLineColor = Color.parseColor("#2f2f34");
+        int unselectBgColor = Color.parseColor("#171718");
+        if(attrs != null){
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WaveformView);
+            try {
+                mAP.lineWidth = a.getDimensionPixelSize(R.styleable.WaveformView_wv_ap_line_width, 3);
+                mAP.dotLineDistance = a.getDimensionPixelSize(R.styleable.WaveformView_wv_ap_dot_line_distance, 12);
+                mAP.dotMinRadius = a.getDimensionPixelSize(R.styleable.WaveformView_wv_ap_dot_min_radius, 3);
+                mAP.dotMaxRadius = a.getDimensionPixelSize(R.styleable.WaveformView_wv_ap_dot_max_radius, 30);
+                mAP.startY = a.getDimensionPixelSize(R.styleable.WaveformView_wv_ap_start_y, 30);
+                mAP.color = a.getColor(R.styleable.WaveformView_wv_ap_default_color, Color.RED);
+                mAP.adjustColor = a.getColor(R.styleable.WaveformView_wv_ap_adjust_color, Color.parseColor("#58c9b9"));
+
+                mParams.roundSize = a.getDimensionPixelSize(R.styleable.WaveformView_wv_waveform_round_size, 50);
+                dashWidth = a.getDimensionPixelSize(R.styleable.WaveformView_wv_waveform_select_range_dash_width, dashWidth);
+                dashSpace = a.getDimensionPixelSize(R.styleable.WaveformView_wv_waveform_select_range_dash_space, dashSpace);
+
+                selectBorderColor = a.getColor(R.styleable.WaveformView_wv_waveform_select_range_color, selectBorderColor);
+                selectLineColor = a.getColor(R.styleable.WaveformView_wv_waveform_select_line_color, selectLineColor);
+                unselectLineColor = a.getColor(R.styleable.WaveformView_wv_waveform_unselect_line_color, unselectLineColor);
+                unselectBgColor = a.getColor(R.styleable.WaveformView_wv_waveform_unselect_bg_color, unselectBgColor);
+            }finally {
+                a.recycle();
+            }
+            mParams.selectStrokeWidth = mAP.lineWidth;
+        }else {
+            mAP.lineWidth = 3;
+            mAP.dotMinRadius = 3;
+            mAP.dotMaxRadius = 30;
+            mAP.startY = mAP.dotMaxRadius + 2;
+            mAP.dotLineDistance = 12;
+            mAP.color = Color.RED;
+            mAP.adjustColor = Color.parseColor("#58c9b9");
+
+            mParams.selectStrokeWidth = 3;
+            mParams.roundSize = 16;
+        }
 
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay().getMetrics(metrics);
         mDensity = metrics.density;
-        Logger.d(TAG, "WaveformView", "widthPixels = " + metrics.widthPixels);
+        //Logger.d(TAG, "WaveformView", "widthPixels = " + metrics.widthPixels);
 
         mSelectedLinePaint = new Paint();
         mSelectedLinePaint.setAntiAlias(false);
-        mSelectedLinePaint.setColor(getResources().getColor(R.color.waveform_selected));
+        mSelectedLinePaint.setColor(selectLineColor);
 
         mUnselectedLinePaint = new Paint();
         mUnselectedLinePaint.setAntiAlias(false);
-        mUnselectedLinePaint.setColor(getResources().getColor(R.color.waveform_unselected));
+        mUnselectedLinePaint.setColor(unselectLineColor);
 
         mUnselectedBgLinePaint = new Paint();
         mUnselectedBgLinePaint.setAntiAlias(false);
-        mUnselectedBgLinePaint.setColor(getResources().getColor(R.color.waveform_unselected_bkgnd_overlay));
+        mUnselectedBgLinePaint.setColor(unselectBgColor);
 
-        mBorderLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBorderLinePaint.setPathEffect(new DashPathEffect(new float[]{10.0f, 5.0f}, 0.0f));
-        mBorderLinePaint.setStrokeWidth(mParams.selectStrokeWidth);
-        mBorderLinePaint.setColor(getResources().getColor(R.color.selection_border));
+        mSelectRangePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mSelectRangePaint.setPathEffect(new DashPathEffect(new float[]{dashWidth, dashSpace}, 0.0f));
+        mSelectRangePaint.setStrokeWidth(mParams.selectStrokeWidth);
+        mSelectRangePaint.setColor(selectBorderColor);
 
         mCenterLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mCenterLinePaint.setStrokeWidth(mParams.selectStrokeWidth);
-        mCenterLinePaint.setColor(getResources().getColor(R.color.playback_indicator));
+        mCenterLinePaint.setColor(mAP.color);
 
         mTimecodePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTimecodePaint.setTextSize(12 * mDensity);
@@ -187,6 +220,9 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         });
     }
 
+    /**
+     * called on pre draw this view.
+     */
     protected void onPreDraw() {
 
     }
@@ -521,7 +557,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mParams.timecodeIntervalSecs = timecodeIntervalSecs;
 
         mDrawDelegate.drawWaveform(canvas, mParams, mAP);
-        mDrawDelegate.drawSelectBorder(canvas, mBorderLinePaint, mParams, mAP);
+        mDrawDelegate.drawSelectBorder(canvas, mSelectRangePaint, mParams, mAP);
         mDrawDelegate.drawTime(canvas, mTimecodePaint, mParams, mAP);
         mDrawDelegate.drawAnnotator(canvas, mAnnotatorPaint, mParams, mAP, mAnnotatorLines);
         mDrawDelegate.drawCenterLine(canvas, mCenterLinePaint, mParams, mAP);
