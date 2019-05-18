@@ -75,18 +75,40 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
     protected boolean drawNoTimeBackground() {
         return true;
     }
+
+    /**
+     * get select state paint
+     * @param i the index of pix. from 0.
+     * @param param the param
+     * @return the paint
+     */
     protected final Paint getSelectStatePaint(final int i, WaveformParam param) {
         int mSelectionStart = param.selectionStart;
         int mSelectionEnd = param.selectionEnd;
         int start = param.offsetX;
         return callback.getSelectStatePaint(i + start >= mSelectionStart && i + start < mSelectionEnd);
     }
+    /**
+     * get select state background paint
+     * @param i the index of pix. from 0.
+     * @param param the param
+     * @return the paint
+     */
     protected final Paint getSelectStateBackgroundPaint(final int i, WaveformParam param) {
         int mSelectionStart = param.selectionStart;
         int mSelectionEnd = param.selectionEnd;
         int start = param.offsetX;
         return callback.getSelectStateBackgroundPaint(i + start >= mSelectionStart && i + start < mSelectionEnd);
     }
+
+    /**
+     * draw waveform at target x and y.
+     * @param canvas the canvas
+     * @param x the x
+     * @param sy the start y
+     * @param ey the end y
+     * @param paint the paint
+     */
     protected final void drawWaveformLine(Canvas canvas, float x, float sy, float ey, Paint paint) {
         sy = wrapStartY(sy);
         ey = wrapEndY(ey);

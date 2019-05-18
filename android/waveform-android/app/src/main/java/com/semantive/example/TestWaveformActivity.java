@@ -124,6 +124,7 @@ public class TestWaveformActivity extends BaseActivity {
         }
         @Override
         public void run() {
+            System.out.println("WaveformView >>> center time = " + wv.getCenterTime());
             wv.seekToCenter(3000);
         }
     }

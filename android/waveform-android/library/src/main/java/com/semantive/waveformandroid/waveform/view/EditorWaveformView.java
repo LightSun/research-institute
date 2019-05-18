@@ -53,6 +53,14 @@ public class EditorWaveformView extends WaveformView {
         invalidate();
     }
 
+    /**
+     * get the end time after edit.
+     * @return the end time. in mill-seconds
+     */
+    public int getEndTime(){
+        return getMaxTime() - pixelsToMillisecs(mTruncateWidth);
+    }
+
     @Override
     protected GestureDetector.SimpleOnGestureListener createGestureListener() {
         return new Gesture0();
@@ -78,11 +86,6 @@ public class EditorWaveformView extends WaveformView {
                 0,
                 mContentRect.right + mFocusParam.blockWidth,
                 mContentRect.bottom);
-    }
-
-    @Override
-    protected int getValidWidth() {
-        return super.getValidWidth();
     }
 
     @Override

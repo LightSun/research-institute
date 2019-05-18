@@ -212,6 +212,14 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     }
 
     /**
+     * get the center time in mill-seconds
+     * @return the center time in mill-seconds.
+     */
+    public int getCenterTime(){
+        return pixelsToMillisecs(mOffsetX + getWidth() / 2);
+    }
+
+    /**
      * add annotator at target time
      * @param msec the time in mill-seconds
      */
@@ -380,6 +388,10 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     //最大能够滑动的位置。
     public int maxPosX() {
         return mLenByZoomLevel[mZoomLevel];
+    }
+    /** get the max time in mill-seconds */
+    public int getMaxTime(){
+        return pixelsToMillisecs(maxPosX());
     }
     /** 默认最大能够滑动的位置 */
     public int maxOffsetX(){

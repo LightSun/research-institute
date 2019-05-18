@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 /**
  * Created by heaven7 on 2019/5/15.
  */
-/*public*/ class AnnotatorLine {
+public final class AnnotatorLine {
 
     private static final Property<AnnotatorLine, Float> sPROP = new Property<AnnotatorLine, Float>(
             Float.class, "annotator") {
@@ -25,7 +25,10 @@ import java.lang.ref.WeakReference;
         }
     };
 
-    int mesc;
+    /**
+     * the annotator time in mill-seconds
+     */
+    public int mesc;
     int pix;
 
     /** draw vertical line or not . default is true .*/
@@ -46,6 +49,9 @@ import java.lang.ref.WeakReference;
         this.pix = pix;
     }
 
+    /**
+     * reset for adjust mode
+     */
     public void resetForAdjust(){
         adjustMode = false;
         mStartOffsetX = 0;
