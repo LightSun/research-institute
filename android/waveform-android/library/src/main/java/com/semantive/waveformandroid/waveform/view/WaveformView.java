@@ -19,6 +19,7 @@ package com.semantive.waveformandroid.waveform.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -79,7 +80,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     private WaveformDrawDelegate mDrawDelegate;
     private TimeLineCallback mCallback;
 
-    /*private*/ final List<AnnotatorLine> mAnnotatorLines = new ArrayList<>();
+    /*private*/ List<AnnotatorLine> mAnnotatorLines = new ArrayList<>();
     // Colors
     protected Paint mSelectedLinePaint;
     protected Paint mUnselectedLinePaint;
@@ -151,6 +152,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mUnselectedBgLinePaint.setColor(getResources().getColor(R.color.waveform_unselected_bkgnd_overlay));
 
         mBorderLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mBorderLinePaint.setPathEffect(new DashPathEffect(new float[]{10.0f, 5.0f}, 0.0f));
         mBorderLinePaint.setStrokeWidth(mParams.selectStrokeWidth);
         mBorderLinePaint.setColor(getResources().getColor(R.color.selection_border));
 
@@ -208,12 +210,18 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         clampOffsetX();
         postInvalidate();
     }
+
+    /**
+     * add annotator at target time
+     * @param msec the time in mill-seconds
+     */
     public void addAnnotator(int msec){
         if(isInitialized()){
             mAnnotatorLines.add(new AnnotatorLine(msec, millisecsToPixels(msec)));
         }else {
             mAnnotatorLines.add(new AnnotatorLine(msec, -1));
         }
+        invalidate();
     }
     @VisibleForTesting
     public void addAnnotatorWidthAnim(int msec){
@@ -221,8 +229,28 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mAnnotatorLines.get(mAnnotatorLines.size() - 1).startAnimation(this);
     }
 
+    /**
+     * get the annotators which used to save all annotators.
+     * @return the annotator
+     */
+    public List<AnnotatorLine> getAnnotators() {
+        return mAnnotatorLines;
+    }
+    /**
+     * set the annotators which used to restore all annotators.
+     * @param list the annotators
+     */
+    public void setAnnotators(List<AnnotatorLine> list){
+        if(list == null){
+            throw new NullPointerException();
+        }
+        this.mAnnotatorLines = list;
+        invalidate();
+    }
+
     public void clearAnnotator(){
         mAnnotatorLines.clear();
+        invalidate();
     }
     public void setWaveformDrawDelegate(WaveformDrawDelegate delegate) {
         this.mDrawDelegate = delegate;
@@ -353,6 +381,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     public int maxPosX() {
         return mLenByZoomLevel[mZoomLevel];
     }
+    /** 默认最大能够滑动的位置 */
     public int maxOffsetX(){
         return maxPosX() - getWidth() / 2;
     }
@@ -407,9 +436,9 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     }
 
     /**
-     * 设置绘制的参数，像素
-     * @param start 标记的起始位置 in pix
-     * @param end  标记的结束位置 in pix
+     * set the select range.
+     * @param start start in pix
+     * @param end  end in pix
      */
     public void setSelectRange(int start, int end) {
         Logger.i(TAG, "setSelectRange", "start = " + start + " ,end = " + end);
@@ -417,7 +446,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mSelectionEnd = end;
         postInvalidate();
     }
-    //offset: 绘制的起始点
+
     public void setOffset(int offset) {
         mOffsetX = offset;
         clampOffsetX();

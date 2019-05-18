@@ -39,8 +39,25 @@ import java.util.List;
     }
 
     public interface Callback{
+        /**
+         * get the waveform height
+         * @param i the start pix index. start from 0
+         * @param param the waveform param
+         * @return the waveform height
+         */
         int getWaveformHeight(int i, WaveformParam param);
+
+        /**
+         * get the select state paint. which used to draw waveform
+         * @param select true if is select
+         * @return the select state paint
+         */
         Paint getSelectStatePaint(boolean select);
+        /**
+         * get the select state background paint which used to draw waveform background.
+         * @param select true if is select
+         * @return the select state paint
+         */
         Paint getSelectStateBackgroundPaint(boolean select);
     }
 }
@@ -51,6 +68,10 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         super(callback);
     }
 
+    /**
+     * a switch for draw background of non-waveform area
+     * @return true to draw background
+     */
     protected boolean drawNoTimeBackground() {
         return true;
     }
@@ -79,6 +100,15 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         return focusParam != null ? endY - focusParam.focusMarginTopBottom : endY;
     }
 
+    /**
+     * get the content width which used to draw waveform
+     * @param param the waveform parameter
+     * @return the valid content width
+     */
+    protected int getContentWidth(WaveformParam param) {
+        return param.offsetX >= 0 ? param.width : param.width - param.offsetX;
+    }
+
     protected void drawWaveform(final Canvas canvas, WaveformParam param, AnnotatorParam ap, int i){
         int measuredHeight = param.viewHeight;
         int ctr = param.viewHeight / 2;
@@ -103,7 +133,7 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
     @Override
     public void drawWaveform(Canvas canvas, WaveformParam param, AnnotatorParam ap) {
         final int offsetX = param.offsetX;
-        int len = offsetX >= 0 ? param.width : param.width - offsetX;
+        int len = getContentWidth(param);
 
         //the limit start means there is no time
         int limitStart = offsetX < 0 ? Math.abs(offsetX) : -1;
@@ -155,10 +185,11 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
         if(!DEBUG){
             return;
         }
+        final int width = getContentWidth(param);
         double fractionalSecs = param.offsetX * param.onePixelInSecs;
         int integerTimecode = (int) (fractionalSecs / param.timecodeIntervalSecs);
         int i = 0;
-        while (i < param.width) {
+        while (i < width) {
             i++;
             fractionalSecs += param.onePixelInSecs;
             if(fractionalSecs < 0){
@@ -251,6 +282,12 @@ class UpWaveformDrawDelegate extends UpDownWaveformDrawDelegate{
         super(callback);
         this.mEWC = ewc;
     }
+
+    @Override
+    protected int getContentWidth(WaveformParam param) {
+        return (int) mEWC.getContentRect().width() - param.offsetX;
+    }
+
     @Override
     protected void drawWaveform(Canvas canvas, WaveformParam param, AnnotatorParam ap, int i) {
         int bottomY = param.viewHeight - ap.startDy;

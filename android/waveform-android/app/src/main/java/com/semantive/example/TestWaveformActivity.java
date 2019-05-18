@@ -58,8 +58,8 @@ public class TestWaveformActivity extends BaseActivity {
                             loadFile(mEditWaveForm, new Runnable() {
                                 @Override
                                 public void run() {
-                                    mEditWaveForm.addAnnotatorWidthAnim(15000);
-                                    mEditWaveForm.setMinOffsetX(-mEditWaveForm.secondsToPixels(20));
+                                    //mEditWaveForm.addAnnotatorWidthAnim(15000);
+                                    mEditWaveForm.setMinOffsetX(-mEditWaveForm.secondsToPixels(5));
                                 }
                             });
                         }

@@ -62,6 +62,19 @@ public class MusicAnnotatorView extends WaveformView {
             paint.setStrokeWidth(ap.lineWidth);
             int lineY = ap.startY + ap.dotLineDistance;
             canvas.drawLine(x , lineY, x, mParams.viewHeight - ap.startDy, paint);
+        }else {
+            //draw center line
+            final AnnotatorParam ap = this.mAP;
+            final Paint paint = mAnnotatorPaint;
+
+            paint.setColor(ap.color);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(ap.lineWidth);
+            paint.setAlpha(255);
+
+            float x = mParams.width / 2;
+            int lineY = ap.startY + ap.dotLineDistance;
+            canvas.drawLine(x, lineY, x, mParams.viewHeight - ap.startDy, paint);
         }
     }
 
