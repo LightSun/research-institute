@@ -32,9 +32,6 @@ public class EditorWaveformView extends WaveformView {
     /** indicate is select state or not */
     private boolean mSelected;
 
-    private boolean mFixContentWidth;
-    private int mContentWidth;
-
     public EditorWaveformView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -87,12 +84,7 @@ public class EditorWaveformView extends WaveformView {
     protected void onOffsetMayChanged() {
         Logger.d(TAG, "onOffsetMayChanged", "mTruncateWidth = " + mTruncateWidth);
 
-        final int width;
-        if(mFixContentWidth && mContentWidth > 0){
-            width = this.mContentWidth;
-        }else {
-            width = maxPosX() - mTruncateWidth;
-        }
+        final int width = maxPosX() - mTruncateWidth;
         mContentRect.set(-mOffsetX, 0, -mOffsetX + width, getHeight() - mAP.startDy);
 
         mLeftRect.set(mContentRect.left - mFocusParam.blockWidth,
@@ -144,13 +136,11 @@ public class EditorWaveformView extends WaveformView {
             if(mTouchDelegate != null && mTouchDelegate.onScroll(e1, e2, distanceX, distanceY)){
                 return true;
             }
-            mFixContentWidth = true;
             return super.onScroll(e1, e2, distanceX, distanceY);
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float vx, float vy) {
-            mFixContentWidth = true;
             return super.onFling(e1, e2, vx, vy);
         }
     }
@@ -165,8 +155,6 @@ public class EditorWaveformView extends WaveformView {
             this.initOffset = mOffsetX;
         }
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
-            mFixContentWidth = false;
-            mContentWidth = maxPosX() - mTruncateWidth;
             delta += distanceX;
             setOffset((int) (initOffset + delta));
             return true;
@@ -177,8 +165,6 @@ public class EditorWaveformView extends WaveformView {
         }
         //dx < 0 右滑， dy < 0 下滑
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
-            mFixContentWidth = false;
-            mContentWidth = maxPosX() - mTruncateWidth;
           //  Logger.d(TAG, "onScroll", "distanceX = " + distanceX);
             //右滑减小 .truncateWidth
             //左滑增大 truncateWidth
