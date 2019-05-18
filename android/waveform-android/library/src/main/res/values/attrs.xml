@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="WaveformView">
+        <attr name="wv_ap_line_width" format="dimension|reference"/>
+        <attr name="wv_ap_dot_line_distance" format="dimension|reference"/>
+        <!-- used for annotator anim -->
+        <attr name="wv_ap_dot_min_radius" format="dimension|reference"/>
+        <attr name="wv_ap_dot_max_radius" format="dimension|reference"/>
+        <attr name="wv_ap_start_y" format="dimension|reference"/>
+        <attr name="wv_ap_start_dy" format="dimension|reference"/>
+
+        <attr name="wv_ap_default_color" format="color|reference"/>
+        <attr name="wv_ap_adjust_color" format="color|reference"/>
+        <!-- some of waveform  -->
+        <attr name="wv_waveform_round_size" format="dimension|reference"/>
+        <attr name="wv_waveform_select_line_color" format="color|reference"/>
+        <attr name="wv_waveform_unselect_line_color" format="color|reference"/>
+        <attr name="wv_waveform_unselect_bg_color" format="color|reference"/>
+
+        <attr name="wv_waveform_select_range_color" format="color|reference"/>
+        <attr name="wv_waveform_select_range_dash_width" format="dimension|reference"/>
+        <attr name="wv_waveform_select_range_dash_space" format="dimension|reference"/>
+    </declare-styleable>
+</resources>

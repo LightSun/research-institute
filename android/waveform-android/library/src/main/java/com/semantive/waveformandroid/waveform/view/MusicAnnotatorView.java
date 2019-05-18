@@ -22,6 +22,7 @@ public class MusicAnnotatorView extends WaveformView {
     private static final float ADJUSTMENT = 20;
     private final RectF mRectF = new RectF();
     private AnnotatorLine mFocusLine;
+    private boolean mSettingFocusLine;
 
     public MusicAnnotatorView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -67,7 +68,7 @@ public class MusicAnnotatorView extends WaveformView {
             final AnnotatorParam ap = this.mAP;
             final Paint paint = mAnnotatorPaint;
 
-            paint.setColor(ap.color);
+            paint.setColor(mSettingFocusLine ? ap.adjustColor : ap.color);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(ap.lineWidth);
             paint.setAlpha(255);
@@ -196,9 +197,14 @@ public class MusicAnnotatorView extends WaveformView {
                 @Override
                 public void run() {
                     mFocusLine = line;
+                    mSettingFocusLine = false;
                     line.drawVerticalLine = false;
                 }
             });
+        }
+        @Override
+        public void onAnimationStart(Animator animation) {
+            mSettingFocusLine = true;
         }
     }
 

@@ -86,7 +86,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     protected Paint mUnselectedLinePaint;
     protected Paint mUnselectedBgLinePaint;
     protected Paint mBorderLinePaint;
-    protected Paint mPlaybackLinePaint;
+    protected Paint mCenterLinePaint;
     protected Paint mTimecodePaint;
     protected Paint mAnnotatorPaint;
 
@@ -156,9 +156,9 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mBorderLinePaint.setStrokeWidth(mParams.selectStrokeWidth);
         mBorderLinePaint.setColor(getResources().getColor(R.color.selection_border));
 
-        mPlaybackLinePaint = new Paint();
-        mPlaybackLinePaint.setAntiAlias(false);
-        mPlaybackLinePaint.setColor(getResources().getColor(R.color.playback_indicator));
+        mCenterLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mCenterLinePaint.setStrokeWidth(mParams.selectStrokeWidth);
+        mCenterLinePaint.setColor(getResources().getColor(R.color.playback_indicator));
 
         mTimecodePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTimecodePaint.setTextSize(12 * mDensity);
@@ -524,7 +524,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mDrawDelegate.drawSelectBorder(canvas, mBorderLinePaint, mParams, mAP);
         mDrawDelegate.drawTime(canvas, mTimecodePaint, mParams, mAP);
         mDrawDelegate.drawAnnotator(canvas, mAnnotatorPaint, mParams, mAP, mAnnotatorLines);
-        mDrawDelegate.drawCenterLine(canvas, mBorderLinePaint, mParams, mAP);
+        mDrawDelegate.drawCenterLine(canvas, mCenterLinePaint, mParams, mAP);
     }
     protected int getValidWidth(){
         if(mOffsetX < 0){
