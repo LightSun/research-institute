@@ -256,6 +256,16 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
     }
 
     /**
+     * set truncate width
+     * @param width the width in pixes
+     */
+    public void setTruncateWidth(int width){
+        mTruncateWidth = width;
+        onOffsetMayChanged();
+        invalidate();
+    }
+
+    /**
      * add annotator at target time
      * @param msec the time in mill-seconds
      */
