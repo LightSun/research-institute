@@ -59,7 +59,9 @@ public class TestWaveformActivity extends BaseActivity {
                                 @Override
                                 public void run() {
                                     //mEditWaveForm.addAnnotatorWidthAnim(15000);
-                                    mEditWaveForm.setMinOffsetX(-mEditWaveForm.secondsToPixels(5));
+                                    mEditWaveForm.setMinOffsetX( -mEditWaveForm.getWidth() / 2);
+                                    mEditWaveForm.seekToCenter(0);
+                                    mEditWaveForm.setTruncateWidth(mEditWaveForm.maxPosX() - mEditWaveForm.secondsToPixels(30));
                                 }
                             });
                         }
@@ -80,12 +82,12 @@ public class TestWaveformActivity extends BaseActivity {
             }));
             int start = wv.millisecsToPixels(3000);
             int end = wv.millisecsToPixels(30000);
-            wv.setSelectRange(start, end);
+            //.setSelectRange(start, end);
             //test a delay task
-            MainWorker.postDelay(1000, task);
+            MainWorker.postDelay(20, task);
             //
             if(wv == mAnnotatorView){
-                MainWorker.postDelay(1000, new Runnable() {
+                MainWorker.postDelay(20, new Runnable() {
                     @Override
                     public void run() {
                         mAnnotatorView.addAnnotatorWidthAnim(5000);

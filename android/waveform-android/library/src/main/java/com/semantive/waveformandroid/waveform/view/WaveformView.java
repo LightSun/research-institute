@@ -206,8 +206,8 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mLenByZoomLevel = null;
         mOffsetX = 0;
         mPlaybackPos = -1;
-        mSelectionStart = 0;
-        mSelectionEnd = 0;
+        mSelectionStart = -1;
+        mSelectionEnd = -1;
         mInitialized = false;
 
         getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -567,7 +567,9 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         mParams.timecodeIntervalSecs = timecodeIntervalSecs;
 
         mDrawDelegate.drawWaveform(canvas, mParams, mAP);
-        mDrawDelegate.drawSelectBorder(canvas, mSelectRangePaint, mParams, mAP);
+        if(mParams.selectionStart >= 0){
+            mDrawDelegate.drawSelectBorder(canvas, mSelectRangePaint, mParams, mAP);
+        }
         mDrawDelegate.drawTime(canvas, mTimecodePaint, mParams, mAP);
         mDrawDelegate.drawAnnotator(canvas, mAnnotatorPaint, mParams, mAP, mAnnotatorLines);
         mDrawDelegate.drawCenterLine(canvas, mCenterLinePaint, mParams, mAP);

@@ -82,9 +82,8 @@ public class EditorWaveformView extends WaveformView {
 
     @Override
     protected void onOffsetMayChanged() {
-        Logger.d(TAG, "onOffsetMayChanged", "mTruncateWidth = " + mTruncateWidth);
-
         final int width = maxPosX() - mTruncateWidth;
+        Logger.d(TAG, "onOffsetMayChanged", "mTruncateWidth = " + mTruncateWidth + " ,width = " + width);
         mContentRect.set(-mOffsetX, 0, -mOffsetX + width, getHeight() - mAP.startDy);
 
         mLeftRect.set(mContentRect.left - mFocusParam.blockWidth,
