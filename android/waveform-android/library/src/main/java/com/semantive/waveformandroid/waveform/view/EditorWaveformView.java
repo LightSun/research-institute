@@ -9,7 +9,6 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-import com.heaven7.core.util.Logger;
 import com.semantive.waveformandroid.R;
 
 /**
@@ -83,7 +82,7 @@ public class EditorWaveformView extends WaveformView {
     @Override
     protected void onOffsetMayChanged() {
         final int width = maxPosX() - mTruncateWidth;
-        Logger.d(TAG, "onOffsetMayChanged", "mTruncateWidth = " + mTruncateWidth + " ,width = " + width);
+        //Logger.d(TAG, "onOffsetMayChanged", "mTruncateWidth = " + mTruncateWidth + " ,width = " + width);
         mContentRect.set(-mOffsetX, 0, -mOffsetX + width, getHeight() - mAP.startDy);
 
         mLeftRect.set(mContentRect.left - mFocusParam.blockWidth,

@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import butterknife.Optional;
 
 /**
  * Created by heaven7 on 2019/5/13.
@@ -82,7 +83,7 @@ public class TestWaveformActivity extends BaseActivity {
             }));
             int start = wv.millisecsToPixels(3000);
             int end = wv.millisecsToPixels(30000);
-            //.setSelectRange(start, end);
+            wv.setSelectRange(start, end);
             //test a delay task
             MainWorker.postDelay(20, task);
             //
@@ -126,7 +127,7 @@ public class TestWaveformActivity extends BaseActivity {
         }
         @Override
         public void run() {
-            System.out.println("WaveformView >>> center time = " + wv.getCenterTime());
+           // System.out.println("WaveformView >>> center time = " + wv.getCenterTime());
             wv.seekToCenter(3000);
         }
     }

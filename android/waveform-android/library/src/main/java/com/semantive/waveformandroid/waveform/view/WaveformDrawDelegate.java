@@ -179,12 +179,14 @@ class UpDownWaveformDrawDelegate extends WaveformDrawDelegate{
                     wrapEndY(param.viewHeight - ap.startDy),
                     paint);
         }
-
         //0- abs(offsetX) draw nothing.
         for (int i = limitStart ; i < len ; i ++){
             param.fractionalSecs += param.onePixelInSecs;
             // Draw waveform
             drawWaveform(canvas, param, ap, i);
+            if(i - limitStart > param.viewWidth){
+                break;
+            }
         }
     }
 

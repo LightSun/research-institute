@@ -40,6 +40,7 @@ import com.semantive.waveformandroid.waveform.ScrollerWrapper;
 import com.semantive.waveformandroid.waveform.soundfile.CheapSoundFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -116,6 +117,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     /*private*/ int mMinOffsetX;
 
+    private int mDistancePerSecond = 58 * 3;
     /** true to fix the select length. */
     private boolean mFixSelectLength;
     /** the truncate width of tail/end.(this will effect the {@linkplain #getValidWidth()}. */
@@ -582,30 +584,6 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         }
     }
 
-    protected float getGain(int i, int numFrames, int[] frameGains) {
-        int x = Math.min(i, numFrames - 1);
-        if (numFrames < 2) {
-            return frameGains[x];
-        } else {
-            if (x == 0) {
-                return (frameGains[0] / 2.0f) + (frameGains[1] / 2.0f);
-            } else if (x == numFrames - 1) {
-                return (frameGains[numFrames - 2] / 2.0f) + (frameGains[numFrames - 1] / 2.0f);
-            } else {
-                return (frameGains[x - 1] / 3.0f) + (frameGains[x] / 3.0f) + (frameGains[x + 1] / 3.0f);
-            }
-        }
-    }
-
-    protected float getHeight(int i, int numFrames, int[] frameGains, float scaleFactor, float minGain, float range) {
-        float value = (getGain(i, numFrames, frameGains) * scaleFactor - minGain) / range;
-        if (value < 0.0)
-            value = 0.0f;
-        if (value > 1.0)
-            value = 1.0f;
-        return value;
-    }
-
     /**
      * Called once when a new sound file is added
      */
@@ -702,25 +680,43 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         }
         //set max zoom level
         mZoomLevel = mNumZoomLevels - 1;
+        //added by heaven7: make the distance as out expect.
+        mLenByZoomLevel[mZoomLevel] *= (mDistancePerSecond * 1f / secondsToPixels(1));
+        mZoomFactorByZoomLevel[mZoomLevel] = mLenByZoomLevel[mZoomLevel] * 1f / numFrames;
+
+        float average = mZoomFactorByZoomLevel[mZoomLevel] / mNumZoomLevels;
+        for (int i = 0; i < mNumZoomLevels ; i ++){
+            float value = (i + 1) * average;
+            mZoomFactorByZoomLevel[i] = value;
+            mLenByZoomLevel[i] = (int) (value * numFrames);
+        }
+
         mInitialized = true;
     }
 
-    protected float getZoomedInHeight(float zoomLevel, int i) {
-        int f = (int) zoomLevel;
-        if (i == 0) {
-            return 0.5f * getHeight(0, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
+    //i = [0, numFrames - 1]. frameGains.len = numFrames
+    protected float getGain(int i, int numFrames, int[] frameGains) {
+        int x = Math.min(i, numFrames - 1);
+        if (numFrames < 2) {
+            return frameGains[x];
+        } else {
+            if (x == 0) {
+                return (frameGains[0] / 2.0f) + (frameGains[1] / 2.0f);
+            } else if (x == numFrames - 1) {
+                return (frameGains[numFrames - 2] / 2.0f) + (frameGains[numFrames - 1] / 2.0f);
+            } else {
+                return (frameGains[x - 1] / 3.0f) + (frameGains[x] / 3.0f) + (frameGains[x + 1] / 3.0f);
+            }
         }
-        if (i == 1) {
-            return getHeight(0, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
-        }
-        if (i % f == 0) {
-            float x1 = getHeight(i / f - 1, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
-            float x2 = getHeight(i / f, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
-            return 0.5f * (x1 + x2);
-        } else if ((i - 1) % f == 0) {
-            return getHeight((i - 1) / f, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
-        }
-        return 0;
+    }
+
+    protected float getHeight(int i, int numFrames, int[] frameGains, float scaleFactor, float minGain, float range) {
+        float value = (getGain(i, numFrames, frameGains) * scaleFactor - minGain) / range;
+        if (value < 0.0)
+            value = 0.0f;
+        if (value > 1.0)
+            value = 1.0f;
+        return value;
     }
 
     protected float getZoomedOutHeight(float zoomLevel, int i) {
@@ -730,17 +726,8 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         return 0.5f * (x1 + x2);
     }
 
-    protected float getNormalHeight(int i) {
-        return getHeight(i, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
-    }
-
     protected float getScaledHeight(float zoomLevel, int i) {
-        if (zoomLevel == 1.0) {
-            return getNormalHeight(i);
-        } else if (zoomLevel < 1.0) {
-            return getZoomedOutHeight(zoomLevel, i);
-        }
-        return getZoomedInHeight(zoomLevel, i);
+        return getZoomedOutHeight(zoomLevel, i);
     }
     private boolean canScroll(float dx) {
         if (mOffsetX == mMinOffsetX && dx < 0) {
