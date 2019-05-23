@@ -117,7 +117,7 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     /*private*/ int mMinOffsetX;
 
-    private int mDistancePerSecond = 58 * 3;
+    private int mDistancePerSecond = 0;
     /** true to fix the select length. */
     private boolean mFixSelectLength;
     /** the truncate width of tail/end.(this will effect the {@linkplain #getValidWidth()}. */
@@ -678,17 +678,20 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
                 }
             }
         }
+
         //set max zoom level
         mZoomLevel = mNumZoomLevels - 1;
-        //added by heaven7: make the distance as out expect.
-        mLenByZoomLevel[mZoomLevel] *= (mDistancePerSecond * 1f / secondsToPixels(1));
-        mZoomFactorByZoomLevel[mZoomLevel] = mLenByZoomLevel[mZoomLevel] * 1f / numFrames;
+        if(mDistancePerSecond > 0){
+            //added by heaven7: make the distance as out expect.
+            mLenByZoomLevel[mZoomLevel] *= (mDistancePerSecond * 1f / secondsToPixels(1));
+            mZoomFactorByZoomLevel[mZoomLevel] = mLenByZoomLevel[mZoomLevel] * 1f / numFrames;
 
-        float average = mZoomFactorByZoomLevel[mZoomLevel] / mNumZoomLevels;
-        for (int i = 0; i < mNumZoomLevels ; i ++){
-            float value = (i + 1) * average;
-            mZoomFactorByZoomLevel[i] = value;
-            mLenByZoomLevel[i] = (int) (value * numFrames);
+            float average = mZoomFactorByZoomLevel[mZoomLevel] / mNumZoomLevels;
+            for (int i = 0; i < mNumZoomLevels ; i ++){
+                float value = (i + 1) * average;
+                mZoomFactorByZoomLevel[i] = value;
+                mLenByZoomLevel[i] = (int) (value * numFrames);
+            }
         }
 
         mInitialized = true;
@@ -719,6 +722,24 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         return value;
     }
 
+    protected float getZoomedInHeight(float zoomLevel, int i) {
+        int f = (int) zoomLevel;
+        if (i == 0) {
+            return 0.5f * getHeight(0, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
+        }
+        if (i == 1) {
+            return getHeight(0, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
+        }
+        if (i % f == 0) {
+            float x1 = getHeight(i / f - 1, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
+            float x2 = getHeight(i / f, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
+            return 0.5f * (x1 + x2);
+        } else if ((i - 1) % f == 0) {
+            return getHeight((i - 1) / f, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
+        }
+        return 0;
+    }
+
     protected float getZoomedOutHeight(float zoomLevel, int i) {
         int f = (int) (i / zoomLevel);
         float x1 = getHeight(f, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
@@ -726,8 +747,17 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
         return 0.5f * (x1 + x2);
     }
 
+    protected float getNormalHeight(int i) {
+        return getHeight(i, mSoundFile.getNumFrames(), mSoundFile.getFrameGains(), scaleFactor, minGain, range);
+    }
+
     protected float getScaledHeight(float zoomLevel, int i) {
-        return getZoomedOutHeight(zoomLevel, i);
+        if (zoomLevel == 1.0) {
+            return getNormalHeight(i);
+        } else if (zoomLevel < 1.0) {
+            return getZoomedOutHeight(zoomLevel, i);
+        }
+        return getZoomedInHeight(zoomLevel, i);
     }
     private boolean canScroll(float dx) {
         if (mOffsetX == mMinOffsetX && dx < 0) {
@@ -755,6 +785,9 @@ public class WaveformView extends View implements WaveformDrawDelegate.Callback{
 
     @Override
     public int getWaveformHeight(int i, WaveformParam param) {
+        if(mDistancePerSecond > 0){
+            return  (int) (getZoomedOutHeight(mZoomFactorByZoomLevel[mZoomLevel], param.offsetX + i) * param.viewHeight/ 2);
+        }
         return (int) (getScaledHeight(mZoomFactorByZoomLevel[mZoomLevel], param.offsetX + i) * param.viewHeight/ 2);
     }
     @Override
