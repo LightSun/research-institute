@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+<!--
     <com.heaven7.vida.research.widget.RoundedCornerLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,6 +21,10 @@
         android:layout_width="300dp"
         android:layout_height="200dp"
         android:background="@color/colorAccent"
-        />
+        />-->
+
+    <com.heaven7.vida.research.widget.ClipView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

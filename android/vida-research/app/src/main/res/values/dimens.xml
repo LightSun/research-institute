@@ -2,4 +2,6 @@
 <resources>
     <dimen name="disc_step">56dp</dimen>
     <dimen name="disc_max_text_size">30sp</dimen>
+
+    <dimen name="touch_item_min_height">60dp</dimen>
 </resources>

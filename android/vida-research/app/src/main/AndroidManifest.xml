@@ -80,6 +80,7 @@
         <activity android:name=".sample.TestGLSurfaceViewActivity" />
         <activity android:name=".sample.TestVideoEditorTimeLineActivity" />
         <activity android:name=".sample.TestRecyclerViewSwipeRemoveActivity" />
+        <activity android:name=".sample.TestPagerActivity" />
 
         <service
             android:name=".service.TestAccessibilityService"
