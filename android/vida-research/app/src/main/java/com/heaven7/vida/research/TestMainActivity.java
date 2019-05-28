@@ -1,7 +1,9 @@
 package com.heaven7.vida.research;
 
+import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 
 import com.heaven7.vida.research.drag.DragActivity;
 import com.heaven7.vida.research.sample.BalanceViewTest;
@@ -13,6 +15,7 @@ import com.heaven7.vida.research.sample.TestClipScaleActivity;
 import com.heaven7.vida.research.sample.TestDiscViewActivity;
 import com.heaven7.vida.research.sample.TestDynamicContentActivity;
 import com.heaven7.vida.research.sample.TestGLSurfaceViewActivity;
+import com.heaven7.vida.research.sample.TestGetMediaInfoActivity;
 import com.heaven7.vida.research.sample.TestLottieActivity;
 import com.heaven7.vida.research.sample.TestMultiPieceProgressView;
 import com.heaven7.vida.research.sample.TestPageTipViewActivity;
@@ -33,6 +36,7 @@ import com.heaven7.vida.research.sample.TestVideoEditorTimeLineActivity;
 import com.heaven7.vida.research.sample.TestZoomDrawableActivity;
 import com.heaven7.vida.research.service.TestAccessibilityService;
 import com.heaven7.vida.research.utils.AccessibilityHelper;
+import com.heaven7.vida.research.utils.PermissionHelper;
 
 import java.io.IOException;
 import java.net.URL;
@@ -42,6 +46,20 @@ import java.util.List;
  * Created by heaven7 on 2017/12/22.
  */
 public class TestMainActivity extends AbsMainActivity {
+
+    private PermissionHelper mHelper = new PermissionHelper(this);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mHelper.startRequestPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                new int[]{1}, new PermissionHelper.ICallback() {
+            @Override
+            public void onRequestPermissionResult(String requestPermission, int requestCode, boolean success) {
+                System.out.println(" Req Permission >>> success = "+ success + ", requestPermission = " + requestPermission);
+            }
+        });
+    }
 
     @Override
     protected void addDemos(List<ActivityInfo> list) {
@@ -84,6 +102,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestPageTitleStrip.class));
         list.add(new ActivityInfo(TestGLSurfaceViewActivity.class));
         list.add(new ActivityInfo(TestVideoEditorTimeLineActivity.class));
+        list.add(new ActivityInfo(TestGetMediaInfoActivity.class));
 
         testLoadImageFromJar();
     }

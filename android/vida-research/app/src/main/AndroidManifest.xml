@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heaven7.vida.research">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -10,7 +11,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
-   <!-- <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>-->
 
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
@@ -80,7 +80,7 @@
         <activity android:name=".sample.TestGLSurfaceViewActivity" />
         <activity android:name=".sample.TestVideoEditorTimeLineActivity" />
         <activity android:name=".sample.TestRecyclerViewSwipeRemoveActivity" />
-        <activity android:name=".sample.TestPagerActivity" />
+        <activity android:name=".sample.TestGetMediaInfoActivity" />
 
         <service
             android:name=".service.TestAccessibilityService"
