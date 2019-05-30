@@ -81,6 +81,7 @@
         <activity android:name=".sample.TestVideoEditorTimeLineActivity" />
         <activity android:name=".sample.TestRecyclerViewSwipeRemoveActivity" />
         <activity android:name=".sample.TestGetMediaInfoActivity" />
+        <activity android:name=".sample.TestTrapezoidPartsView" />
 
         <service
             android:name=".service.TestAccessibilityService"

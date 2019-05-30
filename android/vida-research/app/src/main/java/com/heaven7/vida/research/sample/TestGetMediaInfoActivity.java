@@ -71,7 +71,8 @@ public class TestGetMediaInfoActivity extends BaseActivity {
                 MediaStore.Audio.Media.DISPLAY_NAME,
         };
         //String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-        Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor cursor = getContentResolver().query(uri,
                 projection, null, null, null);
         try {
             if (cursor == null) {

@@ -1,8 +1,10 @@
 package com.heaven7.vida.research.utils;
 
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 
 /**
  * Created by heaven7 on 2018/11/7 0007.
@@ -23,7 +25,7 @@ public class DrawingUtils {
         out.bottom = paint.descent() - paint.ascent();
         out.left += (srcRange.width() - out.right) / 2.0f;
         out.top += (srcRange.height() - out.bottom) / 2.0f;
-        //  canvas.drawText(text, bounds.left, bounds.top - mPaint.ascent(), mPaint);
+        //  canvas.drawText(text, out.left, out.top - mPaint.ascent(), mPaint);
     }
 
     /** make the small rect center in big rect. */
@@ -42,6 +44,17 @@ public class DrawingUtils {
             offsetY = (bigH - smallH) / 2;
         }
         small.offset(offsetX, offsetY);
+    }
+
+    /** draw the icon in center of rect */
+    public static void drawCenter(Canvas canvas, Rect mRect, Drawable icon) {
+        int x = (mRect.width() - icon.getIntrinsicWidth()) / 2;
+        int y = (mRect.height() - icon.getIntrinsicHeight()) / 2;
+        canvas.translate(mRect.left, mRect.top);
+        canvas.translate(x, y);
+        icon.draw(canvas);
+        canvas.translate(-x, -y);
+        canvas.translate(-mRect.left, -mRect.top);
     }
 
 }

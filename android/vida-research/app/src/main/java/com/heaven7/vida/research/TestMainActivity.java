@@ -29,6 +29,7 @@ import com.heaven7.vida.research.sample.TestScaleDrawableActivity;
 import com.heaven7.vida.research.sample.TestShadowShapeActivity;
 import com.heaven7.vida.research.sample.TestSwitchImageActivity;
 import com.heaven7.vida.research.sample.TestTransitionAnimationActivity1;
+import com.heaven7.vida.research.sample.TestTrapezoidPartsView;
 import com.heaven7.vida.research.sample.TestV7_CircleImageViewActivity;
 import com.heaven7.vida.research.sample.TestVidaStickyLayoutActivity;
 import com.heaven7.vida.research.sample.TestVidaTransDrawable;
@@ -103,6 +104,7 @@ public class TestMainActivity extends AbsMainActivity {
         list.add(new ActivityInfo(TestGLSurfaceViewActivity.class));
         list.add(new ActivityInfo(TestVideoEditorTimeLineActivity.class));
         list.add(new ActivityInfo(TestGetMediaInfoActivity.class));
+        list.add(new ActivityInfo(TestTrapezoidPartsView.class));
 
         testLoadImageFromJar();
     }
