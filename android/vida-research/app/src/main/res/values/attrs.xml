@@ -106,4 +106,12 @@
         <attr name="vetl_time_distance" format="dimension|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="TrapezoidPartsView">
+        <attr name="tpv_space" format="dimension|reference"/>
+        <attr name="tpv_touch_alpha" format="float|reference"/>
+        <attr name="tpv_text_size" format="dimension|reference"/>
+        <attr name="tpv_text_color" format="color|reference"/>
+        <attr name="tpv_text_margin_top" format="dimension|reference"/>
+    </declare-styleable>
+
 </resources>

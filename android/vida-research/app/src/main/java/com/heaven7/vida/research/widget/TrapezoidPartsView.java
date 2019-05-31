@@ -306,11 +306,10 @@ public class TrapezoidPartsView extends View {
 
         int mTrapezoidSecondLength; //second max length of trapezoid
         int mShortLength;           // short length of Triangle
-        int mPartHeight = 200;
+        int mPartHeight;
 
-        int mSpace = 40;
+        int mSpace;
         int mTextMarginTop = 40;
-        boolean mTouched;
     }
 
     /**
