@@ -1,6 +1,7 @@
 package com.heaven7.vida.research.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.vida.research.R;
 import com.heaven7.vida.research.utils.DimenUtil;
 import com.heaven7.vida.research.utils.DrawingUtils;
 
@@ -26,13 +28,14 @@ import androidx.core.view.GestureDetectorCompat;
 
 /**
  * 梯形控件
- * Created by heaven7 on 2019/5/30.
+ * @author heaven7
  */
 public class TrapezoidPartsView extends View {
 
-    private static final boolean DEBUG = false;
-    private static final String TAG = "TrapezoidPartsView";
-    private final Path mPath = new Path();
+    //for debug
+    private boolean mDebug = false;
+    private Path mPath;
+
     private final BaseShape.RectangleShape mRectShape = new BaseShape.RectangleShape();
     private final BaseShape.TriangleShape mTriangleShape = new BaseShape.TriangleShape();
 
@@ -43,14 +46,13 @@ public class TrapezoidPartsView extends View {
     private final Param mParam = new Param();
 
     private float mAngle = 68;     //梯形角度
+    private float mImageRatio = 488 * 1f/ 264;
 
     private int mTouchAlpha = 179;
-    private int mTextSize = 50;
-    private int mTextColor = Color.WHITE;
     private GestureDetectorCompat mGesture;
 
     private OnTrapezoidPartClickListener mListener;
-    private List<TrapezoidPart> parts;
+    private List<TrapezoidPart> mParts;
 
     private TrapezoidPart mFocusPart;
 
@@ -69,17 +71,68 @@ public class TrapezoidPartsView extends View {
     public TrapezoidPartsView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        mParam.mSpace = DimenUtil.dip2px(context, 16);
-        //TODO init
+        int mTextSize = 50;
+        int mTextColor = Color.WHITE;
+        if(attrs != null){
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TrapezoidPartsView);
+            try {
+                float alpha = a.getFloat(R.styleable.TrapezoidPartsView_tpv_touch_alpha, 0.7f);
+                mTouchAlpha = (int) (alpha * 255);
+                mParam.mSpace = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_space, mParam.mSpace);
+                mParam.mTextMarginTop = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_text_margin_top, mParam.mTextMarginTop);
+                mAngle = a.getFloat(R.styleable.TrapezoidPartsView_tpv_angle, mAngle);
+                mDebug = a.getBoolean(R.styleable.TrapezoidPartsView_tpv_debug, mDebug);
+                mTextSize = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_text_size, mTextSize);
+                mTextColor = a.getColor(R.styleable.TrapezoidPartsView_tpv_text_color, mTextColor);
+            }finally {
+                a.recycle();
+            }
+        }else {
+            mParam.mSpace = DimenUtil.dip2px(context, 16);
+            mParam.mTextMarginTop = 40;
+            mTouchAlpha = 179;
+        }
         mPaint.setTextSize(mTextSize);
         mPaint.setColor(mTextColor);
 
         mGesture = new GestureDetectorCompat(context, new GestureListener());
+        if(mDebug){
+            mPath = new Path();
+        }
     }
 
+    /**
+     * set on click TrapezoidPart listener.
+     * @param mListener the listener
+     */
+    public void setOnTrapezoidPartClickListener(OnTrapezoidPartClickListener mListener) {
+        this.mListener = mListener;
+    }
+
+    /**
+     * get the all trapezoid parts
+     * @return the pars
+     */
+    public List<TrapezoidPart> getParts() {
+        return mParts;
+    }
+
+    /**
+     * set the trapezoid parts
+     * @param parts the parts
+     */
+    public void setParts(List<TrapezoidPart> parts) {
+        if (parts.size() < 2) {
+            throw new UnsupportedOperationException();
+        }
+        this.mParts = parts;
+        computeAll();
+        requestLayout();
+        postInvalidate();
+    }
     private void computeTrapezoidParameters(Context context) {
         double tan = Math.tan(Math.toRadians(mAngle));
-        int count = parts.size();
+        int count = mParts.size();
         int wholeWidth = getWidth() - getPaddingLeft() - getPaddingRight();
         int val = wholeWidth - (count - 1 ) * mParam.mSpace;
         double a = count - (count - 1) * 264 / (tan * 488);
@@ -89,27 +142,13 @@ public class TrapezoidPartsView extends View {
         mParam.mTrapezoidSecondLength = mParam.mTrapezoidMaxLength - mParam.mShortLength;
     }
 
-    public void setOnTrapezoidPartClickListener(OnTrapezoidPartClickListener mListener) {
-        this.mListener = mListener;
-    }
-    public List<TrapezoidPart> getParts() {
-        return parts;
-    }
-    public void setParts(List<TrapezoidPart> parts) {
-        if (parts.size() < 2) {
-            throw new UnsupportedOperationException();
-        }
-        this.parts = parts;
-        computeRects();
-        requestLayout();
-        postInvalidate();
-    }
-
-    private void computeRects() {
-        if(Predicates.isEmpty(parts)){
+    private void computeAll() {
+        if(Predicates.isEmpty(mParts)){
             return;
         }
-        mPath.reset();
+        if(mDebug){
+            mPath.reset();
+        }
         computeTrapezoidParameters(getContext());
         int mPartHeight = mParam.mPartHeight;
         int shortLen = mParam.mShortLength;
@@ -117,7 +156,7 @@ public class TrapezoidPartsView extends View {
         int left = getPaddingLeft();
         int top = getPaddingTop();
         //handle left.(p1,p2,p3, 从左往右。从上到下)
-        TrapezoidPart leftPart = parts.get(0);
+        TrapezoidPart leftPart = mParts.get(0);
         Rect rect_left_part = leftPart.getRect();
         rect_left_part.set(left, top, left + mParam.mTrapezoidMaxLength - shortLen, top + mPartHeight);
         Point p1 = new Point(rect_left_part.right, rect_left_part.top);
@@ -128,7 +167,7 @@ public class TrapezoidPartsView extends View {
         triangle.setP2(p2);
         triangle.setP3(p3);
 
-        if (DEBUG) {
+        if (mDebug) {
             mRectF.set(rect_left_part);
             mPath.addRect(mRectF, Path.Direction.CW);
             mPath.moveTo(p1.x, p1.y);
@@ -137,11 +176,11 @@ public class TrapezoidPartsView extends View {
         }
         //handle centers
         Point lastTailP = leftPart.getRightTriangle().getP2();
-        if (parts.size() > 2) {
-            int size = parts.size() - 1;
+        if (mParts.size() > 2) {
+            int size = mParts.size() - 1;
             //last p2.
             for (int i = 1; i < size; i++) {
-                TrapezoidPart part = parts.get(i);
+                TrapezoidPart part = mParts.get(i);
                 BaseShape.TriangleRange lt = part.getLeftTriangle();
                 Point pp1 = new Point(lastTailP.x + mParam.mSpace, lastTailP.y);
                 Point pp3 = new Point(pp1.x + shortLen, pp1.y);
@@ -159,7 +198,7 @@ public class TrapezoidPartsView extends View {
                 rt.setP3(ppp3);
 
                 part.getRect().set(pp2.x, pp2.y, ppp2.x, ppp2.y);
-                if (DEBUG) {
+                if (mDebug) {
                     mRectF.set(part.getRect());
                     mPath.addRect(mRectF, Path.Direction.CW);
                     mPath.moveTo(pp3.x, pp3.y);
@@ -176,7 +215,7 @@ public class TrapezoidPartsView extends View {
         }
 
         //handle right
-        TrapezoidPart rightPart = parts.get(parts.size() - 1);
+        TrapezoidPart rightPart = mParts.get(mParts.size() - 1);
         triangle = rightPart.getLeftTriangle();
 
         p1 = new Point(lastTailP.x + mParam.mSpace, lastTailP.y);
@@ -187,7 +226,7 @@ public class TrapezoidPartsView extends View {
         triangle.setP1(p1);
 
         rightPart.getRect().set(p2.x, p2.y, p2.x + mParam.mTrapezoidSecondLength, rect_left_part.bottom);
-        if (DEBUG) {
+        if (mDebug) {
             mRectF.set(rightPart.getRect());
             mPath.addRect(mRectF, Path.Direction.CW);
             mPath.moveTo(p3.x, p3.y);
@@ -225,10 +264,9 @@ public class TrapezoidPartsView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         Rect rect = DrawingUtils.measure(mPaint, "PROJECT");
-        if(Predicates.isEmpty(parts)){
+        if(Predicates.isEmpty(mParts)){
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }else {
-           // int size = parts.size();
             int height = mParam.mPartHeight + mParam.mTextMarginTop + rect.height() + getPaddingTop() + getPaddingBottom();
           /*  int width = size * mParam.mTrapezoidMaxLength - (size - 1) * (mParam.mShortLength - mParam.mSpace)
                     + getPaddingLeft() + getPaddingRight();*/
@@ -239,10 +277,10 @@ public class TrapezoidPartsView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (Predicates.isEmpty(parts)) {
+        if (Predicates.isEmpty(mParts)) {
             return;
         }
-        if (DEBUG) {
+        if (mDebug) {
             mPaint.setColor(Color.RED);
             mPaint.setStyle(Paint.Style.STROKE);
             canvas.drawPath(mPath, mPaint);
@@ -250,14 +288,14 @@ public class TrapezoidPartsView extends View {
             mParam.top = getPaddingTop();
             mParam.bottom = getHeight() - getPaddingBottom();
             //draw left
-            TrapezoidPart leftPart = parts.get(0);
+            TrapezoidPart leftPart = mParts.get(0);
             leftPart.draw(canvas, mPaint, mRect, mRectF, mParam);
 
-            TrapezoidPart rightPart = parts.get(parts.size() - 1);
+            TrapezoidPart rightPart = mParts.get(mParts.size() - 1);
             rightPart.draw(canvas, mPaint, mRect, mRectF, mParam);
-            if(parts.size() > 2){
-                for (int i = 1, size = parts.size() - 1; i < size ; i ++){
-                    TrapezoidPart part = parts.get(i);
+            if(mParts.size() > 2){
+                for (int i = 1, size = mParts.size() - 1; i < size ; i ++){
+                    TrapezoidPart part = mParts.get(i);
                     part.draw(canvas, mPaint, mRect, mRectF, mParam);
                 }
             }
@@ -267,7 +305,7 @@ public class TrapezoidPartsView extends View {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            return !Predicates.isEmpty(parts);
+            return !Predicates.isEmpty(mParts);
         }
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
@@ -284,7 +322,7 @@ public class TrapezoidPartsView extends View {
     private void findFocusPart(MotionEvent e) {
         int x = (int) e.getX();
         int y = (int) e.getY();
-        for (TrapezoidPart part : parts){
+        for (TrapezoidPart part : mParts){
             if(mRectShape.isPointIn(part.rect, x, y)){
                 mFocusPart = part;
                 break;
@@ -297,18 +335,16 @@ public class TrapezoidPartsView extends View {
             }
         }
     }
-
-
-    static class Param {
+    private static class Param {
         int top;
         int bottom;
         int mTrapezoidMaxLength;    // max length of trapezoid
 
         int mTrapezoidSecondLength; //second max length of trapezoid
         int mShortLength;           // short length of Triangle
-        int mPartHeight;
+        int mPartHeight;            // the height of bg image
 
-        int mSpace;
+        int mSpace = 40;
         int mTextMarginTop = 40;
     }
 
@@ -326,6 +362,10 @@ public class TrapezoidPartsView extends View {
         void onClickTrapezoidPart(TrapezoidPartsView view, TrapezoidPart part);
     }
 
+    /**
+     * the trapezoid part
+     * @author heaven7
+     */
     public static class TrapezoidPart {
         int alpha = 255;
         private int type;
