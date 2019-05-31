@@ -45,7 +45,7 @@ public class TrapezoidPartsView extends View {
 
     private final Param mParam = new Param();
 
-    private float mAngle = 68;     //梯形角度
+    private float mAngle = 68;
     private float mImageRatio = 488 * 1f/ 264;
 
     private int mTouchAlpha = 179;
@@ -81,6 +81,7 @@ public class TrapezoidPartsView extends View {
                 mParam.mSpace = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_space, mParam.mSpace);
                 mParam.mTextMarginTop = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_text_margin_top, mParam.mTextMarginTop);
                 mAngle = a.getFloat(R.styleable.TrapezoidPartsView_tpv_angle, mAngle);
+                mImageRatio = a.getFloat(R.styleable.TrapezoidPartsView_tpv_debug, mImageRatio);
                 mDebug = a.getBoolean(R.styleable.TrapezoidPartsView_tpv_debug, mDebug);
                 mTextSize = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_text_size, mTextSize);
                 mTextColor = a.getColor(R.styleable.TrapezoidPartsView_tpv_text_color, mTextColor);
@@ -135,9 +136,9 @@ public class TrapezoidPartsView extends View {
         int count = mParts.size();
         int wholeWidth = getWidth() - getPaddingLeft() - getPaddingRight();
         int val = wholeWidth - (count - 1 ) * mParam.mSpace;
-        double a = count - (count - 1) * 264 / (tan * 488);
+        double a = count - (count - 1) / (tan * mImageRatio);
         mParam.mTrapezoidMaxLength = (int) (val / a);
-        mParam.mPartHeight = mParam.mTrapezoidMaxLength * 264 / 488;
+        mParam.mPartHeight = (int) (mParam.mTrapezoidMaxLength / mImageRatio);
         mParam.mShortLength = (int) (mParam.mPartHeight / tan);
         mParam.mTrapezoidSecondLength = mParam.mTrapezoidMaxLength - mParam.mShortLength;
     }
