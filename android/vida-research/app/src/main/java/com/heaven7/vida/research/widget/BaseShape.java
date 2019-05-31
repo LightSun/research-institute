@@ -1,4 +1,4 @@
-package com.heaven7.vida.research.widget.shape;
+package com.heaven7.vida.research.widget;
 
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -10,7 +10,8 @@ public abstract class BaseShape<T> {
 
     public abstract boolean isPointIn(T range, int x, int y);
 
-    public static class RectangleShape extends BaseShape<Rect>{
+
+    public static class RectangleShape extends BaseShape<Rect> {
         @Override
         public boolean isPointIn(Rect range, int x, int y) {
             return range.contains(x, y);
@@ -43,9 +44,12 @@ public abstract class BaseShape<T> {
         }
     }
 
-    public static class TriangleShape extends BaseShape<TriangleRange>{
+    public static class TriangleShape extends BaseShape<TriangleRange> {
         @Override
         public boolean isPointIn(TriangleRange range, int x, int y) {
+            if(range == null){
+                return false;
+            }
             Point P = new Point(x, y);
             Point A = range.getP1();
             Point B = range.getP2();

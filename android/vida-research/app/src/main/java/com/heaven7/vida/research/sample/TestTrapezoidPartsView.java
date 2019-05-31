@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 
+import com.heaven7.java.base.util.DefaultPrinter;
 import com.heaven7.vida.research.BaseActivity;
 import com.heaven7.vida.research.R;
 import com.heaven7.vida.research.widget.TrapezoidPartsView;
@@ -19,7 +20,10 @@ import butterknife.OnClick;
 /**
  * Created by heaven7 on 2019/5/30.
  */
-public class TestTrapezoidPartsView extends BaseActivity {
+public class TestTrapezoidPartsView extends BaseActivity implements TrapezoidPartsView.OnTrapezoidPartClickListener {
+
+
+    private static final String TAG = "TestTrapezoidPartsView";
 
     @BindView(R.id.tpv)
     TrapezoidPartsView mTpv;
@@ -31,7 +35,7 @@ public class TestTrapezoidPartsView extends BaseActivity {
 
     @Override
     protected void onInitialize(Context context, Bundle savedInstanceState) {
-
+        mTpv.setOnTrapezoidPartClickListener(this);
     }
 
     @OnClick(R.id.bt1)
@@ -67,7 +71,12 @@ public class TestTrapezoidPartsView extends BaseActivity {
         return list;
     }
     private Bitmap getDrawableBitmap(int resId){
-       BitmapDrawable bd = (BitmapDrawable) getResources().getDrawable(resId);
-       return bd.getBitmap();
+        BitmapDrawable bd = (BitmapDrawable) getResources().getDrawable(resId);
+        return bd.getBitmap();
+    }
+
+    @Override
+    public void onClickTrapezoidPart(TrapezoidPartsView view, TrapezoidPartsView.TrapezoidPart part) {
+        DefaultPrinter.getDefault().debug(TAG , "onClickTrapezoidPart", part.getText());
     }
 }
