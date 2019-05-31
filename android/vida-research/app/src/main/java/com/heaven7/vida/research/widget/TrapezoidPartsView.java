@@ -81,7 +81,7 @@ public class TrapezoidPartsView extends View {
                 mParam.mSpace = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_space, mParam.mSpace);
                 mParam.mTextMarginTop = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_text_margin_top, mParam.mTextMarginTop);
                 mAngle = a.getFloat(R.styleable.TrapezoidPartsView_tpv_angle, mAngle);
-                mImageRatio = a.getFloat(R.styleable.TrapezoidPartsView_tpv_debug, mImageRatio);
+                mImageRatio = a.getFloat(R.styleable.TrapezoidPartsView_tpv_image_aspect_ratio, mImageRatio);
                 mDebug = a.getBoolean(R.styleable.TrapezoidPartsView_tpv_debug, mDebug);
                 mTextSize = a.getDimensionPixelSize(R.styleable.TrapezoidPartsView_tpv_text_size, mTextSize);
                 mTextColor = a.getColor(R.styleable.TrapezoidPartsView_tpv_text_color, mTextColor);
