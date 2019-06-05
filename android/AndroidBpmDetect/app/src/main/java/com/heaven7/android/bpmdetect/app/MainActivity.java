@@ -1,4 +1,4 @@
-package com.heaven7.android.bpmdetect;
+package com.heaven7.android.bpmdetect.app;
 
 import android.Manifest;
 import android.app.Activity;
@@ -10,12 +10,15 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
 
+import com.heaven7.android.bpmdetect.BaseActivity;
+import com.heaven7.android.bpmdetect.BpmDetector;
 import com.heaven7.android.bpmdetect.soundfile.SoundFile;
 import com.heaven7.android.util2.FilePathCompat;
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.java.pc.schedulers.Schedulers;
 
+import java.nio.ShortBuffer;
 
 import butterknife.OnClick;
 
@@ -51,10 +54,11 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == Activity.RESULT_OK && data != null) {
-            String filePath = FilePathCompat.getFilePath(this, data.getData());
+            final String filePath = FilePathCompat.getFilePath(this, data.getData());
             System.out.println(filePath);
             Logger.d(TAG, "onActivityResult", "filePath = " + filePath);
             Toast.makeText(this, filePath, Toast.LENGTH_LONG).show();
+
             mAudioFile = filePath;
             setSoundFile();
         }
@@ -62,11 +66,7 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.bt_start_detect)
     public void onClickStart(View view){
-        if(mAudioFile == null){
-            Logger.w(TAG, "onClickStart", "please select an audio file.");
-        }else {
-            setSoundFile();
-        }
+
     }
 
     private void setSoundFile() {
@@ -90,8 +90,24 @@ public class MainActivity extends BaseActivity {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(intent,1);
     }
-
     private void setAudioData(){
+        ShortBuffer samples = mSoundFile.getSamples();
+        final short[] data = new short[samples.remaining()];
+        samples.get(data);
+        System.out.println(samples);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mDetector.attach(mSoundFile.getChannels(), mSoundFile.getSampleRate());
+                mDetector.setSampleData(data, mSoundFile.getNumSamples());
+                Logger.d(TAG, "setAudioData", " bpm = " + mDetector.getBmp() + " ,file = " + mAudioFile);
+                mDetector.detach();
+            }
+        });
+    }
+   /* private void setAudioData(){
+        ShortBuffer samples = mSoundFile.getSamples();
+        System.out.println(samples);
         int[] gains = mSoundFile.getFrameGains();
         final short[] data = new short[gains.length];
         for (int i = 0, size = gains.length ; i < size ; i ++){
@@ -104,7 +120,8 @@ public class MainActivity extends BaseActivity {
                 mDetector.attach(mSoundFile.getChannels(), mSoundFile.getSampleRate());
                 mDetector.setSampleData(data, mSoundFile.getNumSamples());
                 Logger.d(TAG, "setAudioData", " bpm = " + mDetector.getBmp() + " ,file = " + mAudioFile);
+                mDetector.detach();
             }
         });
-    }
+    }*/
 }

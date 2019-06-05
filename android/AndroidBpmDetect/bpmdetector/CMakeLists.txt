@@ -12,6 +12,7 @@ include_directories(src/main/cpp/soundtouch/src/SoundTouch)
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
 
 add_library( # Sets the name of the library.
         audio-detect

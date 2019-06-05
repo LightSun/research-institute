@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.heaven7.android.bpmdetect"
+        applicationId "com.heaven7.android.bpmdetect.app"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1

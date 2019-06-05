@@ -57,7 +57,6 @@
 #include "FIFOSampleBuffer.h"
 #include "PeakFinder.h"
 #include "BPMDetect.h"
-#include <exception>
 
 using namespace soundtouch;
 
@@ -260,6 +259,7 @@ int BPMDetect::decimate(SAMPLETYPE *dest, const SAMPLETYPE *src, int numsamples)
         // convert to mono and accumulate
         for (j = 0; j < channels; j ++)
         {
+            //LOGD("src = %ld, channels = %d, j = %d", src, channels, j);
             decimateSum += src[j];
         }
         src += j;
@@ -282,10 +282,13 @@ int BPMDetect::decimate(SAMPLETYPE *dest, const SAMPLETYPE *src, int numsamples)
                 out = -32768;
             }
 #endif // SOUNDTOUCH_INTEGER_SAMPLES
-            LOGD("start dest : LONG_SAMPLETYPE, decimateSum = %d, decimateBy = %d, channels = %d, outcount = %d",
-                 decimateSum, decimateBy, channels, outcount);
+ /*           LOGD("start dest : LONG_SAMPLETYPE, decimateSum = %d, decimateBy = %d, channels = %d, outcount = %d",
+                 decimateSum, decimateBy, channels, outcount);*/
+            if(outcount >= DECIMATED_BLOCK_SIZE){
+                LOGD("end dest : wrong outcount = %d", outcount);
+            }
             dest[outcount] = (SAMPLETYPE)out;
-            LOGD("end dest : LONG_SAMPLETYPE. outcount = %d", outcount);
+           // LOGD("end dest : LONG_SAMPLETYPE. outcount = %d", outcount);
             outcount ++;
         }
     }

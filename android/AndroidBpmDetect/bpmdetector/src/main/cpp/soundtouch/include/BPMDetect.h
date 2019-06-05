@@ -58,8 +58,8 @@
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,"Bmp_detect",__VA_ARGS__);
 
 //HEAVEN7
-/*using Log_callback = void (*)(char*, ...);
-Log_callback log_callback;*/
+/*extern using Log_callback = void (*)(char*, ...);
+extern Log_callback log_callback;*/
 
 namespace soundtouch
 {
