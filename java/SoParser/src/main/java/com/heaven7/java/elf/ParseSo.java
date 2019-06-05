@@ -80,15 +80,16 @@ public class ParseSo {
 		parseSectionHeaderList(fileByteArys, s_header_offset);
 		type_32.printShdrList();
 
-		/*//读取符号表信息(Symbol Table)
+		//读取符号表信息(Symbol Table)
 		System.out.println();
 		System.out.println("+++++++++++++++++++Symbol Table++++++++++++++++++");
-		//这里需要注意的是：在Elf表中没有找到SymbolTable的数目，但是我们仔细观察Section中的Type=DYNSYM段的信息可以得到，这个段的大小和偏移地址，而SymbolTable的结构大小是固定的16个字节
+		//这里需要注意的是：在Elf表中没有找到SymbolTable的数目，但是我们仔细观察Section中的Type=DYNSYM段的信息可以得到，
+		//这个段的大小和偏移地址，而SymbolTable的结构大小是固定的16个字节
 		//那么这里的数目=大小/结构大小
 		//首先在SectionHeader中查找到dynsym段的信息
 		int offset_sym = 0;
 		int total_sym = 0;
-		for(elf32_shdr shdr : type_32.shdrList){
+		for(ElfType32.elf32_shdr shdr : type_32.shdrList){
 			if(Utils.byte2Int(shdr.sh_type) == ElfType32.SHT_DYNSYM){
 				total_sym = Utils.byte2Int(shdr.sh_size);
 				offset_sym = Utils.byte2Int(shdr.sh_offset);
@@ -102,7 +103,7 @@ public class ParseSo {
 
 		//读取字符串表信息(String Table)
 		System.out.println();
-		System.out.println("+++++++++++++++++++Symbol Table++++++++++++++++++");
+		System.out.println("+++++++++++++++++++String Table++++++++++++++++++");
 		//这里需要注意的是：在Elf表中没有找到StringTable的数目，但是我们仔细观察Section中的Type=STRTAB段的信息，
 		//可以得到，这个段的大小和偏移地址，但是我们这时候我们不知道字符串的大小，所以就获取不到数目了
 		//这里我们可以查看Section结构中的name字段：表示偏移值，那么我们可以通过这个值来获取字符串的大小
@@ -132,7 +133,7 @@ public class ParseSo {
 			System.out.println("len:"+lens[i]);
 		}
 		//上面的那个方法不好，我们发现StringTable中的每个字符串结束都会有一个00(传说中的字符串结束符)，那么我们只要知道StringTable的开始位置，然后就可以读取到每个字符串的值了
-       */
+
 	}
 
 	/**
