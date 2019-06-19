@@ -12,7 +12,7 @@ public final class LogMonitor {
     private static final LogMonitor sInstance = new LogMonitor();
     private static final int MSG_LOG = 1;
 
-    private static final long TIME_BLOCK = 25;
+    private static final long TIME_BLOCK = 30;
     private final HandlerThread mLogThread = new HandlerThread("log");
     private final InternalHandler mIoHandler;
 
