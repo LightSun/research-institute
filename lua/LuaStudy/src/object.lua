@@ -55,4 +55,4 @@ r = Rect2:new(nil, 10, 20)
 print(r.aa)
 r:printArea()
 
-
+print(type(r))
