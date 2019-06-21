@@ -5,7 +5,7 @@
 -- Time: 下午 13:50
 -- To change this template use File | Settings | File Templates.
 --
-local dir = "E:/study/github/research-institute/lua/LuaStudy/src/module/?.lua";
+local dir = "src/module/?.lua";
 package.path = dir..";"..package.path
 local utils = require("TableUtils")
 local it = require("Iterator")

@@ -50,5 +50,5 @@ local prefix = modname:match "(.*%.).*$" or (modname .. ".")
 
 --[[local list = require("listImpl")
 print(list)]]
-local im = import("fff")
-print(im("ddd"))
+--[[local im = import("fff")
+print(im("ddd"))]]

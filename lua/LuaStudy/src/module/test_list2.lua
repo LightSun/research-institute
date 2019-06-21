@@ -6,7 +6,7 @@
 -- To change this template use File | Settings | File Templates.
 --
 
-local dir = "E:/study/github/research-institute/lua/LuaStudy/src/module/?.lua";
+local dir = "src/module/?.lua";
 package.path = dir .. ";" .. package.path
 local List = require("listImpl2")
 local utils = require("TableUtils")

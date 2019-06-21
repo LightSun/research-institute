@@ -2,7 +2,7 @@
 -- http://lua-users.org/wiki/InheritanceTutorial
 --
 
-local dir = "E:/study/github/research-institute/lua/LuaStudy/src/module/listImpl.lua";
+local dir = "src/module/?.lua";
 package.path = dir .. ";" .. package.path
 local listImpl = require("listImpl")
 
