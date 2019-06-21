@@ -6,8 +6,7 @@
 -- To change this template use File | Settings | File Templates.
 --
 local dir = "E:/study/github/research-institute/lua/LuaStudy/src/module/?.lua";
-local dir2 = "E:/study/github/research-institute/lua/LuaStudy/src/module/Iterator.lua";
-package.path = dir..";"..dir2 ..";"..package.path
+package.path = dir..";"..package.path
 local utils = require("TableUtils")
 local it = require("Iterator")
 
@@ -18,12 +17,12 @@ print(it2)]]
 local List = {elements = {} }
 function List:new(array)
     local arg = array or {}
-    local o = {}
-    setmetatable(o, self)
-
+    setmetatable(arg, self)
     self.__index = self
     self.elements = arg;
-    return self;
+    -- print(self, arg)
+    -- self 指当前文件table.
+    return arg;
 end
 
 function List:size()
@@ -125,8 +124,7 @@ function List:subList(from, to)
     return newList;
 end
 
---[[
-local list = List:new();
+--[[local list = List:new();
 list:add("8")
 list:add("32424")
 

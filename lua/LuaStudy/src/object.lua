@@ -29,8 +29,10 @@ function Rect:printArea()
     print("Rect 矩形面积为: ",self.area)
 end
 
-r = Rect:new(nil, 10, 20)
-print(r.length)
+local r = Rect:new(nil, 10, 20)
+local r99 = Rect:new(nil, 10, 20)
+print("r: ",r)
+print("r2: ",r99)
 -- 调用方法需要用:
 r:printArea()
 
@@ -51,8 +53,9 @@ function Rect2:printArea()
     print("Rect2 矩形面积为: ",self.area)
 end
 
-r = Rect2:new(nil, 10, 20)
-print(r.aa)
-r:printArea()
+local r2 = Rect2:new(nil, 10, 200)
+print(r2.breadth)
+print(r.breadth)
 
-print(type(r))
+print(r2.aa)
+r2:printArea()
