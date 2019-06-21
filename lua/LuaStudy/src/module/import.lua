@@ -46,7 +46,7 @@ local modname = "com.heaven7.modname"
 local prefix = modname:match "(.*%.).*$" or (modname .. ".")
 --print(prefix) -- com.heaven7.
 
-local require = import and import(...) or require
+--local require = import and import(...) or require
 
 --[[local list = require("listImpl")
 print(list)]]

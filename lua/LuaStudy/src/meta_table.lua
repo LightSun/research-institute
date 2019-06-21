@@ -26,6 +26,7 @@ local mytable = setmetatable({key1 = "value1"}, {
 
 print(mytable.key1, mytable.key2)
 
+------------------------------------
 local map = {}
 metaMap = setmetatable({key1 = "value1" }, {
     __newindex  = map

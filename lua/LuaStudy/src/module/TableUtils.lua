@@ -45,12 +45,12 @@ function module._logTable(tab, log_func)
     local str = "{ "
     local i = 1;
     local function travel(key, value)
+        print("key-value: ",key, value)
         if(i ~= 1) then
             str = str..", "
-        else
-            i = i + 1
-            str = str..key.."="..value;
         end
+        i = i + 1
+        str = str..key.."="..value;
     end
     module.travelTable(tab, travel)
     str = str.." }"

@@ -8,8 +8,11 @@
 
 if a or b then
     print(" a or b")
+else if c then
+    print("c")
 else
     print("unknown")
+end
 end
 
 local a = 1;
