@@ -37,4 +37,10 @@ end
 print("------------- 3")
 for i = 5, -5, -2 do
     print(i)
-    end
+end
+
+
+for i = 1, 10 do
+    if( i == 5)then break end
+    print("i= ", i)
+end

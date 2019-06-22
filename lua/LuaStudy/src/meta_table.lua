@@ -42,5 +42,5 @@ metaMap.key1="new_value1"
 print(metaMap.key1, map.key1);
 
 
-print(getmetatable("lua")) -->table: 002F19B8
-print(getmetatable(10))    -->nil
+--print(getmetatable("lua")) -->table: 002F19B8
+--print(getmetatable(10))    -->nil
