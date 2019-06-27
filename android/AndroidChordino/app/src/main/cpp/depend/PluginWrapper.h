@@ -89,7 +89,7 @@ public:
     size_t getMinChannelCount() const;
     size_t getMaxChannelCount() const;
 
-    OutputList getOutputDescriptors() const;
+    OutputList* getOutputDescriptors();
 
     FeatureSet process(const float *const *inputBuffers, RealTime timestamp);
 

@@ -60,11 +60,11 @@ NNLSChroma::getDescription() const
     return "This plugin provides a number of features derived from a DFT-based log-frequency amplitude spectrum: some variants of the log-frequency spectrum, including a semitone spectrum derived from approximate transcription using the NNLS algorithm; and based on this semitone spectrum, different chroma features.";
 }
 
-NNLSChroma::OutputList
-NNLSChroma::getOutputDescriptors() const
+NNLSChroma::OutputList*
+NNLSChroma::getOutputDescriptors()
 {
     if (debug_on) cerr << "--> getOutputDescriptors" << endl;
-    OutputList list;
+    OutputList* list = new OutputList();
     
     // Make chroma names for the binNames property
 
@@ -99,7 +99,7 @@ NNLSChroma::getOutputDescriptors() const
     logfreqspecOutput.sampleType = OutputDescriptor::FixedSampleRate;
     logfreqspecOutput.hasDuration = false;
     logfreqspecOutput.sampleRate = featureRate;
-    list.push_back(logfreqspecOutput);
+    list->push_back(logfreqspecOutput);
     m_outputLogfreqspec = index++;
 
     OutputDescriptor tunedlogfreqspecOutput;
@@ -114,7 +114,7 @@ NNLSChroma::getOutputDescriptors() const
     tunedlogfreqspecOutput.sampleType = OutputDescriptor::FixedSampleRate;
     tunedlogfreqspecOutput.hasDuration = false;
     tunedlogfreqspecOutput.sampleRate = featureRate;
-    list.push_back(tunedlogfreqspecOutput);
+    list->push_back(tunedlogfreqspecOutput);
     m_outputTunedlogfreqspec = index++;
     
     OutputDescriptor semitonespectrumOutput;
@@ -129,7 +129,7 @@ NNLSChroma::getOutputDescriptors() const
     semitonespectrumOutput.sampleType = OutputDescriptor::FixedSampleRate;
     semitonespectrumOutput.hasDuration = false;
     semitonespectrumOutput.sampleRate = featureRate;
-    list.push_back(semitonespectrumOutput);
+    list->push_back(semitonespectrumOutput);
     m_outputSemitonespectrum = index++;
     
     OutputDescriptor chromaOutput;
@@ -145,7 +145,7 @@ NNLSChroma::getOutputDescriptors() const
     chromaOutput.sampleType = OutputDescriptor::FixedSampleRate;
     chromaOutput.hasDuration = false;
     chromaOutput.sampleRate = featureRate;
-    list.push_back(chromaOutput);
+    list->push_back(chromaOutput);
     m_outputChroma = index++;
     
     OutputDescriptor basschromaOutput;
@@ -161,7 +161,7 @@ NNLSChroma::getOutputDescriptors() const
     basschromaOutput.sampleType = OutputDescriptor::FixedSampleRate;
     basschromaOutput.hasDuration = false;
     basschromaOutput.sampleRate = featureRate;
-    list.push_back(basschromaOutput);
+    list->push_back(basschromaOutput);
     m_outputBasschroma = index++;
     
     OutputDescriptor bothchromaOutput;
@@ -177,7 +177,7 @@ NNLSChroma::getOutputDescriptors() const
     bothchromaOutput.sampleType = OutputDescriptor::FixedSampleRate;
     bothchromaOutput.hasDuration = false;
     bothchromaOutput.sampleRate = featureRate;
-    list.push_back(bothchromaOutput);
+    list->push_back(bothchromaOutput);
     m_outputBothchroma = index++;    
     return list;
 }

@@ -643,7 +643,7 @@ PluginAdapterBase::Impl::checkOutputMap(Plugin *plugin)
     if (i == m_pluginOutputs.end() || !i->second) {
 
         m_pluginOutputs[plugin] = new Plugin::OutputList
-            (plugin->getOutputDescriptors());
+            (*plugin->getOutputDescriptors());
 
 //        std::cerr << "PluginAdapterBase::Impl::checkOutputMap: Have " << m_pluginOutputs[plugin]->size() << " outputs for plugin " << plugin->getIdentifier() << std::endl;
     }

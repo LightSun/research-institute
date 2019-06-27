@@ -338,7 +338,7 @@ public:
      * is used as its numeric index when looking it up in the
      * FeatureSet returned from the process() call.
      */
-    virtual OutputList getOutputDescriptors() const = 0;
+    virtual OutputList* getOutputDescriptors() = 0;
 
     struct Feature
     {

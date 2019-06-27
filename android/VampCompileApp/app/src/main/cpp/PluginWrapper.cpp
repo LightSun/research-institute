@@ -178,8 +178,8 @@ size_t PluginWrapper::getMaxChannelCount() const
     return m_plugin->getMaxChannelCount();
 }
 
-Plugin::OutputList
-PluginWrapper::getOutputDescriptors() const
+Plugin::OutputList*
+PluginWrapper::getOutputDescriptors()
 {
     return m_plugin->getOutputDescriptors();
 }

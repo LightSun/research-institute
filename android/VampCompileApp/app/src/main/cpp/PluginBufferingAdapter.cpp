@@ -60,14 +60,14 @@ public:
     Impl(Plugin *plugin, float inputSampleRate);
     ~Impl();
 	
-    void setPluginStepSize(size_t stepSize);	
+    void setPluginStepSize(size_t stepSize);
     void setPluginBlockSize(size_t blockSize);
 
     bool initialise(size_t channels, size_t stepSize, size_t blockSize);
 
     void getActualStepAndBlockSizes(size_t &stepSize, size_t &blockSize);
 
-    OutputList getOutputDescriptors() const;
+    OutputList* getOutputDescriptors();
 
     void setParameter(std::string, float);
     void selectProgram(std::string);
@@ -246,12 +246,21 @@ protected:
     float m_inputSampleRate;
     long m_frame;
     bool m_unrun;
-    mutable OutputList m_outputs;
-    mutable std::map<int, bool> m_rewriteOutputTimes;
+    /*mutable */ OutputList* m_outputs;
+    /*mutable*/ std::map<int, bool> m_rewriteOutputTimes;
     std::map<int, int> m_fixedRateFeatureNos; // output no -> feature no
 		
     void processBlock(FeatureSet& allFeatureSets);
     void adjustFixedRateFeatureTime(int outputNo, Feature &);
+
+    void removeOutputDesc(){
+        //TODO later
+       /* if(m_outputs!= nullptr){
+            delete m_outputs;
+            m_outputs = nullptr;
+        }*/
+        m_outputs = nullptr;
+    }
 };
 		
 PluginBufferingAdapter::PluginBufferingAdapter(Plugin *plugin) :
@@ -314,8 +323,8 @@ PluginBufferingAdapter::initialise(size_t channels, size_t stepSize, size_t bloc
     return m_impl->initialise(channels, stepSize, blockSize);
 }
 
-PluginBufferingAdapter::OutputList
-PluginBufferingAdapter::getOutputDescriptors() const
+Plugin::OutputList*
+PluginBufferingAdapter::getOutputDescriptors()
 {
     return m_impl->getOutputDescriptors();
 }
@@ -364,9 +373,10 @@ PluginBufferingAdapter::Impl::Impl(Plugin *plugin, float inputSampleRate) :
     m_buffers(0),
     m_inputSampleRate(inputSampleRate),
     m_frame(0),
-    m_unrun(true)
+    m_unrun(true),
+    m_outputs(nullptr)
 {
-    (void)getOutputDescriptors(); // set up m_outputs and m_rewriteOutputTimes
+    getOutputDescriptors(); // set up m_outputs and m_rewriteOutputTimes
 }
 		
 PluginBufferingAdapter::Impl::~Impl()
@@ -378,6 +388,7 @@ PluginBufferingAdapter::Impl::~Impl()
         delete[] m_buffers[i];
     }
     delete[] m_buffers;
+    removeOutputDesc();
 }
 		
 void
@@ -492,37 +503,43 @@ PluginBufferingAdapter::Impl::initialise(size_t channels, size_t stepSize, size_
     if (success) {
         // Re-query outputs; properties such as bin count may have
         // changed on initialise
-        m_outputs.clear();
-        (void)getOutputDescriptors();
+        removeOutputDesc();
+        getOutputDescriptors();
     }
 
     return success;
 }
 		
-PluginBufferingAdapter::OutputList
-PluginBufferingAdapter::Impl::getOutputDescriptors() const
+PluginBufferingAdapter::OutputList*
+PluginBufferingAdapter::Impl::getOutputDescriptors()
 {
-    if (m_outputs.empty()) {
+    if (!m_outputs || m_outputs->empty()) {
 //    std::cerr << "PluginBufferingAdapter::getOutputDescriptors: querying anew" << std::endl;
-
         m_outputs = m_plugin->getOutputDescriptors();
+        if(m_outputs){
+            std::cerr << "m_outputs size is"<< m_outputs->size() <<  std::endl;
+        }
     }
+    //会拷贝vector 但是vector默认不能拷贝
+   // Plugin::OutputList outs = *m_outputs;
+  //  outs.assign(m_outputs->begin(), m_outputs->end());
+    Plugin::OutputList* outs = m_outputs;
 
-    PluginBufferingAdapter::OutputList outs = m_outputs;
+    for (int i = 0; i < int(outs->size()); ++i) {
 
-    for (int i = 0; i < int(outs.size()); ++i) {
-
-        switch (outs[i].sampleType) {
+        OutputDescriptor &des = outs->at(i);
+       // outs->
+        switch (des.sampleType) {
 
         case OutputDescriptor::OneSamplePerStep:
-            outs[i].sampleType = OutputDescriptor::FixedSampleRate;
-            outs[i].sampleRate = m_inputSampleRate / float(m_stepSize);
+            des.sampleType = OutputDescriptor::FixedSampleRate;
+            des.sampleRate = m_inputSampleRate / float(m_stepSize);
             m_rewriteOutputTimes[i] = true;
             break;
             
         case OutputDescriptor::FixedSampleRate:
-            if (outs[i].sampleRate == 0.f) {
-                outs[i].sampleRate = m_inputSampleRate / float(m_stepSize);
+            if (des.sampleRate == 0.f) {
+                des.sampleRate = m_inputSampleRate / float(m_stepSize);
             }
             // We actually only need to rewrite output times for
             // features that don't have timestamps already, but we
@@ -546,8 +563,8 @@ PluginBufferingAdapter::Impl::setParameter(std::string name, float value)
     m_plugin->setParameter(name, value);
 
     // Re-query outputs; properties such as bin count may have changed
-    m_outputs.clear();
-    (void)getOutputDescriptors();
+    removeOutputDesc();
+    getOutputDescriptors();
 }
 
 void
@@ -556,8 +573,8 @@ PluginBufferingAdapter::Impl::selectProgram(std::string name)
     m_plugin->selectProgram(name);
 
     // Re-query outputs; properties such as bin count may have changed
-    m_outputs.clear();
-    (void)getOutputDescriptors();
+    removeOutputDesc();
+    getOutputDescriptors();
 }
 
 void
@@ -621,7 +638,7 @@ PluginBufferingAdapter::Impl::adjustFixedRateFeatureTime(int outputNo,
 {
 //    cerr << "adjustFixedRateFeatureTime: from " << feature.timestamp;
     
-    double rate = m_outputs[outputNo].sampleRate;
+    double rate = m_outputs->at(outputNo).sampleRate;
     if (rate == 0.0) {
         rate = m_inputSampleRate / float(m_stepSize);
     }
@@ -665,23 +682,24 @@ PluginBufferingAdapter::Impl::getRemainingFeatures()
 
     FeatureSet featureSet = m_plugin->getRemainingFeatures();
 
-    for (map<int, FeatureList>::iterator iter = featureSet.begin();
-         iter != featureSet.end(); ++iter) {
+    if(!featureSet.empty()){
+        for (map<int, FeatureList>::iterator iter = featureSet.begin();
+             iter != featureSet.end(); ++iter) {
 
-        int outputNo = iter->first;
-        FeatureList featureList = iter->second;
+            int outputNo = iter->first;
+            FeatureList featureList = iter->second;
 
-        for (size_t i = 0; i < featureList.size(); ++i) {
+            for (size_t i = 0; i < featureList.size(); ++i) {
 
-            if (m_outputs[outputNo].sampleType ==
-                OutputDescriptor::FixedSampleRate) {
-                adjustFixedRateFeatureTime(outputNo, featureList[i]);
+                if (m_outputs->at(outputNo).sampleType ==
+                    OutputDescriptor::FixedSampleRate) {
+                    adjustFixedRateFeatureTime(outputNo, featureList[i]);
+                }
+
+                allFeatureSets[outputNo].push_back(featureList[i]);
             }
-
-            allFeatureSets[outputNo].push_back(featureList[i]);
         }
     }
-    
     return allFeatureSets;
 }
     
@@ -693,8 +711,7 @@ PluginBufferingAdapter::Impl::processBlock(FeatureSet& allFeatureSets)
     }
 
     long frame = m_frame;
-    RealTime timestamp = RealTime::frame2RealTime
-        (frame, int(m_inputSampleRate + 0.5));
+    RealTime timestamp = RealTime::frame2RealTime(frame, int(m_inputSampleRate + 0.5));
 
     FeatureSet featureSet = m_plugin->process(m_buffers, timestamp);
     
@@ -706,46 +723,43 @@ PluginBufferingAdapter::Impl::processBlock(FeatureSet& allFeatureSets)
         if (ida) adjustment = ida->getTimestampAdjustment();
     }
 
-    for (FeatureSet::iterator iter = featureSet.begin();
-         iter != featureSet.end(); ++iter) {
+    if(!featureSet.empty()){
+        for (FeatureSet::iterator iter = featureSet.begin(); iter != featureSet.end(); ++iter) {
 
-        int outputNo = iter->first;
+            int outputNo = iter->first;
+            if (m_rewriteOutputTimes[outputNo]) {
+                FeatureList featureList = iter->second;
+                for (size_t i = 0; i < featureList.size(); ++i) {
 
-        if (m_rewriteOutputTimes[outputNo]) {
-            
-            FeatureList featureList = iter->second;
-	
-            for (size_t i = 0; i < featureList.size(); ++i) {
+                    switch (m_outputs->at(outputNo).sampleType) {
+                        case OutputDescriptor::OneSamplePerStep:
+                            // use our internal timestamp, always
+                            featureList[i].timestamp = timestamp + adjustment;
+                            featureList[i].hasTimestamp = true;
+                            break;
 
-                switch (m_outputs[outputNo].sampleType) {
+                        case OutputDescriptor::FixedSampleRate:
+                            adjustFixedRateFeatureTime(outputNo, featureList[i]);
+                            break;
 
-                case OutputDescriptor::OneSamplePerStep:
-                    // use our internal timestamp, always
-                    featureList[i].timestamp = timestamp + adjustment;
-                    featureList[i].hasTimestamp = true;
-                    break;
+                        case OutputDescriptor::VariableSampleRate:
+                            // plugin must set timestamp
+                            break;
 
-                case OutputDescriptor::FixedSampleRate:
-                    adjustFixedRateFeatureTime(outputNo, featureList[i]);
-                    break;
-
-                case OutputDescriptor::VariableSampleRate:
-                    // plugin must set timestamp
-                    break;
-
-                default:
-                    break;
+                        default:
+                            break;
+                    }
+                    allFeatureSets[outputNo].push_back(featureList[i]);
                 }
-            
-                allFeatureSets[outputNo].push_back(featureList[i]);
-            }
-        } else {
-            for (size_t i = 0; i < iter->second.size(); ++i) {
-                allFeatureSets[outputNo].push_back(iter->second[i]);
+            } else {
+                for (size_t i = 0; i < iter->second.size(); ++i) {
+                    allFeatureSets[outputNo].push_back(iter->second[i]);
+                }
             }
         }
     }
-    
+
+
     // step forward
 
     for (size_t i = 0; i < m_channels; ++i) {
@@ -757,5 +771,5 @@ PluginBufferingAdapter::Impl::processBlock(FeatureSet& allFeatureSets)
 }
 
 }
-	
+
 }

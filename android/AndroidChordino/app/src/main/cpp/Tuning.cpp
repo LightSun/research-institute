@@ -27,6 +27,7 @@
 #include <algorithm>
 
 const bool debug_on = false;
+using namespace std;
 
 Tuning::Tuning(float inputSampleRate) :
     NNLSBase(inputSampleRate)
@@ -90,11 +91,10 @@ Tuning::getParameterDescriptors() const
     return list;
 }
 
-Tuning::OutputList
-Tuning::getOutputDescriptors() const
+Tuning::OutputList* Tuning::getOutputDescriptors()
 {
     if (debug_on) cerr << "--> getOutputDescriptors" << endl;
-    OutputList list;
+    auto * list = new OutputList();
     
     int index = 0;
 
@@ -111,7 +111,7 @@ Tuning::getOutputDescriptors() const
     d0.isQuantized = false;
     d0.sampleType = OutputDescriptor::VariableSampleRate;
     d0.hasDuration = true;
-    list.push_back(d0);
+    list->push_back(d0);
     m_outputTuning = index++;
 	
     OutputDescriptor d10;
@@ -128,7 +128,7 @@ Tuning::getOutputDescriptors() const
     d10.sampleType = OutputDescriptor::FixedSampleRate;
     d10.sampleRate = (m_stepSize == 0) ? m_inputSampleRate/2048 : m_inputSampleRate/m_stepSize;
     d10.hasDuration = false;
-    list.push_back(d10);
+    list->push_back(d10);
     m_outputLocalTuning = index++;
   
     return list;

@@ -82,7 +82,7 @@ float cospuls(float x, float centre, float width)
 
 float pitchCospuls(float x, float centre, int binsperoctave) 
 {
-    float warpedf = -binsperoctave * (log2(centre) - log2(x));
+    float warpedf = -binsperoctave * (log(centre) - log(x));
     float out = cospuls(warpedf, 0.0, 2.0);
     // now scale to correct for note density
     float c = log(2.0)/binsperoctave;
@@ -192,7 +192,7 @@ void dictionaryMatrix(float* dm, float s_param) {
         for (int iHarm = 1; iHarm <= 20; ++iHarm) {
 //            curr_f = 440 * pow(2,(minMIDI-69+iOut)*1.0/12) * iHarm;
             // if (curr_f > cq_f[nNote-1])  break;
-            floatbin = ((iOut + 1) * binspersemitone + 1) + binspersemitone * 12 * log2(iHarm);
+            floatbin = ((iOut + 1) * binspersemitone + 1) + binspersemitone * 12 * log(iHarm);
             // cerr << floatbin << endl;
             curr_amp = pow(s_param,float(iHarm-1));
             // cerr << "curramp" << curr_amp << endl;

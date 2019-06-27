@@ -11,12 +11,21 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11 -fexceptions"
+                cppFlags "-std=c++11 -fexceptions -O0"
             }
+        }
+        ndk {
+            stl "gnustl_shared"
         }
     }
     buildTypes {
         release {
+            minifyEnabled false
+            jniDebuggable true
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
             minifyEnabled false
             jniDebuggable true
             debuggable true

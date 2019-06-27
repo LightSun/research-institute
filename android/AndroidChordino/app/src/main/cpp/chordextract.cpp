@@ -37,8 +37,10 @@
 #include <iostream>
 #include <string>
 
-#include "Chordino.h"
 #include "depend/RealTime.h"
+#include "Chordino.h"
+#include "NNLSChroma.h"
+#include "Tuning.h"
 
 #include "sndfile.h"
 #include "depend/PluginInputDomainAdapter.h"
@@ -47,9 +49,9 @@
 #include "chordextract.h"
 
 #define TAG "ChordinoExtract"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, #__VA_ARGS__)
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, #__VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, #__VA_ARGS__)
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
+#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
 
 
 using namespace std;
@@ -112,9 +114,9 @@ int main(int argc, char **argv)
     Plugin::FeatureSet fs;
 
     int chordFeatureNo = -1;
-    Plugin::OutputList outputs = adapter->getOutputDescriptors();
-    for (int i = 0; i < int(outputs.size()); ++i) {
-        if (outputs[i].identifier == "simplechord") {
+    Plugin::OutputList* outputs = adapter->getOutputDescriptors();
+    for (int i = 0; i < int(outputs->size()); ++i) {
+        if (outputs->at(i).identifier == "simplechord") {
             chordFeatureNo = i;
         }
     }
@@ -127,15 +129,16 @@ int main(int argc, char **argv)
     int frame = 0;
     while (frame < sfinfo.frames) {
         int count = -1;
-        if ((count = sf_readf_float(sndfile, filebuf, blocksize)) <= 0) break;
+        if ((count = sf_readf_float(sndfile, filebuf, blocksize)) <= 0)
+            break;
 
         // mix down
         for (int i = 0; i < blocksize; ++i) {
             mixbuf[i] = 0.f;
             if (i < count) {
-            for (int c = 0; c < sfinfo.channels; ++c) {
-                mixbuf[i] += filebuf[i * sfinfo.channels + c] / sfinfo.channels;
-            }
+                for (int c = 0; c < sfinfo.channels; ++c) {
+                    mixbuf[i] += filebuf[i * sfinfo.channels + c] / sfinfo.channels;
+                }
             }
         }
 
@@ -162,7 +165,9 @@ int main(int argc, char **argv)
 			 fs[chordFeatureNo].end());
 
     for (int i = 0; i < (int)chordFeatures.size(); ++i) {
-        LOGD("chords is %s, label is %s", chordFeatures[i].timestamp.toString(), chordFeatures[i].label);
+        string timestamp = chordFeatures[i].timestamp.toString();
+        string label = chordFeatures[i].label;
+        LOGD("chords is %s, label is %s", timestamp.c_str(), label.c_str());
         //cout << chordFeatures[i].timestamp.toString() << ": " << chordFeatures[i].label << endl;
     }
 

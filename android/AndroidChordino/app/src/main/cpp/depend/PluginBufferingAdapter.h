@@ -170,7 +170,7 @@ public:
     void setParameter(std::string, float);
     void selectProgram(std::string);
 
-    OutputList getOutputDescriptors() const;
+    OutputList* getOutputDescriptors();
 
     void reset();
 

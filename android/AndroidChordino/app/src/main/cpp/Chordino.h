@@ -35,7 +35,7 @@ public:
     string getDescription() const;
 
     ParameterList getParameterDescriptors() const;
-    OutputList getOutputDescriptors() const;
+    OutputList* getOutputDescriptors();
 
     FeatureSet process(const float *const *inputBuffers,
                        Vamp::RealTime timestamp);

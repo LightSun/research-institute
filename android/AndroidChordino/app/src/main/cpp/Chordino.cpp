@@ -159,11 +159,10 @@ Chordino::getParameterDescriptors() const
     return list;
 }
 
-Chordino::OutputList
-Chordino::getOutputDescriptors() const
+Chordino::OutputList* Chordino::getOutputDescriptors()
 {
     if (debug_on) cerr << "--> getOutputDescriptors" << endl;
-    OutputList list;
+    OutputList *list = new OutputList();
     
     int index = 0;
 
@@ -182,7 +181,7 @@ Chordino::getOutputDescriptors() const
     d7.sampleType = OutputDescriptor::VariableSampleRate;
     d7.hasDuration = false;
     d7.sampleRate = featureRate;
-    list.push_back(d7);
+    list->push_back(d7);
     m_outputChords = index++;
     
     OutputDescriptor chordnotes;
@@ -200,7 +199,7 @@ Chordino::getOutputDescriptors() const
     chordnotes.sampleType = OutputDescriptor::VariableSampleRate;
     chordnotes.hasDuration = true;
     chordnotes.sampleRate = featureRate;
-    list.push_back(chordnotes);
+    list->push_back(chordnotes);
     m_outputChordnotes = index++;
     
     OutputDescriptor d8;
@@ -215,7 +214,7 @@ Chordino::getOutputDescriptors() const
     d8.sampleType = OutputDescriptor::FixedSampleRate;
     d8.sampleRate = featureRate;
     d8.hasDuration = false;
-    list.push_back(d8);
+    list->push_back(d8);
     m_outputHarmonicChange = index++;
   
     OutputDescriptor loglikelihood;
@@ -230,7 +229,7 @@ Chordino::getOutputDescriptors() const
     loglikelihood.sampleType = OutputDescriptor::FixedSampleRate;
     loglikelihood.sampleRate = featureRate;
     loglikelihood.hasDuration = false;
-    list.push_back(loglikelihood);
+    list->push_back(loglikelihood);
     m_outputLoglikelihood = index++;
   
     return list;
