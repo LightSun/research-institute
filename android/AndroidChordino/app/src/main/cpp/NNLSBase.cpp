@@ -45,7 +45,7 @@ NNLSBase::NNLSBase(float inputSampleRate) :
     m_kernelFftIndex(0),
     m_kernelNoteIndex(0),
     m_dict(0),
-    m_tuneLocal(0.0),
+    m_tuneLocal(false),
     m_doNormalizeChroma(0),
     m_rollon(0.0),
     m_boostN(0.1),

@@ -28,6 +28,7 @@
 #include <algorithm>
 
 const bool debug_on = false;
+Chordino::OutputList * mOutList = nullptr;
 
 Chordino::Chordino(float inputSampleRate) :
     NNLSBase(inputSampleRate),
@@ -36,11 +37,16 @@ Chordino::Chordino(float inputSampleRate) :
     m_chordnames(0)    
 {
     if (debug_on) cerr << "--> Chordino" << endl;
+    mOutList = new OutputList();
 }
 
 Chordino::~Chordino()
 {
     if (debug_on) cerr << "--> ~Chordino" << endl;
+    if(mOutList != nullptr){
+        delete(mOutList);
+        mOutList = nullptr;
+    }
 }
 
 string
@@ -162,7 +168,10 @@ Chordino::getParameterDescriptors() const
 Chordino::OutputList* Chordino::getOutputDescriptors()
 {
     if (debug_on) cerr << "--> getOutputDescriptors" << endl;
-    OutputList *list = new OutputList();
+    OutputList *list = mOutList;
+    if(!list->empty()){
+        list->clear();
+    }
     
     int index = 0;
 

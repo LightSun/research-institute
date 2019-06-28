@@ -62,20 +62,20 @@ protected:
     int m_lengthOfNoteIndex;
     vector<float> m_meanTunings;
     vector<float> m_localTunings;
-    float m_whitening;
+    float m_whitening;   //spectral whitening 光谱美白
     float m_preset;
-	float m_useNNLS;
+	float m_useNNLS;   //use approximate transcription (0 or 1) . default 1
     vector<float> m_localTuning;
     vector<float> m_kernelValue;
     vector<int> m_kernelFftIndex;
     vector<int> m_kernelNoteIndex;
     float *m_dict;
-    bool m_tuneLocal;
-    float m_doNormalizeChroma;
-    float m_rollon;
-    float m_boostN;
-    float m_s;
-	float m_harte_syntax;
+    bool m_tuneLocal; //turning mode . true if global turning
+    float m_doNormalizeChroma;  //chromanormalize  default=0
+    float m_rollon;   //bass noise threshold [0,5, 0.5]
+    float m_boostN;  //boost n
+    float m_s;       //spectral shape. 光谱形状  [0.5, 0.9] default 0.7
+	float m_harte_syntax; //usehartesyntax [0,1]
     vector<float> hw;
     vector<float> sinvalues;
     vector<float> cosvalues;

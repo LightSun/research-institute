@@ -27,6 +27,8 @@ const int nOctave = 7;
 const int nNote = nOctave * 12 * nBPS + 2 * (nBPS/2+1); // a core over all octaves, plus some overlap at top and bottom
 const int MIDI_basenote = 45;
 
+extern double log2n(double v);
+
 extern std::vector<float> SpecialConvolution(std::vector<float> convolvee, std::vector<float> kernel);
 extern void dictionaryMatrix(float* dm, float s_param);
 extern std::vector<std::string> chordDictionary(std::vector<float> *mchorddict, std::vector<std::vector<int> > *m_chordnotes, float boostN, float harte_syntax);

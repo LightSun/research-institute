@@ -41,6 +41,13 @@ public:
                        Vamp::RealTime timestamp);
     FeatureSet getRemainingFeatures();
 
+    /**
+     *
+     * @param channels channel count.
+     * @param stepSize  step size
+     * @param blockSize  block size
+     * @return
+     */
     bool initialise(size_t channels, size_t stepSize, size_t blockSize);
     void reset();
 
