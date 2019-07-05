@@ -9,7 +9,7 @@
 -- 标识符： 开头- 下划线和字母。 其余下划线，字幕，数字
 
 -- 数据类型： nil, boolean, number, string, function, table, thread, userdata
-function test()
+local function test()
     print("---------")
 end
 

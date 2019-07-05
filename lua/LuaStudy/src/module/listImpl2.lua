@@ -14,6 +14,8 @@ local it = require("Iterator")
 local List = {}
 List.__index = List;
 
+--insert(v,index) append . map, filter,sum,avg,
+
 setmetatable(List, {
     __call = function(cls, ...)
         local self = setmetatable({}, cls)
@@ -51,6 +53,11 @@ function List:add2(index, val)
     return self:size() > len;
 end
 
+-- ios
+function List:insert(val, index)
+    return self:add2(index, val);
+end
+
 function List:addMulti(...)
     local arg = {...};
     for i = 1 ,#arg do
@@ -62,6 +69,12 @@ function List:add(val)
     local len = self:size(self);
     return self:add2(len, val)
 end
+
+-- ios
+function List:append(val)
+    self:add(val)
+end
+
 
 function List:copy()
     local a = List(utils.copyTable(self.elements))
