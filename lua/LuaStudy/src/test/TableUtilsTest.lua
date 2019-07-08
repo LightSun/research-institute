@@ -1,6 +1,4 @@
-local dir    = "src/core/?.lua";
-package.path = dir .. ";" .. package.path
-
+require("src.core.init")
 local utils  = require("TableUtils")
 
 -- test map map
@@ -41,7 +39,7 @@ print(#tab1)
 --assert(#tab == 4)
 
 local tab11 = {["a"] = 1, ["n"] = 2}
-assert(utils.equals(tab1 ,tab11) == true)
+assert(utils.equalsList(tab1 ,tab11) == true)
 local tab111 = {["a"] = 1, ["n"] = 2, ["c"] = 6}
-assert(utils.containsAll(tab111, tab11))
-assert(not utils.containsAll(tab11, tab111))
+assert(utils.containsAllList(tab111, tab11))
+assert(not utils.containsAllList(tab11, tab111))

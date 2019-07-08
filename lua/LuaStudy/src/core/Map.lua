@@ -1,6 +1,5 @@
 -- heaven7
-local dir = "src/core/?.lua";
-package.path = dir..";"..package.path
+require("src.core.init")
 
 local utils = require("TableUtils")
 local obj = require("Object")

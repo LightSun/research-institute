@@ -1,5 +1,4 @@
-local dir    = "src/core/?.lua";
-package.path = dir .. ";" .. package.path
+require("src.core.init")
 
 local obj    = require("Object")
 

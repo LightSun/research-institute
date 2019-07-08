@@ -1,7 +1,6 @@
 ---heaven7
 
-local dir    = "src/core/?.lua";
-package.path = dir .. ";" .. package.path
+require("src.core.init")
 
 local obj    = require("Object")
 local it    = require("Iterator")
@@ -12,14 +11,13 @@ function module.new(typeName , func_create , ...)
     local self = obj.new(typeName , func_create , ...);
     local size = 0;
 
-    function self.add(e)
-        return nil;
-    end
-
     function self.size()
         return size
     end
 
+    function self.add(e)
+        return nil;
+    end
     function self.remove(e)
         return nil;
     end
@@ -44,6 +42,14 @@ function module.new(typeName , func_create , ...)
 
     function self.copy()
         return nil
+    end
+
+    function self.toList()
+        return self
+    end
+
+    function self.toSet()
+        return self
     end
 
     function self.recomputeSize()

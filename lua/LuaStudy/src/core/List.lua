@@ -1,6 +1,5 @@
 
-local dir = "src/core/?.lua";
-package.path = dir..";"..package.path
+require("src.core.init")
 
 local utils = require("TableUtils")
 local it = require("Iterator")
@@ -156,11 +155,7 @@ function module.new(list)
         if(type(collection) ~= "table") then
             return nil
         end
-        return utils.containsAll(self, collection)
-    end
-
-    function self.map(context, func)
-        return utils.mapArray(self, context, func)
+        return utils.containsAllList(self, collection)
     end
 
     function self.addAll(collection)
@@ -169,12 +164,29 @@ function module.new(list)
         return result
     end
 
+    function self.toSet()
+        local set = {}
+        local function traveller(index, value)
+            set[value] = true
+        end
+        utils.travelTable(set, traveller)
+        return set
+    end
+
+    function self.equals(other)
+        return utils.equalsList(self, other);
+    end
+
+    function self.map(context, func)
+        return utils.mapArray(self, context, func)
+    end
+
     self.recomputeSize()
 
     -- meta methods
     local meta = {
         __eq = function(t1, t2)
-            return utils.equals(t1, t2);
+            return utils.equalsList(t1, t2);
         end
         ,__add = function(t1, t2)
             return t1.addAll(t2);
@@ -184,9 +196,9 @@ function module.new(list)
     return self
 end
 
-setmetatable(module, {
+--[[setmetatable(module, {
     __call = function (cls, t)
         return module.new(t)
     end,
-})
+})]]
 return module

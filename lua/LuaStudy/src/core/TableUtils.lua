@@ -1,6 +1,3 @@
-local dir    = "src/core/?.lua";
-package.path = dir .. ";" .. package.path
-
 local module ={}
 
 module.MAP_TYPE_KEY   = 1;
@@ -10,7 +7,7 @@ module.MERGE_INCLUDE_METHODS       = 1;
 module.MERGE_INCLUDE_OBJECT_MEMBER = 2;
 module.MERGE_INCLUDE_TABLE         = 4;
 
--- module.NOT_TABLE = 1;
+--- travel tables all field. ignored functions
 function module.travelTable(tab, func)
     if not tab then
         return nil
@@ -20,13 +17,22 @@ function module.travelTable(tab, func)
         error("tab is not table")
     end
 
-    for index, value in pairs(tab) do
-        if(type(value) == "table") then
-            module.travelTable(value, func)
-        --elseif type(value) == "function" then
-        else
-            func(index, value)
+    local index;
+    while true do
+        -- travel all member.
+        local key, val = next(tab, index);
+        if(not val) then
+            break
         end
+        if(type(val) == "function") then
+           -- ignored
+        else
+            local shouldBreak = func(key, val)
+            if(shouldBreak) then
+                break
+            end
+        end
+        index = key
     end
 end
 
@@ -98,7 +104,7 @@ function module._logTable(tab, log_func)
         if(type(value) == "function") then
             return
         end
-        print("key-value: ",key, value)
+        -- print("key-value: ",key, value)
         if(i ~= 1) then
             str = str..", "
         end
@@ -153,11 +159,14 @@ function module.mergeMap(receiver, ...)
     if not tabs then
         return result
     end
+
+    local function merge(index, value)
+        result[index] = value;
+    end
+
     for i = 1, #tabs do
         if tabs[i] then
-            for k, v in pairs(tabs[i]) do
-                result[k] = v;
-            end
+            module.travelTable(tabs[i], merge)
         end
     end
     return result
@@ -167,13 +176,16 @@ function module.mergeArray(receiver, ...)
     local result = receiver or {}
     local tabs = {...}
     if not tabs then
-        return receiver
+        return result
     end
+
+    local function merge(index, value)
+        table.insert(result, value);
+    end
+
     for i = 1, #tabs do
         if tabs[i] then
-            for k, v in pairs(tabs[i]) do
-                table.insert(result, v);
-            end
+            module.travelTable(tabs[i], merge)
         end
     end
     return result
@@ -213,7 +225,7 @@ end
 --- @param tab1: table 1
 --- @param tab2: table 2
 ---@return: true if equals. nil other wise
-function module.equals(tab1, tab2)
+function module.equalsList(tab1, tab2)
     if( not tab1 ) then
         if(not tab2) then
             return true
@@ -224,10 +236,18 @@ function module.equals(tab1, tab2)
     if(not tab2) then
         return nil
     end
+
+    if(type(tab1) ~= "table") then
+        if(type(tab2) == "table") then
+            return nil
+        else
+            return tab1 == tab2
+        end
+    end
     for k, v in pairs(tab1) do
         local t = type(v);
         if(t == "table") then
-            if(not tab2[k] or type(tab2[k]) ~= "table" or not module.equals(v, tab2[k])) then
+            if(not tab2[k] or type(tab2[k]) ~= "table" or not module.equalsList(v, tab2[k])) then
                 return nil
             end
         else
@@ -250,7 +270,7 @@ function module.equals(tab1, tab2)
 end
 
 --- whether the tab1 contains all tab2's elements
-function module.containsAll(tab1, tab2)
+function module.containsAllList(tab1, tab2)
     if( not tab1 or not tab2) then
         return nil
     end
@@ -258,7 +278,7 @@ function module.containsAll(tab1, tab2)
     for k, v in pairs(tab2) do
         local t = type(v);
         if(t == "table") then
-            if(not tab1[k] or type(tab1[k]) ~= "table" or not module.equals(v, tab1[k])) then
+            if(not tab1[k] or type(tab1[k]) ~= "table" or not module.containsAllList(v, tab1[k])) then
                 return nil
             end
         else
