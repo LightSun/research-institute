@@ -24,6 +24,9 @@ function module.new(map)
     end
 
     function self.put(key, value)
+        if(not value) then
+            return nil;
+        end
         local old = self[key]
         self[key] = value;
         if not old then
@@ -140,11 +143,6 @@ function module.new(map)
 
     function self.recomputeSize()
         SIZE = self.keySet().size()
-    end
-
-    function self.map(mapFunc)
-        --todo wait
-        utils.travelTable(self, mapFunc);
     end
 
     self.recomputeSize()

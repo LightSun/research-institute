@@ -46,3 +46,6 @@ assert(map2.size() == 4)
 assert(map2.keySet().size() == 4)
 assert(map2.values().size() == 4)
 assert(map2.entrySet().size() == 4)
+
+local a = true
+print(a ~= true)

@@ -87,19 +87,25 @@ function module.new(list)
     end
 
     function self.iterator()
-        local tab = self;
+        local keys = {}
+        -- for list.
+        local function traveller(index , value)
+            table.insert(keys , #keys + 1 , value)
+        end
+        utils.travelTable(self , traveller)
+
         local function listIterator()
             local self = it.new()
             self.__index = self;
             self.index = -1;
-            self.size = #tab;
+            self.size = #keys;
             function self.hasNext()
                 return self.index + 1 < self.size;
             end
 
             function self.next()
                 self.index = self.index + 1
-                return tab[self.index + 1]
+                return keys[self.index + 1]
             end
             return self;
         end
@@ -202,11 +208,6 @@ function module.new(list)
         utils.travelTable(self, traveller);
         return result;
     end
-
-    function self.map(context, func)
-        return utils.mapArray(self, context, func)
-    end
-
     self.recomputeSize()
 
     -- meta methods
