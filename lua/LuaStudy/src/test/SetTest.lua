@@ -49,3 +49,11 @@ assert(set2.size() == 0)
 set2 = set.copy()
 assert(set2.equals(set))
 assert(set2 == set)
+
+
+set2 = set.copy()
+set2 = set2 + Set.new({4,5,6})
+assert(set2.size() == 5)
+assert(set2.contains(4))
+assert(set2.contains(5))
+assert(set2.contains(6))

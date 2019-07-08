@@ -23,20 +23,16 @@ function module.new(list)
     end
 
     function self.remove(e)
-        if(type(e) == "table") then
-            error("no support now")
-        else if type(e) == "function" then
-            error("no support now")
-        else
-            for k, v in pairs(self) do
-                if(v == e) then
-                    self.removeAt(k)
-                    break
-                end
-
+        local result;
+        local function traveller(index, value)
+            if(value == e) then
+                self.removeAt(index)
+                result = true;
+                return true
             end
         end
-        end
+        utils.travelTable(self, traveller)
+        return result
     end
 
     function self.removeAt(index)
@@ -159,9 +155,11 @@ function module.new(list)
     end
 
     function self.addAll(collection)
-        local result = utils.mergeArrayWithFlags(self, 0, collection)
-        result.recomputeSize()
-        return result
+        local result, state = utils.mergeArrayWithFlags(self, 0, collection)
+        if(state) then
+            result.recomputeSize()
+        end
+        return state
     end
 
     function self.toSet()
@@ -189,7 +187,10 @@ function module.new(list)
             return utils.equalsList(t1, t2);
         end
         ,__add = function(t1, t2)
-            return t1.addAll(t2);
+            if(t1.addAll(t2)) then
+                return t1
+            end
+            return nil
         end
     }
     setmetatable(self, meta)

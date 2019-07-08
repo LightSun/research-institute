@@ -232,7 +232,10 @@ function module.new(list)
             return state;
         end
     ,__add = function(t1, t2)
-            return t1.addAll(t2);
+            if(t1.addAll(t2)) then
+                return t1
+            end
+            return nil
         end
     }
     setmetatable(self, meta)

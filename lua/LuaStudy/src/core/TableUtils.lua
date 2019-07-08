@@ -195,30 +195,36 @@ function module.mergeArrayWithFlags(receiver, flags, ...)
     local result = receiver or {}
     local tabs = {...}
     if not tabs then
-        return receiver
+        return receiver, nil
     end
+
+    local changed
     for i = 1, #tabs do
         if tabs[i] then
             for k, v in pairs(tabs[i]) do
                 local t = type(v);
                 if(t == "function" and (flags & module.MERGE_INCLUDE_METHODS == module.MERGE_INCLUDE_METHODS)) then
                     table.insert(result, v);
+                    changed = true;
                 else if(t == "table" and (flags & module.MERGE_INCLUDE_TABLE == module.MERGE_INCLUDE_TABLE)) then
                     table.insert(result, v);
+                    changed = true;
                 end
                 end
 
                 if(k == "__type") then
                     if(flags & module.MERGE_INCLUDE_OBJECT_MEMBER == module.MERGE_INCLUDE_OBJECT_MEMBER) then
                         table.insert(result, v);
+                        changed = true;
                     end
                 else
                     table.insert(result, v);
+                    changed = true;
                 end
             end
         end
     end
-    return result
+    return result, changed
 end
 
 --- judge the two table is equals or not
