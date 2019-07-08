@@ -228,8 +228,7 @@ function module.new(list)
     -- meta
     local meta = {
         __eq = function(t1, t2)
-            local state, _ = pcall(t1.equals, t2)
-            return state;
+            return t1.equals(t2);
         end
     ,__add = function(t1, t2)
             if(t1.addAll(t2)) then
