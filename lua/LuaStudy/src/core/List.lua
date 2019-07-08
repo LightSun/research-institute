@@ -4,22 +4,49 @@ package.path = dir..";"..package.path
 
 local utils = require("TableUtils")
 local it = require("Iterator")
+local coll = require("Collection")
 
 local module = {};
 
 function module.new(list)
-    local self = list or {}
-
-    function self.size()
-        return #(self)
+    -- check
+    if( list and type(list) ~= "table") then
+        error("param list must be table")
     end
+    --- only need the first element
+    local function create(...)
+        return utils.getAt(0, ...)
+    end
+    local self = coll.new("List", create, list)
 
     function self.get(index)
         return (self)[index + 1]
     end
 
-    function self.remove(index)
-        return table.remove(self, index + 1);
+    function self.remove(e)
+        if(type(e) == "table") then
+            error("no support now")
+        else if type(e) == "function" then
+            error("no support now")
+        else
+            for k, v in pairs(self) do
+                if(v == e) then
+                    self.removeAt(k)
+                    break
+                end
+
+            end
+        end
+        end
+    end
+
+    function self.removeAt(index)
+        if(table.remove(self, index + 1)) then
+            self.addSize(-1)
+            return true
+        else
+            return false;
+        end
     end
 
     function self.set(index , val)
@@ -32,7 +59,8 @@ function module.new(list)
     function self.add2(index, val)
         local len = self.size();
         table.insert(self, index + 1, val)
-        return self.size() > len;
+        self.addSize(1)
+       return self.size() > len
     end
 
     function self.insert(val, index)
@@ -58,6 +86,7 @@ function module.new(list)
 
     function self.copy()
         local a = module.new(utils.copyTable(self))
+        a.recomputeSize()
         return a;
     end
 
@@ -81,7 +110,7 @@ function module.new(list)
         return listIterator();
     end
 
-    function self.indexOf()
+    function self.indexOf(obj)
         for key, value in pairs(self) do
             if(value == obj)then
                 return key - 1;
@@ -115,13 +144,43 @@ function module.new(list)
             -- print("subList. ", val)
             newList.add(val)
         end
+        newList.recomputeSize()
         return newList;
+    end
+
+    function self.contains(e)
+        return self.indexOf(e) >= 0
+    end
+
+    function self.containsAll(collection)
+        if(type(collection) ~= "table") then
+            return nil
+        end
+        return utils.containsAll(self, collection)
     end
 
     function self.map(context, func)
         return utils.mapArray(self, context, func)
     end
 
+    function self.addAll(collection)
+        local result = utils.mergeArrayWithFlags(self, 0, collection)
+        result.recomputeSize()
+        return result
+    end
+
+    self.recomputeSize()
+
+    -- meta methods
+    local meta = {
+        __eq = function(t1, t2)
+            return utils.equals(t1, t2);
+        end
+        ,__add = function(t1, t2)
+            return t1.addAll(t2);
+        end
+    }
+    setmetatable(self, meta)
     return self
 end
 

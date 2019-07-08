@@ -1,9 +1,27 @@
---
--- Created by IntelliJ IDEA.
--- User: Administrator
--- Date: 2019/6/19
--- Time: 下午 16:42
--- To change this template use File | Settings | File Templates.
+--[[
+__add: 对+进行重载
+
+__sub: 对-进行重载
+
+__mul: 对*进行重载
+
+__div: 对/进行重载
+
+__unm: 对相反数进行重载
+
+__mod: 对%进行重载
+
+__pow: 对^进行重载
+
+__concat: 对连接操作符进行重载
+
+__eq: 对==进行重载
+
+__lt: 对<进行重载
+
+__le: 对<=进行重载
+
+__tostring: 类似于C++中对<<的重载 只要做了该重载，在使用print时就会使用对应的函数做处理后再输出
 --
 
 -- 元表 --
