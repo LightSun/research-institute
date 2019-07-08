@@ -2,13 +2,13 @@
 
 require("src.core.init")
 
-local obj    = require("Object")
 local it    = require("Iterator")
+local CF    = require("CollectionFamily")
 
 local module = {}
 
-function module.new(typeName , func_create , ...)
-    local self = obj.new(typeName , func_create , ...);
+function module.new(tt, typeName , func_create , ...)
+    local self = CF.new(tt, typeName , func_create , ...);
     local size = 0;
 
     function self.size()

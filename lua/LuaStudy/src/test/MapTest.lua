@@ -37,3 +37,12 @@ assert( Map.new(t).equals(t))
 
 map2.clear()
 assert(map2.size() == 0)
+
+-- test meta
+assert( map.copy() == map)
+map2 = Map.new(t);
+map2 = map2 + map
+assert(map2.size() == 4)
+assert(map2.keySet().size() == 4)
+assert(map2.values().size() == 4)
+assert(map2.entrySet().size() == 4)

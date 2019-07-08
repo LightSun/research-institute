@@ -4,7 +4,7 @@ require("src.core.init")
 local utils  = require("TableUtils")
 local it     = require("Iterator")
 local coll   = require("Collection")
-local List   = require("List")
+local CF   = require("CollectionFamily")
 
 local module = {};
 
@@ -38,8 +38,8 @@ function module.new(list)
         return set;
     end
 
-    local self = coll.new("Set" , create , list)
-    ---- methods -----------------
+    local self = coll.new(CF.COLLECTION_TYPE_SET, "Set" , create , list)
+    ---- methods ---------------
     function self.add(e)
         local old = self[e]
         self[e]   = true

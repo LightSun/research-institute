@@ -4,6 +4,7 @@ require("src.core.init")
 local utils = require("TableUtils")
 local it = require("Iterator")
 local coll = require("Collection")
+local CF = require("CollectionFamily")
 
 local module = {};
 
@@ -16,7 +17,7 @@ function module.new(list)
     local function create(...)
         return utils.getAt(0, ...)
     end
-    local self = coll.new("List", create, list)
+    local self = coll.new(CF.COLLECTION_TYPE_LIST, "List", create, list)
 
     function self.get(index)
         return (self)[index + 1]
@@ -172,7 +173,34 @@ function module.new(list)
     end
 
     function self.equals(other)
-        return utils.equalsList(self, other);
+        local m2
+        local state, code = pcall(other.getCollectionType)
+        if(state) then
+            if(code == "Set") then
+                return nil
+            else if(code == "List") then
+                m2 = other;
+            else
+                return nil;
+            end
+            end
+        else
+            m2 = module.new(other);
+        end
+        -- first check size
+        if(self.size() ~= m2.size()) then
+            return nil;
+        end
+
+        local result = true
+        local function traveller(index , value)
+            if(m2.get(index - 1) ~= value) then
+                result = nil;
+                return true;
+            end
+        end
+        utils.travelTable(self, traveller);
+        return result;
     end
 
     function self.map(context, func)
@@ -184,7 +212,8 @@ function module.new(list)
     -- meta methods
     local meta = {
         __eq = function(t1, t2)
-            return utils.equalsList(t1, t2);
+            local state, _ = pcall(t1.equals, t2)
+            return state;
         end
         ,__add = function(t1, t2)
             if(t1.addAll(t2)) then

@@ -2,17 +2,21 @@
 require("src.core.init")
 
 local utils = require("TableUtils")
-local obj = require("Object")
 local List = require("List")
 local Set = require("Set")
 local Entry = require("Entry")
+local CF = require("CollectionFamily")
 
 local module = {}
 
 --map, filter,sum,avg,
 function module.new(map)
 
-    local self = obj.new1("Map", map)
+    local function create(...)
+        return utils.getAt(0, ...)
+    end
+
+    local self = CF.new(CF.COLLECTION_TYPE_MAP, "Map", create, map)
     local SIZE = 0;
 
     function self.size()
@@ -144,6 +148,22 @@ function module.new(map)
     end
 
     self.recomputeSize()
+
+    -- meta
+    local meta = {
+        __eq = function(t1, t2)
+            local state, _ = pcall(t1.equals, t2)
+            return state;
+        end
+    ,__add = function(t1, t2)
+            local state, _ = pcall(t1.putAll, t2)
+            if(state) then
+                return t1
+            end
+            return nil;
+        end
+    }
+    setmetatable(self, meta)
     return self;
 end
 
