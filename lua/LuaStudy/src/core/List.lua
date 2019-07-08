@@ -182,9 +182,9 @@ function module.new(list)
         local m2
         local state, code = pcall(other.getCollectionType)
         if(state) then
-            if(code == "Set") then
+            if(code == CF.COLLECTION_TYPE_SET) then
                 return nil
-            else if(code == "List") then
+            else if(code == CF.COLLECTION_TYPE_LIST) then
                 m2 = other;
             else
                 return nil;
@@ -213,8 +213,7 @@ function module.new(list)
     -- meta methods
     local meta = {
         __eq = function(t1, t2)
-            local state, _ = pcall(t1.equals, t2)
-            return state;
+            return t1.equals(t2);
         end
         ,__add = function(t1, t2)
             if(t1.addAll(t2)) then
