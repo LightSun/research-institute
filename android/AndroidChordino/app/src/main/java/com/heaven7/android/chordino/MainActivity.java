@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
+        System.loadLibrary("mediaformat");
         System.loadLibrary("sndfile");
         System.loadLibrary("chordino_depend");
         System.loadLibrary("native-lib");

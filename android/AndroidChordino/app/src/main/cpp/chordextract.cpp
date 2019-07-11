@@ -42,13 +42,13 @@
 #include "NNLSChroma.h"
 #include "Tuning.h"
 
-#include "sndfile.h"
 #include "depend/PluginInputDomainAdapter.h"
 #include "depend/PluginBufferingAdapter.h"
 
 #include "chordextract.h"
 
 #include "chordinomedia.h"
+#include "mediamanager.h"
 #include "formats.h"
 
 #define TAG "ChordinoExtract"
@@ -93,13 +93,13 @@ int main(int argc, char **argv)
     }
     const char *infile = argv[1];
 
+    setLog(log);
     //================================
     
     int count = 1;
     MediaFormat*  formats[count];
     formats[0] = createSndMediaFormat();
-    registerMediaFormats(formats, count);
-
+    registerMediaFormats(reinterpret_cast<MediaFormat **>(&formats), count);
 
     MediaFormat *mediaFormat = getMediaFormat(infile);
     if(mediaFormat == nullptr){
@@ -115,16 +115,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-  /*  SF_INFO sfinfo;
-    SNDFILE *sndfile = sf_open(infile, SFM_READ, &sfinfo);
-
-    if (!sndfile) { //some wav is wrong which is from ffmpeg convert,"Error in WAV/W64/RF64 file. Malformed 'fmt ' chunk."
-        const char * error = sf_strerror(sndfile);
-        //cerr << myname << ": Failed to open input file " << infile<< ": " << sf_strerror(sndfile) << endl;
-        LOGD("usage: %s : Failed to open input file. file = %s. error is %s", myname, infile, error);
-        return 1;
-    }
-*/
     /**
      * 需要解码后的数据： 采样率. 通道数, 总的帧数
      * sf_readf_float(sndfile, filebuf, blocksize)读取多少帧的数据到缓冲区 float* 类型
@@ -195,7 +185,6 @@ int main(int argc, char **argv)
 
     mediaFormat->releaseMedia(openResult);
     releaseMediaFormats();
-    //sf_close(sndfile);
 
     // features at end of processing (actually Chordino does all its work here)
     fs = adapter->getRemainingFeatures();

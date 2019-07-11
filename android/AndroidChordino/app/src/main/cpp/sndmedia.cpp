@@ -10,7 +10,10 @@ void* snd_openMedia(const char* file, MediaData* out){
     out->channelCount = sfinfo.channels;
     out->sampleRate = sfinfo.samplerate;
 
-    log("frames = %d", sfinfo.frames);
+    Log log = getLog();
+    if(log != nullptr) {
+        log("frames = %d", sfinfo.frames);
+    }
     return sndfile;
 }
 
@@ -19,7 +22,10 @@ void snd_logError(const char* file, void * openResult){
     SNDFILE *sndfile = static_cast<SNDFILE *>(openResult);
     const char * error = sf_strerror(sndfile);
     //cerr << myname << ": Failed to open input file " << infile<< ": " << sf_strerror(sndfile) << endl;
-    log("Failed to open input file. file = %s. error is %s", file, error);
+    Log log = getLog();
+    if(log != nullptr) {
+        log("Failed to open input file. file = %s. error is %s", file, error);
+    }
 }
 
 /**
