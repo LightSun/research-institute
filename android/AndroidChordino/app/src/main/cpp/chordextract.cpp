@@ -48,6 +48,9 @@
 
 #include "chordextract.h"
 
+#include "chordinomedia.h"
+#include "formats.h"
+
 #define TAG "ChordinoExtract"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
@@ -57,6 +60,26 @@
 using namespace std;
 using namespace Vamp;
 using namespace HostExt;
+
+std::string &getFormattedStr(std::string &strFormatted, const char *strFormat, va_list arglist)
+{
+    const int MAX_FORMATTED_STR_LEN = 2048;
+    char strResult[MAX_FORMATTED_STR_LEN] = { 0 };
+    vsprintf(strResult, strFormat, arglist);
+    strFormatted = strResult;
+    return strFormatted;
+}
+
+void log(const char *tem, ...)
+{
+    std::string strLog;
+    va_list arglist;
+    va_start(arglist, tem);
+    strLog = getFormattedStr(strLog, tem, arglist);
+    va_end(arglist);
+    LOGD(strLog.c_str());
+}
+
 
 //俩个参数： 0是简单的名称，1 是完整的音乐文件名
 int main(int argc, char **argv)
@@ -68,10 +91,31 @@ int main(int argc, char **argv)
         LOGD("usage: %s file.wav", myname);
         return 2;
     }
-
     const char *infile = argv[1];
 
-    SF_INFO sfinfo;
+    //================================
+    
+    int count = 1;
+    MediaFormat*  formats[count];
+    formats[0] = createSndMediaFormat();
+    registerMediaFormats(formats, count);
+
+
+    MediaFormat *mediaFormat = getMediaFormat(infile);
+    if(mediaFormat == nullptr){
+        releaseMediaFormats();
+        LOGD("can't find media format for target file = %s", infile);
+        return 1;
+    }
+    //open
+    MediaData mediaData;
+    void * openResult = mediaFormat->openMedia(infile, &mediaData);
+    if(openResult == nullptr){
+        mediaFormat->logError(infile, openResult);
+        return 1;
+    }
+
+  /*  SF_INFO sfinfo;
     SNDFILE *sndfile = sf_open(infile, SFM_READ, &sfinfo);
 
     if (!sndfile) { //some wav is wrong which is from ffmpeg convert,"Error in WAV/W64/RF64 file. Malformed 'fmt ' chunk."
@@ -80,18 +124,18 @@ int main(int argc, char **argv)
         LOGD("usage: %s : Failed to open input file. file = %s. error is %s", myname, infile, error);
         return 1;
     }
-
+*/
     /**
      * 需要解码后的数据： 采样率. 通道数, 总的帧数
      * sf_readf_float(sndfile, filebuf, blocksize)读取多少帧的数据到缓冲区 float* 类型
      */
-    Chordino *chordino = new Chordino(sfinfo.samplerate);
+    Chordino *chordino = new Chordino(mediaData.sampleRate);
     PluginInputDomainAdapter *ia = new PluginInputDomainAdapter(chordino);
     ia->setProcessTimestampMethod(PluginInputDomainAdapter::ShiftData);
     PluginBufferingAdapter *adapter = new PluginBufferingAdapter(ia);
 
     int blocksize = adapter->getPreferredBlockSize();
-    LOGD("frames = %d, blocksize = %d", sfinfo.frames, blocksize);
+    //LOGD("frames = %d, blocksize = %d", sfinfo.frames, blocksize);
 
     // Plugin requires 1 channel (we will mix down)
     if (!adapter->initialise(1, blocksize, blocksize)) {
@@ -100,7 +144,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    float *filebuf = new float[sfinfo.channels * blocksize];
+    float *filebuf = new float[mediaData.channelCount * blocksize];
     float *mixbuf = new float[blocksize];
 
     Plugin::FeatureList chordFeatures;
@@ -120,9 +164,10 @@ int main(int argc, char **argv)
     }
     
     int frame = 0;
-    while (frame < sfinfo.frames) {
+  //  while (frame < sfinfo.frames) {
+    while (true) {
         int count = -1;
-        if ((count = sf_readf_float(sndfile, filebuf, blocksize)) <= 0)
+        if ((count = mediaFormat->readMediaData(openResult, filebuf, blocksize)) <= 0)
             break;
         LOGD("sf_readf_float >> count = %d", count);
 
@@ -130,13 +175,13 @@ int main(int argc, char **argv)
         for (int i = 0; i < blocksize; ++i) {
             mixbuf[i] = 0.f;
             if (i < count) {
-                for (int c = 0; c < sfinfo.channels; ++c) {
-                    mixbuf[i] += filebuf[i * sfinfo.channels + c] / sfinfo.channels;
+                for (int c = 0; c < mediaData.channelCount; ++c) {
+                    mixbuf[i] += filebuf[i * mediaData.channelCount + c] / mediaData.channelCount;
                 }
             }
         }
 
-        RealTime timestamp = RealTime::frame2RealTime(frame, sfinfo.samplerate);
+        RealTime timestamp = RealTime::frame2RealTime(frame, mediaData.sampleRate);
 
         // feed to plugin: can just take address of buffer, as only one channel
         fs = adapter->process(&mixbuf, timestamp);
@@ -148,7 +193,9 @@ int main(int argc, char **argv)
         frame += count;
     }
 
-    sf_close(sndfile);
+    mediaFormat->releaseMedia(openResult);
+    releaseMediaFormats();
+    //sf_close(sndfile);
 
     // features at end of processing (actually Chordino does all its work here)
     fs = adapter->getRemainingFeatures();

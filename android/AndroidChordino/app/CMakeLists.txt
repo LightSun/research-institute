@@ -38,6 +38,10 @@ add_library( # Sets the name of the library.
         src/main/cpp/plugins.cpp
         src/main/cpp/Tuning.cpp
         src/main/cpp/viterbi.cpp
+        src/main/cpp/chordinomedia.cpp
+
+        src/main/cpp/sndmedia.cpp
+        src/main/cpp/formats.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a
