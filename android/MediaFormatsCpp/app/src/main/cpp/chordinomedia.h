@@ -13,7 +13,7 @@ typedef struct{
     int channelCount;
 } MediaData;
 
-extern void log(const char *tem, ...);
+typedef void (*Log)(const char *tem, ...);
 
 //typedef void (*__log)(const char* str,...);
 typedef void *(*OpenMedia)(const char *file, MediaData *out);
@@ -36,11 +36,8 @@ struct MediaFormat {
     int formatCount;
 };
 
-bool travelStrings(std::string* formats, int c, void* param, bool (*travel)(int,const std::string*, void*));
-
-void registerMediaFormats(MediaFormat** formats, int count);
-void releaseMediaFormats();
-MediaFormat* getMediaFormat(const char* filename);
+void setLog(Log log);
+Log getLog();
 
 
 #endif //ANDROIDCHORDINO_CHORDINOMEDIA_H
