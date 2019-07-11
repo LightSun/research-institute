@@ -10,12 +10,23 @@ import android.widget.TextView;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
+import com.heaven7.core.util.Toaster;
 import com.heaven7.java.pc.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private final PermissionHelper mHelper = new PermissionHelper(this);
+
+    static final String[] FILES = {
+            "/vida/test_videos/Home_v3.wav",
+            "/WindCloud/14_60.wav",
+            "/WindCloud/1_60.wav",
+            "/WindCloud/103_60.wav",
+            "/WindCloud/17_60.wav",
+            "/WindCloud/21_60.wav",
+    };
+    int index = 0;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -45,13 +56,20 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         mHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
+    public void startNextChord(View view){
+        index ++;
+        if(index >= FILES.length){
+            Toaster.show(this, "all files done.");
+            return;
+        }
+        startChord(view);
+    }
     public void startChord(View view){
         Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
             public void run() {
                 String sn = "extract_chord";
-                String file = Environment.getExternalStorageDirectory() + "/vida/test_videos/Home_v3.wav";
+                String file = Environment.getExternalStorageDirectory() + FILES[index];
                 Logger.d(TAG, "run", "file = " + file);
                 extractChords(sn, file);
                 Logger.w(TAG, "run", "extractChords done !!!");

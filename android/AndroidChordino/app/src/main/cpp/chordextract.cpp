@@ -59,18 +59,6 @@ using namespace Vamp;
 using namespace HostExt;
 
 //俩个参数： 0是简单的名称，1 是完整的音乐文件名
-//Chordino: getOutputDescriptors -> PluginBufferingAdapter.
-/**
-PluginBufferingAdapter::Impl::getOutputDescriptors() const
-{
-    if (m_outputs.empty()) {
-//    std::cerr << "PluginBufferingAdapter::getOutputDescriptors: querying anew" << std::endl;
-
-        m_outputs = m_plugin->getOutputDescriptors(); //拿不到list
-    }
-
-    PluginBufferingAdapter::OutputList outs = m_outputs;
-    */
 int main(int argc, char **argv)
 {
     const char *myname = argv[0];
@@ -93,12 +81,17 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    /**
+     * 需要解码后的数据： 采样率. 通道数, 总的帧数
+     * sf_readf_float(sndfile, filebuf, blocksize)读取多少帧的数据到缓冲区 float* 类型
+     */
     Chordino *chordino = new Chordino(sfinfo.samplerate);
     PluginInputDomainAdapter *ia = new PluginInputDomainAdapter(chordino);
     ia->setProcessTimestampMethod(PluginInputDomainAdapter::ShiftData);
     PluginBufferingAdapter *adapter = new PluginBufferingAdapter(ia);
 
     int blocksize = adapter->getPreferredBlockSize();
+    LOGD("frames = %d, blocksize = %d", sfinfo.frames, blocksize);
 
     // Plugin requires 1 channel (we will mix down)
     if (!adapter->initialise(1, blocksize, blocksize)) {
@@ -131,8 +124,9 @@ int main(int argc, char **argv)
         int count = -1;
         if ((count = sf_readf_float(sndfile, filebuf, blocksize)) <= 0)
             break;
+        LOGD("sf_readf_float >> count = %d", count);
 
-        // mix down
+        // mix down 取中值
         for (int i = 0; i < blocksize; ++i) {
             mixbuf[i] = 0.f;
             if (i < count) {
