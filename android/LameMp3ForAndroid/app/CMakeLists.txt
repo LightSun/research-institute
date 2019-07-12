@@ -18,8 +18,11 @@ add_library(lamemp3 SHARED
         ${SRC_LIST2}
         src/main/cpp/lame_chordino.cpp
         src/main/cpp/array.cpp
-        src/main/cpp/lame_jni.c
+        src/main/cpp/audio_process.cpp
+
         src/main/cpp/SimpleLame.cpp
+        src/main/cpp/lame_jni.c
+        src/main/cpp/test.cpp
         )
 
 find_library(log-lib log )

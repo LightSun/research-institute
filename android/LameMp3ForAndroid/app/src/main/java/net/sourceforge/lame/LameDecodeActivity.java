@@ -30,6 +30,7 @@ public class LameDecodeActivity extends AppCompatActivity {
 
     static {
         System.loadLibrary("mediaformat");
+        System.loadLibrary("lamemp3");
     }
 
     @Override
@@ -62,10 +63,32 @@ public class LameDecodeActivity extends AppCompatActivity {
                 if(Lame.initializeDecoder() == 0) {
                     Logger.d(TAG, "onClickLameDecode", "initializeDecoder ok.");
                 }
-              //  executeDecode();
-                executeDecode2();
+              // executeDecode();
+                 executeDecode2();
+               // executeDecode3();
             }
         });
+    }
+
+    private void executeDecode3(){
+        ChordinoMediaPreTest test = new ChordinoMediaPreTest();
+        if(test.init(FILE)){
+            int blockSize = 16532;
+            float[] pcm = new float[blockSize * 2];
+            try {
+                while (true){
+                    int sampleCount = test.readMediaData(pcm, blockSize);
+                    Logger.d(TAG, "executeDecode3", "decodeFrame ok. read sampleCount = " + sampleCount);
+                    if(sampleCount < 0){
+                        break;
+                    }
+                }
+            }finally {
+                test.destroy();
+            }
+        }else {
+            Logger.w(TAG, "executeDecode3", "init failed");
+        }
     }
 
     private void executeDecode(){
@@ -112,8 +135,8 @@ public class LameDecodeActivity extends AppCompatActivity {
                 Logger.w(TAG, "executeDecode2", "config decoder error.");
                 return;
             }
-            float[] left = new float[frames / 4];
-            float[] right = new float[frames / 4];
+            float[] left = new float[frames];
+            float[] right = new float[frames];
             int result;
             int total = 0;
             while ( (result = Lame.decodeFrame2(in, left, right)) != -1){

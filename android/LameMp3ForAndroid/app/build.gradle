@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 
+////adb logcat | ndk-stack -sym arm64-v8a 定位ndk崩溃
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
@@ -12,7 +13,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11 -fexceptions -O0"
+                cppFlags "-std=c++11 -fexceptions -O0 -Wno-error=format-security"
             }
         }
         ndk {

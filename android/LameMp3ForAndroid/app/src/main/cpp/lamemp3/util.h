@@ -591,6 +591,18 @@ extern  "C" {
 int
 hip_decode1_unclipped2(hip_t hip, unsigned char *buffer, size_t len, sample_t pcm_l[], sample_t pcm_r[], mp3data_struct* mp3data);
 
+/**
+ * decode but not split left and right data
+ * @param hip context
+ * @param buffer the buffer
+ * @param len the length
+ * @param pcms contains all data with left and right pcm data.
+ * @param mp3data the mp3 data
+ * @return the samples read
+ */
+int
+hip_decode1_unclipped3(hip_t hip, unsigned char *buffer, size_t len, sample_t pcms[], mp3data_struct* mp3data);
+
     extern int has_MMX(void);
     extern int has_3DNow(void);
     extern int has_SSE(void);
