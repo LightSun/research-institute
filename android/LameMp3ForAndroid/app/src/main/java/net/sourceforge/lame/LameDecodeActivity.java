@@ -16,6 +16,7 @@ import com.heaven7.java.pc.schedulers.Schedulers;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
 
 /**
  * Created by heaven7 on 2019/7/4.
@@ -26,6 +27,10 @@ public class LameDecodeActivity extends AppCompatActivity {
     private static final String TAG = "LameDecodeActivity";
     private static final String FILE = Environment.getExternalStorageDirectory() + "/vida/resource/musics/103_60.mp3";
     private final PermissionHelper mHelper = new PermissionHelper(this);
+
+    static {
+        System.loadLibrary("mediaformat");
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,7 +62,8 @@ public class LameDecodeActivity extends AppCompatActivity {
                 if(Lame.initializeDecoder() == 0) {
                     Logger.d(TAG, "onClickLameDecode", "initializeDecoder ok.");
                 }
-                executeDecode();
+              //  executeDecode();
+                executeDecode2();
             }
         });
     }
@@ -81,7 +87,41 @@ public class LameDecodeActivity extends AppCompatActivity {
             while ( (result = Lame.decodeFrame(in, left, right)) != -1){
                 total += result;
                 Logger.d(TAG, "executeDecode", "decodeFrame ok. result = " + result);
+                Logger.d(TAG, "executeDecode", "decodeFrame ok. left = " + Arrays.toString(left));
             }
+            //3709440
+            Logger.w(TAG, "executeDecode", "decode done. total = " + total);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            IOUtils.closeQuietly(in);
+            Lame.closeDecoder();
+        }
+    }
+    private void executeDecode2(){
+        File file = new File(FILE);
+        FileInputStream in = null;
+        try{
+            in = new FileInputStream(file);
+            int frames;
+            if(Lame.configureDecoder(in) == 0){
+                frames = Lame.getDecoderFrameSize();
+                Logger.d(TAG, "executeDecode", "configureDecoder ok. frame size = " + frames);
+            }else {
+                Logger.w(TAG, "executeDecode2", "config decoder error.");
+                return;
+            }
+            float[] left = new float[frames / 4];
+            float[] right = new float[frames / 4];
+            int result;
+            int total = 0;
+            while ( (result = Lame.decodeFrame2(in, left, right)) != -1){
+                total += result;
+                Logger.d(TAG, "executeDecode", "decodeFrame ok. result = " + result);
+                Logger.d(TAG, "executeDecode", "decodeFrame ok. left = " + Arrays.toString(left));
+            }
+            //3709440
             Logger.w(TAG, "executeDecode", "decode done. total = " + total);
         }catch (Exception e){
             e.printStackTrace();
