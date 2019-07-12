@@ -212,7 +212,8 @@ int lame_ReadMediaData(void *openResult, float *filebuf, int blockSize) {
 
         FILE *file = static_cast<FILE *>(openResult);
         char buf[bufferSize];
-        float pcms[mp3data->framesize * mp3data->stereo];
+      //  float pcms[mp3data->framesize * mp3data->stereo]; //error why?
+        float* pcms = new float[mp3data->framesize * mp3data->stereo];
         size_t readSize;
 
         //read all data to queue.
@@ -236,6 +237,7 @@ int lame_ReadMediaData(void *openResult, float *filebuf, int blockSize) {
             }*/
         }
         //close
+        delete[] pcms;
         fclose(file);
         readed = true;
         endPreProcessAudio();

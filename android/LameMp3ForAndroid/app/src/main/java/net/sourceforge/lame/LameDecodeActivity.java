@@ -60,12 +60,12 @@ public class LameDecodeActivity extends AppCompatActivity {
         Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                if(Lame.initializeDecoder() == 0) {
+               /* if(Lame.initializeDecoder() == 0) {
                     Logger.d(TAG, "onClickLameDecode", "initializeDecoder ok.");
-                }
+                }*/
               // executeDecode();
-                 executeDecode2();
-               // executeDecode3();
+                // executeDecode2();
+                executeDecode3();
             }
         });
     }
@@ -83,6 +83,7 @@ public class LameDecodeActivity extends AppCompatActivity {
                         break;
                     }
                 }
+                Logger.d(TAG, "executeDecode3", "decode done.");
             }finally {
                 test.destroy();
             }

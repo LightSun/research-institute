@@ -5,11 +5,6 @@ package net.sourceforge.lame;
  */
 public final class ChordinoMediaPreTest {
 
-    static {
-        System.loadLibrary("mediaformat");
-        System.loadLibrary("lamemp3");
-    }
-
     public boolean init(String fileName){
         return nInit(fileName);
     }

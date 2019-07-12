@@ -12,6 +12,11 @@
 
 using namespace std;
 
+//when define the struct or class we often should align . or else may cause crash.
+//see: https://www.cnblogs.com/mlj318/p/6089001.html
+#pragma pack(push) //keep align
+#pragma pack(8)   //align with 4 b
+
 typedef struct FloatData {
     float *data;
     /** total size of data */
@@ -98,6 +103,7 @@ public:
           }
       }*/
 };
+#pragma pack(pop)
 
 BlockList __blockList;
 int __blockSize;
@@ -135,6 +141,7 @@ extern "C"  void addAudioData(float *data, int start, int size) {
                 __blockList.add(newBlockData());
             }
         }if(size > left){
+            //not enough to copy all data once
             copyFloatArray(data, start, tail->data, tail->used, left);
             tail->used = tail->size;
             if(log != nullptr){
@@ -143,7 +150,7 @@ extern "C"  void addAudioData(float *data, int start, int size) {
             }
             __blockList.add(newBlockData());
             //to handle the more data
-            addAudioData(data, left, size - left);
+            addAudioData(data, start + left, size - left);
         }
     } else{
         //should not reach here.
