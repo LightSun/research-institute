@@ -12,98 +12,14 @@
 
 using namespace std;
 
-//when define the struct or class we often should align . or else may cause crash.
-//see: https://www.cnblogs.com/mlj318/p/6089001.html
-#pragma pack(push) //keep align
-#pragma pack(8)   //align with 4 b
+bool _isFull(FD* fd){
+    return fd->size == fd->used;
+}
+/** get left size which not used */
+int _getLeft(FD* fd){
+    return fd->size - fd->used;
+}
 
-typedef struct FloatData {
-    /** total size of data */
-    int size;
-    /** the used count of data. */
-    int used;
-    float *data;
-
-    bool isFull(){
-        return size == used;
-    }
-    /** get left size which not used */
-    int getLeft(){
-        return size - used;
-    }
-} FD;
-
-class BlockList {
-private:
-    vector<FD *> list;
-
-public:
-
-    inline FD *getTail() {
-        return getAt(size() - 1);
-    }
-
-    inline size_t size() {
-        return list.size();
-    }
-
-    inline vector<FD *> &getVector() {
-        return list;
-    }
-
-    FD *getAt(int index) {
-        if (index >= size()) {
-            return nullptr;
-        }
-        return list[index];
-    }
-
-    void add(FD *t) {
-        list.push_back(t);
-    }
-
-    void add(int index, FD *t) {
-        list.insert(list.begin() + index, t);
-    }
-
-    bool isEmpty() {
-        return size() == 0;
-    }
-
-    inline void set(int index, FD *newFD) {
-        if (index >= size()) {
-            return;
-        }
-        list[index] = newFD;
-    }
-
-    inline void clear() {
-        size_t size = BlockList::size();
-        if (size > 0) {
-            remove(0, (int) size);
-        }
-    }
-
-    inline void removeAt(int index) {
-        remove(index, 1);
-    }
-
-    inline void remove(int startIndex, int count) {
-        long size = list.size();
-        if (count <= 0 || startIndex < 0) {
-            __throw_invalid_argument("start or end index is wrong");
-        }
-        list.erase(list.begin() + startIndex, list.begin() + count);
-    }
-
-    /*  void travel(VectorFDraveller<FD> &vt) {
-          long size = list.size();
-          for (int i = 0; i < size; i++) {
-              vt.travel(i, list[i]);
-          }
-      }*/
-};
-#pragma pack(pop)
 
 BlockList __blockList;
 int __blockSize;
@@ -117,19 +33,20 @@ FD* newBlockData(){
     return fd;
 }
 
-extern "C" void startPreProcessAudio(int blockSize) {
+void startPreProcessAudio(int blockSize) {
     __blockSize = blockSize;
     __blockList.clear();
     __blockList.add(newBlockData());
 }
 
 //add size of audio data from start.
-extern "C"  void addAudioData(float *data, int start, int size) {
+void addAudioData(float *data, int start, int size) {
     const size_t blockSize = __blockList.size();
     FD * tail = __blockList.getTail();
-    if(!tail->isFull()){
-        const int left = tail->getLeft();
-        Log log = getLog();
+    Log log = getLog();
+    if(!_isFull(tail)){
+        const int left = _getLeft(tail);
+
         if(size <= left){
             copyFloatArray(data, start, tail->data, tail->used, size);
             tail->used += size;
@@ -137,7 +54,7 @@ extern "C"  void addAudioData(float *data, int start, int size) {
                 log("addAudioData [ size <= left ] >>> on The %d audio-block( >=1 ), from %d to %d. blockSize is %d.",
                         blockSize, tail->used - size, tail->used, tail->size);
             }
-            if(tail->isFull()){
+            if(_isFull(tail)){
                 __blockList.add(newBlockData());
             }
         }if(size > left){
@@ -159,11 +76,11 @@ extern "C"  void addAudioData(float *data, int start, int size) {
     }
 }
 
-extern "C"  void endPreProcessAudio() {
+void endPreProcessAudio() {
     __blockIndex = -1;
 }
 
-extern "C"  int nextBlockedAudioData(float *out) {
+int nextBlockedAudioData(float *out) {
     __blockIndex ++;
     FD* fd = __blockList.getAt(__blockIndex);
     if(fd == nullptr){
@@ -173,7 +90,7 @@ extern "C"  int nextBlockedAudioData(float *out) {
     return fd->used;
 }
 
-extern "C"  void releaseAudioData(){
+void releaseAudioData(){
     int size = __blockList.size();
     for (int i = size - 1; i >= 0; i--) {
         FD *const fd = __blockList.getAt(i);

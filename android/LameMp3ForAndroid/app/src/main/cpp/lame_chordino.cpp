@@ -2,6 +2,7 @@
 // Created by Administrator on 2019/7/11.
 //
 
+#include "chordinomedia.h"
 #include "lame_chordino.h"
 #include "lame.h"
 #include <util.h>
@@ -230,11 +231,6 @@ int lame_ReadMediaData(void *openResult, float *filebuf, int blockSize) {
             } else if (samples_read < 0) {
                 break;
             }
-            /*else{
-                do{
-                    samples_read = hip_decode1_unclipped3(hip_context, (unsigned char *)buf, readSize, pcms, mp3data);
-                } while (samples_read == 0);
-            }*/
         }
         //close
         delete[] pcms;
