@@ -60,6 +60,7 @@ public class TestWaveformActivity extends BaseActivity {
                                 @Override
                                 public void run() {
                                     //mEditWaveForm.addAnnotatorWidthAnim(15000);
+                                    //mEditWaveForm.setOffset(mEditWaveForm.secondsToPixels(2));
                                     mEditWaveForm.setMinOffsetX( -mEditWaveForm.getWidth() / 2);
                                     mEditWaveForm.seekToCenter(0);
                                     mEditWaveForm.setTruncateWidth(mEditWaveForm.maxPosX() - mEditWaveForm.secondsToPixels(30));

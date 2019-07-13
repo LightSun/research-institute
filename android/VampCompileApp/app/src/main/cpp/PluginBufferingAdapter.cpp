@@ -254,11 +254,7 @@ protected:
     void adjustFixedRateFeatureTime(int outputNo, Feature &);
 
     void removeOutputDesc(){
-        //TODO later
-       /* if(m_outputs!= nullptr){
-            delete m_outputs;
-            m_outputs = nullptr;
-        }*/
+        //this is not managed by this class
         m_outputs = nullptr;
     }
 };

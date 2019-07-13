@@ -5,7 +5,7 @@
 #ifndef ANDROIDCHORDINO_MEDIAMANAGER_H
 #define ANDROIDCHORDINO_MEDIAMANAGER_H
 
-#include "chordinomedia.h"
+#include "chordinomedia/chordinomedia.h"
 #include "string"
 
 bool travelStrings(std::string* formats, int c, std::string param, bool (*travel)(int,std::string, std::string));

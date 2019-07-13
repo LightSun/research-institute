@@ -3,7 +3,7 @@
 //
 
 #include "mediamanager.h"
-#include "chordinomedia.h"
+#include "chordinomedia/chordinomedia.h"
 
 MediaFormat** __formats;
 int __count;

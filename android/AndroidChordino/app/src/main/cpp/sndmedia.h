@@ -5,7 +5,7 @@
 #ifndef ANDROIDCHORDINO_SND_MEDIA_H
 #define ANDROIDCHORDINO_SND_MEDIA_H
 
-#include "chordinomedia.h"
+#include "chordinomedia/chordinomedia.h"
 #include "sndfile.h"
 
 void* snd_openMedia(const char* file, MediaData* out);

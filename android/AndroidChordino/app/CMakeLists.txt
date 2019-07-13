@@ -10,12 +10,15 @@ set(LIB_DIR ${CMAKE_SOURCE_DIR}/src/main/jniLibs)
 add_library(sndfile SHARED IMPORTED)
 add_library(chordino_depend SHARED IMPORTED)
 add_library(mediaformat SHARED IMPORTED)
+add_library(lame SHARED IMPORTED)
 # --------path to find pre-build lib
 set_target_properties(sndfile PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libsndfile.so)
 set_target_properties(chordino_depend PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libchordino_depend.so)
 set_target_properties(mediaformat PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libmediaformat.so)
+set_target_properties(lame PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/liblame.so)
 
 include_directories(src/main/cpp)
+include_directories(src/main/cpp/lame)
 # include_directories(SYSTEM ${ANDROID_NDK}/sysroot/usr/include)
 
 # Creates and names a library, sets it as either STATIC
@@ -68,6 +71,7 @@ target_link_libraries( # Specifies the target library.
         mediaformat
         chordino_depend
         sndfile
+        lame
 
         # Links the target library to the log library
         # included in the NDK.

@@ -19,19 +19,28 @@ public class MainActivity extends AppCompatActivity {
     private final PermissionHelper mHelper = new PermissionHelper(this);
 
     static final String[] FILES = {
-            "/vida/test_videos/Home_v3.wav",
             "/WindCloud/14_60.wav",
             "/WindCloud/1_60.wav",
             "/WindCloud/103_60.wav",
             "/WindCloud/17_60.wav",
             "/WindCloud/21_60.wav",
     };
-    int index = 0;
+    int index = -1;
+
+    static final String[] FILES_mp3 = {
+            "/vida/resource/musics/14_60.mp3",
+            "/vida/resource/musics/17_60.mp3",
+            "/vida/resource/musics/1_60.mp3",
+            "/vida/resource/musics/21_60.mp3",
+            "/vida/resource/musics/35_60.mp3",
+    };
+    int index_mp3 = -1;
 
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("mediaformat");
         System.loadLibrary("sndfile");
+        System.loadLibrary("lame");
         System.loadLibrary("chordino_depend");
         System.loadLibrary("native-lib");
     }
@@ -63,13 +72,33 @@ public class MainActivity extends AppCompatActivity {
             Toaster.show(this, "all files done.");
             return;
         }
-        startChord(view);
+        startChordWav(view);
     }
-    public void startChord(View view){
+    public void startNextMp3(View view){
+        index_mp3 ++;
+        if(index_mp3 >= FILES_mp3.length){
+            Toaster.show(this, "all files done.");
+            return;
+        }
+        startChordmp3(view);
+    }
+    public void startChordmp3(View view){
         Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                String sn = "extract_chord";
+                String sn = "startChordmp3";
+                String file = Environment.getExternalStorageDirectory() + FILES_mp3[index_mp3];
+                Logger.d(TAG, "run", "file = " + file);
+                extractChords(sn, file);
+                Logger.w(TAG, "run", "extractChords done !!!");
+            }
+        });
+    }
+    public void startChordWav(View view){
+        Schedulers.io().newWorker().schedule(new Runnable() {
+            @Override
+            public void run() {
+                String sn = "startChordWav";
                 String file = Environment.getExternalStorageDirectory() + FILES[index];
                 Logger.d(TAG, "run", "file = " + file);
                 extractChords(sn, file);

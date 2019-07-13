@@ -47,7 +47,7 @@
 
 #include "chordextract.h"
 
-#include "chordinomedia.h"
+#include "chordinomedia/chordinomedia.h"
 #include "mediamanager.h"
 #include "formats.h"
 
@@ -96,10 +96,11 @@ int main(int argc, char **argv)
     setLog(log);
     //================================
     
-    int count = 1;
-    MediaFormat*  formats[count];
+    int count = 2;
+    MediaFormat* * formats = new MediaFormat*[count];
     formats[0] = createSndMediaFormat();
-    registerMediaFormats(reinterpret_cast<MediaFormat **>(&formats), count);
+    formats[1] = createMp3MediaFormat();
+    registerMediaFormats(formats, count);
 
     MediaFormat *mediaFormat = getMediaFormat(infile);
     if(mediaFormat == nullptr){
@@ -185,6 +186,7 @@ int main(int argc, char **argv)
 
     mediaFormat->releaseMedia(openResult);
     releaseMediaFormats();
+    delete[](formats);
 
     // features at end of processing (actually Chordino does all its work here)
     fs = adapter->getRemainingFeatures();

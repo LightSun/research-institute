@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-include_directories(src/main/cpp)
+#include_directories(src/main/cpp)
 
 aux_source_directory(src/main/cpp SRC_LIST)
 

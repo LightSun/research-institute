@@ -5,8 +5,9 @@
 #ifndef ANDROIDCHORDINO_FORMATS_H
 #define ANDROIDCHORDINO_FORMATS_H
 
-#include "chordinomedia.h"
+#include "chordinomedia/chordinomedia.h"
 
 MediaFormat* createSndMediaFormat();
+MediaFormat* createMp3MediaFormat();
 
 #endif //ANDROIDCHORDINO_FORMATS_H

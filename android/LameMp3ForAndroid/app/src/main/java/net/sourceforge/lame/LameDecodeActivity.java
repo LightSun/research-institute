@@ -30,6 +30,7 @@ public class LameDecodeActivity extends AppCompatActivity {
 
     static {
         System.loadLibrary("mediaformat");
+        System.loadLibrary("lame");
         System.loadLibrary("lamemp3");
     }
 

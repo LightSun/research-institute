@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.heaven7.android.bpmdetect.BaseActivity;
 import com.heaven7.android.bpmdetect.BpmDetector;
+import com.heaven7.android.bpmdetect.soundfile.IAudioOutputDelegate;
 import com.heaven7.android.bpmdetect.soundfile.SoundFile;
 import com.heaven7.android.util2.FilePathCompat;
 import com.heaven7.core.util.Logger;
@@ -22,7 +23,7 @@ import java.nio.ShortBuffer;
 
 import butterknife.OnClick;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements IAudioOutputDelegate {
 
     private static final String TAG = "MainActivity";
     private final PermissionHelper mHelper = new PermissionHelper(this);
@@ -70,12 +71,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setSoundFile() {
+        //mDetector.attach(mSoundFile.getChannels(), mSoundFile.getSampleRate());
         Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mSoundFile = SoundFile.create(mAudioFile);
-                    setAudioData();
+                    mSoundFile = SoundFile.create(mAudioFile, null, MainActivity.this);
+                    Logger.d(TAG, "setAudioData", " bpm = " + mDetector.getBmp() + " ,file = " + mAudioFile);
+                    mDetector.detach();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -99,13 +102,23 @@ public class MainActivity extends BaseActivity {
             @Override
             public void run() {
                 mDetector.attach(mSoundFile.getChannels(), mSoundFile.getSampleRate());
-                mDetector.setSampleData(data, mSoundFile.getNumSamples());
+                mDetector.putSampleData(data, mSoundFile.getNumSamples());
                 Logger.d(TAG, "setAudioData", " bpm = " + mDetector.getBmp() + " ,file = " + mAudioFile);
                 mDetector.detach();
             }
         });
     }
-   /* private void setAudioData(){
+
+    @Override
+    public void out(short[] data, int numberSamples) {
+        Logger.d(TAG, "out", "numberSamples = " + numberSamples);
+        mDetector.putSampleData(data, numberSamples);
+    }
+    @Override
+    public void onDetectInit(int channels, int sampleRate) {
+        mDetector.attach(channels, sampleRate);
+    }
+    /* private void setAudioData(){
         ShortBuffer samples = mSoundFile.getSamples();
         System.out.println(samples);
         int[] gains = mSoundFile.getFrameGains();

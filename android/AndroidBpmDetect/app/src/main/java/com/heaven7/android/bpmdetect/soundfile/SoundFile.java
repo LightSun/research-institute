@@ -26,6 +26,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
+import com.heaven7.android.bpmdetect.ShortArray;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,7 +41,9 @@ import java.nio.ShortBuffer;
 import java.util.Arrays;
 
 public class SoundFile {
+    private final ShortArray mSA = new ShortArray(1);
     private ProgressListener mProgressListener = null;
+    private IAudioOutputDelegate mOutputDelegate;
     private File mInputFile = null;
 
     // Member variables representing frame data
@@ -103,10 +107,14 @@ public class SoundFile {
             }
         });
     }
-
+    public static SoundFile create(String fileName,
+                                   ProgressListener progressListener)  throws java.io.FileNotFoundException,
+            IOException, InvalidInputException{
+        return create(fileName, progressListener, null);
+    }
     // Create and return a SoundFile object using the file fileName.
     public static SoundFile create(String fileName,
-                                   ProgressListener progressListener)
+                                   ProgressListener progressListener, IAudioOutputDelegate delegate)
         throws java.io.FileNotFoundException,
                IOException, InvalidInputException {
         // First check that the file exists and that its extension is supported.
@@ -124,6 +132,7 @@ public class SoundFile {
         }
         SoundFile soundFile = new SoundFile();
         soundFile.setProgressListener(progressListener);
+        soundFile.setAudioOutputDelegate(delegate);
         soundFile.ReadFile(f);
         return soundFile;
     }
@@ -138,6 +147,10 @@ public class SoundFile {
         soundFile.setProgressListener(progressListener);
         soundFile.RecordAudio();
         return soundFile;
+    }
+
+    public void setAudioOutputDelegate(IAudioOutputDelegate mOutputDelegate) {
+        this.mOutputDelegate = mOutputDelegate;
     }
 
     public String getFiletype() {
@@ -228,6 +241,9 @@ public class SoundFile {
         }
         mChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
         mSampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+        if(mOutputDelegate != null){
+            mOutputDelegate.onDetectInit(mChannels, mSampleRate);
+        }
         // Expected total number of samples per channel.
         int expectedNumSamples =
             (int)((format.getLong(MediaFormat.KEY_DURATION) / 1000000.f) * mSampleRate + 0.5f);
@@ -338,6 +354,12 @@ public class SoundFile {
                 }
                 mDecodedBytes.put(decodedSamples, 0, info.size);
                 codec.releaseOutputBuffer(outputBufferIndex, false);
+                if(mOutputDelegate != null){
+                    mSA.fill(decodedSamples, 0, info.size);
+                    short[] data = mSA.getData();
+                    int numberSamples = data.length / mChannels;
+                    mOutputDelegate.out(data, numberSamples);
+                }
             } else if (outputBufferIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 outputBuffers = codec.getOutputBuffers();
             } else if (outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {

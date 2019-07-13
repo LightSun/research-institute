@@ -18,11 +18,11 @@ using namespace std;
 #pragma pack(8)   //align with 4 b
 
 typedef struct FloatData {
-    float *data;
     /** total size of data */
     int size;
     /** the used count of data. */
     int used;
+    float *data;
 
     bool isFull(){
         return size == used;

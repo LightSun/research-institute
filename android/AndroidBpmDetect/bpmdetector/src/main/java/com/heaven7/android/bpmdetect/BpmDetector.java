@@ -42,7 +42,7 @@ public final class BpmDetector {
      * @param data the sample data
      * @param numSamples the number of samples.
      */
-    public void setSampleData(short[] data, int numSamples){
+    public void putSampleData(short[] data, int numSamples){
         checkAttached();
         _setSampleData(ptr, data, numSamples);
     }

@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include "string"
 
+#pragma pack(push) //keep align
+#pragma pack(8)   //align with 4 b
 typedef struct{
     int sampleRate;
     int channelCount;
@@ -35,6 +37,8 @@ struct MediaFormat {
     std::string formats[2];
     int formatCount;
 };
+
+#pragma pack(pop)
 
 void setLog(Log log);
 Log getLog();

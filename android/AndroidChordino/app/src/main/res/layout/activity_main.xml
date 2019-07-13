@@ -7,14 +7,26 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/bt_next_chord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textAllCaps="false"
-        android:text="next_music"
+        android:text="next_music (wav)"
         android:onClick="startNextChord"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bt_next_chord"
+        android:textAllCaps="false"
+        android:text="next music (mp3)"
+        android:onClick="startNextMp3"
         />
 
     <TextView
