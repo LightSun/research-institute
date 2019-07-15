@@ -24,6 +24,19 @@ public:
     int size;
     /** the used count of data. */
     int used;
+
+    FD(){}
+    ~FD(){
+        delete[] data;
+    }
+
+    bool isFull(){
+        return FD::size == FD::used;
+    }
+/** get left size which not used */
+    int getLeft(){
+        return FD::size - FD::used;
+    }
 };
 
 class BlockList {
@@ -89,10 +102,6 @@ public:
         list.erase(list.begin() + startIndex, list.begin() + count);
     }
 };
-bool _isFull(FD* fd);
-/** get left size which not used */
-int _getLeft(FD* fd);
-
 //#pragma pack(pop)
 /**
  * start pre process audio
@@ -110,10 +119,15 @@ void addAudioData(float* data, int start,int size);
 
 void endPreProcessAudio();
 
+/** check next block data is enough or not */
+bool isNextBlockDataPrepared();
+
+/** return the next blocked sample size */
+int testNextBlockedSampleSize();
 /**
  * get the next block data.
  * @param out the out data
- * @return the size of out data.
+ * @return the sample size of out data.
  */
 int nextBlockedAudioData(float * out);
 

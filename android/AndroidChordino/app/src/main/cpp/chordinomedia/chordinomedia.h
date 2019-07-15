@@ -8,8 +8,8 @@
 #include <stdarg.h>
 #include "string"
 
-#pragma pack(push) //keep align
-#pragma pack(8)   //align with 4 b
+#pragma pack(push)
+#pragma pack(8) //4字节对齐
 typedef struct{
     int sampleRate;
     int channelCount;
@@ -25,10 +25,11 @@ typedef void (*LogError)(const char *file, void *openResult);
  * @param openResult
  * @param filebuf
  * @param count
- * @return the count of read
+ * @return the count of read (exclude stereo)
  */
 typedef int (*ReadMediaData)(void *openResult, float *filebuf, int count);
 typedef void (*ReleaseMedia)(void *openResult);
+
 struct MediaFormat {
     OpenMedia openMedia;
     LogError logError;
@@ -37,7 +38,6 @@ struct MediaFormat {
     std::string formats[2];
     int formatCount;
 };
-
 #pragma pack(pop)
 
 void setLog(Log log);

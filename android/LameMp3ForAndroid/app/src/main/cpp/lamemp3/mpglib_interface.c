@@ -120,6 +120,14 @@ lame_decode_init(void)
       *pcm_r++ = (DST_TYPE)(*p_samples++);                                                      \
     }
 
+#define COPY_MONO2(DST_TYPE, SRC_TYPE)                                                           \
+    DST_TYPE *pcm_l = (DST_TYPE *)pcm_l_raw;                                                    \
+    SRC_TYPE const *p_samples = (SRC_TYPE const *)p;                                            \
+    for (i = 0; i < processed_samples; i++) {                                                \
+      *pcm_l++ = (DST_TYPE)(*p_samples++);                 \
+      *pcm_l++ = (DST_TYPE)(*p_samples++);                 \
+    }
+
 /*
  * For lame_decode:  return code
  * -1     error
@@ -211,10 +219,10 @@ decode1_headersB_clipchoice(PMPSTR pmp, unsigned char *buffer, int len,
         case 2:
             processed_samples = (processed_bytes / decoded_sample_size) >> 1;
             if (decoded_sample_size == sizeof(short)) {
-                COPY_STEREO(short, short)
+                COPY_MONO2(short, short)
             }
             else {
-                COPY_STEREO(sample_t, FLOAT)
+                COPY_MONO2(sample_t, FLOAT)
             }
             break;
         default:
@@ -581,9 +589,9 @@ hip_decode(hip_t hip, unsigned char *buffer, size_t len, short pcm_l[], short pc
 
 int
 hip_decode1_headersB(hip_t hip, unsigned char *buffer,
-                      size_t len,
-                      short pcm_l[], short pcm_r[], mp3data_struct * mp3data,
-                      int *enc_delay, int *enc_padding)
+                     size_t len,
+                     short pcm_l[], short pcm_r[], mp3data_struct * mp3data,
+                     int *enc_delay, int *enc_padding)
 {
     static char out[OUTSIZE_CLIPPED];
     if (hip) {
@@ -593,7 +601,6 @@ hip_decode1_headersB(hip_t hip, unsigned char *buffer,
     }
     return -1;
 }
-
 
 void hip_set_pinfo(hip_t hip, plotting_data* pinfo)
 {

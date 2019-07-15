@@ -61,11 +61,11 @@ public class LameDecodeActivity extends AppCompatActivity {
         Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
             public void run() {
-               /* if(Lame.initializeDecoder() == 0) {
+                /*if(Lame.initializeDecoder() == 0) {
                     Logger.d(TAG, "onClickLameDecode", "initializeDecoder ok.");
                 }*/
               // executeDecode();
-                // executeDecode2();
+              //   executeDecode2();
                 executeDecode3();
             }
         });
@@ -74,17 +74,19 @@ public class LameDecodeActivity extends AppCompatActivity {
     private void executeDecode3(){
         ChordinoMediaPreTest test = new ChordinoMediaPreTest();
         if(test.init(FILE)){
-            int blockSize = 16532;
+            int blockSize = 16384;
             float[] pcm = new float[blockSize * 2];
             try {
+                int totalSampleCount = 0;
                 while (true){
                     int sampleCount = test.readMediaData(pcm, blockSize);
                     Logger.d(TAG, "executeDecode3", "decodeFrame ok. read sampleCount = " + sampleCount);
                     if(sampleCount < 0){
                         break;
                     }
+                    totalSampleCount += sampleCount;
                 }
-                Logger.d(TAG, "executeDecode3", "decode done.");
+                Logger.d(TAG, "executeDecode3", "decode done. totalSampleCount = " + totalSampleCount);
             }finally {
                 test.destroy();
             }
@@ -93,6 +95,7 @@ public class LameDecodeActivity extends AppCompatActivity {
         }
     }
 
+    //3709440
     private void executeDecode(){
         File file = new File(FILE);
         FileInputStream in = null;
@@ -124,6 +127,7 @@ public class LameDecodeActivity extends AppCompatActivity {
             Lame.closeDecoder();
         }
     }
+    //3709440
     private void executeDecode2(){
         File file = new File(FILE);
         FileInputStream in = null;

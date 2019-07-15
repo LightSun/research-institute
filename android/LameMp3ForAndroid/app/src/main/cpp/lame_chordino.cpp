@@ -11,10 +11,15 @@
 #include "vector"
 #include "audio_process.h"
 
+static bool _debugMp3Data = false;
 static mp3data_struct *mp3data;
 static hip_t hip_context = nullptr;
 static int enc_delay, enc_padding;
-bool readed = false;
+int _channelCount = 0;
+//----- buffer ----------
+float * bufferData = nullptr;
+int bufferDataSize = 0;
+//----------- debug --------
 
 
 int lame_config(char* buf, int size);
@@ -77,8 +82,9 @@ static bool isMp123SyncWord(char* buf) {
     return true;
 }
 
+float* _pcms = nullptr;
+
 void *lame_OpenMedia(const char *filename, MediaData *out) {
-    readed = false;
     if (!hip_context) {
         hip_context = hip_decode_init();
         if (hip_context) {
@@ -163,6 +169,10 @@ void *lame_OpenMedia(const char *filename, MediaData *out) {
         }
         buf[3] = tmpBuf[0];
     }
+    //============= prepare a buffer ============
+    bufferData = new float[1152 * 2];
+    bufferDataSize = 0;
+    //===========================================
 
     int size;
     do {
@@ -174,26 +184,61 @@ void *lame_OpenMedia(const char *filename, MediaData *out) {
 
     out->sampleRate = mp3data->samplerate;
     out->channelCount = mp3data->stereo;
+    _channelCount = mp3data->stereo;
+
+    //create a buffer
+    _pcms = new float[mp3data->framesize * mp3data->stereo];
     return file;
 }
 
-//nativeConfigureDecoder
+//nativeConfigureDecoder: return 0 for prepared done.
 int lame_config(char *mp3_buf, int size) {
-    int ret = -1;
-    short left_buf[1152], right_buf[1152];
-
-    ret = hip_decode1_headersB(hip_context, reinterpret_cast<unsigned char *>(mp3_buf), size,
-                               left_buf, right_buf, mp3data, &enc_delay, &enc_padding);
+    int samples_read = hip_decode1_unclipped3(hip_context, (unsigned char *) mp3_buf, size,
+                                              bufferData, mp3data);
+    Log const log = getLog();
+    if(mp3data->samplerate == 0 || mp3data->stereo == 0){
+        //not prepared
+        if(samples_read > 0){
+            log("lame_config >>> wrong sample read. samples_read = %d", samples_read);
+        }
+        return -1;
+    }
     if (mp3data->header_parsed) {
         mp3data->totalframes = mp3data->nsamp / mp3data->framesize;
     }
-    return ret;
+    if(log != nullptr){
+        log("lame_config >>> config ok. buffered samples_read = %d", samples_read);
+    }
+    if(samples_read > 0){
+        bufferDataSize = samples_read * mp3data->stereo;
+        samples_read = 0;
+    }
+    return samples_read;
 }
 
 void lame_LogError(const char *file, void *openResult) {
     Log log = getLog();
     if (log != nullptr) {
         log("can't open file = %s", file);
+    }
+}
+
+void readLeftAudioData(char buf[], size_t readSize, const char * tag){
+    //if readSize == 0, means read buffer data
+    Log const log = getLog();
+    int samples_read;
+    while (true){
+        samples_read = hip_decode1_unclipped3(hip_context, (unsigned char *) buf, readSize,
+                                              _pcms, mp3data);
+        //read until no buffer data.
+        if (samples_read > 0) {
+            addAudioData(_pcms, 0, samples_read * _channelCount);
+            if (log != nullptr && _debugMp3Data) {
+                log("readLeftAudioData >>> %s. samples_read = %d", tag, samples_read);
+            }
+        } else{
+            break;
+        }
     }
 }
 
@@ -207,43 +252,77 @@ void lame_LogError(const char *file, void *openResult) {
 int lame_ReadMediaData(void *openResult, float *filebuf, int blockSize) {
     Log log = getLog();
 
-    if (!readed) {
-        startPreProcessAudio(blockSize);
-        int bufferSize = 1024;
+    startPreProcessAudio(blockSize * _channelCount);
+    //check buffer exist or not.
+    if(bufferDataSize > 0){
+        if (log != nullptr && _debugMp3Data) {
+            log("lame_ReadMediaData >>> [ bufferDataSize ]. size = %d",bufferDataSize);
+        }
+        addAudioData(bufferData, 0, bufferDataSize);
+    }
+    //recycle
+    if(bufferData != nullptr){
+        delete[] bufferData;
+        bufferData = nullptr;
+        bufferDataSize = 0;
+    }
+    size_t bufferSize = 1024;
 
-        FILE *file = static_cast<FILE *>(openResult);
-        char buf[bufferSize];
-      //  float pcms[mp3data->framesize * mp3data->stereo]; //error why?
-        float* pcms = new float[mp3data->framesize * mp3data->stereo];
-        size_t readSize;
+    FILE *file = static_cast<FILE *>(openResult);
+    char buf[bufferSize];
+    size_t readSize = 0;
+    int samples_read = 0;
 
-        //read all data to queue.
+    //check for buffered data
+    readLeftAudioData(buf, readSize, "[ check-bufferData 1 ]");
+    //check if data is enough. if enough direct return.
+    if(!isNextBlockDataPrepared()){
         while ((readSize = fread(buf, 1, bufferSize, file)) > 0) {
             // check for buffered data
-            int samples_read = hip_decode1_unclipped3(hip_context, (unsigned char *) buf, readSize,
-                                                      pcms, mp3data);
-            if (log != nullptr) {
-                log("hip_decode1_unclipped3 >>> read sample data. samples_read = %d, bufSize = %d.",
+            samples_read = hip_decode1_unclipped3(hip_context, (unsigned char *) buf, readSize,
+                                                  _pcms, mp3data);
+            if (log != nullptr && _debugMp3Data) {
+                log("lame_ReadMediaData >>> read sample data. samples_read = %d, bufSize = %d",
                     samples_read, bufferSize);
             }
             if (samples_read > 0) {
-                addAudioData(pcms, 0, samples_read);
+                addAudioData(_pcms, 0, samples_read * _channelCount);
+
+                readLeftAudioData(buf, 0, "[ check-bufferData 2 ]");
+                //check if data is enough
+                if(isNextBlockDataPrepared()){
+                    break;
+                }
             } else if (samples_read < 0) {
+                // finished reading input buffer, check for buffered data then break.
+                readLeftAudioData(buf, 0, "[ check-bufferData 3 ]");
                 break;
             }
         }
-        //close
-        delete[] pcms;
-        fclose(file);
-        readed = true;
-        endPreProcessAudio();
     }
-    return nextBlockedAudioData(filebuf);
+    //todo why data is more than 3709440.
+    /*
+2019-07-15 15:41:38.103 9935-9986/com.clam314.lame D/LameDecodeActivity: called [ executeDecode3() ]: decodeFrame ok. read sampleCount = 9440
+2019-07-15 15:41:38.104 9935-9986/com.clam314.lame D/Lame_Chordino_Test: readLeftAudioData >>> [ check-bufferData 1 ]. samples_read = 1152
+2019-07-15 15:41:38.104 9935-9986/com.clam314.lame D/LameDecodeActivity: called [ executeDecode3() ]: decodeFrame ok. read sampleCount = 592
+2019-07-15 15:41:38.104 9935-9986/com.clam314.lame D/LameDecodeActivity: called [ executeDecode3() ]: decodeFrame ok. read sampleCount = -1
+2019-07-15 15:41:38.104 9935-9986/com.clam314.lame D/LameDecodeActivity: called [ executeDecode3() ]: decode done. totalSampleCount = 3710032
+     */
+    const int result = nextBlockedAudioData(filebuf);
+    if(result <= 0){
+        return result;
+    }
+    return result / _channelCount;
 }
 
 void lame_ReleaseMedia(void *openResult) {
+    FILE *file = static_cast<FILE *>(openResult);
+    //close
+    fclose(file);
+    delete[] _pcms;
+    endPreProcessAudio();
+
     releaseAudioData();
-    readed = false;
     if (hip_context) {
         int ret = hip_decode_exit(hip_context);
         hip_context = NULL;

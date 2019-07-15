@@ -183,6 +183,7 @@ int main(int argc, char **argv)
 
         frame += count;
     }
+    LOGD("total samples = %d", frame);
 
     mediaFormat->releaseMedia(openResult);
     releaseMediaFormats();
