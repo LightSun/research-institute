@@ -1102,7 +1102,9 @@ int CDECL hip_decode1_headersB( hip_t gfp
                               , int             *enc_padding
                               );
 
-
+int
+hip_decode1_headersB2(hip_t hip, unsigned char *buffer, size_t len,
+                      float pcm_l[], mp3data_struct * mp3data);
 
 /* OBSOLETE:
  * lame_decode... functions are there to keep old code working

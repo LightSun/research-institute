@@ -8,7 +8,7 @@ set_target_properties(mediaformat PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDR
 set(SRC_DIR src/main/cpp/lamemp3)
 
 include_directories(src/main/cpp/lamemp3)
-
+include_directories(src/main/cpp/extra)
 
 aux_source_directory(src/main/cpp/lamemp3 SRC_LIST)
 aux_source_directory(src/main/cpp/lamemp3/mpglib SRC_LIST2)
@@ -19,6 +19,7 @@ add_library(lame SHARED
         src/main/cpp/lame_chordino.cpp
         src/main/cpp/array.cpp
         src/main/cpp/audio_process.cpp
+        src/main/cpp/extra/float32.c
         )
 
 add_library(lamemp3 SHARED

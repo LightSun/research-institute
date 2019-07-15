@@ -40,7 +40,7 @@
 #include "mpglib/interface.h"
 
 #include "util.h"
-
+#include "../extra/float32.h"
 
 
 #if DEPRECATED_OR_OBSOLETE_CODE_REMOVED
@@ -102,8 +102,6 @@ lame_decode_init(void)
 }
 
 
-
-
 /* copy mono samples */
 #define COPY_MONO(DST_TYPE, SRC_TYPE)                                                           \
     DST_TYPE *pcm_l = (DST_TYPE *)pcm_l_raw;                                                    \
@@ -111,7 +109,7 @@ lame_decode_init(void)
     for (i = 0; i < processed_samples; i++)                                                     \
       *pcm_l++ = (DST_TYPE)(*p_samples++);
 
-/* copy stereo samples */
+/* copy stereo samples (left and right) */
 #define COPY_STEREO(DST_TYPE, SRC_TYPE)                                                         \
     DST_TYPE *pcm_l = (DST_TYPE *)pcm_l_raw, *pcm_r = (DST_TYPE *)pcm_r_raw;                    \
     SRC_TYPE const *p_samples = (SRC_TYPE const *)p;                                            \
@@ -120,12 +118,20 @@ lame_decode_init(void)
       *pcm_r++ = (DST_TYPE)(*p_samples++);                                                      \
     }
 
-#define COPY_MONO2(DST_TYPE, SRC_TYPE)                                                           \
+#define COPY_STEREO2(DST_TYPE, SRC_TYPE)                                                           \
     DST_TYPE *pcm_l = (DST_TYPE *)pcm_l_raw;                                                    \
     SRC_TYPE const *p_samples = (SRC_TYPE const *)p;                                            \
     for (i = 0; i < processed_samples; i++) {                                                \
       *pcm_l++ = (DST_TYPE)(*p_samples++);                 \
       *pcm_l++ = (DST_TYPE)(*p_samples++);                 \
+    }
+
+#define COPY_STEREO3(DST_TYPE, SRC_TYPE)                                                           \
+    DST_TYPE *pcm_l = (DST_TYPE *)pcm_l_raw;                                                    \
+    unsigned char* p_samples = (unsigned char*)p;                                            \
+    for (i = 0; i < processed_samples; i++) {                                                \
+      *pcm_l++ = FLOAT32_READ((const unsigned char*)p_samples); p_samples += 4;                \
+      *pcm_l++ = FLOAT32_READ((const unsigned char*)p_samples); p_samples += 4;                 \
     }
 
 /*
@@ -219,10 +225,10 @@ decode1_headersB_clipchoice(PMPSTR pmp, unsigned char *buffer, int len,
         case 2:
             processed_samples = (processed_bytes / decoded_sample_size) >> 1;
             if (decoded_sample_size == sizeof(short)) {
-                COPY_MONO2(short, short)
+                COPY_STEREO(short, short)
             }
             else {
-                COPY_MONO2(sample_t, FLOAT)
+                COPY_STEREO(sample_t, FLOAT)
             }
             break;
         default:
@@ -345,10 +351,10 @@ decode1_headersB_clipchoice2(PMPSTR pmp, unsigned char *buffer, int len,
                     //just copied as a single channel.
                     processed_samples = (processed_bytes / decoded_sample_size) >> 1;
                     if (decoded_sample_size == sizeof(short)) {
-                        COPY_MONO(short, short)
+                        COPY_STEREO3(short, short)
                     }
                     else {
-                        COPY_MONO(sample_t, FLOAT);
+                        COPY_STEREO3(sample_t, FLOAT);
                     }
                     break;
                 default:
@@ -598,6 +604,20 @@ hip_decode1_headersB(hip_t hip, unsigned char *buffer,
         return decode1_headersB_clipchoice(hip, buffer, len, (char *) pcm_l, (char *) pcm_r, mp3data,
                                            enc_delay, enc_padding, out, OUTSIZE_CLIPPED,
                                            sizeof(short), decodeMP3);
+    }
+    return -1;
+}
+
+int
+hip_decode1_headersB2(hip_t hip, unsigned char *buffer, size_t len,
+        float pcm_l[], mp3data_struct * mp3data)
+{
+    static char out[OUTSIZE_CLIPPED];
+    int enc_delay, enc_padding;
+    if (hip) {
+        return decode1_headersB_clipchoice2(hip, buffer, len, (char *) pcm_l, (char *) pcm_l, mp3data,
+                                           &enc_delay, &enc_padding, out, OUTSIZE_CLIPPED,
+                                           sizeof(float), decodeMP3);
     }
     return -1;
 }

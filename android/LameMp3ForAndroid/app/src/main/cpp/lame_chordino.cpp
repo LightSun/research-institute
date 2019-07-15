@@ -11,6 +11,18 @@
 #include "vector"
 #include "audio_process.h"
 
+//#define _LAME_MP3_CLIPPED_
+
+#ifdef _LAME_MP3_CLIPPED_
+#define decodeAudioData(hip_context, mp3_buf, size, bufferData, mp3data)  \
+        hip_decode1_headersB2(hip_context, (unsigned char *) mp3_buf, size, \
+            bufferData, mp3data);
+#else
+#define decodeAudioData(hip_context, mp3_buf, size, bufferData, mp3data)  \
+            hip_decode1_unclipped3(hip_context, (unsigned char *) mp3_buf, size, \
+            bufferData, mp3data);
+#endif
+
 static bool _debugMp3Data = false;
 static mp3data_struct *mp3data;
 static hip_t hip_context = nullptr;
@@ -193,8 +205,7 @@ void *lame_OpenMedia(const char *filename, MediaData *out) {
 
 //nativeConfigureDecoder: return 0 for prepared done.
 int lame_config(char *mp3_buf, int size) {
-    int samples_read = hip_decode1_unclipped3(hip_context, (unsigned char *) mp3_buf, size,
-                                              bufferData, mp3data);
+    int samples_read = decodeAudioData(hip_context, mp3_buf, size, bufferData, mp3data);
     Log const log = getLog();
     if(mp3data->samplerate == 0 || mp3data->stereo == 0){
         //not prepared
@@ -228,8 +239,7 @@ void readLeftAudioData(char buf[], size_t readSize, const char * tag){
     Log const log = getLog();
     int samples_read;
     while (true){
-        samples_read = hip_decode1_unclipped3(hip_context, (unsigned char *) buf, readSize,
-                                              _pcms, mp3data);
+        samples_read = decodeAudioData(hip_context, buf, readSize, _pcms, mp3data);
         //read until no buffer data.
         if (samples_read > 0) {
             addAudioData(_pcms, 0, samples_read * _channelCount);
@@ -279,8 +289,7 @@ int lame_ReadMediaData(void *openResult, float *filebuf, int blockSize) {
     if(!isNextBlockDataPrepared()){
         while ((readSize = fread(buf, 1, bufferSize, file)) > 0) {
             // check for buffered data
-            samples_read = hip_decode1_unclipped3(hip_context, (unsigned char *) buf, readSize,
-                                                  _pcms, mp3data);
+            samples_read = decodeAudioData(hip_context, buf, readSize, _pcms, mp3data);
             if (log != nullptr && _debugMp3Data) {
                 log("lame_ReadMediaData >>> read sample data. samples_read = %d, bufSize = %d",
                     samples_read, bufferSize);
