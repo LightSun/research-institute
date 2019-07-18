@@ -118,21 +118,22 @@ lame_decode_init(void)
       *pcm_r++ = (DST_TYPE)(*p_samples++);                                                      \
     }
 
-#define COPY_STEREO2(DST_TYPE, SRC_TYPE)                                                           \
+#define COPY_STEREO3(DST_TYPE, SRC_TYPE)                                                           \
     DST_TYPE *pcm_l = (DST_TYPE *)pcm_l_raw;                                                    \
-    SRC_TYPE const *p_samples = (SRC_TYPE const *)p;                                            \
+    unsigned char* p_samples = (unsigned char*)p;                                            \
     for (i = 0; i < processed_samples; i++) {                                                \
-      *pcm_l++ = (DST_TYPE)(*p_samples++);                 \
-      *pcm_l++ = (DST_TYPE)(*p_samples++);                 \
+      *pcm_l++ = (DST_TYPE)(*p_samples++);                  \
+      *pcm_l++ = (DST_TYPE)(*p_samples++);                    \
     }
-
+/*
 #define COPY_STEREO3(DST_TYPE, SRC_TYPE)                                                           \
     DST_TYPE *pcm_l = (DST_TYPE *)pcm_l_raw;                                                    \
     unsigned char* p_samples = (unsigned char*)p;                                            \
     for (i = 0; i < processed_samples; i++) {                                                \
       *pcm_l++ = FLOAT32_READ((const unsigned char*)p_samples); p_samples += 4;                \
       *pcm_l++ = FLOAT32_READ((const unsigned char*)p_samples); p_samples += 4;                 \
-    }
+    }*/
+
 
 /*
  * For lame_decode:  return code

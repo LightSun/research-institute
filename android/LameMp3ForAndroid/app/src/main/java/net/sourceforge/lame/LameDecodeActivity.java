@@ -25,7 +25,7 @@ import java.util.Arrays;
 public class LameDecodeActivity extends AppCompatActivity {
 
     private static final String TAG = "LameDecodeActivity";
-    private static final String FILE = Environment.getExternalStorageDirectory() + "/vida/resource/musics/103_60.mp3";
+    private static final String FILE = Environment.getExternalStorageDirectory() + "/vida/resource/musics/14_60.mp3"; //103_60
     private final PermissionHelper mHelper = new PermissionHelper(this);
 
     static {

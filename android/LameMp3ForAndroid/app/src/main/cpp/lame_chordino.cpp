@@ -186,7 +186,7 @@ void *lame_OpenMedia(const char *filename, MediaData *out) {
     bufferDataSize = 0;
     //===========================================
 
-    int size;
+    size_t size;
     do {
         size = fread(buf, 1, count, file);
         if (lame_config(buf, size) == 0) {
@@ -205,7 +205,7 @@ void *lame_OpenMedia(const char *filename, MediaData *out) {
 
 //nativeConfigureDecoder: return 0 for prepared done.
 int lame_config(char *mp3_buf, int size) {
-    int samples_read = decodeAudioData(hip_context, mp3_buf, size, bufferData, mp3data);
+    int samples_read = decodeAudioData(hip_context, mp3_buf, (size_t)size, bufferData, mp3data);
     Log const log = getLog();
     if(mp3data->samplerate == 0 || mp3data->stereo == 0){
         //not prepared
@@ -303,20 +303,10 @@ int lame_ReadMediaData(void *openResult, float *filebuf, int blockSize) {
                     break;
                 }
             } else if (samples_read < 0) {
-                // finished reading input buffer, check for buffered data then break.
-                readLeftAudioData(buf, 0, "[ check-bufferData 3 ]");
                 break;
             }
         }
     }
-    //todo why data is more than 3709440.
-    /*
-2019-07-15 15:41:38.103 9935-9986/com.clam314.lame D/LameDecodeActivity: called [ executeDecode3() ]: decodeFrame ok. read sampleCount = 9440
-2019-07-15 15:41:38.104 9935-9986/com.clam314.lame D/Lame_Chordino_Test: readLeftAudioData >>> [ check-bufferData 1 ]. samples_read = 1152
-2019-07-15 15:41:38.104 9935-9986/com.clam314.lame D/LameDecodeActivity: called [ executeDecode3() ]: decodeFrame ok. read sampleCount = 592
-2019-07-15 15:41:38.104 9935-9986/com.clam314.lame D/LameDecodeActivity: called [ executeDecode3() ]: decodeFrame ok. read sampleCount = -1
-2019-07-15 15:41:38.104 9935-9986/com.clam314.lame D/LameDecodeActivity: called [ executeDecode3() ]: decode done. totalSampleCount = 3710032
-     */
     const int result = nextBlockedAudioData(filebuf);
     if(result <= 0){
         return result;

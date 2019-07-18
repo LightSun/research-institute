@@ -18,6 +18,8 @@ BlockList __blockList;
 int __blockSize;
 int __blockIndex;
 
+unsigned int totalCount;
+
 FD* newBlockData(){
     FD *fd = new FD();
     fd->data = new float[__blockSize];
@@ -32,6 +34,7 @@ void startPreProcessAudio(int blockSize) {
         if(log != nullptr){
             log("startPreProcessAudio >>> blockSize = %d", blockSize);
         }
+        totalCount = 0;
         __blockIndex = -1;
         __blockSize = blockSize;
         __blockList.add(newBlockData());
@@ -43,8 +46,11 @@ void addAudioData(float *data, int start, int size) {
     const size_t blockSize = __blockList.size();
     FD * tail = __blockList.getTail();
     Log log = getLog();
-    if(start == 0 && log != nullptr){
-      //  log("addAudioData >>> size = %d", size);
+    if(start == 0 ){
+        totalCount += size;
+       /* if(log != nullptr){
+            log("addAudioData >>> size is %d.", size);
+        }*/
     }
     if(!tail->isFull()){
         const int left = tail->getLeft();
@@ -80,6 +86,11 @@ void addAudioData(float *data, int start, int size) {
 
 void endPreProcessAudio() {
     __blockIndex = -1;
+    Log const log = getLog();
+    if(log != nullptr){
+        log("total read counts = %d", totalCount);
+    }
+    totalCount = 0;
 }
 
 bool isNextBlockDataPrepared(){
@@ -100,7 +111,7 @@ int nextBlockedAudioData(float *out) {
     }
    /* Log const log = getLog();
     if(log != nullptr){
-        log("nextBlockedAudioData >>> index = %d, size = %d", __blockIndex, __blockList.size());
+        log("nextBlockedAudioData >>> index = %d, sample_size = %d", __blockIndex - 1, fd->used / 2);
     }*/
     copyFloatArray(fd->data, 0, out, 0, fd->used);
     return fd->used;
