@@ -40,8 +40,14 @@ struct MediaFormat {
 };
 #pragma pack(pop)
 
+typedef void (*LogOnLevel)(int level, const char *tem, ...);
+
+void setLogEnable(int enable);
 void setLog(Log log);
 Log getLog();
+
+void setLogOnLevel(LogOnLevel ll);
+LogOnLevel getLogOnLevel();
 
 
 #endif //ANDROIDCHORDINO_CHORDINOMEDIA_H
