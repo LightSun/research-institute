@@ -8,4 +8,7 @@
 //copy array from src to dest
 void copyFloatArray(float* s1, int s1_start, float* dst, int dst_start, int copySize);
 
+// source is short
+void copyFloatArray(short* s1, int s1_start, float* dst, int dst_start, int copySize);
+
 #endif //LAMEMP3FORANDROID_ARRAY_H

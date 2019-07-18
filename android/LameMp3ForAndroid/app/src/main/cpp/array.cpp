@@ -18,5 +18,12 @@ void copyFloatArray(float* s1, int s1_start, float* dst, int dst_start, int copy
     }
 }
 
+void copyFloatArray(short* s1, int s1_start, float* dst, int dst_start, int copySize){
+    for (int i = 0; i < copySize; ++i) {
+        //short to float.
+        dst[dst_start + i] = s1[s1_start + i] * 1.0f / 32768;
+    }
+}
+
 
 

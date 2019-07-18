@@ -42,7 +42,7 @@ void startPreProcessAudio(int blockSize) {
 }
 
 //add size of audio data from start.
-void addAudioData(float *data, int start, int size) {
+void addAudioData(short *data, int start, int size) {
     const size_t blockSize = __blockList.size();
     FD * tail = __blockList.getTail();
     Log log = getLog();

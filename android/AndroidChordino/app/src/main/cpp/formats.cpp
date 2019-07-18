@@ -7,6 +7,7 @@
 
 #include "sndmedia.h"
 #include "lame_chordino.h"
+#include "mp3ext/mp3_upperlayyer.h"
 
 MediaFormat* createSndMediaFormat(){
     MediaFormat* mf = new MediaFormat();
@@ -24,6 +25,11 @@ MediaFormat* createMp3MediaFormat(){
     MediaFormat* mf = new MediaFormat();
     mf->formats[0] = "mp3";
     mf->formatCount = 1;
+
+   /* mf->openMedia = up_openMedia;
+    mf->logError = up_logError;
+    mf->readMediaData = up_readMediaData;
+    mf->releaseMedia = up_releaseMedia;*/
     mf->openMedia = lame_OpenMedia;
     mf->logError = lame_LogError;
     mf->readMediaData = lame_ReadMediaData;

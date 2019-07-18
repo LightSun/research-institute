@@ -61,10 +61,10 @@ public class LameDecodeActivity extends AppCompatActivity {
         Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                /*if(Lame.initializeDecoder() == 0) {
+               /* if(Lame.initializeDecoder() == 0) {
                     Logger.d(TAG, "onClickLameDecode", "initializeDecoder ok.");
-                }*/
-              // executeDecode();
+                }
+               executeDecode();*/
               //   executeDecode2();
                 executeDecode3();
             }

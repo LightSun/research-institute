@@ -120,9 +120,9 @@ lame_decode_init(void)
 
 #define COPY_STEREO3(DST_TYPE, SRC_TYPE)                                                           \
     DST_TYPE *pcm_l = (DST_TYPE *)pcm_l_raw;                                                    \
-    unsigned char* p_samples = (unsigned char*)p;                                            \
+    SRC_TYPE const *p_samples = (SRC_TYPE const *)p;                                             \
     for (i = 0; i < processed_samples; i++) {                                                \
-      *pcm_l++ = (DST_TYPE)(*p_samples++);                  \
+      *pcm_l++ = (DST_TYPE)(*p_samples++);                    \
       *pcm_l++ = (DST_TYPE)(*p_samples++);                    \
     }
 /*
@@ -520,14 +520,14 @@ hip_decode1_unclipped2(hip_t hip, unsigned char *buffer, size_t len, sample_t pc
 }
 
 int
-hip_decode1_unclipped3(hip_t hip, unsigned char *buffer, size_t len, sample_t pcms[], mp3data_struct* mp3data)
+hip_decode1_unclipped3(hip_t hip, unsigned char *buffer, size_t len, short pcms[], mp3data_struct* mp3data)
 {
     static char out[OUTSIZE_UNCLIPPED];
     int     enc_delay, enc_padding;
     if (hip) {
         return decode1_headersB_clipchoice2(hip, buffer, len, (char *) pcms, (char *) pcms, mp3data,
                                            &enc_delay, &enc_padding, out, OUTSIZE_UNCLIPPED,
-                                           sizeof(FLOAT), decodeMP3_unclipped);
+                                           sizeof(short), decodeMP3_unclipped);
     }
     return 0;
 }
@@ -611,14 +611,14 @@ hip_decode1_headersB(hip_t hip, unsigned char *buffer,
 
 int
 hip_decode1_headersB2(hip_t hip, unsigned char *buffer, size_t len,
-        float pcm_l[], mp3data_struct * mp3data)
+        short pcm[], mp3data_struct * mp3data)
 {
     static char out[OUTSIZE_CLIPPED];
     int enc_delay, enc_padding;
     if (hip) {
-        return decode1_headersB_clipchoice2(hip, buffer, len, (char *) pcm_l, (char *) pcm_l, mp3data,
+        return decode1_headersB_clipchoice2(hip, buffer, len, (char *) pcm, (char *) pcm, mp3data,
                                            &enc_delay, &enc_padding, out, OUTSIZE_CLIPPED,
-                                           sizeof(float), decodeMP3);
+                                           sizeof(short), decodeMP3);
     }
     return -1;
 }

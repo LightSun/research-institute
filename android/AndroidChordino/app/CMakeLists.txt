@@ -47,6 +47,9 @@ add_library( # Sets the name of the library.
         src/main/cpp/mediamanager.cpp
         src/main/cpp/sndmedia.cpp
         src/main/cpp/formats.cpp
+
+        src/main/cpp/mp3ext/mp3_upperlayyer.cpp
+        src/main/cpp/mp3ext/java_env.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a

@@ -160,7 +160,7 @@ int main(int argc, char **argv)
         int count = -1;
         if ((count = mediaFormat->readMediaData(openResult, filebuf, blocksize)) <= 0)
             break;
-        LOGD("sf_readf_float >> count = %d", count);
+        LOGD("readMediaData >> count = %d", count);
 
         // mix down 取中值
         for (int i = 0; i < blocksize; ++i) {

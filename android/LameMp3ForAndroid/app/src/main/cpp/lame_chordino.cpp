@@ -11,7 +11,7 @@
 #include "vector"
 #include "audio_process.h"
 
-//#define _LAME_MP3_CLIPPED_
+#define _LAME_MP3_CLIPPED_
 
 #ifdef _LAME_MP3_CLIPPED_
 #define decodeAudioData(hip_context, mp3_buf, size, bufferData, mp3data)  \
@@ -29,8 +29,9 @@ static hip_t hip_context = nullptr;
 static int enc_delay, enc_padding;
 int _channelCount = 0;
 //----- buffer ----------
-float * bufferData = nullptr;
+short* bufferData = nullptr;
 int bufferDataSize = 0;
+short* _pcms = nullptr;
 //----------- debug --------
 
 
@@ -93,8 +94,6 @@ static bool isMp123SyncWord(char* buf) {
     }
     return true;
 }
-
-float* _pcms = nullptr;
 
 void *lame_OpenMedia(const char *filename, MediaData *out) {
     if (!hip_context) {
@@ -182,7 +181,7 @@ void *lame_OpenMedia(const char *filename, MediaData *out) {
         buf[3] = tmpBuf[0];
     }
     //============= prepare a buffer ============
-    bufferData = new float[1152 * 2];
+    bufferData = new short[1152 * 2];
     bufferDataSize = 0;
     //===========================================
 
@@ -199,7 +198,7 @@ void *lame_OpenMedia(const char *filename, MediaData *out) {
     _channelCount = mp3data->stereo;
 
     //create a buffer
-    _pcms = new float[mp3data->framesize * mp3data->stereo];
+    _pcms = new short[mp3data->framesize * mp3data->stereo];
     return file;
 }
 

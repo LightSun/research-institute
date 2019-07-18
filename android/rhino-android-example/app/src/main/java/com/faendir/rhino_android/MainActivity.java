@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.faendir.rhino_android.utils.AssetsFileCopyUtils;
 import com.faendir.rhinotest.R;
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
@@ -73,6 +72,7 @@ public class MainActivity extends Activity {
                 toastScript(((EditText) findViewById(R.id.editText)).getText().toString());
                 break;
             case R.id.button3:
+               // mRhinoTest.testRequire("js/A.js");
                 //new OptimizationComparisonTask(this, rhinoAndroidHelper).execute(-1, 0, 1);
                /* mRhinoTest.testRequire("js/untitled0.js");
                 mRhinoTest.testRequire("js/test_func_class.js");*/

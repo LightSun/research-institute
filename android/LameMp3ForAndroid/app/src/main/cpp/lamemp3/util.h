@@ -601,7 +601,7 @@ hip_decode1_unclipped2(hip_t hip, unsigned char *buffer, size_t len, sample_t pc
  * @return the samples read
  */
 int
-hip_decode1_unclipped3(hip_t hip, unsigned char *buffer, size_t len, sample_t pcms[], mp3data_struct* mp3data);
+hip_decode1_unclipped3(hip_t hip, unsigned char *buffer, size_t len, short pcms[], mp3data_struct* mp3data);
 
     extern int has_MMX(void);
     extern int has_3DNow(void);

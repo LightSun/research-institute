@@ -115,7 +115,7 @@ void startPreProcessAudio(int blockSize);
  * @param start the start position
  * @param size the length of data
  */
-void addAudioData(float* data, int start,int size);
+void addAudioData(short* data, int start,int size);
 
 void endPreProcessAudio();
 
