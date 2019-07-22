@@ -9,6 +9,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.heaven.android.recyclerview.app.rv.FullableSpanSizeLookUp;
@@ -17,6 +18,7 @@ import com.heaven7.adapter.BaseSelector;
 import com.heaven7.adapter.QuickRecycleViewAdapter;
 import com.heaven7.adapter.util.ViewHelper2;
 import com.heaven7.core.util.Logger;
+import com.heaven7.core.util.MainWorker;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 
@@ -66,8 +68,19 @@ public class MainActivity extends AppCompatActivity {
         list.add(6, item);
         return list;
     }
+    private void swap(){
+        MainWorker.postDelay(200, new Runnable() {
+            @Override
+            public void run() {
+                QuickRecycleViewAdapter<Item> adapter = (QuickRecycleViewAdapter<Item>) mRv.getAdapter();
+                AdapterManager<Item> am = adapter.getAdapterManager();
+                am.moveItem(2, 8);
+                am.moveItem(4, 10);
+            }
+        });
+    }
 
-    private static class Adapter0 extends QuickRecycleViewAdapter<Item>{
+    private class Adapter0 extends QuickRecycleViewAdapter<Item>{
 
         GlideImageLoader mLoader = new GlideImageLoader();
 
@@ -79,13 +92,25 @@ public class MainActivity extends AppCompatActivity {
            if(item.title != null){
                helper.setVisibility(R.id.iv, false)
                    .setVisibility(R.id.tv, true)
-                       .setText(R.id.tv,  item.title);
+                       .setText(R.id.tv,  item.title)
+                       .setRootOnClickListener(new View.OnClickListener() {
+                           @Override
+                           public void onClick(View v) {
+                               swap();
+                           }
+                       });
            }else {
                helper.setVisibility(R.id.iv, true)
                        .setVisibility(R.id.tv, false)
                        .setImageUrl(R.id.iv, item.url, mLoader);
            }
         }
+
+        @Override
+        public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+            super.onAttachedToRecyclerView(recyclerView);
+        }
+
         @Override
         public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
             super.onViewAttachedToWindow(holder);
