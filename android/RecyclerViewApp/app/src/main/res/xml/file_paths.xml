@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path name="cache_download" path="download" />
+    <external-cache-path name="ex_cache_download" path="download" />
+
+    <!-- select image -->
+    <external-path name="external_files" path="."/>
+    <!--相机相册裁剪 eg: huwei. 平板-->
+    <root-path path="" name="camera_photos" />
+</paths>
