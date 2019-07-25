@@ -33,7 +33,6 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        src/main/cpp/native-lib.cpp
         src/main/cpp/chordextract.cpp
         src/main/cpp/Chordino.cpp
         src/main/cpp/chromamethods.cpp
@@ -47,9 +46,14 @@ add_library( # Sets the name of the library.
         src/main/cpp/mediamanager.cpp
         src/main/cpp/sndmedia.cpp
         src/main/cpp/formats.cpp
+        src/main/cpp/cut_generator.cpp
+        src/main/cpp/cut_gen_strategy.cpp
+        src/main/cpp/number.cpp
 
         src/main/cpp/mp3ext/mp3_upperlayyer.cpp
         src/main/cpp/mp3ext/java_env.cpp
+        src/main/cpp/android/logger.cpp
+        src/main/cpp/android/native-lib.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a

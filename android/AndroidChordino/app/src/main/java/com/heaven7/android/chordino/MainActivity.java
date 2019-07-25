@@ -13,6 +13,8 @@ import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.core.util.Toaster;
 import com.heaven7.java.pc.schedulers.Schedulers;
 
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -50,10 +52,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
-
         mHelper.startRequestPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, new int[]{1},
                 new PermissionHelper.ICallback() {
             @Override
@@ -82,6 +80,34 @@ public class MainActivity extends AppCompatActivity {
         }
         startChordmp3(view);
     }
+    public void onClickGenerateCut(View view){
+        Schedulers.io().newWorker().schedule(new Runnable() {
+            @Override
+            public void run() {
+                String file = Environment.getExternalStorageDirectory() + FILES_mp3[0];
+                Logger.d(TAG, "onClickGenerateCut", "file = " + file);
+                int[] ints = Chordino.generateCuts(file);
+                Logger.d(TAG, "onClickGenerateCut", Arrays.toString(ints));
+            }
+        });
+    }
+    public void onClickTestSplit(View view){
+       // int[] ints = Chordino.testSplit(0, 11000);
+        int[] ints = Chordino.testSplit(0, 10000);
+        Logger.d(TAG, "onClickTestSplit", Arrays.toString(ints));
+    }
+    public void onClickTestMerge(View view){
+        int[] ints = {
+             0, 100, 400, 800, 900, 1000, 1100, 1400
+        };
+        /*
+         *  0, 400, 800, 1000, 1400
+         *  0, 400, 800, 1400
+         */
+        int[] result = Chordino.testMerge(ints);
+        Logger.d(TAG, "onClickTestMerge", Arrays.toString(result));
+    }
+    //===========================================
     public void startChordmp3(View view){
         Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
@@ -106,12 +132,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
 
     public native void extractChords(String simpleName, String fileName);
 

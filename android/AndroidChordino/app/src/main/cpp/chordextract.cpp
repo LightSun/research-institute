@@ -51,53 +51,39 @@
 #include "mediamanager.h"
 #include "formats.h"
 
-#define TAG "ChordinoExtract"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
-
+#include "cut_generator.h"
+#include "number.h"
 
 using namespace std;
 using namespace Vamp;
 using namespace HostExt;
+using namespace CUT_GEN;
 
-std::string &getFormattedStr(std::string &strFormatted, const char *strFormat, va_list arglist)
+int extractChords(int argc, void **argv)
 {
-    const int MAX_FORMATTED_STR_LEN = 2048;
-    char strResult[MAX_FORMATTED_STR_LEN] = { 0 };
-    vsprintf(strResult, strFormat, arglist);
-    strFormatted = strResult;
-    return strFormatted;
-}
-
-void log(const char *tem, ...)
-{
-    std::string strLog;
-    va_list arglist;
-    va_start(arglist, tem);
-    strLog = getFormattedStr(strLog, tem, arglist);
-    va_end(arglist);
-    LOGD(strLog.c_str());
-}
-
-
-//俩个参数： 0是简单的名称，1 是完整的音乐文件名
-int main(int argc, char **argv)
-{
-    const char *myname = argv[0];
-
-    if (argc != 2) {
-        //cerr << "usage: " << myname << " file.wav" << endl;
-        LOGD("usage: %s file.wav", myname);
-        return 2;
+    const char *myname = static_cast<const char *>(argv[0]);
+    Log const log = getLog();
+    if(log == nullptr){
+        return STATE_ERROR;
     }
-    const char *infile = argv[1];
+    if (argc < 2) {
+        //cerr << "usage: " << myname << " file.wav" << endl;
+        log("usage: %s file.wav", myname);
+        return PARAM_ERROR;
+    }
+    const char *infile = static_cast<const char *>(argv[1]);
 
-    setLog(log);
+    CutContext* context = nullptr;
+    List<ChordInfo*>* list = nullptr;
+    if(argc >= 4){
+        context = static_cast<CutContext *>(argv[2]);
+        list = static_cast<List<ChordInfo *> *>(argv[3]);
+    }
+
     //================================
     
     int count = 2;
-    MediaFormat* * formats = new MediaFormat*[count];
+    MediaFormat* *formats = new MediaFormat*[count];
     formats[0] = createSndMediaFormat();
     formats[1] = createMp3MediaFormat();
     registerMediaFormats(formats, count);
@@ -105,15 +91,15 @@ int main(int argc, char **argv)
     MediaFormat *mediaFormat = getMediaFormat(infile);
     if(mediaFormat == nullptr){
         releaseMediaFormats();
-        LOGD("can't find media format for target file = %s", infile);
-        return 1;
+        log("can't find media format for target file = %s", infile);
+        return NO_MEDIA_FORMAT;
     }
     //open
     MediaData mediaData;
     void * openResult = mediaFormat->openMedia(infile, &mediaData);
     if(openResult == nullptr){
         mediaFormat->logError(infile, openResult);
-        return 1;
+        return OPEN_FAILED;
     }
 
     /**
@@ -126,13 +112,13 @@ int main(int argc, char **argv)
     PluginBufferingAdapter *adapter = new PluginBufferingAdapter(ia);
 
     int blocksize = adapter->getPreferredBlockSize();
-    //LOGD("frames = %d, blocksize = %d", sfinfo.frames, blocksize);
+    //log("frames = %d, blocksize = %d", sfinfo.frames, blocksize);
 
     // Plugin requires 1 channel (we will mix down)
     if (!adapter->initialise(1, blocksize, blocksize)) {
         //cerr << myname << ": Failed to initialise Chordino adapter!" << endl;
-        LOGD("%s : Failed to initialise Chordino adapter!", myname);
-        return 1;
+        log("%s : Failed to initialise Chordino adapter!", myname);
+        return READ_ERROR;
     }
 
     float *filebuf = new float[mediaData.channelCount * blocksize];
@@ -150,8 +136,8 @@ int main(int argc, char **argv)
     }
     if (chordFeatureNo < 0) {
         //cerr << myname << ": Failed to identify chords output!" << endl;
-        LOGD("%s : Failed to identify chords output!", myname);
-        return 1;
+        log("%s : Failed to identify chords output!", myname);
+        return READ_ERROR;
     }
     
     int frame = 0;
@@ -160,7 +146,7 @@ int main(int argc, char **argv)
         int count = -1;
         if ((count = mediaFormat->readMediaData(openResult, filebuf, blocksize)) <= 0)
             break;
-        LOGD("readMediaData >> count = %d", count);
+        log("readMediaData >> count = %d", count);
 
         // mix down 取中值
         for (int i = 0; i < blocksize; ++i) {
@@ -173,6 +159,7 @@ int main(int argc, char **argv)
         }
 
         RealTime timestamp = RealTime::frame2RealTime(frame, mediaData.sampleRate);
+        //log("timestamp: %d, %d", timestamp.msec(), timestamp.nsec);
 
         // feed to plugin: can just take address of buffer, as only one channel
         fs = adapter->process(&mixbuf, timestamp);
@@ -183,10 +170,12 @@ int main(int argc, char **argv)
 
         frame += count;
     }
-    LOGD("total samples = %d", frame);
+    RealTime timestamp = RealTime::frame2RealTime(frame, mediaData.sampleRate);
+    int maxTimeMsec = (int)(strToFloat(timestamp.toString()) * 1000);
+    log("total samples = %d, maxTime(msec) = %d", frame, maxTimeMsec);
 
     mediaFormat->releaseMedia(openResult);
-    releaseMediaFormats();
+    //releaseMediaFormats();
     delete[](formats);
 
     // features at end of processing (actually Chordino does all its work here)
@@ -200,13 +189,38 @@ int main(int argc, char **argv)
     for (int i = 0; i < (int)chordFeatures.size(); ++i) {
         string timestamp = chordFeatures[i].timestamp.toString();
         string label = chordFeatures[i].label;
-        LOGD("chords is %s, label is %s", timestamp.c_str(), label.c_str());
+        log("chords is %s, label is %s. time = %d.%d", timestamp.c_str(), label.c_str(),
+             chordFeatures[i].timestamp.sec, chordFeatures[i].timestamp.msec());
         //cout << chordFeatures[i].timestamp.toString() << ": " << chordFeatures[i].label << endl;
+        if(argc >= 4){
+            ChordInfo* pInfo = context->pool.create();
+            pInfo->timemsec = (int)(strToFloat(timestamp) * 1000);
+            pInfo->label = chordFeatures[i].label;
+            list->add(pInfo);
+        }
     }
-
+    if(argc >= 4){
+        if(list->size() < 2){
+            log("chord info is not enough.");
+            return READ_ERROR;
+        }
+        log("chord head and tail time: (%d, %d)", list->getStart()->timemsec, list->getEnd()->timemsec);
+        //add start time
+        if(list->getStart()->timemsec > 0){
+            ChordInfo *const pInfo = context->pool.create();
+            pInfo->timemsec = 0;
+            list->add(0, pInfo);
+        }
+        //add end time
+        if(list->getEnd()->timemsec < maxTimeMsec){
+            ChordInfo *const pInfo = context->pool.create();
+            pInfo->timemsec = maxTimeMsec;
+            list->add(pInfo);
+        }
+    }
     delete[] filebuf;
     delete[] mixbuf;
-    
     delete adapter;
+    return 0;
 }
 

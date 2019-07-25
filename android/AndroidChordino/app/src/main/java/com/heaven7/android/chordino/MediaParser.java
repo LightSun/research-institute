@@ -1,13 +1,15 @@
 package com.heaven7.android.chordino;
 
+import android.support.annotation.Keep;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.FloatBuffer;
 
 /**
- * parse mp3.
+ * parse mp3. this called from native.
  * Created by heaven7 on 2019/7/18.
  */
+@Keep
 public final class MediaParser {
 
     private final CommonSoundFile mSoundFile = new CommonSoundFile();
@@ -18,6 +20,7 @@ public final class MediaParser {
     public MediaParser() {
     }
 
+    @Keep
     public void openMedia(String file){
         try {
             mSoundFile.ReadFile(new File(file));
@@ -27,6 +30,7 @@ public final class MediaParser {
             e.printStackTrace();
         }
     }
+    @Keep
     public float[] readMedia(int blockSize, int[] sampleCount){
         if(mTempArr == null){
             mTempArr = new float[blockSize * mSoundFile.getChannels()];
