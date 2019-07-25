@@ -1,6 +1,5 @@
 #include <jni.h>
 #include <string>
-#include <android/logger.h>
 
 #include "../chordextract.h"
 #include "../cut_generator.h"

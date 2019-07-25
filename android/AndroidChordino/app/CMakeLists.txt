@@ -27,7 +27,7 @@ include_directories(src/main/cpp/lame)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-        native-lib
+        cut_gen
 
         # Sets the library as a shared library.
         SHARED
@@ -74,7 +74,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-        native-lib
+        cut_gen
         mediaformat
         chordino_depend
         sndfile

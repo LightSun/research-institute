@@ -44,8 +44,9 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("sndfile");
         System.loadLibrary("lame");
         System.loadLibrary("chordino_depend");
-        System.loadLibrary("native-lib");
+        System.loadLibrary("cut_gen");
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
