@@ -99,9 +99,12 @@ public class MainActivity extends AppCompatActivity {
     }
     public void onClickTestMerge(View view){
         int[] ints = {
-             0, 100, 400, 800, 900, 1000, 1100, 1400
+                57130, 58197, 59690, 63530, 63570
         };
-        /*
+       /* int[] ints = {
+             0, 100, 400, 800, 900, 1000, 1100, 1400, 1500
+        };*/
+       /*
          *  0, 400, 800, 1000, 1400
          *  0, 400, 800, 1400
          */

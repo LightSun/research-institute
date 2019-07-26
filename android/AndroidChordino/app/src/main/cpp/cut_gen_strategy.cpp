@@ -46,6 +46,7 @@ int SplitStrategyImpl(CutContext *rp, ChordInfo* start, ChordInfo* end, List<Cho
 }
 
 int MergeStrategyImpl(CutContext *rp, List<ChordInfo*>* in, List<ChordInfo*>* out){
+    ChordInfo *const &startInfo = in->getStart();
     ChordInfo *const &endInfo = in->getEnd();
     List<ChordInfo*> temp;
 
@@ -59,7 +60,7 @@ int MergeStrategyImpl(CutContext *rp, List<ChordInfo*>* in, List<ChordInfo*>* ou
             ChordInfo *const &info2 = in->getAt(i + 1);
             if(info2->timemsec - info1->timemsec < rp->minShotTimeMsec ){
                 int index = i + 1 - count;
-                ChordInfo *const &pInfo = temp.getAt(index);
+                ChordInfo * const& pInfo = temp.getAt(index);
                 //not the end .need merge
                 if(endInfo->timemsec != pInfo->timemsec){
                     temp.removeAt(index);
@@ -70,6 +71,27 @@ int MergeStrategyImpl(CutContext *rp, List<ChordInfo*>* in, List<ChordInfo*>* ou
                     merged = true;
 
                     i++; // i+1 is already removed
+                } else{
+                    //check to remove previous (not head)
+                    index --;
+                    if(index >= 0){
+                        ChordInfo * const& exInfo = temp.getAt(index);
+                        //ignore head
+                        if(exInfo->timemsec != startInfo->timemsec){
+                            if(log != nullptr){
+                                log("before remove >>> temp = %s", temp.toString().c_str());
+                            }
+                            temp.removeAt(index);
+                            if(log != nullptr){
+                                log("after remove >>> temp = %s", temp.toString().c_str());
+                            }
+                            rp->msg += " --removed =";
+                            rp->msg += exInfo->toString();
+                            rp->msg += "\n";
+                            merged = true;
+                            count ++;
+                        }
+                    }
                 }
             }
         }

@@ -85,10 +85,7 @@ public:
     }
 
     void clear() {
-        size_t size = List::size();
-        if (size > 0) {
-            remove(0, (int) size);
-        }
+        array.clear();
     }
 
     T &removeAt(int index) {
@@ -104,13 +101,14 @@ public:
         remove(index, 1);
         return t;
     }
-
-    void remove(int startIndex, int count) {
+//  57130, 58197, 59690, 63530, 63570
+    inline void remove(int startIndex, int count) {
         long size = array.size();
         if (count <= 0 || startIndex < 0) {
             __throw_invalid_argument("start or end index is wrong");
         }
-        array.erase(array.begin() + startIndex, array.begin() + startIndex + count);
+        array.erase(array.begin() + startIndex,
+                array.begin() + startIndex + count);
     }
 
     void travel(TravelFunc tl) {
