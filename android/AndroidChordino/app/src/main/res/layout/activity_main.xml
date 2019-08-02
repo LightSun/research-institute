@@ -65,4 +65,16 @@
         android:onClick="onClickTestMerge"
         />
 
+    <Button
+        android:id="@+id/bt_gen_all_cuts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bt_test_merge"
+        android:textAllCaps="false"
+        android:text="Gen all cuts"
+        android:onClick="onClickGenAllCuts"
+        />
+
 </android.support.constraint.ConstraintLayout>

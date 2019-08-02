@@ -6,14 +6,17 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.core.util.Toaster;
+import com.heaven7.java.base.util.FileUtils;
 import com.heaven7.java.pc.schedulers.Schedulers;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     int index = -1;
 
     static final String[] FILES_mp3 = {
+            "/vida/test_musics/167_full_bach-jesu-joy-of-man-s-desiring-string-quartet_0237.mp3",
             "/vida/resource/musics/14_60.mp3",
             "/vida/resource/musics/17_60.mp3",
             "/vida/resource/musics/1_60.mp3",
@@ -92,6 +96,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    public void onClickGenAllCuts(View view){
+        Schedulers.io().newWorker().schedule(new Runnable() {
+            @Override
+            public void run() {
+                //TODO
+                String inDir = "";
+                String outDir = "";
+                List<String> files = FileUtils.getFiles(new File(inDir), "mp3");
+                for (String file : files){
+                    String name = FileUtils.getFileName(file);
+                    int[] ints = Chordino.generateCuts(file);
+                    FileUtils.writeTo(new File(outDir, name +".cuts"), new Gson().toJson(ints));
+                    Logger.d(TAG, "onClickGenerateCut", Arrays.toString(ints));
+                }
+            }
+        });
+    }
     public void onClickTestSplit(View view){
        // int[] ints = Chordino.testSplit(0, 11000);
         int[] ints = Chordino.testSplit(0, 10000);
@@ -111,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         int[] result = Chordino.testMerge(ints);
         Logger.d(TAG, "onClickTestMerge", Arrays.toString(result));
     }
+
     //===========================================
     public void startChordmp3(View view){
         Schedulers.io().newWorker().schedule(new Runnable() {

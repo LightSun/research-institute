@@ -36,6 +36,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
@@ -55,4 +60,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
     implementation 'com.heaven7.java.pc:Produce-consume:1.0.0'
+    implementation "com.github.LightSun:ReflectyIo:1.1.0"
+    implementation "com.github.LightSun:Json:1.0.1"
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
