@@ -30,8 +30,8 @@ typedef TValue* StkId;
 
 struct CallInfo {
     StkId func;
-    StkId top;
-    int nresult;
+    StkId top;    //
+    int nresult;  //return count
     int callstatus;
     struct CallInfo* next;
     struct CallInfo* previous;
