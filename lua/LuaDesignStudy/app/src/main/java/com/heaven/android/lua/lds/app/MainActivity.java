@@ -20,4 +20,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickTestSetjmp(View view){
         LuaDesigner.testSetJmp();
     }
+    public void onClickTestSetjmp2(View view){
+        LuaDesigner.testSetJmp2();
+    }
 }

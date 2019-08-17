@@ -11,4 +11,5 @@ public final class LuaDesigner {
 
     public static native void testBase();
     public static native void testSetJmp();
+    public static native void testSetJmp2();
 }

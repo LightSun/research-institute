@@ -29,7 +29,8 @@ add_library(
         ${SRC_VM}
         ${SRC_TEST}
         src/main/cpp/main.c
-        src/main/cpp/test/setjmp_test.cpp
+        src/main/cpp/test/setjmp_test.c
+        src/main/cpp/test/setjmp_test2.c
         src/main/cpp/android/LuaDesigner.cpp
 )
 

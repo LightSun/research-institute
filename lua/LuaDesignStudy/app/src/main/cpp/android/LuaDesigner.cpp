@@ -39,3 +39,6 @@ extern "C" JNIEXPORT void JNICALL Java_com_heaven_android_lua_lds_app_LuaDesigne
 extern "C" JNIEXPORT void JNICALL Java_com_heaven_android_lua_lds_app_LuaDesigner_testSetJmp(JNIEnv* env, jclass clazz){
     main_setjmp();
 }
+extern "C" JNIEXPORT void JNICALL Java_com_heaven_android_lua_lds_app_LuaDesigner_testSetJmp2(JNIEnv* env, jclass clazz){
+    main_setjmp2();
+}
