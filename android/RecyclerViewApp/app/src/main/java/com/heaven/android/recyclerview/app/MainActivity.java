@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
     /*    FullSpannableStaggeredGridLayoutManager gm = new FullSpannableStaggeredGridLayoutManager(
                 4, GridLayoutManager.VERTICAL);
         gm.setSpanSizeLookupHelper(new FullableSpanSizeLookUp<>(adapter));*/
-        StaggeredGridLayoutManager gm = new StaggeredGridLayoutManager( 4, GridLayoutManager.VERTICAL);
+        final StaggeredGridLayoutManager gm = new StaggeredGridLayoutManager( 4, GridLayoutManager.VERTICAL);
+        gm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
         mRv.setLayoutManager(gm);
         mRv.setAdapter(adapter);
 
@@ -101,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
                        });
            }else {
                helper.setVisibility(R.id.iv, true)
-                       .setVisibility(R.id.tv, false)
-                       .setImageUrl(R.id.iv, item.url, mLoader);
+                       .setVisibility(R.id.tv, false);
+                      // .setImageUrl(R.id.iv, item.url, mLoader);
            }
         }
 
