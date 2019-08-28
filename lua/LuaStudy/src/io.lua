@@ -28,7 +28,7 @@ num	reads a string with up to num characters 读取指定长度
 --]]
 
 
-wrongFile = io.open("xxx.lua", "r+");
+local wrongFile = io.open("xxx.lua", "r+");
 -- null if error
 if wrongFile then
     -- iuput方法参数可以为filename，file*
@@ -39,14 +39,14 @@ if wrongFile then
 end
 
 -- 以只读方式打开文件
-file = io.open("src/array.lua", "r")
+local file = io.open("src/array.lua", "r")
 print(type(file)) -- userdata
 -- input default is file . if error .return error.
-input = io.input(file)
+local input = io.input(file)
 print("input result code: ", input);
 
 -- *all 读取所有内容 *number读取数字
-t = io.read("*all")
+local t = io.read("*all")
 print(t)
 io.close(input)
 

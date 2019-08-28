@@ -6,14 +6,14 @@
 -- To change this template use File | Settings | File Templates.
 --
 
-function printArray(arr)
+local function printArray(arr)
     print("---------- printArray ------------");
     for i = 1, #arr do
         print(arr[i]);
     end
 end
 
-array = {}
+local array = {}
 
 -- lua 数组从1开始。 但是可以指定从0和负数开始
 --[[for i = -2, 2 do
@@ -39,7 +39,7 @@ printArray(array);
 -- query
 
 -- sort
-function sortArr(a, b)
+local function sortArr(a, b)
     return a >= b; -- 降序
 end
 table.sort(array, sortArr);
@@ -49,4 +49,3 @@ printArray(array);
 local arr = {"11", "3a", "22" }
 table.sort(arr)
 printArray(arr)
-

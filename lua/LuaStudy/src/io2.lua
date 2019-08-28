@@ -6,7 +6,7 @@
 -- To change this template use File | Settings | File Templates.
 --
 
-file="src/note.txt"
+local file="src/note.txt"
 
 local BUFSIZE = 2^13     -- 8K
 local f = io.input(file)   -- open input file
