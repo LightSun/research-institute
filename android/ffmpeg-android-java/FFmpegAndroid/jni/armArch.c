@@ -11,19 +11,25 @@ Java_com_github_hiteshsondhi88_libffmpeg_ArmArchHelper_cpuArchFromJNI(JNIEnv* en
 	char arch_info[11] = "";
 
     // checking if CPU is of ARM family or not
-	if (android_getCpuFamily() == ANDROID_CPU_FAMILY_ARM) {
-		strcpy(arch_info, "ARM");
+    switch(android_getCpuFamily()){
+       case ANDROID_CPU_FAMILY_ARM:
+            strcat(arch_info, "armv7");
+            break;
+       case ANDROID_CPU_FAMILY_ARM64:
+            strcat(arch_info, "arm64");
+            break;
+    }
 
-		// checking if CPU is ARM v7 or not
-		uint64_t cpuFeatures = android_getCpuFeatures();
-		if ((cpuFeatures & ANDROID_CPU_ARM_FEATURE_ARMv7) != 0) {
-		    strcat(arch_info, " v7");
+    // checking if CPU is ARM v7 or not
+    /* uint64_t cpuFeatures = android_getCpuFeatures();
+    if ((cpuFeatures & ANDROID_CPU_ARM_FEATURE_ARMv7) != 0) {
+        strcat(arch_info, "armv7");
 
-			// checking if CPU is ARM v7 Neon
-			if((cpuFeatures & ANDROID_CPU_ARM_FEATURE_NEON) != 0) {
-			    strcat(arch_info, "-neon");
-			}
-		}
-	}
+        // checking if CPU is ARM v7 Neon
+        if((cpuFeatures & ANDROID_CPU_ARM_FEATURE_NEON) != 0) {
+            strcat(arch_info, "-neon");
+        }
+    } */
+
 	return (*env)->NewStringUTF(env, arch_info);
 }

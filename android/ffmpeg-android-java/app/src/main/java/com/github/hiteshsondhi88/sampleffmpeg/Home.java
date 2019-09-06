@@ -32,6 +32,8 @@ import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ffmpeg -f concat -safe 0 -i 'vidlist.txt' -i 'music.m4a' -c copy -movflags faststart -shortest -y 'test.mp4'
@@ -105,19 +107,31 @@ public class Home extends Activity implements View.OnClickListener {
             showUnsupportedExceptionDialog();
         }
     }
+    private static String strArr2String(String[] command){
+        StringBuilder sb = new StringBuilder();
+        for (String cmd : command){
+            sb.append(cmd).append(" ");
+        }
+        return sb.toString();
+    }
 
-    private void execFFmpegBinary(final String[] command) {
+    private void execFFmpegBinary(final String[] command, final Runnable success) {
         try {
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
                 long startTime;
                 @Override
                 public void onFailure(String s) {
                     addTextViewToLayout("FAILED with output : "+s);
+                    Logger.d(TAG, "onFailed", strArr2String(command));
                 }
 
                 @Override
                 public void onSuccess(String s) {
-                    addTextViewToLayout("SUCCESS with output : "+s);
+                    Logger.d(TAG, "onSuccess", strArr2String(command));
+                    addTextViewToLayout("SUCCESS with output : "+ s);
+                    if(success != null){
+                        success.run();
+                    }
                 }
 
                 @Override
@@ -139,7 +153,7 @@ public class Home extends Activity implements View.OnClickListener {
 
                 @Override
                 public void onFinish() {
-                    Log.d(TAG, "Finished command : ffmpeg "+command);
+                    Log.d(TAG, "Finished command : ffmpeg "+ command);
                     Log.d(TAG, "Finished command : cost time "+ (System.currentTimeMillis() - startTime));
                     progressDialog.dismiss();
                 }
@@ -185,29 +199,82 @@ public class Home extends Activity implements View.OnClickListener {
                     Toast.makeText(Home.this, getString(R.string.empty_command_toast), Toast.LENGTH_LONG).show();
                     return;
                 }
-                if(cmd.startsWith("#heaven7#")){
-                    cmd = cmd.substring(9);
-                    String[] cmds;
-                    if(TextUtils.isEmpty(cmd)){
-                       // String video = Environment.getExternalStorageDirectory() + "/vida/test_videos/v1__2.mp4";
-                        String video = Environment.getExternalStorageDirectory() + "/vida/test_videos/video_goog.mp4";
-                        String concatPath = Environment.getExternalStorageDirectory() + "/vida/test_videos/concat.txt";
-                        //Logger.d("Home", "onClick", "concat file: " + new File(concatPath).exists());
-                        String musicPath = Environment.getExternalStorageDirectory() +"/vida/test_videos/music.mp3";
-                        String out = Environment.getExternalStorageDirectory() +"/vida/test_videos/merged.mp4";
-                        cmds = TestUtils.buildMergeVideosCmd4(video, musicPath, out);
-                    }else {
-                        String[] strs = cmd.split(" ");
-                        cmds = TestUtils.buildMergeVideosCmd(strs[0], strs[1], strs[2]);
-                    }
-                    execFFmpegBinary(cmds);
-                }else {
-                    String[] command = cmd.split(" ");
-                    if (command.length != 0) {
-                        execFFmpegBinary(command);
-                    }
+                switch (cmd){
+                    case "Test":
+                        execFFmpegBinary(new String[]{"-version"}, null);
+                        break;
+                    case "#heaven7#":
+                        runCmd1(cmd.substring(9));
+                        break;
+
+                    case "mix":
+                       // executeMix();
+                        //extractAudioFromVideo();
+                        mixImpl();
+                        break;
+
+                    default:
+                        if(cmd.startsWith("#heaven7#")){
+                            runCmd1(cmd);
+                        }else {
+                            String[] command = cmd.split(" ");
+                            if (command.length != 0) {
+                                execFFmpegBinary(command, null);
+                            }
+                        }
+                        break;
                 }
-                break;
         }
     }
+
+    private void runCmd1(String cmd) {
+        String[] cmds;
+        if(TextUtils.isEmpty(cmd)){
+           // String video = Environment.getExternalStorageDirectory() + "/vida/test_videos/v1__2.mp4";
+            String video = Environment.getExternalStorageDirectory() + "/vida/test_videos/video_goog.mp4";
+            String concatPath = Environment.getExternalStorageDirectory() + "/vida/test_videos/concat.txt";
+            //Logger.d("Home", "onClick", "concat file: " + new File(concatPath).exists());
+            String musicPath = Environment.getExternalStorageDirectory() +"/vida/test_videos/music.mp3";
+            String out = Environment.getExternalStorageDirectory() +"/vida/test_videos/merged.mp4";
+            cmds = TestUtils.buildMergeVideosCmd4(video, musicPath, out);
+        }else {
+            String[] strs = cmd.split(" ");
+            cmds = TestUtils.buildMergeVideosCmd(strs[0], strs[1], strs[2]);
+        }
+        execFFmpegBinary(cmds, null);
+    }
+    public void executeMix(){
+        //1.mp3  video.mp4
+        //extract audio from audio file
+        String[] cmds = TestUtils.extractAudio(AUDIOPATH, 0.3f, false);
+        execFFmpegBinary(cmds, new Runnable() {
+            @Override
+            public void run() {
+                extractAudioFromVideo();
+            }
+        }) ;
+    }
+    private void mixImpl(){
+        List<MixParam> params = new ArrayList<>();
+        params.add(new MixParam(TestUtils.getExtractAudioFileName(AUDIOPATH, 0.3f),
+                0.0f, 5.0f));
+        params.add(new MixParam(TestUtils.getExtractAudioFileName(VIDEOPATH, 0.7f),
+                10.0f, 15.0f));
+        String[] cmds = TestUtils.mix(params, OUT);
+        execFFmpegBinary(cmds, null);
+    }
+
+    private void extractAudioFromVideo() {
+        String[] cmds = TestUtils.extractAudio(VIDEOPATH, 0.7f, true);
+        execFFmpegBinary(cmds, new Runnable() {
+            @Override
+            public void run() {
+                //mixImpl();
+            }
+        });
+    }
+
+    String AUDIOPATH =  Environment.getExternalStorageDirectory() + "/vida/test_videos/1.mp3";
+    String VIDEOPATH =  Environment.getExternalStorageDirectory() + "/vida/test_videos/video.mp4";
+    String OUT = Environment.getExternalStorageDirectory() + "/vida/test_videos/mix_result.mp3";
 }
